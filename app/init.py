@@ -18,7 +18,7 @@ def create_app():
     db.init_app(app)
     jwt.init_app(app)
     bcrypt.init_app(app)
-    CORS(app)
+    CORS(app, origins=['http://localhost:3000'])  # for React frontend
 
 # Register blueprints
     #from app.routes.auth import auth_bp
@@ -26,5 +26,9 @@ def create_app():
 
     #app.register_blueprint(auth_bp, url_prefix='/auth')
     #app.register_blueprint(contacts_bp, url_prefix='/contacts')
+
+    @app.errorhandler(404)
+    def not_found(error):
+        return {'error': 'Not found'}, 404
 
     return app
