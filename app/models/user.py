@@ -1,4 +1,4 @@
-from app import db, bcrypt
+from app.init import db, bcrypt
 from datetime import datetime
 
 class User(db.Model):

@@ -1,4 +1,4 @@
-from app import create_app, db
+from app.init import create_app, db
 from dotenv import load_dotenv
 
 # Make sure this line is present and comes first
