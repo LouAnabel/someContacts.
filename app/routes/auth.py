@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
-from app.init import db
+from app import db
 from app.models.user import User
 import re
 
@@ -62,14 +62,14 @@ def register():
     try:
         db.session.add(user)
         db.session.commit()
-        
+
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': 'Registration Failed!'}), 500
     
     
     # Create token
-    access_token = create_access_token(identity=user.id)
+    access_token = create_access_token(identity=str(user.id))
     
     return jsonify({
         'message': 'User created successfully',
@@ -95,7 +95,7 @@ def login():
     user = User.query.filter_by(email=data['email']).first()
 
     if user and user.check_password(data['password']):
-        access_token = create_access_token(identity=user.id)
+        access_token = create_access_token(identity=str(user.id))
         return jsonify({
             'access_token': access_token,
             'user': user.to_dict()
@@ -109,10 +109,21 @@ def login():
 @jwt_required()
 
 def get_current_user():
-    user_id = get_jwt_identity()
+    user_id_str = get_jwt_identity()
+    user_id = int(user_id_str)
     user = User.query.get(user_id)
 
     if not user:
         return jsonify({'error': 'User not found'}), 404
     
     return jsonify({'user': user.to_dict()}), 200
+
+
+@auth_bp.route('/test-token', methods=['GET'])
+@jwt_required()
+def test_token():
+    user_id = get_jwt_identity()
+    return jsonify({
+        'message': 'Token is valid!',
+        'user_id': int(user_id)
+    }), 200

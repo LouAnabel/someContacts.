@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from app.init import db
+from app import db
 from app.models.user import User
 from app.models.contact import Contact
 # from app.models.category import Category  # Import when you create category model
@@ -10,7 +10,7 @@ from datetime import datetime
 contacts_bp = Blueprint('contacts', __name__)
 
 
-# Email validation helper
+# Email validation
 def validate_email(email):
     if not email:  # Email is optional for contacts
         return True
@@ -18,13 +18,15 @@ def validate_email(email):
     return re.match(email_pattern, email) is not None
 
 
-# Phone validation helper (basic)
+# Phone validation 
 def validate_phone(phone):
     if not phone:  # Phone is optional
         return True
     # Remove spaces, dashes, parentheses for validation
-    clean_phone = re.sub(r'[\s\-\(\)]', '', phone)
+    clean_phone = re.sub(r'[^\d]', '', phone)
+    
     # Check if remaining characters are digits and reasonable length
+    # Allow international numbers (7-15 digits)
     return clean_phone.isdigit() and 7 <= len(clean_phone) <= 15
 
 

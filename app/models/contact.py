@@ -1,11 +1,11 @@
-from app.init import db, bcrypt
+from app import db
 from datetime import datetime, timezone
 
 class Contact(db.Model):
     __tablename__ = 'contact'
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Coloumn(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
     #Basic Contact Information after Registration
     first_name = db.Column(db.String(100), nullable=False)

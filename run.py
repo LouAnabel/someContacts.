@@ -1,4 +1,4 @@
-from app.init import create_app, db
+from app import create_app, db
 from app.models.user import User  # Import User Model
 from app.models.contact import Contact  # Import contact model
 from dotenv import load_dotenv
