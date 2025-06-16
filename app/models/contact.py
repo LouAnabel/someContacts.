@@ -9,8 +9,8 @@ class Contact(db.Model):
 
     # Basic Contact Information
     first_name = db.Column(db.String(100), nullable=False)
-    last_name = db.Column(db.String(100))  # ptional
-    email = db.Column(db.String(255), index=True)  #optional and removed unique constraint
+    last_name = db.Column(db.String(100))  # Optional
+    email = db.Column(db.String(255), index=True)  # Optional and removed unique constraint
     phone = db.Column(db.String(20))
     
     # Additional fields that your to_dict() method expects
@@ -18,7 +18,8 @@ class Contact(db.Model):
     birth_date = db.Column(db.Date)
     last_contact_date = db.Column(db.Date)
     last_contact_place = db.Column(db.String(200))
-    address = db.Column(db.Text)
+    street_and_nr = db.Column(db.Text)
+    postal_code = db.Column(db.Text)
     city = db.Column(db.String(100))
     country = db.Column(db.String(100))
     notes = db.Column(db.Text)
@@ -39,12 +40,13 @@ class Contact(db.Model):
             'birth_date': self.birth_date.strftime('%d-%m-%Y') if self.birth_date else None,
             'last_contact_date': self.last_contact_date.strftime('%d-%m-%Y') if self.last_contact_date else None,
             'last_contact_place': self.last_contact_place,
-            'address': self.address,
+            'street_and_nr': self.street_and_nr,
+            'postal_code': self.postal_code,
             'city': self.city,
             'country': self.country,
             'notes': self.notes,
-            'created_at': self.created_at.isoformat(),
-            'updated_at': self.updated_at.isoformat()
+            'created_at': self.created_at.strftime('%d-%m-%Y %H:%M:%S'),
+            'updated_at': self.updated_at.strftime('%d-%m-%Y %H:%M:%S')
         }
     
     def __repr__(self):

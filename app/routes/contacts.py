@@ -30,70 +30,55 @@ def validate_phone(phone):
     return clean_phone.isdigit() and 7 <= len(clean_phone) <= 15
 
 
-# Date validation
+# Date validation helper
 def validate_date(date_string):
     if not date_string:
         return True
     try:
-        datetime.strptime(date_string, '%d-%m-%Y')
+        datetime.strptime(date_string, '%Y-%m-%d')
         return True
     except ValueError:
         return False
 
-# Debugging
+
+
+# CREATE - add a new Contact
 @contacts_bp.route('/add', methods=['POST'])
 @jwt_required()
 def create_contact():
     try:
-        print("=== DEBUG: Starting contact creation ===")
-        
         user_id_str = get_jwt_identity()
         user_id = int(user_id_str)
-        print(f"DEBUG: User ID: {user_id}")
-        
         data = request.get_json()
-        print(f"DEBUG: Received data: {data}")
 
         # Validate required fields
         if not data.get('first_name'):
             return jsonify({'error': 'First name is required'}), 400
         
-        print("DEBUG: First name validation passed")
-        
         # Validate email format if provided
         if data.get('email') and not validate_email(data['email']):
             return jsonify({'error': 'Invalid email format'}), 400
             
-        print("DEBUG: Email validation passed")
-        
         # Validate phone format if provided
         if data.get('phone') and not validate_phone(data['phone']):
             return jsonify({'error': 'Invalid phone number format'}), 400
-        
-        print("DEBUG: Phone validation passed")
-        
-        # Handle date parsing
+
+        # Handle date parsing with DD-MM-YYYY format
         birth_date = None
         if data.get('birth_date'):
             try:
-                birth_date = datetime.strptime(data['birth_date'], '%Y-%m-%d').date()
-                print(f"DEBUG: Birth date parsed: {birth_date}")
+                birth_date = datetime.strptime(data['birth_date'], '%d-%m-%Y').date()
             except ValueError as e:
-                print(f"DEBUG: Birth date parsing failed: {e}")
-                return jsonify({'error': 'Invalid birth date format. Use YYYY-MM-DD'}), 400
+                return jsonify({'error': 'Invalid birth date format. Use DD-MM-YYYY (e.g., 15-05-1990)'}), 400
 
         last_contact_date = None
         if data.get('last_contact_date'):
             try:
-                last_contact_date = datetime.strptime(data['last_contact_date'], '%Y-%m-%d').date()
-                print(f"DEBUG: Last contact date parsed: {last_contact_date}")
+                last_contact_date = datetime.strptime(data['last_contact_date'], '%d-%m-%Y').date()
             except ValueError as e:
-                print(f"DEBUG: Last contact date parsing failed: {e}")
-                return jsonify({'error': 'Invalid last contact date format. Use YYYY-MM-DD'}), 400
+                return jsonify({'error': 'Invalid last contact date format. Use DD-MM-YYYY (e.g., 03-05-2025)'}), 400
 
-        print("DEBUG: About to create contact object")
-
-        # Create new contact
+        # Create new contact with updated field names
         contact = Contact(
             user_id=user_id,
             first_name=data['first_name'].strip(),
@@ -104,19 +89,15 @@ def create_contact():
             birth_date=birth_date,
             last_contact_date=last_contact_date,
             last_contact_place=data.get('last_contact_place', '').strip(),
-            address=data.get('address', '').strip(),
+            street_and_nr=data.get('street_and_nr', '').strip(),  # Updated field name
+            postal_code=data.get('postal_code', '').strip(),      # Updated field name
             city=data.get('city', '').strip(),
             country=data.get('country', '').strip(),
             notes=data.get('notes', '').strip()
         )
         
-        print("DEBUG: Contact object created")
-        
         db.session.add(contact)
-        print("DEBUG: Contact added to session")
-        
         db.session.commit()
-        print("DEBUG: Contact committed to database")
 
         return jsonify({
             'message': 'Contact successfully created',
@@ -124,75 +105,10 @@ def create_contact():
         }), 201
     
     except ValueError as e:
-        print(f"DEBUG: ValueError: {e}")
-        return jsonify({'error': f'Invalid data format: {str(e)}'}), 400
-    except Exception as e:
-        print(f"DEBUG: Exception occurred: {e}")
-        print(f"DEBUG: Exception type: {type(e)}")
-        import traceback
-        traceback.print_exc()
-        db.session.rollback()
-        return jsonify({'error': f'Failed to create contact: {str(e)}'}), 500
-
-"""
-# CREATE - add a new Contact
-@contacts_bp.route('/add', methods=['POST'])
-@jwt_required()
-def create_contact():
-    try:
-        user_id = get_jwt_identity()
-        data = request.get_json()
-
-        # Validate required fields
-        if not data.get('first_name'):
-            return jsonify({'error': 'First name is required'}), 400
-        
-        # Validate email format if provided
-        if data.get('email') and not validate_email(data['email']):
-            return jsonify({'error': 'Invalid email format'}), 400
-            
-        # Validate phone format if provided
-        if data.get('phone') and not validate_phone(data['phone']):
-            return jsonify({'error': 'Invalid phone number format'}), 400
-        
-        # Validate birth_date format if provided
-        if data.get('birth_date') and not validate_date(data['birth_date']):
-            return jsonify({'error': 'Invalid birth date format. Use YYYY-MM-DD'}), 400
-
-        # Validate last_contact_date format if provided
-        if data.get('last_contact_date') and not validate_date(data['last_contact_date']):
-            return jsonify({'error': 'Invalid last contact date format. Use YYYY-MM-DD'}), 400
-
-        # Create new contact
-        contact = Contact(
-            user_id=user_id,
-            first_name=data['first_name'].strip(),
-            last_name=data.get('last_name', '').strip(),
-            email=data.get('email', '').strip(),
-            phone=data.get('phone', '').strip(),
-            category=data.get('category', '').strip(),  # Fixed field name
-            birth_date=datetime.strptime(data['birth_date'], '%Y-%m-%d').date() if data.get('birth_date') else None,
-            last_contact_date=datetime.strptime(data['last_contact_date'], '%Y-%m-%d').date() if data.get('last_contact_date') else None,
-            last_contact_place=data.get('last_contact_place', '').strip(),  # Fixed field name
-            address=data.get('address', '').strip(),
-            city=data.get('city', '').strip(),
-            country=data.get('country', '').strip(),
-            notes=data.get('notes', '').strip()
-        )
-        
-        db.session.add(contact)
-        db.session.commit()
-
-        return jsonify({
-            'message': 'Contact successfully created',
-            'contact': contact.to_dict()
-        }), 201  # Changed to 201 for created
-    
-    except ValueError as e:
         return jsonify({'error': 'Invalid date format'}), 400
     except Exception as e:
         db.session.rollback()
-        return jsonify({'error': 'Failed to create contact'}), 500"""
+        return jsonify({'error': 'Failed to create contact'}), 500
     
 
         
@@ -276,13 +192,14 @@ def get_contact(contact_id):
 
 # UPDATE - Update Contact by ID
 @contacts_bp.route('/update/<int:contact_id>', methods=['PUT'])
-@jwt_required()  # Fixed decorator
+@jwt_required()
 def update_contact(contact_id):
     try:
-        user_id = get_jwt_identity()
-        data = request.get_json() 
+        user_id_str = get_jwt_identity()
+        user_id = int(user_id_str)
+        data = request.get_json()
 
-        # find the contact
+        # Find the contact
         contact = Contact.query.filter_by(id=contact_id, user_id=user_id).first()
 
         if not contact:
@@ -302,10 +219,10 @@ def update_contact(contact_id):
 
         # Validate date formats if provided
         if 'birth_date' in data and data['birth_date'] and not validate_date(data['birth_date']):
-            return jsonify({'error': 'Invalid birth date format. Use YYYY-MM-DD'}), 400
+            return jsonify({'error': 'Invalid birth date format. Use DD-MM-YYYY (e.g., 15-05-1990)'}), 400
 
         if 'last_contact_date' in data and data['last_contact_date'] and not validate_date(data['last_contact_date']):
-            return jsonify({'error': 'Invalid last contact date format. Use YYYY-MM-DD'}), 400
+            return jsonify({'error': 'Invalid last contact date format. Use DD-MM-YYYY (e.g., 03-05-2025)'}), 400
 
         # Update fields if provided
         if 'first_name' in data:
@@ -317,19 +234,21 @@ def update_contact(contact_id):
         if 'phone' in data:
             contact.phone = data['phone'].strip()
         if 'category' in data:
-            contact.category = data['category'].strip()  # Fixed field assignment
+            contact.category = data['category'].strip()
         if 'birth_date' in data:
-            contact.birth_date = datetime.strptime(data['birth_date'], '%Y-%m-%d').date() if data['birth_date'] else None
+            contact.birth_date = datetime.strptime(data['birth_date'], '%d-%m-%Y').date() if data['birth_date'] else None
         if 'last_contact_date' in data:
-            contact.last_contact_date = datetime.strptime(data['last_contact_date'], '%Y-%m-%d').date() if data['last_contact_date'] else None
+            contact.last_contact_date = datetime.strptime(data['last_contact_date'], '%d-%m-%Y').date() if data['last_contact_date'] else None
         if 'last_contact_place' in data:
             contact.last_contact_place = data['last_contact_place'].strip()
-        if 'address' in data:
-            contact.address = data['address'].strip()
+        if 'street_and_nr' in data:  # Updated field name
+            contact.street_and_nr = data['street_and_nr'].strip()
+        if 'postal_code' in data:    # Updated field name
+            contact.postal_code = data['postal_code'].strip()
         if 'city' in data:
             contact.city = data['city'].strip()
         if 'country' in data:
-            contact.country = data['country'].strip()  # Fixed field assignment
+            contact.country = data['country'].strip()
         if 'notes' in data:
             contact.notes = data['notes'].strip()
         
@@ -341,7 +260,7 @@ def update_contact(contact_id):
         }), 200
     
     except ValueError as e:
-        return jsonify({'error': 'Invalid date format'}), 400
+        return jsonify({'error': 'Invalid date format. Use DD-MM-YYYY'}), 400
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': 'Failed to update contact'}), 500
@@ -349,11 +268,12 @@ def update_contact(contact_id):
 
 
 # DELETE - Delete a contact
-@contacts_bp.route('/<int:contact_id>', methods=['DELETE'])
+@contacts_bp.route('/delete/<int:contact_id>', methods=['DELETE'])
 @jwt_required()
 def delete_contact(contact_id):
     try:
-        user_id = get_jwt_identity()
+        user_id_str = get_jwt_identity()  # Get as string
+        user_id = int(user_id_str)        # Convert to int
         
         contact = Contact.query.filter_by(id=contact_id, user_id=user_id).first()
         
@@ -370,13 +290,13 @@ def delete_contact(contact_id):
         return jsonify({'error': 'Failed to delete contact'}), 500
 
 
-
 # BULK DELETE - Delete multiple contacts
-@contacts_bp.route('/bulk-delete', methods=['DELETE'])
+@contacts_bp.route('/delete/all', methods=['DELETE'])
 @jwt_required()
 def bulk_delete_contacts():
     try:
-        user_id = get_jwt_identity()
+        user_id_str = get_jwt_identity()  # Get as string
+        user_id = int(user_id_str)        # Convert to int
         data = request.get_json()
         
         contact_ids = data.get('contact_ids', [])
