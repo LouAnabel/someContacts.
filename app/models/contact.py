@@ -2,21 +2,30 @@ from app import db
 from datetime import datetime, timezone
 
 class Contact(db.Model):
-    __tablename__ = 'contact'
+    __tablename__ = 'contacts'  # Changed to plural for consistency
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
-    #Basic Contact Information after Registration
+    # Basic Contact Information
     first_name = db.Column(db.String(100), nullable=False)
-    last_name = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(255), unique=True, nullable=False, index=True)
+    last_name = db.Column(db.String(100))  # ptional
+    email = db.Column(db.String(255), index=True)  #optional and removed unique constraint
     phone = db.Column(db.String(20))
+    
+    # Additional fields that your to_dict() method expects
+    category = db.Column(db.String(50))  # Will upgrade to foreign key later
+    birth_date = db.Column(db.Date)
+    last_contact_date = db.Column(db.Date)
+    last_contact_place = db.Column(db.String(200))
+    address = db.Column(db.Text)
+    city = db.Column(db.String(100))
+    country = db.Column(db.String(100))
+    notes = db.Column(db.Text)
     
     # Timestamps
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
-
 
     def to_dict(self):
         return {
@@ -26,9 +35,9 @@ class Contact(db.Model):
             'last_name': self.last_name,
             'email': self.email,
             'phone': self.phone,
-            'category': self.category, # (foreign key to categories table)
-            'birth_date': self.birth_date,
-            'last_contact_date': self.last_contact_date,
+            'category': self.category,
+            'birth_date': self.birth_date.strftime('%d-%m-%Y') if self.birth_date else None,
+            'last_contact_date': self.last_contact_date.strftime('%d-%m-%Y') if self.last_contact_date else None,
             'last_contact_place': self.last_contact_place,
             'address': self.address,
             'city': self.city,
@@ -38,6 +47,5 @@ class Contact(db.Model):
             'updated_at': self.updated_at.isoformat()
         }
     
-
     def __repr__(self):
         return f'<Contact {self.first_name} {self.last_name}>'

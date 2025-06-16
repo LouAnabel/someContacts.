@@ -30,18 +30,111 @@ def validate_phone(phone):
     return clean_phone.isdigit() and 7 <= len(clean_phone) <= 15
 
 
-# Date validation helper
+# Date validation
 def validate_date(date_string):
     if not date_string:
         return True
     try:
-        datetime.strptime(date_string, '%Y-%m-%d')
+        datetime.strptime(date_string, '%d-%m-%Y')
         return True
     except ValueError:
         return False
 
+# Debugging
+@contacts_bp.route('/add', methods=['POST'])
+@jwt_required()
+def create_contact():
+    try:
+        print("=== DEBUG: Starting contact creation ===")
+        
+        user_id_str = get_jwt_identity()
+        user_id = int(user_id_str)
+        print(f"DEBUG: User ID: {user_id}")
+        
+        data = request.get_json()
+        print(f"DEBUG: Received data: {data}")
 
+        # Validate required fields
+        if not data.get('first_name'):
+            return jsonify({'error': 'First name is required'}), 400
+        
+        print("DEBUG: First name validation passed")
+        
+        # Validate email format if provided
+        if data.get('email') and not validate_email(data['email']):
+            return jsonify({'error': 'Invalid email format'}), 400
+            
+        print("DEBUG: Email validation passed")
+        
+        # Validate phone format if provided
+        if data.get('phone') and not validate_phone(data['phone']):
+            return jsonify({'error': 'Invalid phone number format'}), 400
+        
+        print("DEBUG: Phone validation passed")
+        
+        # Handle date parsing
+        birth_date = None
+        if data.get('birth_date'):
+            try:
+                birth_date = datetime.strptime(data['birth_date'], '%Y-%m-%d').date()
+                print(f"DEBUG: Birth date parsed: {birth_date}")
+            except ValueError as e:
+                print(f"DEBUG: Birth date parsing failed: {e}")
+                return jsonify({'error': 'Invalid birth date format. Use YYYY-MM-DD'}), 400
 
+        last_contact_date = None
+        if data.get('last_contact_date'):
+            try:
+                last_contact_date = datetime.strptime(data['last_contact_date'], '%Y-%m-%d').date()
+                print(f"DEBUG: Last contact date parsed: {last_contact_date}")
+            except ValueError as e:
+                print(f"DEBUG: Last contact date parsing failed: {e}")
+                return jsonify({'error': 'Invalid last contact date format. Use YYYY-MM-DD'}), 400
+
+        print("DEBUG: About to create contact object")
+
+        # Create new contact
+        contact = Contact(
+            user_id=user_id,
+            first_name=data['first_name'].strip(),
+            last_name=data.get('last_name', '').strip(),
+            email=data.get('email', '').strip(),
+            phone=data.get('phone', '').strip(),
+            category=data.get('category', '').strip(),
+            birth_date=birth_date,
+            last_contact_date=last_contact_date,
+            last_contact_place=data.get('last_contact_place', '').strip(),
+            address=data.get('address', '').strip(),
+            city=data.get('city', '').strip(),
+            country=data.get('country', '').strip(),
+            notes=data.get('notes', '').strip()
+        )
+        
+        print("DEBUG: Contact object created")
+        
+        db.session.add(contact)
+        print("DEBUG: Contact added to session")
+        
+        db.session.commit()
+        print("DEBUG: Contact committed to database")
+
+        return jsonify({
+            'message': 'Contact successfully created',
+            'contact': contact.to_dict()
+        }), 201
+    
+    except ValueError as e:
+        print(f"DEBUG: ValueError: {e}")
+        return jsonify({'error': f'Invalid data format: {str(e)}'}), 400
+    except Exception as e:
+        print(f"DEBUG: Exception occurred: {e}")
+        print(f"DEBUG: Exception type: {type(e)}")
+        import traceback
+        traceback.print_exc()
+        db.session.rollback()
+        return jsonify({'error': f'Failed to create contact: {str(e)}'}), 500
+
+"""
 # CREATE - add a new Contact
 @contacts_bp.route('/add', methods=['POST'])
 @jwt_required()
@@ -99,10 +192,10 @@ def create_contact():
         return jsonify({'error': 'Invalid date format'}), 400
     except Exception as e:
         db.session.rollback()
-        return jsonify({'error': 'Failed to create contact'}), 500
+        return jsonify({'error': 'Failed to create contact'}), 500"""
     
 
-
+        
 # Read - Get all contacts 
 @contacts_bp.route('/all', methods=['GET'])
 @jwt_required()  # Fixed decorator
