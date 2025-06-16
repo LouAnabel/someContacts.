@@ -20,12 +20,13 @@ def create_app():
     bcrypt.init_app(app)
     CORS(app, origins=['http://localhost:3000'])  # for React frontend
 
-# Register blueprints
-    #from app.routes.auth import auth_bp
-    #from app.routes.contacts import contacts_bp
 
-    #app.register_blueprint(auth_bp, url_prefix='/auth')
-    #app.register_blueprint(contacts_bp, url_prefix='/contacts')
+# Register blueprints
+    from app.routes.auth import auth_bp
+    from app.routes.contacts import contacts_bp
+
+    app.register_blueprint(auth_bp, url_prefix='/auth')
+    app.register_blueprint(contacts_bp, url_prefix='/contacts')
 
     @app.errorhandler(404)
     def not_found(error):

@@ -4,6 +4,7 @@ from app.init import db
 from app.models.user import User
 import re
 
+# create Blueprint for authentication of user
 auth_bp = Blueprint('auth', __name__)
 
 
@@ -61,6 +62,7 @@ def register():
     try:
         db.session.add(user)
         db.session.commit()
+        
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': 'Registration Failed!'}), 500

@@ -1,20 +1,19 @@
 from app.init import create_app, db
+from app.models.user import User  # Import your models
+from app.models.contact import Contact  # Import contact model
 from dotenv import load_dotenv
-from app.models.user import User
-# from app.models.contact import Contact
 import os
 
-# Loads Environment (always Making sure this line is present and comes first)
+# Load environment variables first
 load_dotenv()
 
-#Creates the Flask App
+# Create the Flask app
 app = create_app()
 
-# creates datapase tables
+# Create database tables
 with app.app_context():
     db.create_all()
     print("Database tables created successfully!")
-
 
 if __name__ == '__main__':
     # Get debug mode from environment variable, default to True for development
