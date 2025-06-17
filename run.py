@@ -19,8 +19,8 @@ if __name__ == '__main__':
     # Get debug mode from environment variable, default to True for development
     debug_mode = os.getenv('FLASK_DEBUG', 'True').lower() == 'true'
     
-    # Get port from environment variable, default to 10000
-    port = int(os.getenv('FLASK_PORT', 10000))
+    # Get port from environment variable, default to 5000
+    port = int(os.getenv('FLASK_PORT', 5000))
     
     # Get host from environment variable, default to localhost
     host = os.getenv('FLASK_HOST', '0.0.0.0')
