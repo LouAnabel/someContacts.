@@ -26,6 +26,9 @@ def validate_password(password):
         return False, "Password must contain a number"
     return True, ""
 
+@auth_bp.route('/')
+def health_check():
+    return {'message': 'Server is running'}, 200
 
 # create endpoint for user registration
 @auth_bp.route('/register', methods=['POST'])
