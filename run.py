@@ -23,7 +23,7 @@ if __name__ == '__main__':
     port = int(os.getenv('FLASK_PORT', 5000))
     
     # Get host from environment variable, default to localhost
-    host = os.getenv('FLASK_HOST', '127.0.0.1')
+    host = os.getenv('FLASK_HOST', '0.0.0.0')
     
     print(f"Starting Flask app on {host}:{port} (Debug: {debug_mode})")
     app.run(host=host, port=port, debug=debug_mode)
