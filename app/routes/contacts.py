@@ -41,6 +41,11 @@ def validate_date(date_string):
         return False
 
 
+# Home page
+@contacts_bp.route('/')
+def home():
+    return "Welcome to SomeContacts."
+
 
 # CREATE - add a new Contact
 @contacts_bp.route('/add', methods=['POST'])
