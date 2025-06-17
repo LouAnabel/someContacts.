@@ -27,10 +27,6 @@ def validate_password(password):
     return True, ""
 
 
-# Home page
-@auth_bp.route('/', methods=['GET', 'HEAD'])
-def home():
-    return "Welcome to someContacts.!"
 
 # create endpoint for user registration
 @auth_bp.route('/register', methods=['POST'])

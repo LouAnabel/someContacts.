@@ -27,6 +27,12 @@ def create_app():
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(contacts_bp, url_prefix='/contacts')
 
+
+    # Home page
+    @app.route('/', methods=['GET', 'HEAD'])
+    def home():
+        return "Welcome to someContacts.!"
+    
     # Error handlers
     @app.errorhandler(404)
     def not_found(error):
