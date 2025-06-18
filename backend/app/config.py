@@ -8,8 +8,6 @@ class Config:
     
     # JWT configuration
     JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'secret_jwt_key')
-    JWT_IDENTITY_CLAIM = 'sub'
-    JWT_JSON_ENCODER = None
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=24)
     
     # Flask configuration

@@ -9,6 +9,7 @@ db = SQLAlchemy() #database operations
 jwt = JWTManager() #JSON Web Token authentication
 bcrypt = Bcrypt() #password hashing
 
+
 # implements the "application factory" pattern.
 def create_app():
     app = Flask(__name__)
@@ -18,7 +19,7 @@ def create_app():
     db.init_app(app)
     jwt.init_app(app)
     bcrypt.init_app(app)
-    CORS(app, origins=['http://localhost:3000', 'http://127.0.0.1:3000'])
+    CORS(app, origins=['http://localhost:3000', 'http://localhost:5173']) # http://127.0.0.1:3000
 
     # Register blueprints - Import INSIDE the function to avoid circular imports
     from app.routes.auth import auth_bp
