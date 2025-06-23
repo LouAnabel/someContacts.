@@ -1,4 +1,5 @@
 from app import db
+from sqlalchemy import text
 from datetime import datetime, timezone
 
 
