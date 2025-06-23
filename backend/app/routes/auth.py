@@ -59,7 +59,10 @@ def register():
         
         # Check if user exists
         if User.query.filter_by(email=data['email']).first():
-            return jsonify({'error': 'Email already registered'}), 400
+            return jsonify({
+                'success': False,
+                'message': 'Email already registered'
+            }), 409
     
 
         # After successfull authentication create user
@@ -76,7 +79,7 @@ def register():
 
 
         # Create token
-        access_token = create_access_token(identity=str(user.id))
+        access_token = create_access_token(identity=user.id)
         refresh_token = create_refresh_token(identity=user.id)
 
 
@@ -167,8 +170,7 @@ def refresh():
             }), 404
         
         new_access_token = create_access_token(identity=current_user_id)
-        
-        logger.info(f"Token refreshed for user: {user.username}")
+        logger.info(f"Token refreshed for user: {user.email} (ID: {user.id})")
         
         return jsonify({
             'success': True,
@@ -209,7 +211,7 @@ def logout():
         
         user = User.query.get(current_user_id)
         if user:
-            logger.info(f"User logged out: {user.username}")
+            logger.info(f"User logged out: {user.email}")
         
         return jsonify({
             'success': True,
