@@ -6,8 +6,10 @@ from app.models.contact import Contact
 from app.models.category import Category
 import re
 from datetime import datetime
+import logging
 
 contacts_bp = Blueprint('contacts', __name__)
+logger = logging.getLogger(__name__)
 
 
 # Email validation
@@ -15,7 +17,9 @@ def validate_email(email):
     if not email:  # Email is optional for contacts
         return True
     email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-    return re.match(email_pattern, email) is not None
+    result = re.match(email_pattern, email) is not None
+    logger.debug(f"Email validation for '{email}': {result}")
+    return result
 
 
 # Phone validation 
@@ -26,7 +30,9 @@ def validate_phone(phone):
     clean_phone = re.sub(r'[^\d]', '', phone)
     # Check if it contains only digits and + (for international)
     pattern = r'^\+?[\d]{7,15}$'
-    return re.match(pattern, clean_phone) is not None
+    result = re.match(pattern, clean_phone) is not None
+    logger.debug(f"Phone validation for '{phone}' (cleaned: '{clean_phone}'): {result}")
+    return result
 
 
 # Date validation helper
@@ -35,17 +41,20 @@ def validate_date(date_string):
         return True
     try:
         datetime.strptime(date_string, '%d-%m-%Y')
+        logger.debug(f"Date validation for '{date_string}': valid")
         return True
     except ValueError:
+        logger.debug(f"Date validation for '{date_string}': invalid format")
         return False
 
 
 
 
 # CREATE - add a new Contact
-@contacts_bp.route('/add', methods=['POST'])
+@contacts_bp.route('', methods=['POST'])
 @jwt_required()
 def create_contact():
+    logger.info("Starting contact creation process...")
     try:
         creator_id_str = get_jwt_identity()
         creator_id = int(creator_id_str)
@@ -57,11 +66,14 @@ def create_contact():
         
         # Validate email format if provided
         if data.get('email') and not validate_email(data['email']):
+            logger.warning(f"Contact creation failed: invalid email format '{data.get('email')}'")
             return jsonify({'error': 'Invalid email format'}), 400
             
         # Validate phone format if provided
         if data.get('phone') and not validate_phone(data['phone']):
+            logger.warning(f"Contact creation failed: invalid phone format '{data.get('phone')}'")
             return jsonify({'error': 'Invalid phone number format'}), 400
+
 
         # Handle date parsing with DD-MM-YYYY format
         birth_date = None
@@ -71,6 +83,7 @@ def create_contact():
             except ValueError as e:
                 return jsonify({'error': 'Invalid birth date format. Use DD-MM-YYYY (e.g., 15-05-1990)'}), 400
 
+
         last_contact_date = None
         if data.get('last_contact_date'):
             try:
@@ -78,27 +91,48 @@ def create_contact():
             except ValueError as e:
                 return jsonify({'error': 'Invalid last contact date format. Use DD-MM-YYYY (e.g., 03-05-2025)'}), 400
 
+
+        # Validate category if provided
+        category_id = data.get('category_id')
+        if category_id:
+            logger.debug(f"Validating category_id: {category_id}")
+            category = Category.query.filter_by(
+                id=category_id, 
+                creator_id=creator_id
+            ).first()
+            if not category:
+                logger.warning(f"Invalid category_id {category_id} for user {creator_id}")
+                return jsonify({
+                    'success': False,
+                    'message': 'Invalid category'
+                }), 400
+            logger.debug(f"Category validation successful: {category.name}")
+
+
         # Create new contact with updated field names
+        logger.debug("Creating new contact object")
         contact = Contact(
             creator_id=creator_id,
             first_name=data['first_name'].strip(),
-            last_name=data.get('last_name', '').strip(),
-            email=data.get('email', '').strip(),
-            phone=data.get('phone', '').strip(),
-            is_favorite = data.get('is_favorite', False),
-            category_id = data.get('category_id'),
+            last_name=data.get('last_name', '').strip() if data.get('last_name') else None,
+            email=data.get('email', '').strip() if data.get('email') else None,
+            phone=data.get('phone', '').strip() if data.get('phone') else None,
+            is_favorite=data.get('is_favorite', False),
+            category_id=category_id,
             birth_date=birth_date,
             last_contact_date=last_contact_date,
-            last_contact_place=data.get('last_contact_place', '').strip(),
-            street_and_nr=data.get('street_and_nr', '').strip(),  
-            postal_code=data.get('postal_code', '').strip(),      
-            city=data.get('city', '').strip(),
-            country=data.get('country', '').strip(),
-            notes=data.get('notes', '').strip()
+            last_contact_place=data.get('last_contact_place', '').strip() if data.get('last_contact_place') else None,
+            street_and_nr=data.get('street_and_nr', '').strip() if data.get('street_and_nr') else None,
+            postal_code=data.get('postal_code', '').strip() if data.get('postal_code') else None,
+            city=data.get('city', '').strip() if data.get('city') else None,
+            country=data.get('country', '').strip() if data.get('country') else None,
+            notes=data.get('notes', '').strip() if data.get('notes') else None
         )
         
         db.session.add(contact)
         db.session.commit()
+        logger.info(f"Contact created successfully: {contact.first_name} {contact.last_name or ''} (ID: {contact.id})")
+
 
         return jsonify({
             'message': 'Contact successfully created',
@@ -106,9 +140,11 @@ def create_contact():
         }), 201
     
     except ValueError as e:
+        logger.error(f"ValueError in create_contact: {e}")
         return jsonify({'error': 'Invalid date format'}), 400
     except Exception as e:
         db.session.rollback()
+        logger.error(f"Unexpected error in create_contact: {e}", exc_info=True)
         return jsonify({'error': 'Failed to create contact'}), 500
     
 
@@ -119,25 +155,24 @@ def get_contacts():
     try:
         creator_id_str = get_jwt_identity()
         creator_id = int(creator_id_str)
+        logger.info(f"Fetching contacts for user ID: {creator_id}")
 
         # Get query parameters for pagination and search
         page = request.args.get('page', 1, type=int)
         per_page = request.args.get('per_page', 10, type=int)
-        search = request.args.get('search', '', type=str)
-        
-        # Limit per_page to prevent abuse
-        per_page = min(per_page, 100)
+        search = request.args.get('search', '', type=str).strip
         
         # Optional query parameters
         favorites_only = request.args.get('favorites', '').lower() == 'true'
-        search = request.args.get('search', '').strip()
         category_id = request.args.get('category_id')
 
+        per_page = min(per_page, 100)
         # Base query
         query = Contact.query.filter_by(creator_id=creator_id)
 
         # Search by name, email, last contact place, city, country if provided
         if search:
+            logger.debug(f"Applying search filter: '{search}'")
             search_term = f"%{search}%"
             query = query.filter(
                 db.or_(
@@ -163,7 +198,9 @@ def get_contacts():
                 try:
                     category_id = int(category_id)
                     query = query.filter_by(category_id=category_id)
+                    logger.debug(f"Filtering for category_id: {category_id}")
                 except ValueError:
+                    logger.warning(f"Invalid category_id format: {category_id}")
                     return jsonify({
                         'success': False,
                         'message': 'Invalid category ID'
@@ -193,9 +230,11 @@ def get_contacts():
         }), 200
     
     except Exception as e:
+        logger.error(f"Error in get_contacts: {e}", exc_info=True)
         return jsonify({'error': 'Failed to retrieve contacts'}), 500
-        
-        
+
+
+
 #GET Categories for Dropdown
 @contacts_bp.route('/categories', methods=['GET'])
 @jwt_required()
@@ -204,10 +243,12 @@ def get_category_dropdown():
     try:
         creator_id_str = get_jwt_identity
         creator_id = int(creator_id_str)
-
+        logger.info(f"Fetching categories for user ID: {creator_id}")
         categories = Category.query.filter_by(creator_id=creator_id)\
                                 .order_by(Category.name.asc()).all()
         
+        logger.debug(f"Found {len(categories)} categories")
+
         dropdown_data = [
             {
                 'value': category.id,
@@ -234,6 +275,7 @@ def get_category_dropdown():
         }), 200
         
     except Exception as e:
+        logger.error(f"Error in get_category_dropdown: {e}", exc_info=True)
         return jsonify({
             'success': False,
             'message': 'Failed to fetch dropdown options'
@@ -248,6 +290,7 @@ def update_contact(contact_id):
     try:
         creator_id_str = get_jwt_identity()
         creator_id = int(creator_id_str)
+        logger.info(f"Updating contact {contact_id} for user ID: {creator_id}")
         data = request.get_json()
 
         if not data:
@@ -265,6 +308,7 @@ def update_contact(contact_id):
                 'message': 'Contact not found'
             }), 404
         
+        logger.debug(f"Found contact: {contact.first_name} {contact.last_name or ''}")
 
         # Validate required fields
         if 'first_name' in data and not data['first_name'].strip():
@@ -299,6 +343,8 @@ def update_contact(contact_id):
                         'success': False,
                         'message': 'Invalid category'
                     }), 400
+                logger.debug(f"Category validation successful: {category.name}")
+
 
         # Update basic fields
         if 'first_name' in data:
@@ -346,12 +392,14 @@ def update_contact(contact_id):
         }), 200
     
     except ValueError as e:
+        logger.error(f"ValueError in update_contact: {e}")
         return jsonify({
             'success': False,
             'message': 'Invalid date format. Use DD-MM-YYYY'
         }), 400
     except Exception as e:
         db.session.rollback()
+        logger.error(f"Unexpected error in update_contact: {e}", exc_info=True)
         return jsonify({
             'success': False,
             'message': 'Failed to update contact',
@@ -361,41 +409,53 @@ def update_contact(contact_id):
 
 
 # DELETE - Delete a contact
-@contacts_bp.route('/delete/<int:contact_id>', methods=['DELETE'])
+@contacts_bp.route('/<int:contact_id>', methods=['DELETE'])
 @jwt_required()
 def delete_contact(contact_id):
     try:
         creator_id_str = get_jwt_identity()  # Get as string
         creator_id = int(creator_id_str)        # Convert to int
-        
+        logger.info(f"Deleting contact {contact_id} for user ID: {creator_id}")
+
         contact = Contact.query.filter_by(id=contact_id, creator_id=creator_id).first()
         
         if not contact:
             return jsonify({'error': 'Contact not found'}), 404
         
+        
         db.session.delete(contact)
         db.session.commit()
-        
+        logger.info(f"Contact {contact_id} deleted successfully: {contact.first_name} {contact.last_name}")
         return jsonify({'message': 'Contact deleted successfully'}), 200
-        
+       
+
     except Exception as e:
         db.session.rollback()
-        return jsonify({'error': 'Failed to delete contact'}), 500
+        logger.error(f"Error in delete_contact: {e}", exc_info=True)
+        return jsonify({
+            'success': False,
+            'message': 'Failed to delete contact'
+        }), 500
 
 
 # BULK DELETE - Delete multiple contacts
-@contacts_bp.route('/delete/all', methods=['DELETE'])
+@contacts_bp.route('/delete-all', methods=['DELETE'])
 @jwt_required()
 def bulk_delete_contacts():
     try:
         creator_id_str = get_jwt_identity()  # Get as string
         creator_id = int(creator_id_str)        # Convert to int
-        data = request.get_json()
         
+        data = request.get_json()
+        logger.debug(f"Received bulk delete data: {data}")
+
         contact_ids = data.get('contact_ids', [])
         
         if not contact_ids or not isinstance(contact_ids, list):
+            logger.warning("Bulk delete failed: contact_ids array is required")
             return jsonify({'error': 'contact_ids array is required'}), 400
+        
+        logger.info(f"Attempting to delete {len(contact_ids)} contacts: {contact_ids}")
         
         # Find and delete contacts
         deleted_count = Contact.query.filter(
@@ -413,3 +473,75 @@ def bulk_delete_contacts():
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': 'Failed to delete contacts'}), 500
+    
+
+
+# FAVORITES
+## Get only favorite contacts
+@contacts_bp.route('/favorites', methods=['GET'])
+@jwt_required()
+
+def get_favorites():
+    try:
+        creator_id_str = get_jwt_identity()
+        creator_id = int(creator_id_str)
+        
+        favorites = Contact.query.filter_by(
+            creator_id=creator_id, 
+            is_favorite=True
+        ).order_by(Contact.first_name.asc()).all()
+        
+        logger.info(f"Found {len(favorites)} favorite contacts")
+        
+        return jsonify({
+            'success': True,
+            'favorites': [contact.to_dict() for contact in favorites],
+            'total': len(favorites)
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Error in get_favorites: {e}", exc_info=True)
+        return jsonify({
+            'success': False,
+            'message': 'Failed to fetch favorites'
+        }), 500
+
+
+# Toggle Route for is_Favorite Status
+@contacts_bp.route('/<int:contact_id>/favorite', methods=['POST'])
+@jwt_required()
+
+def toggle_favorite(contact_id):
+    try:
+        creator_id_str = get_jwt_identity()
+        creator_id = int(creator_id_str)
+        logger.info(f"Toggling favorite for contact {contact_id}, user ID: {creator_id}")
+        
+        contact = Contact.query.filter_by(id=contact_id, creator_id=creator_id).first()
+        
+        if not contact:
+            logger.warning(f"Contact {contact_id} not found for user {creator_id}")
+            return jsonify({
+                'success': False,
+                'message': 'Contact not found'
+            }), 404
+        
+        # Toggle favorite status
+        contact.is_favorite = not contact.is_favorite
+        db.session.commit()
+        action = "added to" if contact.is_favorite else "removed from"
+    
+        
+        return jsonify({
+            'success': True,
+            'message': f'Contact {action} favorites',
+            'contact': contact.to_dict()
+        }), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Error in toggle_favorite: {e}", exc_info=True)
+        return jsonify({
+            'success': False,
+            'message': 'Failed to update favorite status'
+        }), 500

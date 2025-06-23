@@ -141,4 +141,4 @@ frontend/.env.production.local
 
 # Production build files
 /build
-/dist
+/dist__pycahce__/
