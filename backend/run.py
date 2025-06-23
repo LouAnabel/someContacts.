@@ -9,9 +9,13 @@ import os
 # Load environment variables first
 load_dotenv()
 
+# Set development environment
+os.environ.setdefault('FLASK_ENV', 'development')
+
 # Create the Flask app
 app = create_app()
 
+# Initialize database for development
 # Create database tables
 with app.app_context():
     try:
@@ -35,6 +39,7 @@ with app.app_context():
 
 
 if __name__ == '__main__':
+    #development settings
     # Get debug mode from environment variable, default to True for development
     debug_mode = os.getenv('FLASK_DEBUG', 'True').lower() == 'true'
     
