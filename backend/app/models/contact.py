@@ -16,7 +16,7 @@ class Contact(db.Model):
     is_favorite = db.Column(db.Boolean, default=False, nullable=False)
     
     # Additional fields that your to_dict() method expects
-    category = db.Column(db.String(50))  # Will upgrade to foreign key later
+    category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=True)
     birth_date = db.Column(db.Date)
     last_contact_date = db.Column(db.Date)
     last_contact_place = db.Column(db.String(200))
@@ -31,15 +31,16 @@ class Contact(db.Model):
     updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
 
-    def to_dict(self):
-        return {
+    def to_dict(self, include_category=True):
+        data = {
             'id': self.id,
             'creator_id': self.creator_id,
             'first_name': self.first_name,
             'last_name': self.last_name,
             'email': self.email,
             'phone': self.phone,
-            'category': self.category,
+            'is_favorite': self.is_favorite,
+            'category_id': self.category_id,
             'birth_date': self.birth_date.strftime('%d-%m-%Y') if self.birth_date else None,
             'last_contact_date': self.last_contact_date.strftime('%d-%m-%Y') if self.last_contact_date else None,
             'last_contact_place': self.last_contact_place,
@@ -52,6 +53,14 @@ class Contact(db.Model):
             'updated_at': self.updated_at.strftime('%d-%m-%Y %H:%M:%S')
         }
     
+        if include_category and self.category:
+            data['category'] = {
+                'id': self.category.id,
+                'name': self.category.name
+            }
+
+        return data
+
 
     def __repr__(self):
         return f'<Contact {self.first_name} {self.last_name}>'

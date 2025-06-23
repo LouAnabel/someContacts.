@@ -3,7 +3,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from app import db
 from app.models.user import User
 from app.models.contact import Contact
-# from app.models.category import Category  # Import when you create category model
+from app.models.category import Category
 import re
 from datetime import datetime
 
@@ -24,10 +24,9 @@ def validate_phone(phone):
         return True
     # Remove spaces, dashes, parentheses for validation
     clean_phone = re.sub(r'[^\d]', '', phone)
-    
-    # Check if remaining characters are digits and reasonable length
-    # Allow international numbers (7-15 digits)
-    return clean_phone.isdigit() and 7 <= len(clean_phone) <= 15
+    # Check if it contains only digits and + (for international)
+    pattern = r'^\+?[\d]{7,15}$'
+    return re.match(pattern, clean_phone) is not None
 
 
 # Date validation helper
@@ -86,7 +85,8 @@ def create_contact():
             last_name=data.get('last_name', '').strip(),
             email=data.get('email', '').strip(),
             phone=data.get('phone', '').strip(),
-            category=data.get('category', '').strip(),
+            is_favorite = data.get('is_favorite', False),
+            category_id = data.get('category_id'),
             birth_date=birth_date,
             last_contact_date=last_contact_date,
             last_contact_place=data.get('last_contact_place', '').strip(),
@@ -112,13 +112,14 @@ def create_contact():
         return jsonify({'error': 'Failed to create contact'}), 500
     
 
-        
-# Read - Get all contacts 
-@contacts_bp.route('/all', methods=['GET'])
-@jwt_required()  # Fixed decorator
-def get_all_contacts():
+#READ contacts by filter
+@contacts_bp.route('', methods=['GET'])
+@jwt_required
+def get_contacts():
     try:
-        user_id = get_jwt_identity()
+        user_id_str = get_jwt_identity()
+        user_id = int(user_id_str)
+        data = request.get_json()
 
         # Get query parameters for pagination and search
         page = request.args.get('page', 1, type=int)
@@ -128,10 +129,15 @@ def get_all_contacts():
         # Limit per_page to prevent abuse
         per_page = min(per_page, 100)
         
-        # Build query
+        # Optional query parameters
+        favorites_only = request.args.get('favorites', '').lower() == 'true'
+        search = request.args.get('search', '').strip()
+        category_id = request.args.get('category_id')
+
+        # Base query
         query = Contact.query.filter_by(user_id=user_id)
 
-        # Add search functionality
+        # Search by name, email, last contact place, city, country if provided
         if search:
             search_term = f"%{search}%"
             query = query.filter(
@@ -140,12 +146,33 @@ def get_all_contacts():
                     Contact.last_name.ilike(search_term),
                     Contact.email.ilike(search_term),
                     Contact.last_contact_place.ilike(search_term),
-                    Contact.city.ilike(search_term)
+                    Contact.city.ilike(search_term),
+                    Contact.country.ilike(search_term)
                 )
             )
 
-        # Order by first name, last name
-        query = query.order_by(Contact.first_name, Contact.last_name)
+        # Filter by favorites if requested
+        if favorites_only:
+            query = query.filter_by(is_favorite=True)
+
+
+        # Filter by category if provided
+        if category_id:
+            if category_id == 'uncategorized':
+                query = query.filter(Contact.category_id.is_(None))
+            else:
+                try:
+                    category_id = int(category_id)
+                    query = query.filter_by(category_id=category_id)
+                except ValueError:
+                    return jsonify({
+                        'success': False,
+                        'message': 'Invalid category ID'
+                    }), 400
+
+       
+        # Order by favorites first, then by name
+        contacts = query.order_by(Contact.is_favorite.desc(), Contact.name.asc()).all()
 
         # Paginate
         contacts = query.paginate(
@@ -168,31 +195,11 @@ def get_all_contacts():
     
     except Exception as e:
         return jsonify({'error': 'Failed to retrieve contacts'}), 500
-    
-
-
-# READ - Get a specific contact
-@contacts_bp.route('/<int:contact_id>', methods=['GET'])
-@jwt_required()
-def get_contact(contact_id):
-    try:
-        user_id = get_jwt_identity()
-        
-        # find the contact
-        contact = Contact.query.filter_by(id=contact_id, user_id=user_id).first()
-        
-        if not contact:
-            return jsonify({'error': 'Contact not found'}), 404
-        
-        return jsonify({'contact': contact.to_dict()}), 200
-        
-    except Exception as e:
-        return jsonify({'error': 'Failed to retrieve contact'}), 500
         
     
 
 # UPDATE - Update Contact by ID
-@contacts_bp.route('/update/<int:contact_id>', methods=['PUT'])
+@contacts_bp.route('/<int:contact_id>', methods=['PUT'])
 @jwt_required()
 def update_contact(contact_id):
     try:
@@ -200,12 +207,22 @@ def update_contact(contact_id):
         user_id = int(user_id_str)
         data = request.get_json()
 
+        if not data:
+            return jsonify({
+                'success': False,
+                'message': 'No data provided'
+            }), 400
+        
         # Find the contact
         contact = Contact.query.filter_by(id=contact_id, user_id=user_id).first()
 
         if not contact:
-            return jsonify({'error': 'Contact cannot be found'}), 404
+            return jsonify({
+                'success': False,
+                'message': 'Contact not found'
+            }), 404
         
+
         # Validate required fields
         if 'first_name' in data and not data['first_name'].strip():
             return jsonify({'error': 'First name cannot be empty'}), 400
@@ -225,46 +242,78 @@ def update_contact(contact_id):
         if 'last_contact_date' in data and data['last_contact_date'] and not validate_date(data['last_contact_date']):
             return jsonify({'error': 'Invalid last contact date format. Use DD-MM-YYYY (e.g., 03-05-2025)'}), 400
 
-        # Update fields if provided
+        # Validate category if provided
+        if 'category_id' in data:
+            category_id = data['category_id']
+            if category_id is not None:
+                # Verify category belongs to user
+                category = Category.query.filter_by(
+                    id=category_id, 
+                    creator_id=user_id
+                ).first()
+                if not category:
+                    return jsonify({
+                        'success': False,
+                        'message': 'Invalid category'
+                    }), 400
+
+        # Update basic fields
         if 'first_name' in data:
             contact.first_name = data['first_name'].strip()
         if 'last_name' in data:
-            contact.last_name = data['last_name'].strip()
+            contact.last_name = data['last_name'].strip() if data['last_name'] else None
         if 'email' in data:
-            contact.email = data['email'].strip()
+            contact.email = data['email'].strip() if data['email'] else None
         if 'phone' in data:
-            contact.phone = data['phone'].strip()
-        if 'category' in data:
-            contact.category = data['category'].strip()
+            contact.phone = data['phone'].strip() if data['phone'] else None
+        if 'is_favorite' in data:
+            contact.is_favorite = bool(data['is_favorite'])
+        
+        # Update category
+        if 'category_id' in data:
+            contact.category_id = data['category_id']
+        
+        # Update extended fields (if your Contact model has them)
         if 'birth_date' in data:
             contact.birth_date = datetime.strptime(data['birth_date'], '%d-%m-%Y').date() if data['birth_date'] else None
         if 'last_contact_date' in data:
             contact.last_contact_date = datetime.strptime(data['last_contact_date'], '%d-%m-%Y').date() if data['last_contact_date'] else None
         if 'last_contact_place' in data:
-            contact.last_contact_place = data['last_contact_place'].strip()
-        if 'street_and_nr' in data:  # Updated field name
-            contact.street_and_nr = data['street_and_nr'].strip()
-        if 'postal_code' in data:    # Updated field name
-            contact.postal_code = data['postal_code'].strip()
+            contact.last_contact_place = data['last_contact_place'].strip() if data['last_contact_place'] else None
+        if 'street_and_nr' in data:
+            contact.street_and_nr = data['street_and_nr'].strip() if data['street_and_nr'] else None
+        if 'postal_code' in data:
+            contact.postal_code = data['postal_code'].strip() if data['postal_code'] else None
         if 'city' in data:
-            contact.city = data['city'].strip()
+            contact.city = data['city'].strip() if data['city'] else None
         if 'country' in data:
-            contact.country = data['country'].strip()
+            contact.country = data['country'].strip() if data['country'] else None
         if 'notes' in data:
-            contact.notes = data['notes'].strip()
+            contact.notes = data['notes'].strip() if data['notes'] else None
+        
+        # Update timestamp
+        contact.updated_at = db.func.current_timestamp()
         
         db.session.commit()
         
         return jsonify({
+            'success': True,
             'message': 'Contact updated successfully',
             'contact': contact.to_dict()
         }), 200
     
     except ValueError as e:
-        return jsonify({'error': 'Invalid date format. Use DD-MM-YYYY'}), 400
+        return jsonify({
+            'success': False,
+            'message': 'Invalid date format. Use DD-MM-YYYY'
+        }), 400
     except Exception as e:
         db.session.rollback()
-        return jsonify({'error': 'Failed to update contact'}), 500
+        return jsonify({
+            'success': False,
+            'message': 'Failed to update contact',
+            'error': str(e)
+        }), 500
 
 
 

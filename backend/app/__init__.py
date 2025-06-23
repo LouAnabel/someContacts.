@@ -17,7 +17,7 @@ bcrypt = Bcrypt() #password hashing
 # initicatializes the APP
 def create_app():
     app = Flask(__name__)
-    app.config.from_object('app.config.Config')
+    app.config.from_object('config.Config')
 
     # Enable CORS for all routes
     CORS(app, 
@@ -32,6 +32,7 @@ def create_app():
     jwt.init_app(app)
     bcrypt.init_app(app)
     redis_service.init_app(app)  # Initialize Redis service
+
 
 
     # JWT Configuration
@@ -61,10 +62,11 @@ def create_app():
     # Register blueprints - Import INSIDE the function to avoid circular imports
     from app.routes.auth import auth_bp
     from app.routes.contacts import contacts_bp
+    from app.routes.categories import categories_bp
 
     app.register_blueprint(auth_bp, url_prefix='/auth')
     app.register_blueprint(contacts_bp, url_prefix='/contacts')
-
+    app.register_blueprint(categories_bp, url_prefix='/categories')
 
     # Home page
     @app.route('/', methods=['GET', 'HEAD'])

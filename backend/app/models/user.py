@@ -13,7 +13,9 @@ class User(db.Model):
     
     # Relationship with contacts
     contacts = db.relationship('Contact', backref='user', lazy=True, cascade='all, delete-orphan')
-    
+    # categories relationship is defined in Category model via backref
+
+
     # Hash and set the user's password
     def set_password(self, password):
         self.password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
