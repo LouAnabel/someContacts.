@@ -5,7 +5,7 @@ from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
 from flask_bcrypt import Bcrypt
 from config import DevelopmentConfig
-from app.services.redis_service import redis_service
+# from app.services.redis_service import redis_service
 from datetime import datetime, timezone
 import os
 
@@ -76,7 +76,8 @@ def create_app():
         print(f"Unauthorized: {error}")  # Debug
         return {'error': 'Authorization token required'}, 401
     
-    # Token blacklist checker using Redis
+    """
+    # TEMPORARILY COMMENT OUT - Redis token blacklisting 
     @jwt.token_in_blocklist_loader
     def check_if_token_revoked(jwt_header, jwt_payload):
         jti = jwt_payload['jti']
@@ -84,7 +85,7 @@ def create_app():
         if is_blacklisted:
             print(f"Token blacklisted: {jti}")  # Debug
         return is_blacklisted
-    
+    """
 
 
     # Import models (important for migrations)
@@ -110,7 +111,7 @@ def create_app():
     def health_check():
         return {
             'status': 'healthy',
-            'redis_available': redis_service.is_available(),
+            'redis_available': False, #redis_service.is_available(),
             'timestamp': datetime.now(timezone.utc).isoformat()
     }
 

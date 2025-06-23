@@ -194,10 +194,13 @@ def refresh():
 def logout():
     try:
         current_user_id = get_jwt_identity()
+        user = User.query.get(current_user_id)
+        
+        """TEMPORARLY COMMENTED OUT 
         jwt_data = get_jwt()
         jti = jwt_data['jti']  # JWT ID
         exp = jwt_data['exp']  # Expiration timestamp
-        
+
         # Calculate how long until token expires
         import time
         current_time = int(time.time())
@@ -208,8 +211,8 @@ def logout():
             success = redis_service.blacklist_token(jti, expires_in)
             if not success:
                 logger.warning(f"Failed to blacklist token for user {current_user_id}")
+        """
         
-        user = User.query.get(current_user_id)
         if user:
             logger.info(f"User logged out: {user.email}")
         
@@ -263,10 +266,14 @@ def logout_all():
     """Logout from all devices by blacklisting both access and refresh tokens"""
     try:
         current_user_id = get_jwt_identity()
+        user = User.query.get(current_user_id)
+
+
+        """REDIS TEMPORARLY COMMENTED OUT
         jwt_data = get_jwt()
         jti = jwt_data['jti']
         exp = jwt_data['exp']
-        
+
         # Calculate expiration time
         import time
         current_time = int(time.time())
@@ -278,8 +285,8 @@ def logout_all():
         
         # Note: In a real implementation, you might want to track all user tokens
         # and blacklist them all. For now, this just blacklists the current token.
+        """
         
-        user = User.query.get(current_user_id)
         if user:
             logger.info(f"User logged out from all devices: {user.email}")
         
