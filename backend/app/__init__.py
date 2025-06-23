@@ -5,6 +5,7 @@ from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
 from flask_bcrypt import Bcrypt
 from app.services.redis_service import redis_service
+from datetime import datetime, timezone
 
 
 #create global instances of
@@ -38,15 +39,15 @@ def create_app():
     # JWT Configuration
     @jwt.expired_token_loader
     def expired_token_callback(jwt_header, jwt_payload):
-        return {'success': False, 'message': 'Token has expired'}, 401
+        return {'error': 'Token has expired'}, 401
     
     @jwt.invalid_token_loader
     def invalid_token_callback(error):
-        return {'success': False, 'message': 'Invalid token'}, 401
+        return {'error': 'Invalid token'}, 401
     
     @jwt.unauthorized_loader
     def unauthorized_callback(error):
-        return {'success': False, 'message': 'Authorization token required'}, 401
+        return {'error': 'Authorization token required'}, 401
     
     # Token blacklist checker using Redis
     @jwt.token_in_blocklist_loader
@@ -57,7 +58,7 @@ def create_app():
 
 
     # Import models (important for migrations)
-    from app.models import user, contact
+    from app.models import user, contact, category
 
     # Register blueprints - Import INSIDE the function to avoid circular imports
     from app.routes.auth import auth_bp
@@ -73,7 +74,21 @@ def create_app():
     def home():
         return "Welcome to someContacts.!"
     
+
+    # Useful for monitoring:
+    @app.route('/health', methods=['GET'])
+    def health_check():
+        return {
+            'status': 'healthy',
+            'redis_available': redis_service.is_available(),
+            'timestamp': datetime.now(timezone.utc).isoformat()
+    }
+
     # Error handlers
+    @app.errorhandler(400)
+    def bad_request(error):
+        return {'error': 'Bad request'}, 400
+    
     @app.errorhandler(404)
     def not_found(error):
         return {'error': 'Not found'}, 404
@@ -81,5 +96,9 @@ def create_app():
     @app.errorhandler(403)
     def forbidden(error):
         return {'error': 'Forbidden'}, 403
+
+    @app.errorhandler(500)
+    def internal_error(error):
+        return {'error': 'Internal server error'}, 500
 
     return app
