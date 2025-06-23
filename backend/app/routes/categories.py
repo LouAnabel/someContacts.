@@ -14,13 +14,6 @@ def get_categories():
     try:
         creator_id_str = get_jwt_identity()
         creator_id = int(creator_id_str) #current user
-        data = request.get_json()
-        
-        if not data:
-            return jsonify({
-                'success': False,
-                'message': 'No data provided'
-            }), 400
         
         categories = Category.query.filter_by(creator_id=creator_id)\
                                  .order_by(Category.name.asc()).all()
@@ -30,7 +23,7 @@ def get_categories():
             category_dict = category.to_dict()
             # Add contact count for this category
             category_dict['contact_count'] = Contact.query.filter_by(
-                user_id=creator_id, 
+                creator_id=creator_id, 
                 category_id=category.id
             ).count()
             categories_data.append(category_dict)

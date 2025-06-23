@@ -195,7 +195,50 @@ def get_contacts():
     except Exception as e:
         return jsonify({'error': 'Failed to retrieve contacts'}), 500
         
-    
+#GET Categories for Dropdown
+@contacts_bp.route('/categories', methods=['GET'])
+@jwt_required()
+
+def get_category_dropdown():
+    try:
+        creator_id_str = get_jwt_identity
+        creator_id = int(creator_id_str)
+
+        categories = Category.query.filter_by(creator_id=creator_id)\
+                                .order_by(Category.name.asc()).all()
+        
+        dropdown_data = [
+            {
+                'value': category.id,
+                'name': category.name
+            }
+            for category in categories
+        ]
+
+        dropdown_data.extend([
+            {
+                'value' : None,
+                'name' : 'No Category'
+            },
+            {
+                'value': 'ADD_NEW',
+                'name': '+ Add Category'
+            }
+        ])
+
+        return jsonify({
+            'success': True,
+            'options': dropdown_data,
+            'total_categories': len(categories)
+        }), 200
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': 'Failed to fetch dropdown options'
+        }), 500
+
+
 
 # UPDATE - Update Contact by ID
 @contacts_bp.route('/<int:contact_id>', methods=['PUT'])
