@@ -11,25 +11,26 @@ class Contact(db.Model):
 
     # Basic Contact Information
     first_name = db.Column(db.String(100), nullable=False)
-    last_name = db.Column(db.String(100))  # Optional
-    email = db.Column(db.String(255), index=True)  # Optional and removed unique constraint
-    phone = db.Column(db.String(20))
+    last_name = db.Column(db.String(100), nullable=True)  # Optional
+    email = db.Column(db.String(255), index=True, nullable=True)  # Optional and removed unique constraint
+    phone = db.Column(db.String(20), nullable=True)
     is_favorite = db.Column(db.Boolean, default=False, nullable=False)
     
     # Additional fields that your to_dict() method expects
     category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=True)
-    birth_date = db.Column(db.Date)
-    last_contact_date = db.Column(db.Date)
-    last_contact_place = db.Column(db.String(200))
-    street_and_nr = db.Column(db.Text)
-    postal_code = db.Column(db.Text)
-    city = db.Column(db.String(100))
-    country = db.Column(db.String(100))
-    notes = db.Column(db.Text)
+    birth_date = db.Column(db.Date,nullable=True)
+    last_contact_date = db.Column(db.Date, nullable=True)
+    last_contact_place = db.Column(db.String(200), nullable=True)
+    street_and_nr = db.Column(db.String(200), nullable=True)
+    postal_code = db.Column(db.String(100), nullable=True)
+    city = db.Column(db.String(100), nullable=True)
+    country = db.Column(db.String(100), nullable=True)
+    notes = db.Column(db.String(2000))
     
     # Timestamps
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
-    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), 
+                          onupdate=lambda: datetime.now(timezone.utc))
 
 
     def to_dict(self, include_category=True):
@@ -54,7 +55,7 @@ class Contact(db.Model):
             'updated_at': self.updated_at.strftime('%d-%m-%Y %H:%M:%S') if self.updated_at else None,
         }
     
-        if include_category and self.category:
+        if include_category and hasattr(self, 'category') and self.category:
             data['category'] = {
                 'id': self.category.id,
                 'name': self.category.name
