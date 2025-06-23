@@ -52,7 +52,7 @@ def create_app():
     migrate.init_app(app, db) #connects changes to database
     jwt.init_app(app)
     bcrypt.init_app(app)
-    redis_service.init_app(app)  # Initialize Redis service
+    # redis_service.init_app(app)  # Initialize Redis service
 
 
     # JWT Configuration
