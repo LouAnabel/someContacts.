@@ -332,7 +332,7 @@ def get_category_contacts(category_id):
             'error': str(e)
         }), 500
     
-
+"""
 #GET all contacts in one selected Category
 @categories_bp.route('/<int:category_id>/contacts', methods=['GET'])  # GET /categories/1/contacts
 @jwt_required()
@@ -377,3 +377,4 @@ def get_category_contacts(category_id):
             'message': 'Failed to fetch category contacts',
             'error': str(e)
         }), 500
+"""

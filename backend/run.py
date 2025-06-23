@@ -2,6 +2,7 @@ from app import create_app, db
 from app.models.user import User  # Import User Model
 from app.models.contact import Contact  # Import contact model
 from app.models.category import Category
+from sqlalchemy import text
 from dotenv import load_dotenv
 import os
 
@@ -15,7 +16,7 @@ app = create_app()
 with app.app_context():
     try:
         # Test database connection
-        db.session.execute('SELECT 1')
+        db.session.execute(text('SELECT 1'))
 
         #create all tables
         db.create_all()
