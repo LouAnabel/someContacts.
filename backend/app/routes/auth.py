@@ -79,8 +79,8 @@ def register():
 
 
         # Create token
-        access_token = create_access_token(identity=user.id)
-        refresh_token = create_refresh_token(identity=user.id)
+        access_token = create_access_token(identity=str(user.id))
+        refresh_token = create_refresh_token(identity=str(user.id))
 
 
         return jsonify({
@@ -133,8 +133,8 @@ def login():
             }), 401
         
         # Create tokens
-        access_token = create_access_token(identity=user.id)
-        refresh_token = create_refresh_token(identity=user.id)
+        access_token = create_access_token(identity=str(user.id))
+        refresh_token = create_refresh_token(identity=str(user.id))
         
         logger.info(f"User logged in: {user.email}")
         
@@ -161,7 +161,7 @@ def login():
 def refresh():
     try:
         current_user_id = get_jwt_identity()
-        user = User.query.get(current_user_id)
+        user = User.query.get(int(current_user_id))
         
         if not user:
             return jsonify({
@@ -256,7 +256,6 @@ def get_current_user():
         }), 500
 
 
-
 # Logout form all devices
 @auth_bp.route('/logout-all', methods=['POST'])
 @jwt_required()
@@ -296,7 +295,3 @@ def logout_all():
             'message': 'Logout all failed',
             'error': str(e)
         }), 500
-
-
-
-    

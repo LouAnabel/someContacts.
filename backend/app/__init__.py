@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
 from flask_bcrypt import Bcrypt
+from config import DevelopmentConfig
 from app.services.redis_service import redis_service
 from datetime import datetime, timezone
 
@@ -18,7 +19,7 @@ bcrypt = Bcrypt() #password hashing
 # initicatializes the APP
 def create_app():
     app = Flask(__name__)
-    app.config.from_object('config.Config')
+    app.config.from_object(DevelopmentConfig)
 
     # Enable CORS for all routes
     CORS(app, 
@@ -27,6 +28,7 @@ def create_app():
          allow_headers=['Content-Type', 'Authorization'],
          supports_credentials=True)
     
+
     # Initialize extensions
     db.init_app(app)
     migrate.init_app(app, db) #connects changes to database
@@ -35,25 +37,35 @@ def create_app():
     redis_service.init_app(app)  # Initialize Redis service
 
 
-
     # JWT Configuration
+    @jwt.expired_token_loader
+    def expired_token_callback(jwt_header, jwt_payload):
+        print(f"Token expired: {jwt_payload}")  # Debug
+        return {'error': 'Token has expired'}, 401
+    
     @jwt.expired_token_loader
     def expired_token_callback(jwt_header, jwt_payload):
         return {'error': 'Token has expired'}, 401
     
     @jwt.invalid_token_loader
     def invalid_token_callback(error):
-        return {'error': 'Invalid token'}, 401
+        print(f"Invalid token: {error}")  # Debug
+        return {'error': 'Invalid token', 'details': str(error)}, 401
     
+
     @jwt.unauthorized_loader
     def unauthorized_callback(error):
+        print(f"Unauthorized: {error}")  # Debug
         return {'error': 'Authorization token required'}, 401
     
     # Token blacklist checker using Redis
     @jwt.token_in_blocklist_loader
     def check_if_token_revoked(jwt_header, jwt_payload):
         jti = jwt_payload['jti']
-        return redis_service.is_token_blacklisted(jti)
+        is_blacklisted = redis_service.is_token_blacklisted(jti)
+        if is_blacklisted:
+            print(f"Token blacklisted: {jti}")  # Debug
+        return is_blacklisted
     
 
 
