@@ -282,7 +282,7 @@ def logout_all():
         
         user = User.query.get(current_user_id)
         if user:
-            logger.info(f"User logged out from all devices: {user.username}")
+            logger.info(f"User logged out from all devices: {user.email}")
         
         return jsonify({
             'success': True,

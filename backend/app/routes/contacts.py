@@ -174,6 +174,7 @@ def get_contacts():
         category_id = request.args.get('category_id')
 
         per_page = min(per_page, 100)
+        
         # Base query
         query = Contact.query.filter_by(creator_id=creator_id)
 
@@ -196,7 +197,6 @@ def get_contacts():
         if favorites_only:
             query = query.filter_by(is_favorite=True)
 
-
         # Filter by category if provided
         if category_id:
             if category_id == 'uncategorized':
@@ -213,11 +213,10 @@ def get_contacts():
                         'message': 'Invalid category ID'
                     }), 400
 
-       
         # Order by favorites first, then by name
-        contacts = query.order_by(Contact.is_favorite.desc(), Contact.last_name.asc()).all()
+        query = query.order_by(Contact.is_favorite.desc(), Contact.first_name.asc())
 
-        # Paginate
+        # Apply pagination (FIXED: removed duplicate query execution)
         contacts = query.paginate(
             page=page,
             per_page=per_page,
