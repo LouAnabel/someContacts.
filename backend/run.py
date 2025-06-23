@@ -20,8 +20,8 @@ with app.app_context():
 
         #create all tables
         db.create_all()
-        print("Database connection successfull!")
-        print("Database tables created successfully!")
+        print("Database connected and Database tables successcully created!")
+        
 
         # Optional: Print table info
         from sqlalchemy import inspect
