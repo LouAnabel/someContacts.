@@ -12,7 +12,13 @@ class User(db.Model):
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     
     # Relationship with contacts
-    contacts = db.relationship('Contact', backref='user', lazy=True, cascade='all, delete-orphan')
+    contacts = db.relationship(
+            'Contact', 
+            backref='creator',  # Changed from 'user' to 'creator'
+            lazy=True, 
+            cascade='all, delete-orphan',
+            foreign_keys='Contact.creator_id'  # Explicitly specify the foreign key
+        )
     # categories relationship is defined in Category model via backref
 
 

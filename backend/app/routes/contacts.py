@@ -195,6 +195,7 @@ def get_contacts():
     except Exception as e:
         return jsonify({'error': 'Failed to retrieve contacts'}), 500
         
+        
 #GET Categories for Dropdown
 @contacts_bp.route('/categories', methods=['GET'])
 @jwt_required()
