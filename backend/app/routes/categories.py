@@ -12,8 +12,8 @@ categories_bp = Blueprint('categories', __name__)
 @jwt_required()
 def get_categories():
     try:
-        user_id_str = get_jwt_identity()
-        user_id = int(user_id_str) #current user
+        creator_id_str = get_jwt_identity()
+        creator_id = int(creator_id_str) #current user
         data = request.get_json()
         
         if not data:
@@ -22,7 +22,7 @@ def get_categories():
                 'message': 'No data provided'
             }), 400
         
-        categories = Category.query.filter_by(creator_id=user_id)\
+        categories = Category.query.filter_by(creator_id=creator_id)\
                                  .order_by(Category.name.asc()).all()
         
         categories_data = []
@@ -30,7 +30,7 @@ def get_categories():
             category_dict = category.to_dict()
             # Add contact count for this category
             category_dict['contact_count'] = Contact.query.filter_by(
-                user_id=user_id, 
+                user_id=creator_id, 
                 category_id=category.id
             ).count()
             categories_data.append(category_dict)
@@ -55,8 +55,8 @@ def get_categories():
 @jwt_required()
 def create_category():
     try:
-        user_id_str = get_jwt_identity()
-        user_id = int(user_id_str) #current user
+        creator_id_str = get_jwt_identity()
+        creator_id = int(creator_id_str) #current user
         data = request.get_json()
         
         if not data:
@@ -76,7 +76,7 @@ def create_category():
         # Check if category with this name already exists for this user
         existing_category = Category.query.filter_by(
             name=name, 
-            creator_id=user_id
+            creator_id=creator_id
         ).first()
         
         if existing_category:
@@ -87,7 +87,7 @@ def create_category():
         
         category = Category(
             name=name,
-            creator_id=user_id
+            creator_id=creator_id
         )
         
         db.session.add(category)
@@ -114,8 +114,8 @@ def create_category():
 @jwt_required()
 def get_category(category_id):
     try:
-        user_id_str = get_jwt_identity()
-        user_id = int(user_id_str) #current user
+        creator_id_str = get_jwt_identity()
+        creator_id = int(creator_id_str) #current user
         data = request.get_json()
         
         if not data:
@@ -124,7 +124,7 @@ def get_category(category_id):
                 'message': 'No data provided'
             }), 400
         
-        category = Category.query.filter_by(id=category_id, creator_id=user_id).first()
+        category = Category.query.filter_by(id=category_id, creator_id=creator_id).first()
         
         if not category:
             return jsonify({
@@ -134,7 +134,7 @@ def get_category(category_id):
         
         # Get contacts in this category
         contacts = Contact.query.filter_by(
-            user_id=user_id, 
+            user_id=creator_id, 
             category_id=category_id
         ).order_by(Contact.name.asc()).all()
         
@@ -159,8 +159,8 @@ def get_category(category_id):
 @jwt_required()
 def update_category(category_id):
     try:
-        user_id_str = get_jwt_identity()
-        user_id = int(user_id_str) #current user
+        creator_id_str = get_jwt_identity()
+        creator_id = int(creator_id_str) #current user
         data = request.get_json()
         
         if not data:
@@ -169,7 +169,7 @@ def update_category(category_id):
                 'message': 'No data provided'
             }), 400
         
-        category = Category.query.filter_by(id=category_id, creator_id=user_id).first()
+        category = Category.query.filter_by(id=category_id, creator_id=creator_id).first()
         
         if not category:
             return jsonify({
@@ -190,7 +190,7 @@ def update_category(category_id):
             # Check for duplicate name (excluding current category)
             existing = Category.query.filter(
                 Category.name == new_name,
-                Category.creator_id == user_id,
+                Category.creator_id == creator_id,
                 Category.id != category_id
             ).first()
             
@@ -226,10 +226,10 @@ def update_category(category_id):
 @jwt_required()
 def delete_category(category_id):
     try:
-        user_id_str = get_jwt_identity()
-        user_id = int(user_id_str) #current user
+        creator_id_str = get_jwt_identity()
+        creator_id = int(creator_id_str) #current user
         
-        category = Category.query.filter_by(id=category_id, creator_id=user_id).first()
+        category = Category.query.filter_by(id=category_id, creator_id=creator_id).first()
         
         if not category:
             return jsonify({
@@ -273,11 +273,11 @@ def delete_category(category_id):
 def get_category_contacts(category_id):
     """Get all contacts in a specific category"""
     try:
-        user_id_str = get_jwt_identity()
-        user_id = int(user_id_str) #current user
+        creator_id_str = get_jwt_identity()
+        creator_id = int(creator_id_str) #current user
         
         # Verify category belongs to user
-        category = Category.query.filter_by(id=category_id, creator_id=user_id).first()
+        category = Category.query.filter_by(id=category_id, creator_id=creator_id).first()
         if not category:
             return jsonify({
                 'success': False,
@@ -285,7 +285,7 @@ def get_category_contacts(category_id):
             }), 404
         
         contacts = Contact.query.filter_by(
-            user_id=user_id, 
+            user_id=creator_id, 
             category_id=category_id
         ).order_by(Contact.is_favorite.desc(), Contact.name.asc()).all()
         

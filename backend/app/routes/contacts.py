@@ -34,7 +34,7 @@ def validate_date(date_string):
     if not date_string:
         return True
     try:
-        datetime.strptime(date_string, '%Y-%m-%d')
+        datetime.strptime(date_string, '%d-%m-%Y')
         return True
     except ValueError:
         return False
@@ -47,8 +47,8 @@ def validate_date(date_string):
 @jwt_required()
 def create_contact():
     try:
-        user_id_str = get_jwt_identity()
-        user_id = int(user_id_str)
+        creator_id_str = get_jwt_identity()
+        creator_id = int(creator_id_str)
         data = request.get_json()
 
         # Validate required fields
@@ -80,7 +80,7 @@ def create_contact():
 
         # Create new contact with updated field names
         contact = Contact(
-            user_id=user_id,
+            creator_id=creator_id,
             first_name=data['first_name'].strip(),
             last_name=data.get('last_name', '').strip(),
             email=data.get('email', '').strip(),
@@ -90,8 +90,8 @@ def create_contact():
             birth_date=birth_date,
             last_contact_date=last_contact_date,
             last_contact_place=data.get('last_contact_place', '').strip(),
-            street_and_nr=data.get('street_and_nr', '').strip(),  # Updated field name
-            postal_code=data.get('postal_code', '').strip(),      # Updated field name
+            street_and_nr=data.get('street_and_nr', '').strip(),  
+            postal_code=data.get('postal_code', '').strip(),      
             city=data.get('city', '').strip(),
             country=data.get('country', '').strip(),
             notes=data.get('notes', '').strip()
@@ -117,9 +117,8 @@ def create_contact():
 @jwt_required
 def get_contacts():
     try:
-        user_id_str = get_jwt_identity()
-        user_id = int(user_id_str)
-        data = request.get_json()
+        creator_id_str = get_jwt_identity()
+        creator_id = int(creator_id_str)
 
         # Get query parameters for pagination and search
         page = request.args.get('page', 1, type=int)
@@ -135,7 +134,7 @@ def get_contacts():
         category_id = request.args.get('category_id')
 
         # Base query
-        query = Contact.query.filter_by(user_id=user_id)
+        query = Contact.query.filter_by(creator_id=creator_id)
 
         # Search by name, email, last contact place, city, country if provided
         if search:
@@ -203,8 +202,8 @@ def get_contacts():
 @jwt_required()
 def update_contact(contact_id):
     try:
-        user_id_str = get_jwt_identity()
-        user_id = int(user_id_str)
+        creator_id_str = get_jwt_identity()
+        creator_id = int(creator_id_str)
         data = request.get_json()
 
         if not data:
@@ -214,7 +213,7 @@ def update_contact(contact_id):
             }), 400
         
         # Find the contact
-        contact = Contact.query.filter_by(id=contact_id, user_id=user_id).first()
+        contact = Contact.query.filter_by(id=contact_id, creator_id=creator_id).first()
 
         if not contact:
             return jsonify({
@@ -249,7 +248,7 @@ def update_contact(contact_id):
                 # Verify category belongs to user
                 category = Category.query.filter_by(
                     id=category_id, 
-                    creator_id=user_id
+                    creator_id=creator_id
                 ).first()
                 if not category:
                     return jsonify({
@@ -322,10 +321,10 @@ def update_contact(contact_id):
 @jwt_required()
 def delete_contact(contact_id):
     try:
-        user_id_str = get_jwt_identity()  # Get as string
-        user_id = int(user_id_str)        # Convert to int
+        creator_id_str = get_jwt_identity()  # Get as string
+        creator_id = int(creator_id_str)        # Convert to int
         
-        contact = Contact.query.filter_by(id=contact_id, user_id=user_id).first()
+        contact = Contact.query.filter_by(id=contact_id, creator_id=creator_id).first()
         
         if not contact:
             return jsonify({'error': 'Contact not found'}), 404
@@ -345,8 +344,8 @@ def delete_contact(contact_id):
 @jwt_required()
 def bulk_delete_contacts():
     try:
-        user_id_str = get_jwt_identity()  # Get as string
-        user_id = int(user_id_str)        # Convert to int
+        creator_id_str = get_jwt_identity()  # Get as string
+        creator_id = int(creator_id_str)        # Convert to int
         data = request.get_json()
         
         contact_ids = data.get('contact_ids', [])
@@ -357,7 +356,7 @@ def bulk_delete_contacts():
         # Find and delete contacts
         deleted_count = Contact.query.filter(
             Contact.id.in_(contact_ids),
-            Contact.user_id == user_id
+            Contact.creator_id == creator_id
         ).delete(synchronize_session=False)
         
         db.session.commit()

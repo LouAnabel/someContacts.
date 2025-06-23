@@ -2,11 +2,12 @@ from app import db
 from datetime import datetime, timezone
 
 
+
 class Contact(db.Model):
     __tablename__ = 'contacts'  # Changed to plural for consistency
 
     id = db.Column(db.Integer, primary_key=True)
-    creator_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
     # Basic Contact Information
     first_name = db.Column(db.String(100), nullable=False)
@@ -16,7 +17,7 @@ class Contact(db.Model):
     is_favorite = db.Column(db.Boolean, default=False, nullable=False)
     
     # Additional fields that your to_dict() method expects
-    category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=True)
+    category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=True)
     birth_date = db.Column(db.Date)
     last_contact_date = db.Column(db.Date)
     last_contact_place = db.Column(db.String(200))
@@ -30,6 +31,7 @@ class Contact(db.Model):
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
+    category = db.relationship('Category', backref='contacts')
 
     def to_dict(self, include_category=True):
         data = {
@@ -49,8 +51,8 @@ class Contact(db.Model):
             'city': self.city,
             'country': self.country,
             'notes': self.notes,
-            'created_at': self.created_at.strftime('%d-%m-%Y %H:%M:%S'),
-            'updated_at': self.updated_at.strftime('%d-%m-%Y %H:%M:%S')
+            'created_at': self.created_at.strftime('%d-%m-%Y %H:%M:%S') if self.created_at else None,
+            'updated_at': self.updated_at.strftime('%d-%m-%Y %H:%M:%S') if self.updated_at else None,
         }
     
         if include_category and self.category:
