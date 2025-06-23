@@ -7,6 +7,7 @@ from flask_bcrypt import Bcrypt
 from config import DevelopmentConfig
 from app.services.redis_service import redis_service
 from datetime import datetime, timezone
+import os
 
 
 #create global instances of
@@ -19,7 +20,24 @@ bcrypt = Bcrypt() #password hashing
 # initicatializes the APP
 def create_app():
     app = Flask(__name__)
-    app.config.from_object(DevelopmentConfig)
+    
+    # Load appropriate config based on environment
+    env = os.getenv('FLASK_ENV', 'development')
+    if env == 'production':
+        app.config.from_object('config.ProductionConfig')
+        print("Loading Production Configuration")
+    else:
+        app.config.from_object('config.DevelopmentConfig')
+        print("Loading Development Configuration")
+    
+
+    # Debug: Print database info (don't log full URL for security)
+    db_url = app.config.get('SQLALCHEMY_DATABASE_URI', '')
+    if 'postgresql' in db_url:
+        print("Using PostgreSQL database")
+    elif 'sqlite' in db_url:
+        print("Using SQLite database")
+
 
     # Enable CORS for all routes
     CORS(app, 
