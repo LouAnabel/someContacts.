@@ -27,7 +27,7 @@ def validate_phone(phone):
     if not phone:  # Phone is optional
         return True
     # Remove spaces, dashes, parentheses for validation
-    clean_phone = re.sub(r'[^\d]', '', phone)
+    clean_phone = re.sub(r'[^\d+]', '', phone)
     # Check if it contains only digits and + (for international)
     pattern = r'^\+?[\d]{7,15}$'
     result = re.match(pattern, clean_phone) is not None
@@ -133,24 +133,31 @@ def create_contact():
         db.session.commit()
         logger.info(f"Contact created successfully: {contact.first_name} {contact.last_name or ''} (ID: {contact.id})")
 
-
         return jsonify({
+            'success': True,
             'message': 'Contact successfully created',
             'contact': contact.to_dict()
         }), 201
     
     except ValueError as e:
         logger.error(f"ValueError in create_contact: {e}")
-        return jsonify({'error': 'Invalid date format'}), 400
+        return jsonify({
+            'success': False,
+            'message': 'Invalid date format'
+        }), 400
     except Exception as e:
         db.session.rollback()
         logger.error(f"Unexpected error in create_contact: {e}", exc_info=True)
-        return jsonify({'error': 'Failed to create contact'}), 500
+        return jsonify({
+            'success': False,
+            'message': 'Failed to create contact'
+        }), 500
     
+
 
 #READ contacts by filter
 @contacts_bp.route('', methods=['GET'])
-@jwt_required
+@jwt_required()
 def get_contacts():
     try:
         creator_id_str = get_jwt_identity()
@@ -160,7 +167,7 @@ def get_contacts():
         # Get query parameters for pagination and search
         page = request.args.get('page', 1, type=int)
         per_page = request.args.get('per_page', 10, type=int)
-        search = request.args.get('search', '', type=str).strip
+        search = request.args.get('search', '', type=str).strip()
         
         # Optional query parameters
         favorites_only = request.args.get('favorites', '').lower() == 'true'
@@ -208,7 +215,7 @@ def get_contacts():
 
        
         # Order by favorites first, then by name
-        contacts = query.order_by(Contact.is_favorite.desc(), Contact.name.asc()).all()
+        contacts = query.order_by(Contact.is_favorite.desc(), Contact.last_name.asc()).all()
 
         # Paginate
         contacts = query.paginate(
@@ -218,6 +225,7 @@ def get_contacts():
         )
 
         return jsonify({
+            'success': True,
             'contacts': [contact.to_dict() for contact in contacts.items],
             'pagination': {
                 'page': page,
@@ -241,9 +249,10 @@ def get_contacts():
 
 def get_category_dropdown():
     try:
-        creator_id_str = get_jwt_identity
+        creator_id_str = get_jwt_identity()
         creator_id = int(creator_id_str)
         logger.info(f"Fetching categories for user ID: {creator_id}")
+
         categories = Category.query.filter_by(creator_id=creator_id)\
                                 .order_by(Category.name.asc()).all()
         
@@ -291,9 +300,10 @@ def update_contact(contact_id):
         creator_id_str = get_jwt_identity()
         creator_id = int(creator_id_str)
         logger.info(f"Updating contact {contact_id} for user ID: {creator_id}")
+        
         data = request.get_json()
-
         if not data:
+            logger.warning("Update failed: No data provided")
             return jsonify({
                 'success': False,
                 'message': 'No data provided'
@@ -303,6 +313,7 @@ def update_contact(contact_id):
         contact = Contact.query.filter_by(id=contact_id, creator_id=creator_id).first()
 
         if not contact:
+            logger.warning(f"Contact {contact_id} not found for user {creator_id}")
             return jsonify({
                 'success': False,
                 'message': 'Contact not found'
@@ -420,13 +431,20 @@ def delete_contact(contact_id):
         contact = Contact.query.filter_by(id=contact_id, creator_id=creator_id).first()
         
         if not contact:
-            return jsonify({'error': 'Contact not found'}), 404
+            logger.warning(f"Contact {contact_id} not found for user {creator_id}")
+            return jsonify({
+                'success': False,
+                'message': 'Contact not found'
+            }), 404
         
         
         db.session.delete(contact)
         db.session.commit()
         logger.info(f"Contact {contact_id} deleted successfully: {contact.first_name} {contact.last_name}")
-        return jsonify({'message': 'Contact deleted successfully'}), 200
+        return jsonify({
+            'success': True,
+            'message': 'Contact deleted successfully'
+        }), 200
        
 
     except Exception as e:
@@ -439,7 +457,7 @@ def delete_contact(contact_id):
 
 
 # BULK DELETE - Delete multiple contacts
-@contacts_bp.route('/delete-all', methods=['DELETE'])
+@contacts_bp.route('/bulk-delete', methods=['DELETE'])
 @jwt_required()
 def bulk_delete_contacts():
     try:
@@ -465,6 +483,7 @@ def bulk_delete_contacts():
         
         db.session.commit()
         
+        logger.info(f"Bulk delete completed: {deleted_count} contacts deleted")
         return jsonify({
             'message': f'{deleted_count} contacts deleted successfully',
             'deleted_count': deleted_count
@@ -472,6 +491,7 @@ def bulk_delete_contacts():
         
     except Exception as e:
         db.session.rollback()
+        logger.error(f"Error in bulk_delete_contacts: {e}", exc_info=True)
         return jsonify({'error': 'Failed to delete contacts'}), 500
     
 
@@ -528,6 +548,7 @@ def toggle_favorite(contact_id):
         
         # Toggle favorite status
         contact.is_favorite = not contact.is_favorite
+        contact.updated_at = db.func.current_timestamp()
         db.session.commit()
         action = "added to" if contact.is_favorite else "removed from"
     
