@@ -33,6 +33,19 @@ class Contact(db.Model):
                           onupdate=lambda: datetime.now(timezone.utc))
 
 
+    # Constraints for data integrity
+    __table_args__ = (
+        # Ensure email uniqueness per user (if provided)
+        db.Index('idx_creator_email', 'creator_id', 'email', unique=True, 
+                postgresql_where=db.text('email IS NOT NULL')),
+        # Index for common queries
+        db.Index('idx_creator_category', 'creator_id', 'category_id'),
+        db.Index('idx_creator_favorite', 'creator_id', 'is_favorite'),
+        # Check constraints
+        db.CheckConstraint('length(first_name) > 0', name='check_first_name_not_empty'),
+        db.CheckConstraint('birth_date <= CURRENT_DATE', name='check_birth_date_not_future'),
+    )
+
     def to_dict(self, include_category=True):
         data = {
             'id': self.id,

@@ -121,14 +121,6 @@ def get_category_by_id(category_id):
         creator_id_str = get_jwt_identity()
         creator_id = int(creator_id_str) #current user
         logger.info(f"Fetching category {category_id} for user ID: {creator_id}")
-
-        data = request.get_json()
-        
-        if not data:
-            return jsonify({
-                'success': False,
-                'message': 'No data provided'
-            }), 400
         
         category = Category.query.filter_by(
             id=category_id, 
@@ -145,7 +137,7 @@ def get_category_by_id(category_id):
         
         # Get all contacts in this category
         contacts = Contact.query.filter_by(
-            user_id=creator_id, 
+            creator_id=creator_id, 
             category_id=category_id
         ).order_by(Contact.name.asc()).all()
         
