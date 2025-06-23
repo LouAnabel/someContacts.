@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
 from flask_bcrypt import Bcrypt
+from app.services.redis_service import redis_service
 
 
 #create global instances of
@@ -13,7 +14,7 @@ jwt = JWTManager() #JSON Web Token authentication
 bcrypt = Bcrypt() #password hashing
 
 
-# implements the "application factory" pattern.
+# initicatializes the APP
 def create_app():
     app = Flask(__name__)
     app.config.from_object('app.config.Config')
@@ -30,6 +31,28 @@ def create_app():
     migrate.init_app(app, db) #connects changes to database
     jwt.init_app(app)
     bcrypt.init_app(app)
+    redis_service.init_app(app)  # Initialize Redis service
+
+
+    # JWT Configuration
+    @jwt.expired_token_loader
+    def expired_token_callback(jwt_header, jwt_payload):
+        return {'success': False, 'message': 'Token has expired'}, 401
+    
+    @jwt.invalid_token_loader
+    def invalid_token_callback(error):
+        return {'success': False, 'message': 'Invalid token'}, 401
+    
+    @jwt.unauthorized_loader
+    def unauthorized_callback(error):
+        return {'success': False, 'message': 'Authorization token required'}, 401
+    
+    # Token blacklist checker using Redis
+    @jwt.token_in_blocklist_loader
+    def check_if_token_revoked(jwt_header, jwt_payload):
+        jti = jwt_payload['jti']
+        return redis_service.is_token_blacklisted(jti)
+    
 
 
     # Import models (important for migrations)

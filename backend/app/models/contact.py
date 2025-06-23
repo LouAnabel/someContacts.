@@ -1,17 +1,19 @@
 from app import db
 from datetime import datetime, timezone
 
+
 class Contact(db.Model):
     __tablename__ = 'contacts'  # Changed to plural for consistency
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    creator_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
     # Basic Contact Information
     first_name = db.Column(db.String(100), nullable=False)
     last_name = db.Column(db.String(100))  # Optional
     email = db.Column(db.String(255), index=True)  # Optional and removed unique constraint
     phone = db.Column(db.String(20))
+    is_favorite = db.Column(db.Boolean, default=False, nullable=False)
     
     # Additional fields that your to_dict() method expects
     category = db.Column(db.String(50))  # Will upgrade to foreign key later
@@ -28,10 +30,11 @@ class Contact(db.Model):
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
 
+
     def to_dict(self):
         return {
             'id': self.id,
-            'user_id': self.user_id,
+            'creator_id': self.creator_id,
             'first_name': self.first_name,
             'last_name': self.last_name,
             'email': self.email,
@@ -49,5 +52,6 @@ class Contact(db.Model):
             'updated_at': self.updated_at.strftime('%d-%m-%Y %H:%M:%S')
         }
     
+
     def __repr__(self):
         return f'<Contact {self.first_name} {self.last_name}>'
