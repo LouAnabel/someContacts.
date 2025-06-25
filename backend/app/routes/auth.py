@@ -193,14 +193,16 @@ def logout():
 
         from app.models.token_block_list import TokenBlockList
         jti = jwt_data['jti']
-        expires_at = datetime.fromtimestamp(jwt_data['exp'], tz=timezone.utc)
+        exp_timestamp = jwt_data['exp']
         token_type = jwt_data.get('type', 'access')
+        expires_at = datetime.fromtimestamp(exp_timestamp, tz=timezone.utc)
 
         # Add current token to blacklist directly
         blacklisted_token = TokenBlockList(
             jti=jti,
+            token_type=token_type,
             user_id=int(current_user_id),
-            token_type=expires_at,
+            expires=expires_at,
             revoked_at=datetime.now(timezone.utc)
         )
 
