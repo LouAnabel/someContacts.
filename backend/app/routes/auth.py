@@ -282,7 +282,6 @@ def get_current_user():
         }), 500
 
 
-
 # JWT token checkers
 @jwt.token_in_blocklist_loader
 def check_if_token_revoked(jwt_header, jwt_payload):
