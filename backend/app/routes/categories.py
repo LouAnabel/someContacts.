@@ -73,48 +73,8 @@ def create_category():
         }), 500
 
 
-# GET /categories
-@categories_bp.route('', methods=['GET'])  
-@jwt_required()
-def get_categories():
-    try:
-        creator_id_str = get_jwt_identity()
-        creator_id = int(creator_id_str) #current user
-        logger.info(f"Fetching categories for user ID: {creator_id}")
-
-        categories = Category.query.filter_by(creator_id=creator_id)\
-                                 .order_by(Category.name.asc()).all()
-        
-        logger.debug(f"Found {len(categories)} categories")
-
-        categories_data = []
-        for category in categories:
-            category_dict = category.to_dict()
-            # Add contact count for this category
-            category_dict['contact_count'] = Contact.query.filter_by(
-                creator_id=creator_id, 
-                category_id=category.id
-            ).count()
-            categories_data.append(category_dict)
-        
-        return jsonify({
-            'success': True,
-            'categories': categories_data,
-            'total': len(categories_data)
-        }), 200
-        
-
-    except Exception as e:
-        logger.error(f"Error in get_categories: {e}", exc_info=True)
-        return jsonify({
-            'success': False,
-            'message': 'Failed to fetch categories',
-            'error': str(e)
-        }), 500
-
-
-
-@categories_bp.route('/<int:category_id>', methods=['GET'])  # GET /categories/1
+# GET /categories/1
+@categories_bp.route('/<int:category_id>', methods=['GET'])  
 @jwt_required()
 def get_category_by_id(category_id):
     try:
@@ -156,6 +116,97 @@ def get_category_by_id(category_id):
             'message': 'Failed to fetch category',
             'error': str(e)
         }), 500
+    
+
+# GET /all categories
+@categories_bp.route('', methods=['GET'])  
+@jwt_required()
+def get_categories():
+    try:
+        creator_id_str = get_jwt_identity()
+        creator_id = int(creator_id_str) #current user
+        logger.info(f"Fetching categories for user ID: {creator_id}")
+
+        categories = Category.query.filter_by(creator_id=creator_id)\
+                                 .order_by(Category.name.asc()).all()
+        
+        logger.debug(f"Found {len(categories)} categories")
+
+        categories_data = []
+        for category in categories:
+            category_dict = category.to_dict()
+            # Add contact count for this category
+            category_dict['contact_count'] = Contact.query.filter_by(
+                creator_id=creator_id, 
+                category_id=category.id
+            ).count()
+            categories_data.append(category_dict)
+        
+        return jsonify({
+            'success': True,
+            'categories': categories_data,
+            'total': len(categories_data)
+        }), 200
+        
+
+    except Exception as e:
+        logger.error(f"Error in get_categories: {e}", exc_info=True)
+        return jsonify({
+            'success': False,
+            'message': 'Failed to fetch categories',
+            'error': str(e)
+        }), 500
+
+
+
+#DROPDOWN
+#GET Categories for Dropdown
+@categories_bp.route('/categories', methods=['GET'])
+@jwt_required()
+
+def get_category_dropdown():
+    try:
+        creator_id_str = get_jwt_identity()
+        creator_id = int(creator_id_str)
+        logger.info(f"Fetching categories for user ID: {creator_id}")
+
+        categories = Category.query.filter_by(creator_id=creator_id)\
+                                .order_by(Category.name.asc()).all()
+        
+        logger.debug(f"Found {len(categories)} categories")
+
+        dropdown_data = [
+            {
+                'value': category.id,
+                'name': category.name
+            }
+            for category in categories
+        ]
+
+        dropdown_data.extend([
+            {
+                'value' : None,
+                'name' : 'No Category'
+            },
+            {
+                'value': 'ADD_NEW',
+                'name': '+ Add Category'
+            }
+        ])
+
+        return jsonify({
+            'success': True,
+            'options': dropdown_data,
+            'total_categories': len(categories)
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Error in get_category_dropdown: {e}", exc_info=True)
+        return jsonify({
+            'success': False,
+            'message': 'Failed to fetch dropdown options'
+        }), 500
+
 
 
 # UPDATE Category

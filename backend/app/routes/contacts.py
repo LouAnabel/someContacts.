@@ -154,6 +154,49 @@ def create_contact():
         }), 500
     
 
+# READ contact by ID
+@contacts_bp.route('<int:contact_id>', methods=['GET'])
+@jwt_required()
+def get_contact_by_id(contact_id):
+    try:
+        creator_id_str = get_jwt_identity()
+        creator_id = int(creator_id_str)
+        logger.info(f"Updating contact {contact_id} for user ID: {creator_id}")
+        
+        
+        # Find the contact
+        contact = Contact.query.filter_by(id=contact_id, creator_id=creator_id).first()
+
+        if not contact:
+            logger.warning(f"Contact {contact_id} not found for user {creator_id}")
+            return jsonify({
+                'success': False,
+                'message': 'Contact not found'
+            }), 404
+        
+        logger.debug(f"Found contact: {contact.first_name} {contact.last_name or ''}")
+
+        # Return the contact data
+        return jsonify({
+            'success': True,
+            'contact': contact.to_dict()
+        }), 200
+        
+    except ValueError as e:
+        logger.error(f"ValueError in get_contact_by_id: {e}")
+        return jsonify({
+            'success': False,
+            'message': 'Invalid contact ID format'
+        }), 400
+    
+    except Exception as e:
+        logger.error(f"Unexpected error in get_contact_by_id: {e}", exc_info=True)
+        return jsonify({
+            'success': False,
+            'message': 'Failed to retrieve contact',
+            'error': str(e)
+        }), 500
+
 
 #READ contacts by filter
 @contacts_bp.route('', methods=['GET'])
@@ -239,56 +282,6 @@ def get_contacts():
     except Exception as e:
         logger.error(f"Error in get_contacts: {e}", exc_info=True)
         return jsonify({'error': 'Failed to retrieve contacts'}), 500
-
-
-
-#GET Categories for Dropdown
-@contacts_bp.route('/categories', methods=['GET'])
-@jwt_required()
-
-def get_category_dropdown():
-    try:
-        creator_id_str = get_jwt_identity()
-        creator_id = int(creator_id_str)
-        logger.info(f"Fetching categories for user ID: {creator_id}")
-
-        categories = Category.query.filter_by(creator_id=creator_id)\
-                                .order_by(Category.name.asc()).all()
-        
-        logger.debug(f"Found {len(categories)} categories")
-
-        dropdown_data = [
-            {
-                'value': category.id,
-                'name': category.name
-            }
-            for category in categories
-        ]
-
-        dropdown_data.extend([
-            {
-                'value' : None,
-                'name' : 'No Category'
-            },
-            {
-                'value': 'ADD_NEW',
-                'name': '+ Add Category'
-            }
-        ])
-
-        return jsonify({
-            'success': True,
-            'options': dropdown_data,
-            'total_categories': len(categories)
-        }), 200
-        
-    except Exception as e:
-        logger.error(f"Error in get_category_dropdown: {e}", exc_info=True)
-        return jsonify({
-            'success': False,
-            'message': 'Failed to fetch dropdown options'
-        }), 500
-
 
 
 # UPDATE - Update Contact by ID
@@ -493,7 +486,7 @@ def bulk_delete_contacts():
         logger.error(f"Error in bulk_delete_contacts: {e}", exc_info=True)
         return jsonify({'error': 'Failed to delete contacts'}), 500
     
-
+    
 
 # FAVORITES
 ## Get only favorite contacts
