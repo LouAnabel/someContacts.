@@ -221,6 +221,144 @@ def get_contacts():
         # Base query
         query = Contact.query.filter_by(creator_id=creator_id)
 
+        # Track what filters are applied for better error messages
+        applied_filters = []
+
+        # Search by name, email, last contact place, city, country if provided
+        if search:
+            logger.debug(f"Applying search filter: '{search}'")
+            applied_filters.append(f"search term '{search}'")
+            search_term = f"%{search}%"
+            query = query.filter(
+                db.or_(
+                    Contact.first_name.ilike(search_term),
+                    Contact.last_name.ilike(search_term),
+                    Contact.email.ilike(search_term),
+                    Contact.last_contact_place.ilike(search_term),
+                    Contact.city.ilike(search_term),
+                    Contact.country.ilike(search_term),
+                    Contact.notes.ilike(search_term)
+                )
+            )
+
+        # Filter by favorites if requested
+        if favorites_only:
+            logger.debug("Applying favorites filter")
+            applied_filters.append("favorites only")
+            query = query.filter_by(is_favorite=True)
+
+        # Filter by category if provided
+        if category_id:
+            if category_id == 'uncategorized':
+                logger.debug("Filtering for uncategorized contacts")
+                applied_filters.append("uncategorized contacts")
+                query = query.filter(Contact.category_id.is_(None))
+            else:
+                try:
+                    category_id = int(category_id)
+                    logger.debug(f"Filtering for category_id: {category_id}")
+                    applied_filters.append(f"category ID {category_id}")
+                    query = query.filter_by(category_id=category_id)
+                except ValueError:
+                    logger.warning(f"Invalid category_id format: {category_id}")
+                    return jsonify({
+                        'success': False,
+                        'message': 'Invalid category ID'
+                    }), 400
+
+        # Order by favorites first, then by name
+        query = query.order_by(Contact.is_favorite.desc(), Contact.first_name.asc())
+
+        # Apply pagination
+        contacts = query.paginate(
+            page=page,
+            per_page=per_page,
+            error_out=False
+        )
+
+        # Check if no results found and filters were applied
+        if contacts.total == 0 and applied_filters:
+            # Create a descriptive error message based on applied filters
+            filter_description = ", ".join(applied_filters)
+            
+            return jsonify({
+                'success': False,
+                'message': f'No matching contacts found for {filter_description}',
+                'details': {
+                    'total_results': 0,
+                    'applied_filters': applied_filters,
+                    'suggestions': [
+                        'Try a different search term',
+                        'Check spelling',
+                        'Remove some filters to broaden your search'
+                    ]
+                }
+            }), 404
+
+        # Check if no results found but no filters applied (user has no contacts at all)
+        elif contacts.total == 0:
+            return jsonify({
+                'success': False,
+                'message': 'You have no contacts yet',
+                'details': {
+                    'total_results': 0,
+                    'suggestion': 'Create your first contact to get started'
+                }
+            }), 404
+
+        # Success - return results
+        logger.debug(f"Found {contacts.total} contacts matching criteria")
+        
+        response_data = {
+            'success': True,
+            'contacts': [contact.to_dict() for contact in contacts.items],
+            'pagination': {
+                'page': page,
+                'per_page': per_page,
+                'total': contacts.total,
+                'pages': contacts.pages,
+                'has_next': contacts.has_next,
+                'has_prev': contacts.has_prev
+            }
+        }
+        
+        # Add search context if filters were applied
+        if applied_filters:
+            response_data['search_context'] = {
+                'applied_filters': applied_filters,
+                'total_matches': contacts.total
+            }
+
+        return jsonify(response_data), 200
+    
+    except Exception as e:
+        logger.error(f"Error in get_contacts: {e}", exc_info=True)
+        return jsonify({
+            'success': False,
+            'message': 'Failed to retrieve contacts',
+            'error': str(e)
+        }), 500
+    
+    """
+    try:
+        creator_id_str = get_jwt_identity()
+        creator_id = int(creator_id_str)
+        logger.info(f"Fetching contacts for user ID: {creator_id}")
+
+        # Get query parameters for pagination and search
+        page = request.args.get('page', 1, type=int)
+        per_page = request.args.get('per_page', 10, type=int)
+        search = request.args.get('search', '', type=str).strip()
+        
+        # Optional query parameters
+        favorites_only = request.args.get('favorites', '').lower() == 'true'
+        category_id = request.args.get('category_id')
+
+        per_page = min(per_page, 100)
+        
+        # Base query
+        query = Contact.query.filter_by(creator_id=creator_id)
+
         # Search by name, email, last contact place, city, country if provided
         if search:
             logger.debug(f"Applying search filter: '{search}'")
@@ -281,7 +419,7 @@ def get_contacts():
     
     except Exception as e:
         logger.error(f"Error in get_contacts: {e}", exc_info=True)
-        return jsonify({'error': 'Failed to retrieve contacts'}), 500
+        return jsonify({'error': 'Failed to retrieve contacts'}), 500"""
 
 
 # UPDATE - Update Contact by ID
