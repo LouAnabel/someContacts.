@@ -11,22 +11,28 @@ class Config:
 
     # JWT configuration
     JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'my_super_secret_jwt_key')
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(seconds=30) #also possible 24h
-    JWT_REFRESH_TOKEN_EXPIRES = timedelta(hours=1)
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(seconds=30) #FOR TEST PHASE! also possible 1h
+    JWT_REFRESH_TOKEN_EXPIRES = timedelta(hours=1) #FOR TEST PHASE! otherwise 24h
 
-    # Database configuration - PostgreSQL
+    DATABASE_URL = os.getenv('DATABASE_URL', os.path.join(basedir, 'someContacts.db'))
+    SQLALCHEMY_DATABASE_URI = f'sqlite:///{DATABASE_URL}'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    # SQLite optimizations
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        'pool_pre_ping': True,
+        'pool_recycle': 300,
+        'connect_args': {
+            'check_same_thread': False,  # Allow SQLite to work with multiple threads
+            'timeout': 20
+        }
+    }
+
+    """If working with Postgres
     DATABASE_URL = os.getenv('DATABASE_URL')
-
     # Fix for newer SQLAlchemy versions (Render uses older postgres:// format)
     if DATABASE_URL and DATABASE_URL.startswith('postgres://'):
         DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgresql://', 1)
-    
-    SQLALCHEMY_DATABASE_URI = DATABASE_URL or \
-        'sqlite:///' + os.path.join(basedir, 'someContacts.db')  # Fallback for local dev
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
-
-    # Redis Configuration
-    REDIS_URL = os.environ.get('REDIS_URL') or 'redis://localhost:6379/0' # if redis is necessary
     
     # PostgreSQL optimizations
     SQLALCHEMY_ENGINE_OPTIONS = {
@@ -35,31 +41,56 @@ class Config:
         'pool_timeout': 20,           # Timeout for getting connection from pool
         'max_overflow': 0             # Don't create extra connections beyond pool_size
     }
+    """ 
 
-    # Redis Configuration
-    REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
+
+class TestingConfig(Config):
+    TESTING = True
+    DEBUG = True
+    
+    # Use in-memory SQLite for testing
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+    
+    # Very short tokens for testing
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(seconds=10)
+    JWT_REFRESH_TOKEN_EXPIRES = timedelta(minutes=1)
 
 
 class DevelopmentConfig(Config):
     DEBUG = True
-    # Use SQLite for local development
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'someContacts.db')
+
+    # Development-specific settings
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=24)  # Longer for development convenience
+    JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=7)
+
+    # Development SQLite path
+    DATABASE_URL = os.path.join(basedir, 'someContacts_dev.db')
+    SQLALCHEMY_DATABASE_URI = f'sqlite:///{DATABASE_URL}'
 
 
 class ProductionConfig(Config):
     DEBUG = False
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=15)  # Shorter for production
-    
-    # Additional production settings
+    JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=1)
+
+    # Production-specific optimizations
     SQLALCHEMY_ENGINE_OPTIONS = {
         'pool_pre_ping': True,
         'pool_recycle': 300,
-        'pool_timeout': 20,
-        'max_overflow': 0,
-        'pool_size': 5                # Limit connection pool size
+        'connect_args': {
+            'check_same_thread': False,
+            'timeout': 30  # Longer timeout for production
+        }
     }
     
-
+    # CORS configuration for production
+    CORS_ORIGINS = [
+        'http://localhost:3000', 
+        'http://127.0.0.1:3000',
+        # 'https://your-frontend-domain.com',  # Add your actual frontend domain
+        # 'https://your-frontend.vercel.app'   # Add your actual frontend domain
+    ]
     
-    # CORS configuration
-    CORS_ORIGINS = ['http://localhost:3000', 'http://127.0.0.1:3000']
+# Necessary?
+# CORS configuration
+# CORS_ORIGINS = ['http://localhost:3000', 'http://127.0.0.1:3000']
