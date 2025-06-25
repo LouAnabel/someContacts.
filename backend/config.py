@@ -28,21 +28,6 @@ class Config:
         }
     }
 
-    """If working with Postgres
-    DATABASE_URL = os.getenv('DATABASE_URL')
-    # Fix for newer SQLAlchemy versions (Render uses older postgres:// format)
-    if DATABASE_URL and DATABASE_URL.startswith('postgres://'):
-        DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgresql://', 1)
-    
-    # PostgreSQL optimizations
-    SQLALCHEMY_ENGINE_OPTIONS = {
-        'pool_pre_ping': True,        # Verify connections before use
-        'pool_recycle': 300,          # Recycle connections every 5 minutes
-        'pool_timeout': 20,           # Timeout for getting connection from pool
-        'max_overflow': 0             # Don't create extra connections beyond pool_size
-    }
-    """ 
-
 
 class TestingConfig(Config):
     TESTING = True
@@ -94,3 +79,20 @@ class ProductionConfig(Config):
 # Necessary?
 # CORS configuration
 # CORS_ORIGINS = ['http://localhost:3000', 'http://127.0.0.1:3000']
+
+
+
+    """If working with Postgres
+    DATABASE_URL = os.getenv('DATABASE_URL')
+    # Fix for newer SQLAlchemy versions (Render uses older postgres:// format)
+    if DATABASE_URL and DATABASE_URL.startswith('postgres://'):
+        DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgresql://', 1)
+    
+    # PostgreSQL optimizations
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        'pool_pre_ping': True,        # Verify connections before use
+        'pool_recycle': 300,          # Recycle connections every 5 minutes
+        'pool_timeout': 20,           # Timeout for getting connection from pool
+        'max_overflow': 0             # Don't create extra connections beyond pool_size
+    }
+    """ 
