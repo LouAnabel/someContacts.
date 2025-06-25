@@ -14,7 +14,11 @@ class Config:
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(seconds=30) #FOR TEST PHASE! also possible 1h
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(hours=1) #FOR TEST PHASE! otherwise 24h
 
-    DATABASE_URL = os.getenv('DATABASE_URL', os.path.join(basedir, 'someContacts.db'))
+    instance_dir = os.path.join(basedir, 'instance')
+    if not os.path.exists(instance_dir):
+        os.makedirs(instance_dir, exist_ok=True)
+
+    DATABASE_URL = os.getenv('DATABASE_URL', os.path.join(instance_dir, 'someContacts.db'))
     SQLALCHEMY_DATABASE_URI = f'sqlite:///{DATABASE_URL}'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
@@ -48,16 +52,36 @@ class DevelopmentConfig(Config):
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=24)  # Longer for development convenience
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=7)
 
+    instance_dir = os.path.join(basedir, 'instance')
+    if not os.path.exists(instance_dir):
+        os.makedirs(instance_dir, exist_ok=True)
+
     # Development SQLite path
-    DATABASE_URL = os.path.join(basedir, 'someContacts_dev.db')
+    DATABASE_URL = os.path.join(instance_dir, 'someContacts_dev.db')
     SQLALCHEMY_DATABASE_URI = f'sqlite:///{DATABASE_URL}'
 
 
 class ProductionConfig(Config):
     DEBUG = False
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=15)  # Shorter for production
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=15)  # Shorter for security reasons
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=1)
 
+    # For local production: use instance/ folder
+    # For Render: set DATABASE_PATH to persistent disk location
+    instance_dir = os.path.join(basedir, 'instance')
+    default_db_path = os.path.join(instance_dir, 'someContacts.db')
+    
+    # For Render deployment with persistent disk
+    DATABASE_PATH = os.getenv('DATABASE_PATH', default_db_path)
+    SQLALCHEMY_DATABASE_URI = f'sqlite:///{DATABASE_PATH}'
+    
+    # Ensure directory exists for local production
+    if not DATABASE_PATH.startswith('/opt/render'):  # Not on Render
+        db_dir = os.path.dirname(DATABASE_PATH)
+        if not os.path.exists(db_dir):
+            os.makedirs(db_dir, exist_ok=True)
+
+        
     # Production-specific optimizations
     SQLALCHEMY_ENGINE_OPTIONS = {
         'pool_pre_ping': True,
