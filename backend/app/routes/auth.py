@@ -1,10 +1,12 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity, get_jwt
 from app import db
 from app.models.user import User
 import re
 from app.services.redis_service import redis_service
 import logging
+from app.services.token_service import add_token_to_database, is_token_revoked
+from app import jwt
 
 
 # create Blueprint for authentication of user
@@ -78,15 +80,8 @@ def register():
         db.session.commit()
 
 
-        # Create token
-        access_token = create_access_token(identity=str(user.id))
-        refresh_token = create_refresh_token(identity=str(user.id))
-
-
         return jsonify({
             'message': 'User created successfully',
-            'access_token': access_token,
-            'refresh_token': refresh_token,
             'user': user.to_dict()
         }), 201
 
@@ -135,6 +130,10 @@ def login():
         # Create tokens
         access_token = create_access_token(identity=str(user.id))
         refresh_token = create_refresh_token(identity=str(user.id))
+
+        add_token_to_database(access_token)
+        add_token_to_database(refresh_token)
+
         
         logger.info(f"User logged in: {user.email}")
         
@@ -302,3 +301,19 @@ def logout_all():
             'message': 'Logout all failed',
             'error': str(e)
         }), 500
+
+
+
+@jwt.token_in_blocklist_loader
+def check_if_token_revoked(jwt_headers, jwt_payload):
+    try:
+        return is_token_revoked(jwt_payload)
+    except Exception:
+        return True
+
+
+@jwt.user_lookup_loader
+def load_user(jwt_headers, jwt_payload):
+    identity_claim = current_app.config["JWT_IDENTITY_CLAIM"]
+    user_id = jwt_payload[identity_claim]
+    return User.query.get(user_id)

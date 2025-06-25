@@ -11,8 +11,8 @@ class Config:
 
     # JWT configuration
     JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'my_super_secret_jwt_key')
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=1) #also possible 24h
-    JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=30)
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(seconds=30) #also possible 24h
+    JWT_REFRESH_TOKEN_EXPIRES = timedelta(hours=1)
 
     # Database configuration - PostgreSQL
     DATABASE_URL = os.getenv('DATABASE_URL')
