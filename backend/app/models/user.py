@@ -11,6 +11,7 @@ class User(db.Model):
     last_name = db.Column(db.String(100), nullable=False)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     
+    # categories relationship is defined in Category model via backref
     # Relationship with contacts
     contacts = db.relationship(
             'Contact', 
@@ -19,7 +20,7 @@ class User(db.Model):
             cascade='all, delete-orphan',
             foreign_keys='Contact.creator_id'  # Explicitly specify the foreign key
         )
-    # categories relationship is defined in Category model via backref
+    
 
 
     # Hash and set the user's password

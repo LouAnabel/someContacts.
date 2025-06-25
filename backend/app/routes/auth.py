@@ -3,9 +3,9 @@ from flask_jwt_extended import create_access_token, create_refresh_token, jwt_re
 from app import db
 from app.models.user import User
 import re
-from app.services.redis_service import redis_service
 import logging
-from app.services.token_service import add_token_to_database, is_token_revoked
+from app.services.token_service import add_token_to_blacklist, is_token_revoked,  revoke_all_user_tokens
+from datetime import datetime, timezone
 from app import jwt
 
 
@@ -97,7 +97,7 @@ def register():
 
 
 
-#create login endpoint route
+#create login endpoint route & create access & refresh token
 @auth_bp.route('/login', methods=['POST'])
 def login():
     try:
@@ -121,7 +121,7 @@ def login():
         
 
         user = User.query.filter_by(email=email).first()
-        if not user or not user.check_password(password):  # This now uses bcrypt
+        if not user or not user.check_password(password):  # This uses bcrypt
             return jsonify({
                 'success': False,
                 'message': 'Invalid credentials'
@@ -131,10 +131,6 @@ def login():
         access_token = create_access_token(identity=str(user.id))
         refresh_token = create_refresh_token(identity=str(user.id))
 
-        add_token_to_database(access_token)
-        add_token_to_database(refresh_token)
-
-        
         logger.info(f"User logged in: {user.email}")
         
         return jsonify({
@@ -168,7 +164,7 @@ def refresh():
                 'message': 'User not found'
             }), 404
         
-        new_access_token = create_access_token(identity=current_user_id)
+        new_access_token = create_access_token(identity=str(current_user_id))
         logger.info(f"Token refreshed for user: {user.email} (ID: {user.id})")
         
         return jsonify({
@@ -193,25 +189,25 @@ def refresh():
 def logout():
     try:
         current_user_id = get_jwt_identity()
-        user = User.query.get(current_user_id)
-        
-        """TEMPORARLY COMMENTED OUT 
         jwt_data = get_jwt()
-        jti = jwt_data['jti']  # JWT ID
-        exp = jwt_data['exp']  # Expiration timestamp
 
-        # Calculate how long until token expires
-        import time
-        current_time = int(time.time())
-        expires_in = exp - current_time
-        
-        # Only blacklist if token hasn't expired yet
-        if expires_in > 0:
-            success = redis_service.blacklist_token(jti, expires_in)
-            if not success:
-                logger.warning(f"Failed to blacklist token for user {current_user_id}")
-        """
-        
+        from app.models.token_block_list import TokenBlockList
+        jti = jwt_data['jti']
+        expires_at = datetime.fromtimestamp(jwt_data['exp'], tz=timezone.utc)
+        token_type = jwt_data.get('type', 'access')
+
+        # Add current token to blacklist directly
+        blacklisted_token = TokenBlockList(
+            jti=jti,
+            user_id=int(current_user_id),
+            token_type=expires_at,
+            revoked_at=datetime.now(timezone.utc)
+        )
+
+        db.session.add(blacklisted_token)
+        db.session.commit()
+
+        user = User.query.get(current_user_id)
         if user:
             logger.info(f"User logged out: {user.email}")
         
@@ -222,12 +218,40 @@ def logout():
         
     except Exception as e:
         logger.error(f"Logout failed: {e}")
+        db.session.rollback()
         return jsonify({
             'success': False,
             'message': 'Logout failed',
             'error': str(e)
         }), 500
-    
+
+
+# Logout form all devices
+@auth_bp.route('/logout-all', methods=['POST'])
+@jwt_required()
+def logout_all():
+    """Logout from all devices by blacklisting both access and refresh tokens"""
+    try:
+        current_user_id = get_jwt_identity()
+        # Revoke all tokens for this user
+        revoked_count = revoke_all_user_tokens(int(current_user_id))
+        
+        user = User.query.get(int(current_user_id))
+        if user:
+            logger.info(f"User logged out from all devices: {user.email} ({revoked_count} tokens revoked)")
+        
+        return jsonify({
+            'success': True,
+            'message': f'Successfully logged out from all devices ({revoked_count} sessions ended)'
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Logout all failed: {e}")
+        return jsonify({
+            'success': False,
+            'message': 'Logout all failed',
+            'error': str(e)
+        }), 500
 
 
 # Identify current user
@@ -236,7 +260,7 @@ def logout():
 def get_current_user():
     try:
         current_user_id = get_jwt_identity()
-        user = User.query.get(current_user_id)
+        user = User.query.get(int(current_user_id))
         
         if not user:
             return jsonify({
@@ -258,62 +282,18 @@ def get_current_user():
         }), 500
 
 
-# Logout form all devices
-@auth_bp.route('/logout-all', methods=['POST'])
-@jwt_required()
-def logout_all():
-    """Logout from all devices by blacklisting both access and refresh tokens"""
-    try:
-        current_user_id = get_jwt_identity()
-        user = User.query.get(current_user_id)
 
-
-        """REDIS TEMPORARLY COMMENTED OUT
-        jwt_data = get_jwt()
-        jti = jwt_data['jti']
-        exp = jwt_data['exp']
-
-        # Calculate expiration time
-        import time
-        current_time = int(time.time())
-        expires_in = exp - current_time
-        
-        # Blacklist current token
-        if expires_in > 0:
-            redis_service.blacklist_token(jti, expires_in)
-        
-        # Note: In a real implementation, you might want to track all user tokens
-        # and blacklist them all. For now, this just blacklists the current token.
-        """
-        
-        if user:
-            logger.info(f"User logged out from all devices: {user.email}")
-        
-        return jsonify({
-            'success': True,
-            'message': 'Successfully logged out from all devices'
-        }), 200
-        
-    except Exception as e:
-        logger.error(f"Logout all failed: {e}")
-        return jsonify({
-            'success': False,
-            'message': 'Logout all failed',
-            'error': str(e)
-        }), 500
-
-
-
+# JWT token checkers
 @jwt.token_in_blocklist_loader
-def check_if_token_revoked(jwt_headers, jwt_payload):
+def check_if_token_revoked(jwt_header, jwt_payload):
     try:
         return is_token_revoked(jwt_payload)
-    except Exception:
-        return True
-
+    except Exception as e:
+        logger.error(f"Error in token blocklist loader: {e}")
+        return False  # Don't block users if we can't check
 
 @jwt.user_lookup_loader
-def load_user(jwt_headers, jwt_payload):
+def load_user(jwt_header, jwt_payload):
     identity_claim = current_app.config["JWT_IDENTITY_CLAIM"]
     user_id = jwt_payload[identity_claim]
-    return User.query.get(user_id)
+    return User.query.get(int(user_id))
