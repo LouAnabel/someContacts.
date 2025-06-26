@@ -172,47 +172,6 @@ def revoke_all_user_tokens(user_id):
         db.session.rollback()
         return 0
     
-    
-""" ---- Add token to blacklist when user logs in
-def add_token_to_blacklist(encoded_token):
-    try:
-        decoded_token = decode_token(encoded_token)
-        jti = decoded_token["jti"]
-        token_type = decoded_token["type"]
-        identity_claim = current_app.config["JWT_IDENTITY_CLAIM"]
-
-        user_id = decoded_token.get(identity_claim)
-        expires = datetime.fromtimestamp(decoded_token["exp"], tz=timezone.utc)
-
-        # Check if already blacklisted
-        existing = TokenBlockList.query.filter_by(jti=jti).first()
-        if existing:
-            # Already blacklisted, just update revoked_at if needed
-            if existing.revoked_at is None:
-                existing.revoked_at = datetime.now(timezone.utc)
-                db.session.commit()
-                logger.info(f"Updated revoked_at for token {jti}")
-            return True
-
-        # Add new entry to blacklist
-        db_token = TokenBlockList(
-            jti=jti,
-            token_type=token_type,
-            user_id=int(user_id),
-            expires=expires,
-            revoked_at=datetime.now(timezone.utc) # Mark as revoked immediatly
-        )
-        db.session.add(db_token)
-        db.session.commit()
-        logger.info(f"Token {jti} blacklisted for user {user_id}")
-        return True
-
-    except Exception as e:
-        logger.error(f"Failed to blacklist token: {e}")
-        db.session.rollback()
-        return False
-    """
-    
 
 # Get all active sessions (token pairs) for a user
 def get_user_active_sessions(user_id):
