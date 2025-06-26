@@ -65,30 +65,31 @@ def create_app():
     @jwt.token_in_blocklist_loader
     def check_if_token_revoked(jwt_header, jwt_payload):
         jti = jwt_payload['jti']
-
+        
         try:
             from app.models.token_block_list import TokenBlockList
+            
+            # Look up token in database
             token = TokenBlockList.query.filter_by(jti=jti).first()
-
+            
             if not token:
-                logger.warning(f"Unknown token attempted: {jti}")
-                return True # block this token
+                # Token not found = unknown token = block it
+                logger.warning(f"Unknown token: {jti}")
+                return True  # Block
             
-            if datetime.now(timezone.utc) > token.expires:
-                logger.info(f"Expired token cleaned up: {jti}")
-                return True
-            
+            # Simple check: is the token revoked?
             is_revoked = not token.is_active
+            
             if is_revoked:
                 logger.info(f"Revoked token blocked: {jti}")
             else:
-                logger.debug(f"Valid token allowed: {jti}")
-
-            return is_revoked # revoked = blocked
-        
+                logger.debug(f"Active token allowed: {jti}")
+            
+            return is_revoked  # True = block, False = allow
+            
         except Exception as e:
-            logger.error(f"Token check failed: {e}")
-            return True
+            logger.error(f"Token check error: {e}")
+            return True  # Block if we can't check
 
 
     # JWT Configuration

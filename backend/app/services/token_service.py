@@ -15,22 +15,26 @@ def store_token_pair(access_token, refresh_token, user_id):
         decoded_access = decode_token(access_token)
         decoded_refresh = decode_token(refresh_token)
 
+        access_expires = datetime.fromtimestamp(decoded_access["exp"], tz=timezone.utc)
+        refresh_expires = datetime.fromtimestamp(decoded_refresh["exp"], tz=timezone.utc)
+        current_time = datetime.now(timezone.utc)
+
         access_token_record = TokenBlockList(
             jti=decoded_access["jti"],
             token_type="access",
             user_id=int(user_id),
-            expires=datetime.fromtimestamp(decoded_access["exp"], tz=timezone.utc),
+            expires=access_expires,
             is_active=True, #Token is active when created
-            created_at=datetime.now(timezone.utc)
+            created_at=current_time
         )
 
         refresh_token_record = TokenBlockList(
             jti=decoded_refresh["jti"],
             token_type="refresh",
             user_id=int(user_id),
-            expires=datetime.fromtimestamp(decoded_refresh["exp"], tz=timezone.utc),
+            expires=refresh_expires,
             is_active=True, #Token is active when created
-            created_at=datetime.now(timezone.utc)
+            created_at=current_time
         )
 
         db.session.add(access_token_record)
@@ -45,6 +49,7 @@ def store_token_pair(access_token, refresh_token, user_id):
         db.session.rollback()
         return False
     
+
 # Store a single token like refresh token
 def store_single_token(encoded_token, user_id):
 
@@ -83,9 +88,11 @@ def store_single_token(encoded_token, user_id):
 def revoke_token(token_jti, user_id):
     try:
         token = TokenBlockList.query.filter_by(jti=token_jti, user_id=user_id).first()
+        current_time = datetime.now(timezone.utc)
+
         if token:
             token.is_active= False
-            token.revoked_at = datetime.now(timezone.utc)
+            token.revoked_at = current_time
             db.session.commit()
             logger.info(f"Token {token_jti} revoked for user {user_id or 'any'}")
             return True
@@ -120,7 +127,7 @@ def revoke_user_access_tokens(user_id):
             user_id=user_id,
             token_type='access',
             is_active=True
-        )
+        ).all()
 
         revoked_count = 0
         current_time = datetime.now(timezone.utc)
@@ -138,39 +145,6 @@ def revoke_user_access_tokens(user_id):
         logger.error(f"Error revoking access tokens for user {user_id}: {e}")
         db.session.rollback()
         return 0
-    
-
-# Check if token is revoked, Returns True if revoked, False if valid
-def is_token_revoked(jwt_payload):
-    """Note: JWT library already handles expiration, so we only check blacklist"""
-    try:
-        jti = jwt_payload["jti"]
-        identity_claim = current_app.config["JWT_IDENTITY_CLAIM"]
-        user_id = jwt_payload[identity_claim]
-    
-        token = TokenBlockList.query.filter_by(jti=jti, user_id=user_id).one()
-        if not token:
-            # token nit in database = unknown token = revoked
-            return False
-        
-        
-        # Check if the blacklist entry has expired (cleanup)
-        if datetime.now(timezone.utc) > token.expires:
-            try:
-                db.session.delete(token)
-                db.session.commit()
-                logger.info(f"Cleaned up expired token {jti}")
-                return True  # Expired token is effectively revoked
-            
-            except Exception as cleanup_error:
-                logger.error(f"Failed to cleanup expired token: {cleanup_error}")
-                return True
-        return not token.is_active
-
-    except Exception as e:
-        logger.error(f"Error checking token revocation: {e}")
-        # Fail safe: if we can't check, assume token is valid (don't block users)
-        return False
     
 
 # Revoke all active tokens for a user (when logout all devices)

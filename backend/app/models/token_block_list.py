@@ -12,7 +12,7 @@ class TokenBlockList(db.Model):
     expires = db.Column(db.DateTime(timezone=True), nullable=False)
     is_active=db.Column(db.Boolean, default=True, nullable=False, index=True)
     created_at = db.Column(db.DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
-    revoked_at = db.Column(db.DateTime)
+    revoked_at = db.Column(db.DateTime(timezone=True), nullable=True)
     
 
     user = db.relationship("User", backref='tokens')

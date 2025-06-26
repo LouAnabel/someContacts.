@@ -3,7 +3,7 @@ from flask_jwt_extended import create_access_token, create_refresh_token, jwt_re
 from app import db
 from app.models.user import User
 from app.models.token_block_list import TokenBlockList
-from app.services.token_service import store_token_pair, store_single_token, is_token_revoked, revoke_current_token, revoke_all_user_tokens
+from app.services.token_service import store_token_pair, store_single_token, revoke_current_token, revoke_all_user_tokens
 import re
 import logging
 from datetime import datetime, timezone
@@ -302,15 +302,6 @@ def get_current_user():
             'error': str(e)
         }), 500
 
-
-# JWT token checkers
-@jwt.token_in_blocklist_loader
-def check_if_token_revoked(jwt_header, jwt_payload):
-    try:
-        return is_token_revoked(jwt_payload)
-    except Exception as e:
-        logger.error(f"Error in token blocklist loader: {e}")
-        return False  # Don't block users if we can't check
 
 @jwt.user_lookup_loader
 def load_user(jwt_header, jwt_payload):
