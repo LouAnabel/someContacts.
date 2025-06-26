@@ -2,9 +2,10 @@ from flask import Blueprint, request, jsonify, current_app
 from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity, get_jwt
 from app import db
 from app.models.user import User
+from app.models.token_block_list import TokenBlockList
+from app.services.token_service import store_token_pair, store_single_token, is_token_revoked, revoke_current_token, revoke_all_user_tokens
 import re
 import logging
-from app.services.token_service import add_token_to_blacklist, is_token_revoked,  revoke_all_user_tokens
 from datetime import datetime, timezone
 from app import jwt
 
@@ -97,7 +98,7 @@ def register():
 
 
 
-#create login endpoint route & create access & refresh token
+#create login endpoint route & create and save access & refresh token
 @auth_bp.route('/login', methods=['POST'])
 def login():
     try:
@@ -127,22 +128,30 @@ def login():
                 'message': 'Invalid credentials'
             }), 401
         
+
         # Create tokens
         access_token = create_access_token(identity=str(user.id))
         refresh_token = create_refresh_token(identity=str(user.id))
-
+        
+        # adds token pair to database
+        if not store_token_pair(access_token, refresh_token, user.id):
+            return jsonify({
+                'success': False,
+                'message': 'Failed to create session'
+            }), 500
+        
         logger.info(f"User logged in: {user.email}")
         
         return jsonify({
             'success': True,
-            'message': 'Login successful',
-            'user': user.to_dict(),
             'access_token': access_token,
-            'refresh_token': refresh_token
+            'refresh_token': refresh_token,
+            'user': user.to_dict()  # Assuming you have a to_dict method
         }), 200
-        
+    
     except Exception as e:
         logger.error(f"Login failed: {e}")
+        db.session.rollback()
         return jsonify({
             'success': False,
             'message': 'Login failed',
@@ -150,27 +159,26 @@ def login():
         }), 500
 
 
-
+# Updated refresh route
 @auth_bp.route('/refresh', methods=['POST'])
 @jwt_required(refresh=True)
 def refresh():
     try:
         current_user_id = get_jwt_identity()
-        user = User.query.get(int(current_user_id))
-        
-        if not user:
-            return jsonify({
-                'success': False,
-                'message': 'User not found'
-            }), 404
         
         new_access_token = create_access_token(identity=str(current_user_id))
-        logger.info(f"Token refreshed for user: {user.email} (ID: {user.id})")
+        logger.info(f"Token refreshed for user with ID: {current_user_id}")
+        
+        # Store new access token in database
+        if not store_single_token(new_access_token, current_user_id):
+            return jsonify({
+                'success': False,
+                'message': 'Failed to refresh token'
+            }), 500
         
         return jsonify({
             'success': True,
-            'access_token': new_access_token,
-            'user': user.to_dict()
+            'access_token': new_access_token
         }), 200
         
     except Exception as e:
@@ -184,43 +192,32 @@ def refresh():
 
 
 # create logout route
+# Note: This only revokes the current access token, not the refresh token.
 @auth_bp.route('/logout', methods=['POST'])
 @jwt_required()
 def logout():
     try:
         current_user_id = get_jwt_identity()
-        jwt_data = get_jwt()
+        jwt_payload = get_jwt()
 
-        from app.models.token_block_list import TokenBlockList
-        jti = jwt_data['jti']
-        exp_timestamp = jwt_data['exp']
-        token_type = jwt_data.get('type', 'access')
-        expires_at = datetime.fromtimestamp(exp_timestamp, tz=timezone.utc)
-
-        # Add current token to blacklist directly
-        blacklisted_token = TokenBlockList(
-            jti=jti,
-            token_type=token_type,
-            user_id=int(current_user_id),
-            expires=expires_at,
-            revoked_at=datetime.now(timezone.utc)
-        )
-
-        db.session.add(blacklisted_token)
-        db.session.commit()
-
-        user = User.query.get(current_user_id)
-        if user:
-            logger.info(f"User logged out: {user.email}")
-        
-        return jsonify({
-            'success': True,
-            'message': 'Successfully logged out'
-        }), 200
+        # Revoke the current token
+        if revoke_current_token(jwt_payload):
+            user = User.query.get(current_user_id)
+            if user:
+                logger.info(f"User logged out: {user.email}")
+            
+            return jsonify({
+                'success': True,
+                'message': 'Successfully logged out'
+            }), 200
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'Failed to logout'
+            }), 500
         
     except Exception as e:
         logger.error(f"Logout failed: {e}")
-        db.session.rollback()
         return jsonify({
             'success': False,
             'message': 'Logout failed',
@@ -228,24 +225,40 @@ def logout():
         }), 500
 
 
-# Logout form all devices
+
+# Logout form all devices:
+# revoking ALL tokens (access and refresh) for the user. This will invalidate all sessions across all devices.
 @auth_bp.route('/logout-all', methods=['POST'])
 @jwt_required()
 def logout_all():
-    """Logout from all devices by blacklisting both access and refresh tokens"""
     try:
         current_user_id = get_jwt_identity()
         # Revoke all tokens for this user
         revoked_count = revoke_all_user_tokens(int(current_user_id))
         
-        user = User.query.get(int(current_user_id))
-        if user:
-            logger.info(f"User logged out from all devices: {user.email} ({revoked_count} tokens revoked)")
+        if revoked_count >= 0:  # 0 or more tokens revoked (0 is valid if no active tokens)
+            user = User.query.get(int(current_user_id))
+            if user:
+                logger.info(f"User logged out from all devices: {user.email} ({revoked_count} tokens revoked)")
         
-        return jsonify({
-            'success': True,
-            'message': f'Successfully logged out from all devices ({revoked_count} sessions ended)'
-        }), 200
+        # Provide different messages based on revoked count
+            if revoked_count == 0:
+                message = "No active sessions found to revoke"
+            elif revoked_count == 1:
+                message = "Successfully logged out from 1 session"
+            else:
+                message = f"Successfully logged out from all devices ({revoked_count} sessions ended)"
+            
+            return jsonify({
+                'success': True,
+                'message': message,
+                'revoked_count': revoked_count
+            }), 200
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'Failed to logout from all devices'
+            }), 500
         
     except Exception as e:
         logger.error(f"Logout all failed: {e}")
