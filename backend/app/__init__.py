@@ -6,6 +6,7 @@ from flask_jwt_extended import JWTManager
 from flask_bcrypt import Bcrypt
 from config import DevelopmentConfig
 from datetime import datetime, timezone
+import logging
 import os
 
 
@@ -14,7 +15,7 @@ db = SQLAlchemy() #database operations
 migrate = Migrate() #database documentation
 jwt = JWTManager() #JSON Web Token authentication
 bcrypt = Bcrypt() #password hashing
-
+logger = logging.getLogger(__name__) 
 
 # initicatializes the APP
 def create_app():
@@ -58,6 +59,36 @@ def create_app():
     migrate.init_app(app, db) #connects changes to database
     jwt.init_app(app)
     bcrypt.init_app(app)
+
+    # This function is called AUTOMATICALLY on every @jwt_required() request.
+    # It checks if the token is in the blocklist and if it's still active.
+    @jwt.token_in_blocklist_loader
+    def check_if_token_revoked(jwt_header, jwt_payload):
+        jti = jwt_payload['jti']
+
+        try:
+            from app.models.token_block_list import TokenBlockList
+            token = TokenBlockList.query.filter_by(jti=jti).first()
+
+            if not token:
+                logger.warning(f"Unknown token attempted: {jti}")
+                return True # block this token
+            
+            if datetime.now(timezone.utc) > token.expires:
+                logger.info(f"Expired token cleaned up: {jti}")
+                return True
+            
+            is_revoked = not token.is_active
+            if is_revoked:
+                logger.info(f"Revoked token blocked: {jti}")
+            else:
+                logger.debug(f"Valid token allowed: {jti}")
+
+            return is_revoked # revoked = blocked
+        
+        except Exception as e:
+            logger.error(f"Token check failed: {e}")
+            return True
 
 
     # JWT Configuration

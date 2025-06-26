@@ -168,7 +168,7 @@ def refresh():
     try:
         current_user_id = get_jwt_identity()
         try:
-            revoked_count = revoke_user_access_tokens(int(current_user_id)                             )
+            revoked_count = revoke_user_access_tokens(int(current_user_id))
             logger.info(f"Revoked {revoked_count} old access tokens for user {current_user_id}")
         
         except Exception as revoke_error:

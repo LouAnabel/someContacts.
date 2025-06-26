@@ -112,14 +112,14 @@ def revoke_current_token(jwt_payload):
         logger.error(f"Error revoking current token: {e}")
         return False
     
-    
+
 # revoke all old access token of user after refresh
 def revoke_user_access_tokens(user_id):
     try:
         active_access_tokens = TokenBlockList.query.filter_by(
             user_id=user_id,
             token_type='access',
-            is_aactive=True
+            is_active=True
         )
 
         revoked_count = 0
