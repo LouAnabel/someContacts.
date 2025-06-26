@@ -50,7 +50,7 @@ def store_single_token(encoded_token, user_id):
 
     try:
         decoded_token = decode_token(encoded_token)
-        jti = decode_token["jti"]
+        jti = decoded_token["jti"]
         token_type = decoded_token["type"]
         expires = datetime.fromtimestamp(decoded_token["exp"], tz=timezone.utc)
 
@@ -111,6 +111,33 @@ def revoke_current_token(jwt_payload):
     except Exception as e:
         logger.error(f"Error revoking current token: {e}")
         return False
+    
+    
+# revoke all old access token of user after refresh
+def revoke_user_access_tokens(user_id):
+    try:
+        active_access_tokens = TokenBlockList.query.filter_by(
+            user_id=user_id,
+            token_type='access',
+            is_aactive=True
+        )
+
+        revoked_count = 0
+        current_time = datetime.now(timezone.utc)
+        
+        for token in active_access_tokens:
+            token.is_active = False
+            token.revoked_at = current_time
+            revoked_count += 1
+        
+        db.session.commit()
+        logger.info(f"Revoked {revoked_count} access tokens for user {user_id}")
+        return revoked_count
+        
+    except Exception as e:
+        logger.error(f"Error revoking access tokens for user {user_id}: {e}")
+        db.session.rollback()
+        return 0
     
 
 # Check if token is revoked, Returns True if revoked, False if valid

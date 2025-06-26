@@ -160,22 +160,28 @@ def login():
 
 
 # Updated refresh route
+from app.services.token_service import revoke_user_access_tokens
+
 @auth_bp.route('/refresh', methods=['POST'])
 @jwt_required(refresh=True)
 def refresh():
     try:
         current_user_id = get_jwt_identity()
+        try:
+            revoked_count = revoke_user_access_tokens(int(current_user_id)                             )
+            logger.info(f"Revoked {revoked_count} old access tokens for user {current_user_id}")
         
+        except Exception as revoke_error:
+            logger.error(f"Failed to revoke old access tokens: {revoke_error}")
+            
         new_access_token = create_access_token(identity=str(current_user_id))
-        logger.info(f"Token refreshed for user with ID: {current_user_id}")
-        
         # Store new access token in database
         if not store_single_token(new_access_token, current_user_id):
             return jsonify({
                 'success': False,
                 'message': 'Failed to refresh token'
             }), 500
-        
+            
         return jsonify({
             'success': True,
             'access_token': new_access_token
