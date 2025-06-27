@@ -1,23 +1,37 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { ThemeProvider } from './components/theme/ThemeContext';
+import Layout from './components/layout/Layout'; // Updated import path
+import Home from './pages/Home';
+import AllContacts from './pages/AllContacts';
+import AddContact from './pages/AddContact';
+
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <Layout />,
+    children: [
+      {
+        index: true,
+        element: <Home />,
+      },
+      {
+        path: 'allcontacts',
+        element: <AllContacts />,
+      },
+      {
+        path: 'addcontact',
+        element: <AddContact />,
+      },
+    ],
+  },
+]);
 
 function App() {
   return (
-    <div className="min-h-screen bg-linear-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-      <div className="bg-white p-8 rounded-lg shadow-xl">
-        <h1 className="text-3xl font-bold text-gray-800 mb-4">
-          Hello Tailwind!
-        </h1>
-        <p className="text-gray-600">
-          If you see styling, Tailwind is working! 🎉
-        </p>
-        <button className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-          Test Button
-        </button>
-      </div>
-    </div>
-  )
+    <ThemeProvider>
+      <RouterProvider router={router} />
+    </ThemeProvider>
+  );
 }
 
-export default App
+export default App;

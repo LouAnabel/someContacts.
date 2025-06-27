@@ -1,1 +1,19 @@
-@import 'tailwindcss';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply scroll-smooth;
+  }
+  
+  body {
+    @apply bg-white dark:bg-black text-gray-900 dark:text-white font-sans transition-colors duration-200;
+  }
+}
+
+@layer components {
+  .nav-link {
+    @apply text-gray-900 dark:text-white hover:text-red-600 dark:hover:text-red-300 transition-colors;
+  }
+}
