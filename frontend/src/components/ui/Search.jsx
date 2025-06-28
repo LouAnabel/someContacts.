@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { HiSearch } from 'react-icons/hi';
+import { buttonStyles, searchStyles } from '../styles/buttonStyles.js';
 
 const Search = ({ 
   placeholder = "Search...",
@@ -11,14 +12,11 @@ const Search = ({
   const [searchTerm, setSearchTerm] = useState('');
 
   const handleSearch = (value) => {
+    console.log('Searching for:', searchTerm);
     setSearchTerm(value);
     if (onSearch) {
       onSearch(value);
     }
-  };
-
-  const toggleSearch = () => {
-    setIsOpen(!isOpen);
   };
 
   // Mobile version with toggle button
@@ -27,16 +25,14 @@ const Search = ({
       <>
         {/* Search Toggle Button */}
         <button
-            type="button"
-            onClick={() => setIsOpen(!isOpen)}
-            className={`p-2.5 rounded-lg text-sm transition-colors ${
-                isOpen 
-                ? 'text-red-500 hover:bg-red-200 dark:bg-black dark:text-red-500' // Active styles (same as hover)
-                : 'text-black dark:text-white hover:bg-red-200 hover:text-red-500 dark:hover:bg-black dark:hover:text-red-500' // Normal styles
-            }`}
->
-        <HiSearch className="w-5 h-5" />
-        <span className="sr-only">Search</span>
+          type="button"
+          onClick={() => setIsOpen(!isOpen)}
+          className={`p-2.5 rounded-lg text-sm ${buttonStyles.base} ${
+            isOpen ? buttonStyles.active : buttonStyles.normal
+          }`}
+        >
+          <HiSearch className="w-5 h-5" />
+          <span className="sr-only">Search</span>
         </button>
         
         {/* Mobile Search Bar (dropdown) */}
@@ -48,7 +44,7 @@ const Search = ({
                 placeholder={placeholder}
                 value={searchTerm}
                 onChange={(e) => handleSearch(e.target.value)}
-                className="w-full px-4 py-2 pl-10 bg-white dark:bg-white border border-gray-300 dark:border-gray-800 rounded-lg font-light text-gray-500 dark:gray-500"
+                className={searchStyles.mobile}
                 autoFocus
               />
               <HiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500" />
@@ -67,7 +63,7 @@ const Search = ({
         placeholder={placeholder}
         value={searchTerm}
         onChange={(e) => handleSearch(e.target.value)}
-        className="w-64 px-4 py-2 pl-10 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-gray-900 dark:text-white"
+        className={searchStyles.desktop}
       />
       <HiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500" />
     </div>
