@@ -28,7 +28,7 @@ function App() {
             <Route path="addcontact" element={<AddContact />} />
             <Route path="contact/:id" element={<ShowContact />} />
             <Route path="updatecontact/:id" element={<UpdateContacts />} />
-            <Route path="hello/logout" element={<Logout />} />
+            <Route path="goodbye/logout" element={<Logout />} />
           </Route>
         </Routes>
       </Router>
