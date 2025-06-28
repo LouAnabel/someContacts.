@@ -1,25 +1,8 @@
-import { Outlet, Link, useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { Outlet } from 'react-router-dom';
+import Navbar from './Navbar';
+import Footer from './Footer';
 
-function UserLayout({ onLogout }) {
-  const [userData, setUserData] = useState(null);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    // Get user data from localStorage
-    const storedUserData = localStorage.getItem('userData');
-    if (storedUserData) {
-      setUserData(JSON.parse(storedUserData));
-    }
-  }, []);
-
-  const handleLogout = () => {
-    if (window.confirm('Are you sure you want to logout?')) {
-      onLogout();
-      navigate('/auth/login');
-    }
-  };
-
+function UserLayout() {
   return (
     <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white font-sans transition-colors duration-200 flex flex-col">
       <Navbar />
@@ -29,6 +12,6 @@ function UserLayout({ onLogout }) {
       <Footer />
     </div>
   );
-};
+}
 
-export default Layout;
+export default UserLayout;

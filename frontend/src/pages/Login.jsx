@@ -1,104 +1,59 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-function Login({ onLogin }) {
-    const [formData, setFormdata] = useState({
-        email: '',
-        password: ''
-    });
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState('');
-    const navigate = useNavigate();
+function Login() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const navigate = useNavigate();
 
-    const handleChange = (e) => {
-        setFormdata({
-            ...formData,
-            [e.traget.name]: e.target.value
-        });
-        setError(''); //clear Error when user starts typing
-    };
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Simple form handling - no authentication
+    console.log('Login form submitted:', { email, password });
+    
+    // Just navigate to home page
+    navigate('/');
+  };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setIsLoading(true);
-        setErrorError('');
-
-        try {
-            // Replace this with your actual API call
-            const response = await fetch('/api/auth/login', {
-            method: 'POST',
-            headers: {
-            'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(formData),
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-        // Success - call the login function passed from App
-            onLogin(data.user, data.token);
-            navigate('/'); // Navigate to dashboard
-        } else {
-            setError(data.message || 'Login failed');
-        }
-        } catch (err) {
-        setError('Network error. Please try again.');
-        console.error('Login error:', err);
-        } finally {
-        setIsLoading(false);
-        }
-    };
-
-    return (
-    <div className="login-container">
-      <form onSubmit={handleSubmit} className="login-form">
-        <h2>Login</h2>
-        
-        {error && (
-          <div className="error-message" style={{ color: 'red', marginBottom: '1rem' }}>
-            {error}
-          </div>
-        )}
-
-        <div className="form-group">
-          <label htmlFor="email">Email:</label>
+  return (
+    <div className="max-w-md mx-auto mt-8 p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+      <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
+      
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label htmlFor="email" className="block text-sm font-medium mb-1">
+            Email
+          </label>
           <input
             type="email"
             id="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700"
             required
-            disabled={isLoading}
           />
         </div>
 
-        <div className="form-group">
-          <label htmlFor="password">Password:</label>
+        <div>
+          <label htmlFor="password" className="block text-sm font-medium mb-1">
+            Password
+          </label>
           <input
             type="password"
             id="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700"
             required
-            disabled={isLoading}
           />
         </div>
 
-        <button 
-          type="submit" 
-          disabled={isLoading}
-          className="login-button"
+        <button
+          type="submit"
+          className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
-          {isLoading ? 'Logging in...' : 'Login'}
+          Login
         </button>
-
-        <p>
-          Don't have an account? 
-          <a href="/hello/register"> Register here</a>
-        </p>
       </form>
     </div>
   );

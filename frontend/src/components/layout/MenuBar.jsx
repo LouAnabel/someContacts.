@@ -10,7 +10,7 @@ const MenuBar = ({ isMenuOpen, setIsMenuOpen }) => {
     { to: "/", label: "home." },
     { to: "/contacts", label: "allContacts." },
     { to: "/addcontact", label: "newContact." },
-    { to: "/logout", label: "logout."}
+    { to: "/hello/logout", label: "logout."}
   ];
 
   const linkClasses = "block top-20 px-4 py-1 pt-6 font-text font-semibold text-lg text-white dark:text-black  hover:text-red-500 dark:hover:text-red-500 rounded transition-colors duration-200";

@@ -1,8 +1,22 @@
 import { Button } from "flowbite-react";
 import { Link } from 'react-router-dom'
 import CircleButton from '../components/ui/Buttons';
+import { useNavigate } from 'react-router-dom';
 
-export default function Home() {
+function Home() {
+
+  const navigate = useNavigate()
+  const handleLogout = () => {
+    /* // Clear auth data
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('userData');*/
+    
+    // Navigate to login
+    navigate('/hello/login');
+    /* // Optionally reload to reset app state
+     window.location.reload();*/
+  }; 
+
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-heading font-bold text-gray-900 dark:text-white mb-4">
@@ -20,9 +34,11 @@ export default function Home() {
         size="medium"
         variant="dark"
         className="border border-white/30"
-        onClick={() => console.log('Get started!')}>
+        onClick={handleLogout}>
         log out.
       </CircleButton>
     </div> 
   );
 }
+
+export default Home;

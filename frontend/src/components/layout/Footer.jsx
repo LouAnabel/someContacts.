@@ -1,6 +1,4 @@
 
-
-
 const Footer = () => {
     return (
         <footer className="bg-white dark:bg-black m-4">
@@ -9,6 +7,6 @@ const Footer = () => {
         </span>
         </footer>
     );
-};
+}
 
 export default Footer;

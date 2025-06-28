@@ -17,6 +17,6 @@ const AuthHeader = () => {
       </div>
     </nav>
   );
-};
+}
 
 export default AuthHeader;
