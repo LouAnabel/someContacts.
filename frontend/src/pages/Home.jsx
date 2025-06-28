@@ -11,7 +11,7 @@ export default function Home() {
       </h1>
       <p className="text-2xl font-text text-black dark:text-white mb-6">
         You have already collected{" "}
-        <Link to="/allcontacts">
+        <Link to="/contacts">
           <span className="font-text font-semibold text-red dark:text-red hover:text-red-500 dark:hover:text-red-500"> 250</span>
         </Link>
         {" "}contacts.

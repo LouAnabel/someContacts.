@@ -1,7 +1,7 @@
 export const buttonStyles = {
   base: "p-2 rounded-md transition-colors duration-200",
-  active: "text-red-500 hover:bg-red-200 dark:bg-black dark:text-red-500",
-  normal: "text-gray-900 dark:text-white hover:text-red-500 hover:bg-red-200 dark:hover:text-red-500"
+  active: "text-red-500 dark:bg-black dark:text-red-500",
+  normal: "text-gray-900 dark:text-white hover:text-red-500 dark:hover:text-red-500"
 };
 
 export const searchStyles = {

@@ -1,26 +1,26 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import ThemeToggle from '../theme/ThemeToggle.jsx';
 import Search from '../ui/Search.jsx';
-import MenuBar from '../ui/MenuBar.jsx';
+import MenuBar from './Menubar.jsx'
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   const handleSearch = (searchTerm) => {
     console.log('Searching for:', searchTerm);
     // Add your search logic here
     if (searchTerm.trim()) {
-    // Navigate to all contacts page (you can handle the filtering there)
-    navigate('/allcontacts', { state: { searchTerm } });
+      // Navigate to all contacts page (you can handle the filtering there)
+      navigate('/contacts', { state: { searchTerm } });
     }
   };
-};
 
   // Common navigation items for desktop
   const navItems = [
     { to: "/", label: "Home" },
-    { to: "/allcontacts", label: "All Contacts" },
+    { to: "/contacts", label: "All Contacts" },
     { to: "/addcontact", label: "Add Contact" }
   ];
 
