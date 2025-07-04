@@ -27,7 +27,7 @@ const Navbar = () => {
   return (
     <nav className="bg-white dark:bg-black dark:border-gray-800 fixed w-full z-50 top-0">
       <div className="max-w-screen-xl mx-auto px-4">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center h-20">
           
           {/* someContacts. Title */}
           <Link to="/" className="flex items-center">
