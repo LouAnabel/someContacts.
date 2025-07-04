@@ -3,6 +3,7 @@ import { ThemeProvider } from './components/theme/ThemeContext';
 
 // Layout components
 import UserLayout from './components/layout/UserLayout';
+import AuthLayout from './components/layout/AuthLayout';  
 
 // Page components
 import Login from './pages/login';
@@ -22,12 +23,16 @@ function App() {
           {/* All routes now use UserLayout - no authentication needed */}
           <Route path="/*" element={<UserLayout />}>
             <Route index element={<Home />} />
-            <Route path="hello/login" element={<Login />} />
-            <Route path="helo/register" element={<Register />} />
             <Route path="contacts" element={<AllContacts />} />
             <Route path="addcontact" element={<AddContact />} />
             <Route path="contact/:id" element={<ShowContact />} />
             <Route path="updatecontact/:id" element={<UpdateContacts />} />
+          </Route>
+          <Route path="/hello/*" element={<AuthLayout />}>
+            <Route path="login" element={<Login />} />
+            <Route path="register" element={<Register />} />
+          </Route>
+          <Route path="/goodbye/*" element={<AuthLayout />}>
             <Route path="goodbye/logout" element={<Logout />} />
           </Route>
         </Routes>

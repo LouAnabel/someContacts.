@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Devanagari:wght@100;200;300;400;500;600;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -8,12 +9,279 @@
   }
   
   body {
-    @apply bg-white dark:bg-black text-gray-900 dark:text-white font-sans transition-colors duration-200;
+    @apply bg-white dark:bg-black text-black dark:text-white font-sans;
   }
 }
 
 @layer components {
-  .nav-link {
-    @apply text-gray-900 dark:text-white hover:text-red-600 dark:hover:text-red-300 transition-colors;
+
+
+  /* Layout structure for proper screen relationship */
+  .login-container {
+    @apply min-h-screen bg-white dark:bg-black flex items-center justify-center p-4;
+    position: relative;
+    font-family: 'IBM Plex Sans Devanagari', sans-serif;
+    align-items: flex-start;
+    padding-top: 20vh;
+  }
+
+  .login-card {
+    @apply bg-gray-100 rounded-3xl p-6;
+    background: #f5f5f5;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    /* Center the card and give it proper constraints */
+    width: 70vw;
+    min-width: 260px;
+    max-width: 480px;
+    height: 250px;
+    /* Center vertically and horizontally */
+    position: relative;
+    z-index: 10;
+    overflow: visible
+  }
+
+  /* Button container for CircleButton positioning 
+  .login-card > *:last-child {
+    position: absolute;
+    bottom: -60px;
+    right: -30px;
+    margin: 0;
+    display: block;
+    width: fit-content;
+  }*/
+
+  /* Alternative: Add a specific class for button wrapper */
+  .button-container {
+    @apply mt-8 flex justify-end;
+  }
+  
+  .signup-link {
+    @apply hover:text-red-500 text-black dark:text-white hover:dark:text-red-500 font-normal mt-12 block;
+    font-size: 16px;
+    position: absolute;
+    bottom: -30px;
+    left: 30px;
+    margin: 0;
+  }
+
+
+
+  .login-title {
+    @apply text-3xl font-bold text-center mb-8 text-black;
+  }
+
+  .input-group {
+    @apply mb-6;
+  }
+
+  .input-field {
+    @apply w-full p-2.5 rounded-xl border border-black bg-transparent text-black placeholder-gray-500 transition-all duration-200;
+    max-width: 100%;
+    min-width: 200px;
+    font-size: 16px;
+    font-weight: 400;
+  }
+
+  .input-field:focus {
+    @apply outline-none border-red-500;
+  }
+
+  .input-field::placeholder {
+    color: #666;
+    font-weight: 300;
+  }
+
+  
+  .bottom-tagline {
+    @apply text-center text-black dark:text-white text-xl md:text-2xl;
+    font-weight: 300;
+    line-height: 1.4;
+    position: absolute;
+    left: 50%;
+    buttom: 10%;
+    transform: translateX(-50%);
+    width: 100%;
+  }
+
+  
+  /* Responsive adjustments */
+  @media (min-width: 480px) {
+    
+    .login-card {
+      @apply p-6;
+      width: 90vw;
+      min-width: 200px;
+      max-width: 400px;
+    }
+    
+    .bottom-tagline {
+      @apply text-base;
+      position: absolute;
+      font-size: 25px;
+      line-height: 1.4;
+      bottom: 18%;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .login-card {
+      min-width: 260px;
+      max-width: 340px;
+    }
+    
+    .app-title {
+      top: 6%;
+    }
+  }
+
+  /* Additional spacing for larger screens */
+  @media (min-width: 1024px) {
+    .login-card {
+      max-width: 520px;
+      min-height: 300px;
+      padding: 3rem;
+    }
+
+    .bottom-tagline {
+      @apply text-base;
+      position: absolute;
+      font-size: 30px;
+      line-height: 1.4;
+      bottom: 12%;
+    }
+  }
+}
+
+
+.register-container {
+  max-width: 700px;
+  width: 100%;
+  background-color: #fff;
+  padding: 25px 30px;
+  border-radius: 5px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+}
+.register-container .title {
+  font-size: 25px;
+  font-weight: 500;
+  position: relative;
+}
+.register-container .title::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: 30px;
+  border-radius: 5px;
+  background: linear-gradient(135deg, #71b7e6, #9b59b6);
+}
+.content form .user-details {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin: 20px 0 12px 0;
+}
+form .user-details .input-box {
+  margin-bottom: 15px;
+  width: calc(100% / 2 - 20px);
+}
+form .input-box span.details {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+.user-details .input-box input {
+  height: 45px;
+  width: 100%;
+  outline: none;
+  font-size: 16px;
+  border-radius: 5px;
+  padding-left: 15px;
+  border: 1px solid #ccc;
+  border-bottom-width: 2px;
+  transition: all 0.3s ease;
+}
+.user-details .input-box input:focus,
+.user-details .input-box input:valid {
+  border-color: #9b59b6;
+}
+form .gender-details .gender-title {
+  font-size: 20px;
+  font-weight: 500;
+}
+form .category {
+  display: flex;
+  width: 80%;
+  margin: 14px 0;
+  justify-content: space-between;
+}
+form .category label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+form .category label .dot {
+  height: 18px;
+  width: 18px;
+  border-radius: 50%;
+  margin-right: 10px;
+  background: #d9d9d9;
+  border: 5px solid transparent;
+  transition: all 0.3s ease;
+}
+#dot-1:checked~.category label .one,
+#dot-2:checked~.category label .two,
+#dot-3:checked~.category label .three {
+  background: #9b59b6;
+  border-color: #d9d9d9;
+}
+form input[type="radio"] {
+  display: none;
+}
+form .button {
+  height: 45px;
+  margin: 35px 0
+}
+form .button input {
+  height: 100%;
+  width: 100%;
+  border-radius: 5px;
+  border: none;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #71b7e6, #9b59b6);
+}
+form .button input:hover {
+  background: linear-gradient(-135deg, #71b7e6, #9b59b6);
+}
+/* Responsive media query code for mobile devices */
+@media(max-width: 584px) {
+  .register-container {
+    max-width: 100%;
+  }
+  form .user-details .input-box {
+    margin-bottom: 15px;
+    width: 100%;
+  }
+  form .category {
+    width: 100%;
+  }
+  .content form .user-details {
+    max-height: 300px;
+    overflow-y: scroll;
+  }
+  .user-details::-webkit-scrollbar {
+    width: 5px;
+  }
+}
+/* Responsive media query code for mobile devices */
+@media(max-width: 459px) {
+  .register-container .content .category {
+    flex-direction: column;
   }
 }
