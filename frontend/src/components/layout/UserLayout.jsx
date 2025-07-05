@@ -3,6 +3,11 @@ import Navbar from './Navbar';
 import Footer from './Footer';
 
 function UserLayout() {
+  const location = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+  
   return (
     <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white font-sans transition-colors duration-200 flex flex-col">
       <Navbar />

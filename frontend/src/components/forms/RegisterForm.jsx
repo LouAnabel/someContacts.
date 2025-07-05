@@ -204,11 +204,11 @@ const RegisterForm = () => {
     const showLoading = apiLoading;
 
     return (
-        <div className="min-h-screen bg-white dark:bg-black p-6 absolute top-[120px]" 
+        <div className="min-h-screen bg-white dark:bg-black p-6 absolute top-[90px]" 
              style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
 
             {/* Main Register Card */}
-            <div className="bg-gray-100 rounded-3xl p-6 relative z-10 overflow-visible w-[75vw] min-w-[260px] max-w-[480px] h-fit absolute left-1/2 transform -translate-x-1/2"
+            <div className="bg-gray-50 rounded-3xl p-6 relative z-10 overflow-visible w-[75vw] min-w-[260px] max-w-[480px] h-fit absolute left-1/2 transform -translate-x-1/2"
                  style={{ 
                      boxShadow: '0 4px 32px rgba(0, 0, 0, 0.3)'
                  }}>
@@ -230,7 +230,7 @@ const RegisterForm = () => {
                             onChange={handleInputChange}
                             placeholder="meryl"
                             disabled={showLoading}
-                            className={`w-full p-2.5 rounded-xl border border-black bg-transparent text-black placeholder-gray-500 transition-all duration-200 max-w-full min-w-[200px] text-base font-normal focus:outline-none focus:border-red-500 ${
+                            className={`w-full p-2.5 rounded-xl border border-black bg-transparent text-black placeholder-gray-400 transition-all duration-200 max-w-full min-w-[200px] text-base font-normal focus:outline-none focus:border-red-500 ${
                                 hasSubmitted && errors.firstName ? 'border-red-400' : ''
                             }`}
                             style={{
@@ -256,7 +256,7 @@ const RegisterForm = () => {
                             onChange={handleInputChange}
                             placeholder="streep"
                             disabled={showLoading}
-                            className={`w-full p-2.5 rounded-xl border border-black bg-transparent text-black placeholder-gray-500 transition-all duration-200 max-w-full min-w-[200px] text-base font-normal focus:outline-none focus:border-red-500 ${
+                            className={`w-full p-2.5 rounded-xl border border-black bg-transparent text-black placeholder-gray-400 transition-all duration-200 max-w-full min-w-[200px] text-base font-normal focus:outline-none focus:border-red-500 ${
                                 hasSubmitted && errors.lastName ? 'border-red-400' : ''
                             }`}
                             style={{
@@ -282,7 +282,7 @@ const RegisterForm = () => {
                             onChange={handleInputChange}
                             placeholder="your@email.com"
                             disabled={showLoading}
-                            className={`w-full p-2.5 rounded-xl border border-black bg-transparent text-black placeholder-gray-500 transition-all duration-200 max-w-full min-w-[200px] text-base font-normal focus:outline-none focus:border-red-500 ${
+                            className={`w-full p-2.5 rounded-xl border border-black bg-transparent text-black placeholder-gray-400 transition-all duration-200 max-w-full min-w-[200px] text-base font-normal focus:outline-none focus:border-red-500 ${
                                 hasSubmitted && errors.email ? 'border-red-400' : ''
                             }`}
                             style={{
@@ -308,7 +308,7 @@ const RegisterForm = () => {
                             onChange={handleInputChange}
                             placeholder="••••••••"
                             disabled={showLoading}
-                            className={`w-full p-2.5 rounded-xl border border-black bg-transparent text-black placeholder-gray-500 transition-all duration-200 max-w-full min-w-[200px] text-base font-normal focus:outline-none focus:border-red-500 ${
+                            className={`w-full p-2.5 rounded-xl border border-black bg-transparent text-black placeholder-gray-400 transition-all duration-200 max-w-full min-w-[200px] text-base font-normal focus:outline-none focus:border-red-500 ${
                                 hasSubmitted && errors.password ? 'border-red-400' : ''
                             }`}
                             style={{
@@ -334,7 +334,7 @@ const RegisterForm = () => {
                             onChange={handleInputChange}
                             placeholder="••••••••"
                             disabled={showLoading}
-                            className={`w-full p-2.5 rounded-xl border border-black bg-transparent text-black placeholder-gray-500 transition-all duration-200 max-w-full min-w-[200px] text-base font-normal focus:outline-none focus:border-red-500 ${
+                            className={`w-full p-2.5 rounded-xl border border-black bg-transparent text-black placeholder-gray-400 transition-all duration-200 max-w-full min-w-[200px] text-base font-normal focus:outline-none focus:border-red-500 ${
                                 hasSubmitted && errors.confirmPassword ? 'border-red-400' : ''
                             }`}
                             style={{
@@ -354,11 +354,14 @@ const RegisterForm = () => {
                             type="checkbox" 
                             checked={acceptTerms}
                             onChange={(e) => setAcceptTerms(e.target.checked)}
-                            disabled={setApiLoading}
-                            className="w-4 h-4 rounded cursor-pointer mt-1 hover:border-red-500 dark:hover:border-red-500 dark:checked:bg-black"
-                            style={{ accentColor: 'black' }}
+                            className="w-4 h-4 rounded mt-1 border-2 border-black-300 focus:ring-0 focus:ring-offset-0"
+                            style={{ 
+                                accentColor: 'black',
+                                backgroundColor: acceptTerms ? 'black' : 'transparent',
+                                borderColor: acceptTerms ? 'black' : '#d1d5db'
+                            }}
                         />
-                        <label htmlFor="terms" className="text-sm font-light text-black dark:text-white mt-0.5 cursor-pointer">
+                        <label htmlFor="terms" className="text-sm font-light text-black dark:text-black mt-0.5 cursor-pointer">
                             I accept the{' '}
                             <a href="#" className="font-medium text-red-500 hover:underline">
                                 terms and conditions.
@@ -381,6 +384,7 @@ const RegisterForm = () => {
                     onClick={handleSubmit}>
                     {showLoading ? '. . .' : 'create.'}
                 </CircleButton>
+            
             </div>
 
             {/* Signup Link */}
@@ -392,7 +396,6 @@ const RegisterForm = () => {
                 </a>
             </div>
         </div>
-    );
-};
-
+    )};
+    
 export default RegisterForm;

@@ -3,7 +3,7 @@ import CircleButton from '../ui/Buttons';
 import { useNavigate } from 'react-router-dom';
 
 
-const ContactsLogin = ({ onSubmit, isLoading = false }) => {
+const LoginForm = ({ onSubmit, isLoading = false }) => {
     const [formData, setFormData] = useState({
         email: '',
         password: ''
@@ -86,14 +86,13 @@ const ContactsLogin = ({ onSubmit, isLoading = false }) => {
             [name]: value
         }));
         
-        // clear submit error if user starts typing
-        if (hasSubmitted && errors.submit) {
-            setErrors(prev => ({ ...prev, submit: '' }));
-        }
-
-        // clear submitted field errors when user modifies input    
+        // Only clear errors if user has already submitted once
         if (hasSubmitted && errors[name]) {
             setErrors(prev => ({ ...prev, [name]: '' }));
+        }
+
+        if (errors.submit) {
+            setErrors(prev => ({ ...prev, submit: '' }));
         }
     };
 
@@ -142,7 +141,7 @@ const ContactsLogin = ({ onSubmit, isLoading = false }) => {
              style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
 
             {/* Main Login Card */}
-            <div className="bg-gray-100 rounded-3xl p-6 relative z-10 overflow-visible w-[75vw] min-w-[260px] max-w-[480px] h-fit absolute  left-1/2 transform -translate-x-1/2"
+            <div className="bg-gray-50 rounded-3xl p-6 relative z-10 overflow-visible w-[75vw] min-w-[260px] max-w-[480px] h-fit absolute  left-1/2 transform -translate-x-1/2"
                  style={{ 
                      boxShadow: '0 4px 32px rgba(0, 0, 0, 0.3)'
                  }}>
@@ -165,7 +164,7 @@ const ContactsLogin = ({ onSubmit, isLoading = false }) => {
                         }}
                     />
                     {hasSubmitted && errors.email && (
-                        <p className="absolute top-full left-0 mt-2 text-sm text-red-600 z-20">{errors.email}</p>
+                        <p className="absolute top-full right-0 text-sm text-red-600 z-20">{errors.email}</p>
                     )}
                 </div>
 
@@ -185,7 +184,7 @@ const ContactsLogin = ({ onSubmit, isLoading = false }) => {
                         }}
                     />
                     {hasSubmitted && errors.password && (
-                        <p className="absolute top-full left-0 mt-2 text-sm text-red-600 z-20">{errors.password}</p>
+                        <p className="absolute top-full right-0 text-sm text-red-600 z-20">{errors.password}</p>
                     )}
                 </div>
 
@@ -235,4 +234,4 @@ const ContactsLogin = ({ onSubmit, isLoading = false }) => {
     );
 };
 
-export default ContactsLogin;
+export default LoginForm;
