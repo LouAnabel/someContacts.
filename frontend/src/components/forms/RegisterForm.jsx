@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import CircleButton from '../ui/Buttons';
+import { useNavigate } from 'react-router-dom';
 
-const RegisterForm = () => {
+
+
+const RegisterForm = ({ onSubmit, isLoading = false }) => {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
@@ -12,7 +16,80 @@ const RegisterForm = () => {
     const [errors, setErrors] = useState({});
     const [hasSubmitted, setHasSubmitted] = useState(false);
     const [acceptTerms, setAcceptTerms] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
+    const [apiLoading, setApiLoading] = useState(false);
+
+
+    // Api function call
+    const registerUser = async (registerData) => {
+        try {
+            setApiLoading(true);
+
+            // Simulate API call & replace with actual API logic
+            const response = await fetch('http://localhost:3000/auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify( {
+                    firstName: registerData.firstName,
+                    lastName: registerData.lastName,
+                    email: registerData.email,
+                    password: registerData.password
+                })
+            });
+
+            const data = await response.json();
+            
+            console-log('API Response Status:', response.status);
+            console.log('API Response Data:', data);
+
+
+            // Check if the response is ok (status code 200-299)
+            if (response.ok) {
+                console.log('Registration successful:', data);
+            
+            // Store token in localStorage or context
+            if (data.token) {
+                localStorage.setItem('authToken', data.token);
+            }
+
+            // Store user data in localStorage or context
+            if (data.user) {
+                localStorage.setItem('userData', JSON.stringify(data.user));    
+            }
+
+                // clear any previous errors & clear form data
+                setErrors({});
+                setFormData({
+                    firstName: '',
+                    lastName: '',
+                    email: '',
+                    password: '',
+                    confirmPassword: ''
+                });
+                
+                alert('Registration successful! Check console for form data.');
+                
+                // Redirect to login page after successful registration
+                navigate('/login');
+
+            } else {
+                // Error case - backend validation failed
+                console.error('Registration failed:', data);
+                setErrors({
+                    submit: data.message || 'Registration failed. Please try again.'
+                });
+            }
+        } catch (error) {
+            // Network error
+            console.error('Network/API error:', error);
+            setErrors({
+                submit: 'Unable to connect to server. Please try again later.'
+            });
+        } finally {
+            setApiLoading(false);
+        }
+    };
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -25,37 +102,51 @@ const RegisterForm = () => {
         if (hasSubmitted && errors[name]) {
             setErrors(prev => ({ ...prev, [name]: '' }));
         }
+
+        if (errors.submit) {
+            setErrors(prev => ({ ...prev, submit: '' }));
+        }
     };
 
     const validateForm = () => {
         const newErrors = {};
         
+        // first name validation
         if (!formData.firstName.trim()) {
             newErrors.firstName = 'First name is required';
+        } else if (formData.firstName.trim().length < 2) {
+            newErrors.firstName = 'First name must be at least 2 characters';
         }
         
+        // last name validation
         if (!formData.lastName.trim()) {
             newErrors.lastName = 'Last name is required';
+        } else if (formData.lastName.trim().length < 2) {
+            newErrors.lastName = 'Last name must be at least 2 characters';
         }
         
+        // email validation
         if (!formData.email) {
             newErrors.email = 'Email is required';
         } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
             newErrors.email = 'Email is invalid';
         }
         
+        // password validation
         if (!formData.password) {
             newErrors.password = 'Password is required';
         } else if (formData.password.length < 6) {
             newErrors.password = 'Password must be at least 6 characters';
         }
 
+        // confirm password validation
         if (!formData.confirmPassword) {
             newErrors.confirmPassword = 'Please confirm your password';
         } else if (formData.password !== formData.confirmPassword) {
             newErrors.confirmPassword = 'Passwords do not match';
         }
 
+        // terms and conditions validation
         if (!acceptTerms) {
             newErrors.terms = 'You must accept the terms and conditions';
         }
@@ -64,23 +155,34 @@ const RegisterForm = () => {
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setHasSubmitted(true);
-        setIsLoading(true);
+        setApiLoading(true);
         
         if (!validateForm()) {
-            setIsLoading(false);
+            apiLoading(false);
+            console.error('Form validation failed:', errors);
+            // If validation fails, don't proceed with the API call  
             return;
         }
         
-        // Simulate API call or actual registration
-        setTimeout(() => {
-            console.log('Registration data:', formData);
-            setIsLoading(false);
-            // Handle successful registration here
-        }, 2000);
+        // Form is valid, proceed with API call
+        console.log('Form is valid, proceed with registration:', {
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            email: formData.email,
+            password: '[HIDDEN]'
+        });
+        
+        await registerUser(formData);
+
+        if (onSubmit) {
+            onSubmit(formData);
+        }
     };
+
+    const isLoading = apiLoading || isLoading;
 
     return (
         <div className="min-h-screen bg-white dark:bg-black p-6 absolute top-[120px]" 

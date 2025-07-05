@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import CircleButton from '../ui/Buttons';
 import { useNavigate } from 'react-router-dom';
 
@@ -11,15 +11,16 @@ const ContactsLogin = ({ onSubmit, isLoading = false }) => {
     const [errors, setErrors] = useState({});
     const [hasSubmitted, setHasSubmitted] = useState(false);
     const [apiLoading, setApiLoading] = useState(false);
-    const navigate = useNavigate();
+    
 
     // Api function call
     const loginUser = async (loginData) => {
+        const navigate = useNavigate();
         try {
             setApiLoading(true);
 
             // Simulate API call & replace with actual API logic
-            const response = await fetch('http://localhost:3000/hello/login', {
+            const response = await fetch('http://localhost:3000/auth/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -52,7 +53,7 @@ const ContactsLogin = ({ onSubmit, isLoading = false }) => {
 
                 alert('Login successful! Check console for form data.');
                 // Redirect to contacts page    
-                // navigate('/');
+                navigate('/');
             
 
             } else {
