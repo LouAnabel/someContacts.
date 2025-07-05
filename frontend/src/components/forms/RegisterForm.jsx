@@ -2,9 +2,7 @@ import React, { useState } from 'react';
 import CircleButton from '../ui/Buttons';
 import { useNavigate } from 'react-router-dom';
 
-
-
-const RegisterForm = ({ onSubmit, isLoading = false }) => {
+const RegisterForm = () => {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         firstName: '',
@@ -18,19 +16,58 @@ const RegisterForm = ({ onSubmit, isLoading = false }) => {
     const [acceptTerms, setAcceptTerms] = useState(false);
     const [apiLoading, setApiLoading] = useState(false);
 
-
-    // Api function call
+    // Api function call - TEMPORARILY DISABLED FOR TESTING
     const registerUser = async (registerData) => {
         try {
             setApiLoading(true);
+            
+            // =================
+            // DEBUG MODE: Skip API call, just log the data
+            // =================
+            console.log('=== FORM DATA THAT WOULD BE SENT TO API ===');
+            console.log('Registration Data:', {
+                firstName: registerData.firstName,
+                lastName: registerData.lastName,
+                email: registerData.email,
+                password: ['HIDDEN']
+            });
+            console.log('Raw Form Data:', registerData);
+            console.log('Accept Terms:', acceptTerms);
+            console.log('============================================');
+            
+            // Simulate API delay
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // Simulate successful response
+            console.log('✅ Simulated API Success');
+            
+            // Clear any previous errors & clear form data
+            setErrors({});
+            setFormData({
+                firstName: '',
+                lastName: '',
+                email: '',
+                password: '',
+                confirmPassword: ''
+            });
+            setAcceptTerms(false); // Also reset terms checkbox
+            
+            alert('Form submitted successfully! Check console for the data that would be sent to your API.');
+            
+            // Uncomment the line below when you want to redirect after testing
+            navigate('/hello/login');
 
-            // Simulate API call & replace with actual API logic
+            /* 
+            ========================================
+            COMMENTED OUT: ACTUAL API CALL
+            ========================================
+            
             const response = await fetch('http://localhost:3000/auth/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify( {
+                body: JSON.stringify({
                     firstName: registerData.firstName,
                     lastName: registerData.lastName,
                     email: registerData.email,
@@ -40,25 +77,20 @@ const RegisterForm = ({ onSubmit, isLoading = false }) => {
 
             const data = await response.json();
             
-            console-log('API Response Status:', response.status);
+            console.log('API Response Status:', response.status);
             console.log('API Response Data:', data);
 
-
-            // Check if the response is ok (status code 200-299)
             if (response.ok) {
                 console.log('Registration successful:', data);
             
-            // Store token in localStorage or context
-            if (data.token) {
-                localStorage.setItem('authToken', data.token);
-            }
+                if (data.token) {
+                    localStorage.setItem('authToken', data.token);
+                }
 
-            // Store user data in localStorage or context
-            if (data.user) {
-                localStorage.setItem('userData', JSON.stringify(data.user));    
-            }
+                if (data.user) {
+                    localStorage.setItem('userData', JSON.stringify(data.user));    
+                }
 
-                // clear any previous errors & clear form data
                 setErrors({});
                 setFormData({
                     firstName: '',
@@ -69,19 +101,17 @@ const RegisterForm = ({ onSubmit, isLoading = false }) => {
                 });
                 
                 alert('Registration successful! Check console for form data.');
-                
-                // Redirect to login page after successful registration
                 navigate('/login');
 
             } else {
-                // Error case - backend validation failed
                 console.error('Registration failed:', data);
                 setErrors({
                     submit: data.message || 'Registration failed. Please try again.'
                 });
             }
+            */
+            
         } catch (error) {
-            // Network error
             console.error('Network/API error:', error);
             setErrors({
                 submit: 'Unable to connect to server. Please try again later.'
@@ -158,31 +188,20 @@ const RegisterForm = ({ onSubmit, isLoading = false }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setHasSubmitted(true);
-        setApiLoading(true);
         
         if (!validateForm()) {
-            apiLoading(false);
-            console.error('Form validation failed:', errors);
-            // If validation fails, don't proceed with the API call  
+            setApiLoading(false);
+            console.error('❌ Form validation failed:', errors);
             return;
         }
         
-        // Form is valid, proceed with API call
-        console.log('Form is valid, proceed with registration:', {
-            firstName: formData.firstName,
-            lastName: formData.lastName,
-            email: formData.email,
-            password: '[HIDDEN]'
-        });
+        // Form is valid, proceed with "API call" (debug mode)
+        console.log('✅ Form validation passed, proceeding with submission...');
         
         await registerUser(formData);
-
-        if (onSubmit) {
-            onSubmit(formData);
-        }
     };
 
-    const isLoading = apiLoading || isLoading;
+    const showLoading = apiLoading;
 
     return (
         <div className="min-h-screen bg-white dark:bg-black p-6 absolute top-[120px]" 
@@ -210,6 +229,7 @@ const RegisterForm = ({ onSubmit, isLoading = false }) => {
                             value={formData.firstName}
                             onChange={handleInputChange}
                             placeholder="meryl"
+                            disabled={showLoading}
                             className={`w-full p-2.5 rounded-xl border border-black bg-transparent text-black placeholder-gray-500 transition-all duration-200 max-w-full min-w-[200px] text-base font-normal focus:outline-none focus:border-red-500 ${
                                 hasSubmitted && errors.firstName ? 'border-red-400' : ''
                             }`}
@@ -219,7 +239,7 @@ const RegisterForm = ({ onSubmit, isLoading = false }) => {
                             }}
                         />
                         {hasSubmitted && errors.firstName && (
-                            <p className="absolute top-full right-0 mt-1 text-sm text-red-600 z-20">{errors.firstName}</p>
+                            <p className="absolute top-full right-0 text-sm text-red-600 z-20">{errors.firstName}</p>
                         )}
                     </div>
 
@@ -235,6 +255,7 @@ const RegisterForm = ({ onSubmit, isLoading = false }) => {
                             value={formData.lastName}
                             onChange={handleInputChange}
                             placeholder="streep"
+                            disabled={showLoading}
                             className={`w-full p-2.5 rounded-xl border border-black bg-transparent text-black placeholder-gray-500 transition-all duration-200 max-w-full min-w-[200px] text-base font-normal focus:outline-none focus:border-red-500 ${
                                 hasSubmitted && errors.lastName ? 'border-red-400' : ''
                             }`}
@@ -244,7 +265,7 @@ const RegisterForm = ({ onSubmit, isLoading = false }) => {
                             }}
                         />
                         {hasSubmitted && errors.lastName && (
-                            <p className="absolute top-full right-0 mt-1 text-sm text-red-600 z-20">{errors.lastName}</p>
+                            <p className="absolute top-full right-0 text-sm text-red-600 z-20">{errors.lastName}</p>
                         )}
                     </div>
 
@@ -260,6 +281,7 @@ const RegisterForm = ({ onSubmit, isLoading = false }) => {
                             value={formData.email}
                             onChange={handleInputChange}
                             placeholder="your@email.com"
+                            disabled={showLoading}
                             className={`w-full p-2.5 rounded-xl border border-black bg-transparent text-black placeholder-gray-500 transition-all duration-200 max-w-full min-w-[200px] text-base font-normal focus:outline-none focus:border-red-500 ${
                                 hasSubmitted && errors.email ? 'border-red-400' : ''
                             }`}
@@ -269,7 +291,7 @@ const RegisterForm = ({ onSubmit, isLoading = false }) => {
                             }}
                         />
                         {hasSubmitted && errors.email && (
-                            <p className="absolute top-full right-0 mt-1 text-sm text-red-600 z-20">{errors.email}</p>
+                            <p className="absolute top-full right-0 text-sm text-red-600 z-20">{errors.email}</p>
                         )}
                     </div>
 
@@ -285,6 +307,7 @@ const RegisterForm = ({ onSubmit, isLoading = false }) => {
                             value={formData.password}
                             onChange={handleInputChange}
                             placeholder="••••••••"
+                            disabled={showLoading}
                             className={`w-full p-2.5 rounded-xl border border-black bg-transparent text-black placeholder-gray-500 transition-all duration-200 max-w-full min-w-[200px] text-base font-normal focus:outline-none focus:border-red-500 ${
                                 hasSubmitted && errors.password ? 'border-red-400' : ''
                             }`}
@@ -294,7 +317,7 @@ const RegisterForm = ({ onSubmit, isLoading = false }) => {
                             }}
                         />
                         {hasSubmitted && errors.password && (
-                            <p className="absolute top-full right-0 mt-1 text-sm text-red-600 z-20">{errors.password}</p>
+                            <p className="absolute top-full right-0 text-sm text-red-600 z-20">{errors.password}</p>
                         )}
                     </div>
 
@@ -310,6 +333,7 @@ const RegisterForm = ({ onSubmit, isLoading = false }) => {
                             value={formData.confirmPassword}
                             onChange={handleInputChange}
                             placeholder="••••••••"
+                            disabled={showLoading}
                             className={`w-full p-2.5 rounded-xl border border-black bg-transparent text-black placeholder-gray-500 transition-all duration-200 max-w-full min-w-[200px] text-base font-normal focus:outline-none focus:border-red-500 ${
                                 hasSubmitted && errors.confirmPassword ? 'border-red-400' : ''
                             }`}
@@ -319,29 +343,27 @@ const RegisterForm = ({ onSubmit, isLoading = false }) => {
                             }}
                         />
                         {hasSubmitted && errors.confirmPassword && (
-                            <p className="absolute top-full right-0 mt-1 text-sm text-red-600 z-20">{errors.confirmPassword}</p>
+                            <p className="absolute top-full right-0 text-sm text-red-600 z-20">{errors.confirmPassword}</p>
                         )}
                     </div>
 
                     {/* Terms and Conditions */}
-                    <div className="flex items-start space-x-3 relative">
+                    <div className={`flex items-start space-x-3 relative mt-8 p-1 rounded-lg ${hasSubmitted && errors.terms ? 'ring-2 ring-red-500' : ''}`}>
                         <input 
                             id="terms" 
                             type="checkbox" 
                             checked={acceptTerms}
                             onChange={(e) => setAcceptTerms(e.target.checked)}
+                            disabled={setApiLoading}
                             className="w-4 h-4 rounded cursor-pointer mt-1 hover:border-red-500 dark:hover:border-red-500 dark:checked:bg-black"
                             style={{ accentColor: 'black' }}
                         />
-                        <label htmlFor="terms" className="text-sm font-light text-black dark:text-black mt-0.5 cursor-pointer">
+                        <label htmlFor="terms" className="text-sm font-light text-black dark:text-white mt-0.5 cursor-pointer">
                             I accept the{' '}
                             <a href="#" className="font-medium text-red-500 hover:underline">
                                 terms and conditions.
                             </a>
                         </label>
-                        {hasSubmitted && errors.terms && (
-                            <p className="absolute top-full left-0 text-sm text-red-600 z-20">{errors.terms}</p>
-                        )}
                     </div>
                 </div>
 
@@ -355,21 +377,20 @@ const RegisterForm = ({ onSubmit, isLoading = false }) => {
                         marginLeft: 'auto', 
                         display: 'block' 
                     }}
-                    disabled={isLoading}
+                    disabled={showLoading}
                     onClick={handleSubmit}>
-                    {isLoading ? '. . .' : 'create.'}
+                    {showLoading ? '. . .' : 'create.'}
                 </CircleButton>
             </div>
 
             {/* Signup Link */}
-                <div className=" text-black dark:text-white dark:text-white font-light block mt-2 absolute left-[40px]"
-                     style={{ fontSize: '16px' }}>
-                    already have an account? {' '}
-                        <a href="login" className="font-light font-normal text-red-500 hover:underline">
-                             login here.
-                        </a>
-                </div>
-
+            <div className="text-black dark:text-white font-light block mt-2 absolute left-[40px]"
+                 style={{ fontSize: '16px' }}>
+                already have an account? {' '}
+                <a href="login" className="font-light font-normal text-red-500 hover:underline">
+                     login here.
+                </a>
+            </div>
         </div>
     );
 };
