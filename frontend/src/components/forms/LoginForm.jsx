@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import CircleButton from '../ui/Buttons';
+import { useNavigate } from 'react-router-dom';
+
 
 const ContactsLogin = ({ onSubmit, isLoading = false }) => {
     const [formData, setFormData] = useState({
@@ -8,6 +10,73 @@ const ContactsLogin = ({ onSubmit, isLoading = false }) => {
     });
     const [errors, setErrors] = useState({});
     const [hasSubmitted, setHasSubmitted] = useState(false);
+    const [apiLoading, setApiLoading] = useState(false);
+    const navigate = useNavigate();
+
+    // Api function call
+    const loginUser = async (loginData) => {
+        try {
+            setApiLoading(true);
+
+            // Simulate API call & replace with actual API logic
+            const response = await fetch('http://localhost:3000/hello/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email: loginData.email,
+                    password: loginData.password
+                })
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                console.log('Login successful:', data);
+
+                if (data.token) {
+                    // Store token in localStorage or context
+                    localStorage.setItem('authToken', data.token);
+                }
+
+                // Store user data in localStorage or context   
+                localStorage.setItem('userData', JSON.stringify(data.user));
+                
+
+                // clear any previous errors & clear form data
+                setErrors({});
+                setFormData({
+                    email: '',
+                    password: ''
+                });
+
+                alert('Login successful! Check console for form data.');
+                // Redirect to contacts page    
+                // navigate('/');
+            
+
+            } else {
+                // Error case - backend validation failed
+                console.error('Login failed:', data);
+
+                // set error message to display on the form
+                setErrors({
+                    submit: data.message || 'Login failed. Please try again.'
+                });
+            }
+
+        } catch (error) {
+            // Network error
+            console.error('Network/API error:', error);
+            setErrors({
+                submit: 'Unable to connect to server. Please try again later.'
+            });
+        } finally {
+            setApiLoading(false);
+        }
+    };    
+
+
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -16,7 +85,12 @@ const ContactsLogin = ({ onSubmit, isLoading = false }) => {
             [name]: value
         }));
         
-        // Only clear errors if user has already submitted once
+        // clear submit error if user starts typing
+        if (hasSubmitted && errors.submit) {
+            setErrors(prev => ({ ...prev, submit: '' }));
+        }
+
+        // clear submitted field errors when user modifies input    
         if (hasSubmitted && errors[name]) {
             setErrors(prev => ({ ...prev, [name]: '' }));
         }
@@ -41,16 +115,26 @@ const ContactsLogin = ({ onSubmit, isLoading = false }) => {
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setHasSubmitted(true); // Mark that form has been submitted
         
-        if (!validateForm()) return;
-        
+        // Validate form before submitting
+        if (!validateForm()) {
+            console.error('Form validation failed:', errors);
+            return;
+        }
+
+        // Form is valid, proceed with API call
+        console.log('Submitting form with data:', formData);
+        await loginUser(formData);
+
         if (onSubmit) {
             onSubmit(formData);
         }
     };
+
+    const showLoading = isLoading || apiLoading;
 
     return (
         <div className="min-h-screen bg-white dark:bg-black p-6 absolute top-[180px]" 
@@ -62,7 +146,7 @@ const ContactsLogin = ({ onSubmit, isLoading = false }) => {
                      boxShadow: '0 4px 32px rgba(0, 0, 0, 0.3)'
                  }}>
                 
-                <h2 className="text-3xl font-bold text-center mb-8 text-black">Login.</h2>
+                <h2 className="text-3xl font-bold text-center mb-8 text-black">login.</h2>
 
                 <div className="mb-8 relative">
                     <input
@@ -111,9 +195,12 @@ const ContactsLogin = ({ onSubmit, isLoading = false }) => {
                 )}
 
                 {/* Signup Link */}
-                <div className="hover:text-red-500 text-black dark:text-white hover:dark:text-red-500 font-normal block absolute bottom-[-30px] left-[30px]"
+                <div className= "text-black dark:text-white font-light block absolute bottom-[-30px] left-[30px]"
                      style={{ fontSize: '16px' }}>
-                    no account? sign in here.
+                    no account? {' '}
+                            <a href="register" className="font-light font-normal text-red-500 hover:underline">
+                                sign in here
+                            </a>
                 </div>
 
                 {/* Circle Button */}

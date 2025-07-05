@@ -92,7 +92,7 @@ const RegisterForm = () => {
                      boxShadow: '0 4px 32px rgba(0, 0, 0, 0.3)'
                  }}>
                 <h1 className="text-3xl font-bold text-center mb-8 text-black">
-                    Create an account
+                    create an account.
                 </h1>
 
                 <div className="space-y-6">
@@ -107,7 +107,7 @@ const RegisterForm = () => {
                             id="firstName" 
                             value={formData.firstName}
                             onChange={handleInputChange}
-                            placeholder="john"
+                            placeholder="meryl"
                             className={`w-full p-2.5 rounded-xl border border-black bg-transparent text-black placeholder-gray-500 transition-all duration-200 max-w-full min-w-[200px] text-base font-normal focus:outline-none focus:border-red-500 ${
                                 hasSubmitted && errors.firstName ? 'border-red-400' : ''
                             }`}
@@ -132,7 +132,7 @@ const RegisterForm = () => {
                             id="lastName" 
                             value={formData.lastName}
                             onChange={handleInputChange}
-                            placeholder="doe"
+                            placeholder="streep"
                             className={`w-full p-2.5 rounded-xl border border-black bg-transparent text-black placeholder-gray-500 transition-all duration-200 max-w-full min-w-[200px] text-base font-normal focus:outline-none focus:border-red-500 ${
                                 hasSubmitted && errors.lastName ? 'border-red-400' : ''
                             }`}
@@ -234,7 +234,7 @@ const RegisterForm = () => {
                         <label htmlFor="terms" className="text-sm font-light text-black dark:text-black mt-0.5 cursor-pointer">
                             I accept the{' '}
                             <a href="#" className="font-medium text-red-500 hover:underline">
-                                Terms and Conditions
+                                terms and conditions.
                             </a>
                         </label>
                         {hasSubmitted && errors.terms && (
@@ -262,9 +262,9 @@ const RegisterForm = () => {
             {/* Signup Link */}
                 <div className=" text-black dark:text-white dark:text-white font-light block mt-2 absolute left-[40px]"
                      style={{ fontSize: '16px' }}>
-                    Already have an account?{' '}
-                        <a href="#" className="font-light text-red-500 hover:underline">
-                            Login here
+                    already have an account? {' '}
+                        <a href="login" className="font-light font-normal text-red-500 hover:underline">
+                             login here.
                         </a>
                 </div>
 
