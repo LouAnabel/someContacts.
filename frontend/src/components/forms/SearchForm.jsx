@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { HiSearch, HiX } from 'react-icons/hi';
 import { buttonStyles, searchStyles } from '../ui/ButtonStyles.jsx';
 
-const SearchToggle = ({ 
+const SearchForm = ({ 
   placeholder = "search...",
   onSearch,
   isMobile = true,
@@ -90,13 +90,13 @@ const SearchToggle = ({
         
       {/* Mobile Search Bar (dropdown) */}
       {isOpen && (
-        <div className="absolute top-13 right-2 bg-white dark:bg-black z-50">
+        <div className="absolute top-15 right-2 z-50">
           <form onSubmit={handleSubmit}>
             <div className="p-4 flex items-center gap-0 relative" ref={dropdownRef}>
               <button 
                 id="dropdown-button" 
                 onClick={toggleDropdown}
-                className="inline-flex items-center py-2 px-4 text-sm font-light text-center text-black bg-gray-200 dark:bg-gray-200 rounded-s-lg hover:bg-red-200 hover:text-red-500 hover:dark:bg-red-200 hover:dark:text-red-500" 
+                className="inline-flex items-center py-2 px-4 text-sm font-light text-center text-white bg-red-500 rounded-s-lg hover:bg-red-200 hover:text-red-500 hover:dark:bg-red-200 hover:dark:text-red-500" 
                 type="button"
               >
                 all categories
@@ -137,7 +137,7 @@ const SearchToggle = ({
                   id="search-dropdown" 
                   value={searchTerm}
                   onChange={(e) => handleSearch(e.target.value)}
-                  className="block py-2 px-5 w-full border-white text-sm dark:border-0 text-black placeholder-gray-300 bg-gray-50 dark:placeholder-gray-300 dark:text-black" 
+                  className="border-white rounded-md py-3 px-4 w-full text-sm dark:border-0 text-black placeholder-gray-300 bg-gray-50 dark:placeholder-gray-300 dark:text-black" 
                   placeholder={placeholder}
                   required 
                 />
@@ -146,7 +146,7 @@ const SearchToggle = ({
               {/* Submit Button */}
               <button 
                 type="submit" 
-                className="py-2.5 px-2.5 text-sm font-medium text-black bg-gray-200 dark:bg-gray-200 rounded-e-md hover:bg-red-200 hover:text-red-500 dark:hover:bg-red-200 hover:dark:text-red-500"
+                className="py-2.5 px-2.5 text-sm font-medium bg-black bg-red-500 text-white rounded-e-md hover:bg-red-200 hover:text-red-500 dark:hover:bg-red-200 hover:dark:text-red-500"
               >
                 <svg className="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
                   <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
@@ -161,4 +161,4 @@ const SearchToggle = ({
   )
 }
 
-export default SearchToggle;
+export default SearchForm;

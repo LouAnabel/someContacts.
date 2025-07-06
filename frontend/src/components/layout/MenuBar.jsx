@@ -7,13 +7,13 @@ const MenuBar = ({ isMenuOpen, setIsMenuOpen }) => {
   const menuRef = useRef(null);
 
   const menuItems = [
-    { to: "/", label: "home." },
-    { to: "/contacts", label: "allContacts." },
-    { to: "/addcontact", label: "newContact." },
-    { to: "/goodbye/logout", label: "logout."}
+    { to: "/", secondPart: "home." },
+    { to: "/contacts", firstPart: "all", secondPart: "Contacts." },
+    { to: "/addcontact", firstPart: "new", secondPart: "Contact." },
+    { to: "/goodbye/logout", secondPart: "logout."}
   ];
 
-  const linkClasses = "block top-20 px-4 py-1 pt-6 font-text font-semibold text-lg text-white dark:text-black  hover:text-red-500 dark:hover:text-red-500 rounded transition-colors duration-200";
+  const linkClasses = "block top-20 px-4 py-1 pt-6 font-sans font-semibold text-lg text-white dark:text-black hover:text-red-500 dark:hover:text-red-500 rounded";
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -49,8 +49,8 @@ const MenuBar = ({ isMenuOpen, setIsMenuOpen }) => {
 
       {/* Mobile Menu Dropdown */}
       {isMenuOpen && (
-        <div className="fixed top-20 right-0 h-80 w-40 bg-black dark:text-black dark:bg-white z-50 md:hidden transform transition-transform duration-200 ease-in-out shadow-lg rounded-l-lg border-radius">
-          <div className="space-y-2 p-1">
+        <div className="fixed top-20 right-0 h-80 w-40 bg-black dark:text-black dark:bg-white z-50 md:hidden transform ease-in-out shadow-lg rounded-l-lg border-radius">
+          <div className="space-y-2 p-2 tracking-wider">
             {menuItems.map((item) => (
               <Link
                 key={item.to}
@@ -58,7 +58,8 @@ const MenuBar = ({ isMenuOpen, setIsMenuOpen }) => {
                 className={linkClasses}
                 onClick={() => setIsMenuOpen(false)}
               >
-                {item.label}
+                <span className="font-semibold">{item.firstPart}</span>
+                <span className="font-light">{item.secondPart}</span>
               </Link>
             ))}
           </div>

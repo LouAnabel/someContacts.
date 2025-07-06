@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import ThemeToggle from '../theme/ThemeToggle.jsx';
-import SearchToggle from '../forms/SearchToggle.jsx'
+import SearchForm from '../forms/SearchForm.jsx'
 import MenuBar from './Menubar.jsx'
 
 const Navbar = () => {
@@ -19,19 +19,18 @@ const Navbar = () => {
 
   // Common navigation items for desktop
   const navItems = [
-    // { to: "/", label: "home." },
-    { to: "/contacts", label: "allContacts" },
-    { to: "/addcontact", label: "newContact" }
-  ];
+  { to: "/contacts", firstPart: "all", secondPart: "Contacts." },
+  { to: "/addcontact", firstPart: "new", secondPart: "Contact." }
+];
 
   return (
-    <nav className="bg-white dark:bg-black dark:border-gray-800 fixed w-full z-50 top-0">
-      <div className="max-w-screen-xl mx-auto px-4">
+    <nav className="bg-white font-text dark:bg-black dark:border-gray-800 fixed w-full z-50 top-0">
+      <div className="max-w-screen-xl mx-auto px-4 relative">
         <div className="flex justify-between items-center h-20">
           
           {/* someContacts. Title */}
           <Link to="/" className="flex items-center">
-            <span className="p-3 text-3xl sm:text-3xl font-heading text-black hover:text-red-500 dark:text-white hover:dark:text-red-500">
+            <span className="p-3 text-3xl sm:text-3xl tracking-wide font-heading text-black hover:text-red-500 dark:text-white hover:dark:text-red-500">
               <span className="font-semibold">some</span>
               <span className="font-light">Contacts.</span>
             </span>
@@ -40,7 +39,7 @@ const Navbar = () => {
           {/* Small screens: Mobile search + Theme + Menu toggle */}
           <div className="flex items-center space-x-2 md:hidden">
             
-            <SearchToggle 
+            <SearchForm 
               isMobile={true}
               placeholder="search contacts..."
               onSearch={handleSearch}
@@ -53,9 +52,9 @@ const Navbar = () => {
             />
           </div>
 
-          {/* Medium screens: Mobile search + Nav links + Theme */}
-          <div className="hidden md:flex items-center space-x-6">
-            <SearchToggle 
+          {/* Bigger screens: Mobile search + Nav links + Theme */}
+          <div className="hidden md:flex items-center space-x-6 tracking-wider">
+            <SearchForm 
               isMobile={true}
               placeholder="search contacts..."
               onSearch={handleSearch}
@@ -67,16 +66,15 @@ const Navbar = () => {
                 to={item.to} 
                 className="nav-link hover:text-red-500 dark:hover:text-red-500"
               >
-                {item.label}
+                <span className="font-semibold">{item.firstPart}</span>
+                <span className="font-light">{item.secondPart}</span>
               </Link>
             ))}
             </div>
             <ThemeToggle />
           </div>
-
-           
-          </div>
         </div>
+      </div>
     </nav>
   );
 };
