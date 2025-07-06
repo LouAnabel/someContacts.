@@ -163,7 +163,7 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
                         }`}
                         style={{
                             fontSize: '16px',
-                            fontWeight: 400
+                            fontWeight: 300
                         }}
                     />
                     {hasSubmitted && errors.email && (
@@ -186,7 +186,7 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
                         }`}
                         style={{
                             fontSize: '16px',
-                            fontWeight: 400
+                            fontWeight: 300
                         }}
                     />
                     {hasSubmitted && errors.password && (

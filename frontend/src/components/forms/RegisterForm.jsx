@@ -191,7 +191,7 @@ const RegisterForm = () => {
         
         if (!validateForm()) {
             setApiLoading(false);
-            console.error('❌ Form validation failed:', errors);
+            console.error('Form validation failed:', errors);
             return;
         }
         
@@ -235,7 +235,7 @@ const RegisterForm = () => {
                             }`}
                             style={{
                                 fontSize: '16px',
-                                fontWeight: 400
+                                fontWeight: 300
                             }}
                         />
                         {hasSubmitted && errors.firstName && (
@@ -261,7 +261,7 @@ const RegisterForm = () => {
                             }`}
                             style={{
                                 fontSize: '16px',
-                                fontWeight: 400
+                                fontWeight: 300
                             }}
                         />
                         {hasSubmitted && errors.lastName && (
@@ -287,7 +287,7 @@ const RegisterForm = () => {
                             }`}
                             style={{
                                 fontSize: '16px',
-                                fontWeight: 400
+                                fontWeight: 300
                             }}
                         />
                         {hasSubmitted && errors.email && (
@@ -313,7 +313,7 @@ const RegisterForm = () => {
                             }`}
                             style={{
                                 fontSize: '16px',
-                                fontWeight: 400
+                                fontWeight: 300
                             }}
                         />
                         {hasSubmitted && errors.password && (
@@ -339,7 +339,7 @@ const RegisterForm = () => {
                             }`}
                             style={{
                                 fontSize: '16px',
-                                fontWeight: 400
+                                fontWeight: 300
                             }}
                         />
                         {hasSubmitted && errors.confirmPassword && (

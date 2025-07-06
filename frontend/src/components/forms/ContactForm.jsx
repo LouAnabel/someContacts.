@@ -16,7 +16,9 @@ const ContactForm = ({ contact = {}, onSubmit, onCancel }) => {
         postalcode: '',
         city: '',
         country: '',
-        notes: ''
+        notes: '',
+        lastContactDate: '',
+        meetingPlace: ''
     });
 
     const [errors, setErrors] = useState({});
@@ -24,6 +26,10 @@ const ContactForm = ({ contact = {}, onSubmit, onCancel }) => {
     const [apiLoading, setApiLoading] = useState(false);
     const [showBirthdate, setShowBirthdate] = useState(false);
     const [showAddress, setShowAddress] = useState(false);
+    const [expandedNotes, setExpandedNotes] = useState(false);
+    const [showContactDetails, setShowContactDetails] = useState(false);
+    const [showLinks, setShowLinks] = useState(false);
+    const [links, setLinks] = useState(['']);
 
     const handleInputChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -39,6 +45,23 @@ const ContactForm = ({ contact = {}, onSubmit, onCancel }) => {
 
         if (errors.submit) {
             setErrors(prev => ({ ...prev, submit: '' }));
+        }
+    };
+
+    const handleLinkChange = (index, value) => {
+        const newLinks = [...links];
+        newLinks[index] = value;
+        setLinks(newLinks);
+    };
+
+    const addLink = () => {
+        setLinks([...links, '']);
+    };
+
+    const removeLink = (index) => {
+        if (links.length > 1) {
+            const newLinks = links.filter((_, i) => i !== index);
+            setLinks(newLinks);
         }
     };
 
@@ -89,10 +112,11 @@ const ContactForm = ({ contact = {}, onSubmit, onCancel }) => {
         // Form is valid, proceed with submission
         console.log('Form validation passed, proceeding with submission...');
         console.log('New contact data:', formData);
+        console.log('Links:', links);
         
         // Call the onSubmit prop if provided
         if (onSubmit) {
-            onSubmit(formData);
+            onSubmit({ ...formData, links });
         }
         
         // Simulate API call
@@ -112,10 +136,16 @@ const ContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                 postalcode: '',
                 city: '',
                 country: '',
-                notes: ''
+                notes: '',
+                lastContactDate: '',
+                meetingPlace: ''
             });
             setShowBirthdate(false);
             setShowAddress(false);
+            setShowContactDetails(false);
+            setShowLinks(false);
+            setExpandedNotes(false);
+            setLinks(['']);
             setHasSubmitted(false);
             // navigate('/contacts'); // Uncomment when ready to redirect
         }, 1000);
@@ -136,30 +166,31 @@ const ContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                     new contact.
                 </h1>
                 {/* Favorite Checkbox */}
-                    <div className={`flex items-start space-x-3 relative mb-4 p-1 rounded-lg`}>
-                        <input 
-                            id="isFavorite" 
-                            type="checkbox" 
-                            name="isFavorite"
-                            checked={formData.isFavorite}
-                            onChange={handleInputChange}
-                            className="w-4 h-4 rounded mt-1 border-2 border-black-300 focus:ring-0 focus:ring-offset-0"
-                            style={{ 
-                                accentColor: 'black',
-                                backgroundColor: formData.isFavorite ? 'black' : 'transparent',
-                                borderColor: formData.isFavorite ? 'black' : '#d1d5db'
-                            }}
-                        />
-                        <label htmlFor="isFavorite" className="text-sm font-light text-black dark:text-black mt-0.5 cursor-pointer">
-                            favorite contact
-                        </label>
-                    </div>
+                <div className={`flex items-start space-x-3 relative mb-4 p-1 rounded-lg`}>
+                    <input 
+                        id="isFavorite" 
+                        type="checkbox" 
+                        name="isFavorite"
+                        checked={formData.isFavorite}
+                        onChange={handleInputChange}
+                        className="w-4 h-4 rounded mt-1 border-2 border-black-300 focus:ring-0 focus:ring-offset-0"
+                        style={{ 
+                            accentColor: 'black',
+                            backgroundColor: formData.isFavorite ? 'black' : 'transparent',
+                            borderColor: formData.isFavorite ? 'black' : '#d1d5db'
+                        }}
+                    />
+                    <label htmlFor="isFavorite" className="text-sm font-light text-black dark:text-black mt-0.5 cursor-pointer">
+                        <span className="text-red-500 font-semibold">add</span>
+                        <span> to favorites</span>
+                    </label>
+                </div>
 
-                 {/* Contact Information */}
+                {/* Contact Information */}
                 <div className="space-y-5">
                     {/* First Name Field */}
                     <div className="relative">
-                        <label htmlFor="firstName" className=" block relative left-2 text-sans text-base text-black font-light">
+                        <label htmlFor="firstName" className="block relative left-2 text-sans text-base text-black font-light">
                             first name
                         </label>
                         <input 
@@ -175,7 +206,7 @@ const ContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                             }`}
                             style={{
                                 fontSize: '16px',
-                                fontWeight: 400
+                                fontWeight: 300
                             }}
                         />
                         {hasSubmitted && errors.firstName && (
@@ -197,11 +228,11 @@ const ContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                             placeholder="streep"
                             disabled={showLoading}
                             className={`w-full p-2.5 rounded-xl border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 ${
-                                hasSubmitted && errors.firstName ? 'border-red-400' : ''
+                                hasSubmitted && errors.lastName ? 'border-red-400' : ''
                             }`}
                             style={{
                                 fontSize: '16px',
-                                fontWeight: 400
+                                fontWeight: 300
                             }}
                         />
                         {hasSubmitted && errors.lastName && (
@@ -221,11 +252,11 @@ const ContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                             onChange={handleInputChange}
                             disabled={showLoading}
                             className={`w-full p-2.5 rounded-xl border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 ${
-                                hasSubmitted && errors.firstName ? 'border-red-400' : ''
+                                hasSubmitted && errors.category ? 'border-red-400' : ''
                             }`}
                             style={{
                                 fontSize: '16px',
-                                fontWeight: 400
+                                fontWeight: 300
                             }}
                         >
                             <option value="">select category</option>
@@ -254,11 +285,11 @@ const ContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                             placeholder="your@email.com"
                             disabled={showLoading}
                             className={`w-full p-2.5 rounded-xl border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 ${
-                                hasSubmitted && errors.firstName ? 'border-red-400' : ''
+                                hasSubmitted && errors.email ? 'border-red-400' : ''
                             }`}
                             style={{
                                 fontSize: '16px',
-                                fontWeight: 400
+                                fontWeight: 300
                             }}
                         />
                         {hasSubmitted && errors.email && (
@@ -280,11 +311,11 @@ const ContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                             placeholder="+1 (555) 123-4567"
                             disabled={showLoading}
                             className={`w-full p-2.5 rounded-xl border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 ${
-                                hasSubmitted && errors.firstName ? 'border-red-400' : ''
+                                hasSubmitted && errors.phone ? 'border-red-400' : ''
                             }`}
                             style={{
                                 fontSize: '16px',
-                                fontWeight: 400
+                                fontWeight: 300
                             }}
                         />
                         {hasSubmitted && errors.phone && (
@@ -293,221 +324,394 @@ const ContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                     </div>
 
                     {/* Birthdate Toggle and Field */}
-                    <div className="relative">
-                        {!showBirthdate ? (
-                            <button
-                                type="button"
-                                onClick={() => setShowBirthdate(true)}
-                                className="flex items-center space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-light"
-                                disabled={showLoading}
-                            >
-                                <span className="text-lg font-semibold ">+</span>
-                                <span className="text-base text-black hover:text-red-500">date of birth</span>
-                            </button>
-                        ) : (
-                            <div>
-                                <div className="flex items-center justify-between">
-                                    <label htmlFor="birthdate" className="block relative left-2 text-sans text-base text-black font-light">
-                                        date of birth
-                                    </label>
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            setShowBirthdate(false);
-                                            setFormData(prev => ({ ...prev, birthdate: '' }));
-                                        }}
-                                        className="text-red-500 hover:text-red-700 transition-colors duration-200 text-sm"
-                                        disabled={showLoading}
-                                    >
-                                        remove
-                                    </button>
-                                </div>
-                                <input 
-                                    type="date" 
-                                    name="birthdate" 
-                                    id="birthdate" 
-                                    value={formData.birthdate}
-                                    onChange={handleInputChange}
+                    <div className="space-y-2">
+                        <div className="relative">
+                            {!showBirthdate ? (
+                                <button
+                                    type="button"
+                                    onClick={() => setShowBirthdate(true)}
+                                    className="flex items-center space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-light"
                                     disabled={showLoading}
-                                    className={`w-full p-2.5 rounded-xl border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 ${
-                                hasSubmitted && errors.firstName ? 'border-red-400' : ''
-                            }`}
-                            style={{
-                                fontSize: '16px',
-                                fontWeight: 400
-                            }}
-                                />
-                                {hasSubmitted && errors.birthdate && (
-                                    <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.birthdate}</p>
-                                )}
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Address Toggle and Fields */}
-                    <div className="relative">
-                        {!showAddress ? (
-                            <button
-                                type="button"
-                                onClick={() => setShowAddress(true)}
-                                className="flex items-center space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-light"
-                                disabled={showLoading}
-                            >
-                                <span className="text-lg font-semibold">+</span>
-                                <span className="text-base text-black hover:text-red-500">add address</span>
-                            </button>
-                        ) : (
-                            <div className="space-y-2">
-                                <div className="flex items-center justify-between mb-2">
-                                    <span className="text-sans text-base text-black font-light">
-                                        address information
-                                    </span>
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            setShowAddress(false);
-                                            setFormData(prev => ({ 
-                                                ...prev, 
-                                                address: '', 
-                                                postalcode: '', 
-                                                city: '', 
-                                                country: '' 
-                                            }));
-                                        }}
-                                        className="text-red-500 hover:text-red-700 transition-colors duration-200 text-sm"
-                                        disabled={showLoading}
-                                    >
-                                        remove
-                                    </button>
-                                </div>
-                                
-                                {/* Address Field */}
-                                <div className="relative">
-                                    <label htmlFor="address" className="block relative left-2 text-sans text-base text-black font-light">
-                                        street address, nr°
-                                    </label>
+                                >
+                                    <span className="text-lg font-semibold">+</span>
+                                    <span className="text-base text-black hover:text-red-500">date of birth</span>
+                                </button>
+                            ) : (
+                                <div>
+                                    <div className="flex items-center justify-between">
+                                        <label htmlFor="birthdate" className="block relative left-2 text-sans text-base text-black font-light">
+                                            date of birth
+                                        </label>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setShowBirthdate(false);
+                                                setFormData(prev => ({ ...prev, birthdate: '' }));
+                                            }}
+                                            className="text-red-500 hover:text-red-700 transition-colors duration-200 text-sm"
+                                            disabled={showLoading}
+                                        >
+                                            remove
+                                        </button>
+                                    </div>
                                     <input 
-                                        type="text" 
-                                        name="address" 
-                                        id="address" 
-                                        value={formData.address}
+                                        type="date" 
+                                        name="birthdate" 
+                                        id="birthdate" 
+                                        value={formData.birthdate}
                                         onChange={handleInputChange}
-                                        placeholder="greifwalder Str. 8"
                                         disabled={showLoading}
                                         className={`w-full p-2.5 rounded-xl border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 ${
-                                            hasSubmitted && errors.firstName ? 'border-red-400' : ''
+                                            hasSubmitted && errors.birthdate ? 'border-red-400' : ''
                                         }`}
                                         style={{
                                             fontSize: '16px',
-                                            fontWeight: 400
+                                            fontWeight: 300
                                         }}
                                     />
-                                    {hasSubmitted && errors.address && (
-                                        <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.address}</p>
+                                    {hasSubmitted && errors.birthdate && (
+                                        <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.birthdate}</p>
                                     )}
                                 </div>
+                            )}
+                        </div>
 
-                                {/* Postal Code and City in a row */}
-                                <div className="flex space-x-4">
-                                    <div className="relative flex-1">
-                                        <label htmlFor="postalcode" className="block relative left-2  text-sans text-base text-black font-light">
-                                            postal code
+                        {/* Address Toggle and Fields */}
+                        <div className="relative">
+                            {!showAddress ? (
+                                <button
+                                    type="button"
+                                    onClick={() => setShowAddress(true)}
+                                    className="flex items-center space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-light"
+                                    disabled={showLoading}
+                                >
+                                    <span className="text-lg font-semibold">+</span>
+                                    <span className="text-base text-black hover:text-red-500">add address</span>
+                                </button>
+                            ) : (
+                                <div className="space-y-2">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <span className="relative left-2 text-sans text-base text-black font-light">
+                                            
+                                        </span>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setShowAddress(false);
+                                                setFormData(prev => ({ 
+                                                    ...prev, 
+                                                    address: '', 
+                                                    postalcode: '', 
+                                                    city: '', 
+                                                    country: '' 
+                                                }));
+                                            }}
+                                            className="text-red-500 hover:text-red-700 transition-colors duration-200 text-sm"
+                                            disabled={showLoading}
+                                        >
+                                            remove
+                                        </button>
+                                    </div>
+                                    
+                                    {/* Address Field */}
+                                    <div className="relative">
+                                        <label htmlFor="address" className="block relative left-2 text-sans text-base text-black font-light">
+                                            street address, nr°
                                         </label>
                                         <input 
                                             type="text" 
-                                            name="postalcode" 
-                                            id="postalcode" 
-                                            value={formData.postalcode}
+                                            name="address" 
+                                            id="address" 
+                                            value={formData.address}
                                             onChange={handleInputChange}
-                                            placeholder="10407"
+                                            placeholder="greifwalder Str. 8"
                                             disabled={showLoading}
                                             className={`w-full p-2.5 rounded-xl border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 ${
-                                                hasSubmitted && errors.firstName ? 'border-red-400' : ''
+                                                hasSubmitted && errors.address ? 'border-red-400' : ''
                                             }`}
                                             style={{
                                                 fontSize: '16px',
-                                                fontWeight: 400
+                                                fontWeight: 300
                                             }}
                                         />
-                                        {hasSubmitted && errors.postalcode && (
-                                            <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.postalcode}</p>
+                                        {hasSubmitted && errors.address && (
+                                            <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.address}</p>
                                         )}
                                     </div>
 
-                                    <div className="relative flex-1">
-                                        <label htmlFor="city" className="block relative left-2 text-sans text-base text-black font-light">
-                                            city
+                                    {/* Postal Code and City in a row */}
+                                    <div className="flex space-x-4">
+                                        <div className="relative flex-1">
+                                            <label htmlFor="postalcode" className="block relative left-2 text-sans text-base text-black font-light">
+                                                postal code
+                                            </label>
+                                            <input 
+                                                type="text" 
+                                                name="postalcode" 
+                                                id="postalcode" 
+                                                value={formData.postalcode}
+                                                onChange={handleInputChange}
+                                                placeholder="10407"
+                                                disabled={showLoading}
+                                                className={`w-full p-2.5 rounded-xl border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 ${
+                                                    hasSubmitted && errors.postalcode ? 'border-red-400' : ''
+                                                }`}
+                                                style={{
+                                                    fontSize: '16px',
+                                                    fontWeight: 300
+                                                }}
+                                            />
+                                            {hasSubmitted && errors.postalcode && (
+                                                <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.postalcode}</p>
+                                            )}
+                                        </div>
+
+                                        <div className="relative flex-1">
+                                            <label htmlFor="city" className="block relative left-2 text-sans text-base text-black font-light">
+                                                city
+                                            </label>
+                                            <input 
+                                                type="text" 
+                                                name="city" 
+                                                id="city" 
+                                                value={formData.city}
+                                                onChange={handleInputChange}
+                                                placeholder="berlin"
+                                                disabled={showLoading}
+                                                className={`w-full p-2.5 rounded-xl border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 py-2.5 px-4 focus:outline-none focus:border-red-500 ${
+                                                    hasSubmitted && errors.city ? 'border-red-400' : ''
+                                                }`}
+                                                style={{
+                                                    fontSize: '16px',
+                                                    fontWeight: 300
+                                                }}
+                                            />
+                                            {hasSubmitted && errors.city && (
+                                                <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.city}</p>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* Country Field */}
+                                    <div className="relative">
+                                        <label htmlFor="country" className="block relative left-2 text-sans text-base text-black font-light">
+                                            country
                                         </label>
                                         <input 
                                             type="text" 
-                                            name="city" 
-                                            id="city" 
-                                            value={formData.city}
+                                            name="country" 
+                                            id="country" 
+                                            value={formData.country}
                                             onChange={handleInputChange}
-                                            placeholder="berlin"
+                                            placeholder="germany"
                                             disabled={showLoading}
-                                            className={`w-full p-2.5 rounded-xl border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 py-2.5 px-4 focus:outline-none focus:border-red-500 ${
-                                                hasSubmitted && errors.firstName ? 'border-red-400' : ''
+                                            className={`w-full p-2.5 rounded-xl border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 ${
+                                                hasSubmitted && errors.country ? 'border-red-400' : ''
                                             }`}
                                             style={{
                                                 fontSize: '16px',
-                                                fontWeight: 400
+                                                fontWeight: 300
                                             }}
                                         />
-                                        {hasSubmitted && errors.city && (
-                                            <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.city}</p>
+                                        {hasSubmitted && errors.country && (
+                                            <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.country}</p>
                                         )}
                                     </div>
                                 </div>
+                            )}
+                        </div>
 
-                                {/* Country Field */}
-                                <div className="relative">
-                                    <label htmlFor="country" className="block relative left-2 text-sans text-base text-black font-light">
-                                        country
-                                    </label>
-                                    <input 
-                                        type="text" 
-                                        name="country" 
-                                        id="country" 
-                                        value={formData.country}
-                                        onChange={handleInputChange}
-                                        placeholder="germany"
-                                        disabled={showLoading}
-                                        className={`w-full p-2.5 rounded-xl border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 ${
-                                            hasSubmitted && errors.firstName ? 'border-red-400' : ''
-                                        }`}
-                                        style={{
-                                            fontSize: '16px',
-                                            fontWeight: 400
-                                        }}
-                                    />
-                                    {hasSubmitted && errors.country && (
-                                        <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.country}</p>
-                                    )}
+                        {/* Contact Details Toggle and Fields */}
+                        <div className="relative">
+                            {!showContactDetails ? (
+                                <button
+                                    type="button"
+                                    onClick={() => setShowContactDetails(true)}
+                                    className="flex items-center space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-light"
+                                    disabled={showLoading}
+                                >
+                                    <span className="text-lg font-semibold">+</span>
+                                    <span className="text-base text-black hover:text-red-500">when and where did you meet? </span>
+                                </button>
+                            ) : (
+                                <div className="space-y-2">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <span className="relative left-2 text-sans text-base text-black font-light">
+                                            
+                                        </span>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setShowContactDetails(false);
+                                                setFormData(prev => ({ 
+                                                    ...prev, 
+                                                    lastContactDate: '', 
+                                                    meetingPlace: '' 
+                                                }));
+                                            }}
+                                            className="text-red-500 hover:text-red-700 transition-colors duration-200 text-sm"
+                                            disabled={showLoading}
+                                        >
+                                            remove
+                                        </button>
+                                    </div>
+                                    
+                                    {/* Last Contact Date Field */}
+                                    <div className="relative">
+                                        <label htmlFor="lastContactDate" className="block relative left-2 text-sans text-base text-black font-light">
+                                            date of last contact
+                                        </label>
+                                        <input 
+                                            type="date" 
+                                            name="lastContactDate" 
+                                            id="lastContactDate" 
+                                            value={formData.lastContactDate}
+                                            onChange={handleInputChange}
+                                            disabled={showLoading}
+                                            className={`w-full p-2.5 rounded-xl border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 ${
+                                                hasSubmitted && errors.lastContactDate ? 'border-red-400' : ''
+                                            }`}
+                                            style={{
+                                                fontSize: '16px',
+                                                fontWeight: 300
+                                            }}
+                                        />
+                                        {hasSubmitted && errors.lastContactDate && (
+                                            <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.lastContactDate}</p>
+                                        )}
+                                    </div>
+
+                                    {/* Meeting Place Field */}
+                                    <div className="relative">
+                                        <label htmlFor="meetingPlace" className="block relative left-2 text-sans text-base text-black font-light">
+                                            place where you met
+                                        </label>
+                                        <input 
+                                            type="text" 
+                                            name="meetingPlace" 
+                                            id="meetingPlace" 
+                                            value={formData.meetingPlace}
+                                            onChange={handleInputChange}
+                                            placeholder="coffe shop, berlin ..."
+                                            disabled={showLoading}
+                                            className={`w-full p-2.5 rounded-xl border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 ${
+                                                hasSubmitted && errors.meetingPlace ? 'border-red-400' : ''
+                                            }`}
+                                            style={{
+                                                fontSize: '16px',
+                                                fontWeight: 300
+                                            }}
+                                        />
+                                        {hasSubmitted && errors.meetingPlace && (
+                                            <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.meetingPlace}</p>
+                                        )}
+                                    </div>
                                 </div>
-                            </div>
-                        )}
-                    </div>
+                            )}
+                        </div>
+
+                        {/* Links Toggle and Fields */}
+                        <div className="relative">
+                            {!showLinks ? (
+                                <button
+                                    type="button"
+                                    onClick={() => setShowLinks(true)}
+                                    className="flex items-center space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-light"
+                                    disabled={showLoading}
+                                >
+                                    <span className="text-lg font-semibold">+</span>
+                                    <span className="text-base text-black hover:text-red-500">add links</span>
+                                </button>
+                            ) : (
+                                <div className="space-y-2">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <span className="relative left-2 text-sans text-base text-black font-light">
+                                            websites & links
+                                        </span>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setShowLinks(false);
+                                                setLinks(['']);
+                                            }}
+                                            className="text-red-500 hover:text-red-700 transition-colors duration-200 text-sm"
+                                            disabled={showLoading}
+                                        >
+                                            remove
+                                        </button>
+                                    </div>
+                                    
+                                    {links.map((link, index) => (
+                                        <div key={index} className="relative flex items-center space-x-2">
+                                            <input 
+                                                type="url" 
+                                                value={link}
+                                                onChange={(e) => handleLinkChange(index, e.target.value)}
+                                                placeholder="https://example.com"
+                                                disabled={showLoading}
+                                                className="flex-1 p-2.5 rounded-xl border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 focus:outline-none focus:border-red-500"
+                                                style={{
+                                                    fontSize: '16px',
+                                                    fontWeight: 300
+                                                }}
+                                            />
+                                            {links.length > 1 && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeLink(index)}
+                                                    className="text-red-500 hover:text-red-700 transition-colors duration-200 p-1"
+                                                    disabled={showLoading}
+                                                >
+                                                    ×
+                                                </button>
+                                            )}
+                                        </div>
+                                    ))}
+                                    
+                                    <button
+                                        type="button"
+                                        onClick={addLink}
+                                        className="flex items-center space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-light text-sm"
+                                        disabled={showLoading}
+                                    >
+                                        <span className="text-base">+</span>
+                                        <span className="text-black hover:text-red-500">add another link</span>
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    </div>    
 
                     {/* Notes Field */}
                     <div className="relative">
-                        <label htmlFor="notes" className="block relative left-2 text-sans text-base text-black font-light">
-                            notes
-                        </label>
+                        <div className="flex items-center justify-between mb-2">
+                            <label htmlFor="notes" className="block relative left-2 text-sans text-base text-black font-light">
+                                any notes or things to remember?
+                            </label>
+                            <button
+                                type="button"
+                                onClick={() => setExpandedNotes(!expandedNotes)}
+                                className="text-red-500 hover:text-red-600 relative right-1 text-sm font-light"
+                                disabled={showLoading}
+                            >
+                                {expandedNotes ? 'show less' : 'show more'}
+                            </button>
+                        </div>
                         <textarea 
                             name="notes" 
                             id="notes" 
                             value={formData.notes}
                             onChange={handleInputChange}
-                            placeholder="additional notes..."
+                            placeholder="everything that matters.."
                             disabled={showLoading}
-                            rows={3}
-                            className={`w-full p-2.5 rounded-xl border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 ${
-                                hasSubmitted && errors.firstName ? 'border-red-400' : ''
+                            rows={expandedNotes ? 6 : 3}
+                            className={`w-full p-2.5 rounded-xl border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 transition-all duration-300 resize-none ${
+                                hasSubmitted && errors.notes ? 'border-red-400' : ''
                             }`}
                             style={{
                                 fontSize: '16px',
-                                fontWeight: 400
+                                fontWeight: 300,
+                                height: expandedNotes ? 'auto' : 'auto'
                             }}
                         />
                         {hasSubmitted && errors.notes && (
@@ -534,7 +738,7 @@ const ContactForm = ({ contact = {}, onSubmit, onCancel }) => {
             </div>
 
             {/* Back Link */}
-            <div className="text-black dark:text-white font-light mt-2 relative w-full text-left left-14 "
+            <div className="text-black dark:text-white font-light mt-2 relative w-full text-left left-14"
                  style={{ fontSize: '16px' }}>
                 want to cancel? {' '}
                 <button 
@@ -542,12 +746,12 @@ const ContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                         if (onCancel) {
                             onCancel();
                         } else {
-                            navigate('/contacts');
+                            navigate('/home');
                         }
                     }}
                     className="font-light font-normal text-red-500 hover:underline bg-transparent border-none cursor-pointer"
                 >
-                     go back.
+                    go back.
                 </button>
             </div>
         </div>
