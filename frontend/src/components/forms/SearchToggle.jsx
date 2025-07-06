@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { HiSearch, HiX } from 'react-icons/hi';
 import { buttonStyles, searchStyles } from '../ui/ButtonStyles.jsx';
 
-const SearchSmall = ({ 
+const SearchToggle = ({ 
   placeholder = "search...",
   onSearch,
   isMobile = true,
@@ -76,7 +76,7 @@ const SearchSmall = ({
       <button
         type="button"
         onClick={handleToggle}
-        className={`p-2.5 rounded-lg text-sm ${buttonStyles.base} ${
+        className={`p-2 rounded-lg text-sm ${buttonStyles.base} ${
           isOpen ? buttonStyles.active : buttonStyles.normal
         }`}
        >
@@ -90,7 +90,7 @@ const SearchSmall = ({
         
       {/* Mobile Search Bar (dropdown) */}
       {isOpen && (
-        <div className="absolute top-13 left-0 right-2 bg-white dark:bg-black z-50">
+        <div className="absolute top-13 right-2 bg-white dark:bg-black z-50">
           <form onSubmit={handleSubmit}>
             <div className="p-4 flex items-center gap-0 relative" ref={dropdownRef}>
               <button 
@@ -137,7 +137,7 @@ const SearchSmall = ({
                   id="search-dropdown" 
                   value={searchTerm}
                   onChange={(e) => handleSearch(e.target.value)}
-                  className="block py-2 px-8 w-full border-white text-sm dark:border-0 text-black placeholder-gray-300 bg-gray-50 dark:placeholder-gray-300 dark:text-black" 
+                  className="block py-2 px-5 w-full border-white text-sm dark:border-0 text-black placeholder-gray-300 bg-gray-50 dark:placeholder-gray-300 dark:text-black" 
                   placeholder={placeholder}
                   required 
                 />
@@ -161,4 +161,4 @@ const SearchSmall = ({
   )
 }
 
-export default SearchSmall;
+export default SearchToggle;
