@@ -35,11 +35,11 @@ const NewContact = () => {
 
 
     return (
-        <div className="min-h-screen bg-white dark:bg-black flex flex-col justify-start items-center text-black dark:text-white font-sans p-0" 
+        <div className="flex flex-col items-center justify-center px-6 mx-auto md:h-screen lg:py-0" 
              style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
             
             {/* Photo Field - Full width at top */}
-            <div className="w-full pt-[50px] pb-6">
+            <div className="w-full pb-6">
                 <PhotoField 
                     photo={contactPhoto}
                     name="New Contact"
@@ -50,7 +50,7 @@ const NewContact = () => {
             </div>
             
             {/* Contact Form */}
-            <div className="flex flex-col items-center w-full">
+            <div className="w-full">
                 <ContactForm 
                     onSubmit={handleSubmit}
                     onCancel={handleCancel}
