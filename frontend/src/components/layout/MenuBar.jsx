@@ -49,7 +49,7 @@ const MenuBar = ({ isMenuOpen, setIsMenuOpen }) => {
 
       {/* Mobile Menu Dropdown */}
       {isMenuOpen && (
-        <div className="fixed top-16 right-0 h-80 w-40 bg-black dark:text-black dark:bg-white z-50 md:hidden transform transition-transform duration-200 ease-in-out shadow-lg rounded-l-lg border-radius">
+        <div className="fixed top-20 right-0 h-80 w-40 bg-black dark:text-black dark:bg-white z-50 md:hidden transform transition-transform duration-200 ease-in-out shadow-lg rounded-l-lg border-radius">
           <div className="space-y-2 p-1">
             {menuItems.map((item) => (
               <Link

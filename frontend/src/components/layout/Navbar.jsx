@@ -32,7 +32,7 @@ const Navbar = () => {
           
           {/* someContacts. Title */}
           <Link to="/" className="flex items-center">
-            <span className="text-3xl sm:text-3xl font-heading text-black hover:text-red-500 dark:text-white hover:dark:text-red-500 transition-colors duration-200">
+            <span className="text-3xl sm:text-3xl font-heading text-black hover:text-red-500 dark:text-white hover:dark:text-red-500">
               <span className="font-semibold">some</span>
               <span className="font-light">Contacts.</span>
             </span>
