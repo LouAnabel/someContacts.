@@ -15,7 +15,7 @@ function UserLayout() {
       <main className="pt-16 flex-grow">
         <Outlet />
       </main>
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 }

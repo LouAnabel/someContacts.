@@ -528,7 +528,7 @@ const ContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                     }}
                     disabled={showLoading}
                     onClick={handleSubmit}>
-                    {showLoading ? '. . .' : 'create.'}
+                    {showLoading ? '. . .' : 'next.'}
                 </CircleButton>
             
             </div>
