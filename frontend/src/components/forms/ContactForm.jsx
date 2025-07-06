@@ -521,7 +521,45 @@ const ContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                             )}
                         </div>
 
-                        {/* Contact Details Toggle and Fields */}
+                        
+
+                    {/* Notes Field */}
+                    <div className="relative">
+                        <div className="flex items-center justify-between mt-4">
+                            <label htmlFor="notes" className="block relative left-2 text-sans text-base text-black font-light">
+                                any notes or things to remember?
+                            </label>
+                            <button
+                                type="button"
+                                onClick={() => setExpandedNotes(!expandedNotes)}
+                                className="text-red-500 hover:text-red-600 relative right-1 text-sm font-light"
+                                disabled={showLoading}
+                            >
+                                {expandedNotes ? 'show less' : 'show more'}
+                            </button>
+                        </div>
+                        <textarea 
+                            name="notes" 
+                            id="notes" 
+                            value={formData.notes}
+                            onChange={handleInputChange}
+                            placeholder="everything that matters.."
+                            disabled={showLoading}
+                            rows={expandedNotes ? 6 : 3}
+                            className={`w-full p-2.5 mb-3 rounded-xl border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 transition-all duration-300 resize-none ${
+                                hasSubmitted && errors.notes ? 'border-red-400' : ''
+                            }`}
+                            style={{
+                                fontSize: '16px',
+                                fontWeight: 300,
+                                height: expandedNotes ? 'auto' : 'auto'
+                            }}
+                        />
+                        {hasSubmitted && errors.notes && (
+                            <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.notes}</p>
+                        )}
+                    </div>
+                    {/* Contact Details Toggle and Fields */}
                         <div className="relative">
                             {!showContactDetails ? (
                                 <button
@@ -620,7 +658,7 @@ const ContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                                     disabled={showLoading}
                                 >
                                     <span className="text-lg font-semibold">+</span>
-                                    <span className="text-base text-black hover:text-red-500">add links</span>
+                                    <span className="text-base text-black hover:text-red-500">add weblinks</span>
                                 </button>
                             ) : (
                                 <div className="space-y-2">
@@ -681,43 +719,6 @@ const ContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                             )}
                         </div>
                     </div>    
-
-                    {/* Notes Field */}
-                    <div className="relative">
-                        <div className="flex items-center justify-between mb-2">
-                            <label htmlFor="notes" className="block relative left-2 text-sans text-base text-black font-light">
-                                any notes or things to remember?
-                            </label>
-                            <button
-                                type="button"
-                                onClick={() => setExpandedNotes(!expandedNotes)}
-                                className="text-red-500 hover:text-red-600 relative right-1 text-sm font-light"
-                                disabled={showLoading}
-                            >
-                                {expandedNotes ? 'show less' : 'show more'}
-                            </button>
-                        </div>
-                        <textarea 
-                            name="notes" 
-                            id="notes" 
-                            value={formData.notes}
-                            onChange={handleInputChange}
-                            placeholder="everything that matters.."
-                            disabled={showLoading}
-                            rows={expandedNotes ? 6 : 3}
-                            className={`w-full p-2.5 rounded-xl border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 transition-all duration-300 resize-none ${
-                                hasSubmitted && errors.notes ? 'border-red-400' : ''
-                            }`}
-                            style={{
-                                fontSize: '16px',
-                                fontWeight: 300,
-                                height: expandedNotes ? 'auto' : 'auto'
-                            }}
-                        />
-                        {hasSubmitted && errors.notes && (
-                            <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.notes}</p>
-                        )}
-                    </div>
                 </div>
 
                 {/* Circle Button - Outside the space-y-6 div but inside the card */}
