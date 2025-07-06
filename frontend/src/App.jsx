@@ -13,7 +13,7 @@ import AllContacts from './pages/AllContacts';
 import AddContact from './pages/AddContact';
 import ShowContact from './pages/ShowContact';
 import UpdateContacts from './pages/UpdateContact';
-import Logout from './pages/logout';
+
 
 function App() {
   return (
@@ -31,9 +31,6 @@ function App() {
           <Route path="/hello/*" element={<AuthLayout />}>
             <Route path="login" element={<Login />} />
             <Route path="register" element={<Register />} />
-          </Route>
-          <Route path="/goodbye/*" element={<AuthLayout />}>
-            <Route path="goodbye/logout" element={<Logout />} />
           </Route>
         </Routes>
       </Router>

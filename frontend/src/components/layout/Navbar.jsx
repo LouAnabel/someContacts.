@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import ThemeToggle from '../theme/ThemeToggle.jsx';
-import Search from '../ui/Search.jsx';
+import SearchSmall from '../forms/SearchSmall.jsx'
+import SearchBig from '../forms/SearchBig.jsx'; 
 import MenuBar from './Menubar.jsx'
 
 const Navbar = () => {
@@ -19,9 +20,9 @@ const Navbar = () => {
 
   // Common navigation items for desktop
   const navItems = [
-    { to: "/", label: "Home" },
-    { to: "/contacts", label: "All Contacts" },
-    { to: "/addcontact", label: "Add Contact" }
+    { to: "/", label: "home." },
+    { to: "/contacts", label: "all contacts." },
+    { to: "/addcontact", label: "add contact." }
   ];
 
   return (
@@ -37,11 +38,11 @@ const Navbar = () => {
             </span>
           </Link>
 
-          {/* Mobile: Search + Theme + Menubar */}
+          {/* Small screens: Mobile search + Theme + Menu toggle */}
           <div className="flex items-center space-x-2 md:hidden">
-            <Search 
+            <SearchSmall 
               isMobile={true}
-              placeholder="Search contacts..."
+              placeholder="search contacts..."
               onSearch={handleSearch}
             />
             <ThemeToggle />
@@ -51,25 +52,50 @@ const Navbar = () => {
             />
           </div>
 
-          {/* Desktop: Search + Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            <Search 
-              placeholder="Search contacts..."
+          {/* Medium screens: Mobile search + Nav links + Theme */}
+          <div className="hidden md:flex lg:hidden items-center space-x-4 ">
+            <SearchSmall 
+              isMobile={true}
+              placeholder="search contacts..."
               onSearch={handleSearch}
             />
+            <div className="flex items-center space-x-5">
             {navItems.map((item) => (
               <Link 
                 key={item.to}
                 to={item.to} 
-                className="nav-link"
+                className="nav-link hover:text-red-500 dark:hover:text-red-500"
               >
                 {item.label}
               </Link>
             ))}
+            </div>
             <ThemeToggle />
           </div>
+
+          {/* Large screens: Nav links + Theme on top, Desktop search below */}
+            <div className="hidden lg:flex items-center justify-items width-full">
+              <div className="flex relative right-10">
+              <SearchBig 
+                placeholder="search by ..."
+                onSearch={handleSearch}
+              />
+              </div>
+              <div className="flex items-center space-x-6">
+                {navItems.map((item) => (
+                  <Link 
+                   key={item.to}
+                    to={item.to} 
+                    className="nav-link hover:text-red-500 dark:hover:text-red-500"
+                  >
+                  {item.label}
+                 </Link>
+                ))}
+                <ThemeToggle />
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
     </nav>
   );
 };
