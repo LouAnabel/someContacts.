@@ -155,7 +155,7 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
                         value={formData.email}
                         onChange={handleInputChange}
                         placeholder="email"
-                        className={`w-full p-2.5 rounded-xl border border-black bg-transparent text-black placeholder-gray-500 max-w-full min-w-[200px] text-base font-normal focus:outline-none focus:border-red-500 ${
+                        className={`w-full p-2.5 rounded-xl border  bg-transparent text-black border-gray-500 placeholder-gray-500 max-w-full min-w-[200px] text-base font-normal focus:outline-none focus:border-red-500 ${
                             errors.email ? 'border-red-400' : ''
                         }`}
                         style={{
@@ -175,7 +175,7 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
                         value={formData.password}
                         onChange={handleInputChange}
                         placeholder="password"
-                        className={`w-full p-2.5 rounded-xl border border-black bg-transparent text-black placeholder-gray-500 transition-all duration-200 max-w-full min-w-[200px] text-base font-normal focus:outline-none focus:border-red-500 ${
+                        className={`w-full p-2.5 rounded-xl border  bg-transparent text-black border-gray-500 placeholder-gray-500 transition-all duration-200 max-w-full min-w-[200px] text-base font-normal focus:outline-none focus:border-red-500 ${
                             errors.password ? 'border-red-400' : ''
                         }`}
                         style={{

@@ -106,7 +106,7 @@ const SearchForm = ({
               </button>
 
               {isDropdownOpen && (
-                <div className="absolute bg-black bg-opacity-80 rounded-xl shadow-sm shadow-gray-200 w-44 top-full z-10 dark:bg-white">
+                <div className="absolute bg-black bg-opacity-80 rounded-xl shadow-sm shadow-gray-200 dark:bg-white w-44 top-full z-10 ">
                   <ul className="py-4 text-sm font-light text-white dark:text-black tracking-wider ">
                     <li>
                       <button 

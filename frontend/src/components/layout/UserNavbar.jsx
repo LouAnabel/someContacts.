@@ -20,7 +20,7 @@ const Navbar = () => {
   // Common navigation items for desktop
   const navItems = [
   { to: "/contacts", firstPart: "all", secondPart: "Contacts." },
-  { to: "/addcontact", firstPart: "new", secondPart: "Contact." }
+  { to: "/newcontact", firstPart: "new", secondPart: "Contact." }
 ];
 
   return (

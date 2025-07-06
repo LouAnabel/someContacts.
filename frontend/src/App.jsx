@@ -10,7 +10,7 @@ import Login from './pages/login';
 import Register from './pages/Register';
 import Home from './pages/Home';
 import AllContacts from './pages/AllContacts';
-import AddContact from './pages/AddContact';
+import NewContact from './pages/NewContact';
 import ShowContact from './pages/ShowContact';
 import UpdateContacts from './pages/UpdateContact';
 
@@ -24,7 +24,7 @@ function App() {
           <Route path="/*" element={<UserLayout />}>
             <Route index element={<Home />} />
             <Route path="contacts" element={<AllContacts />} />
-            <Route path="addcontact" element={<AddContact />} />
+            <Route path="newcontact" element={<NewContact />} />
             <Route path="contact/:id" element={<ShowContact />} />
             <Route path="updatecontact/:id" element={<UpdateContacts />} />
           </Route>
