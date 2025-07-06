@@ -256,8 +256,8 @@ const RegisterForm = () => {
                             onChange={handleInputChange}
                             placeholder="streep"
                             disabled={showLoading}
-                            className={`w-full p-2.5 rounded-xl border border-gray-500 bg-transparent text-black font-text placeholder-gray-300 transition-all duration-200 max-w-full min-w-[200px] text-normal focus:outline-none focus:border-red-500 ${
-                                hasSubmitted && errors.lastName ? 'border-red-400' : ''
+                            className={`w-full p-2.5 rounded-xl border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 ${
+                                hasSubmitted && errors.firstName ? 'border-red-400' : ''
                             }`}
                             style={{
                                 fontSize: '16px',
@@ -282,8 +282,8 @@ const RegisterForm = () => {
                             onChange={handleInputChange}
                             placeholder="your@email.com"
                             disabled={showLoading}
-                            className={`w-full p-2.5 rounded-xl border border-gray-500 bg-transparent text-black placeholder-gray-300 transition-all duration-200 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 ${
-                                hasSubmitted && errors.email ? 'border-red-400' : ''
+                            className={`w-full p-2.5 rounded-xl border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 ${
+                                hasSubmitted && errors.firstName ? 'border-red-400' : ''
                             }`}
                             style={{
                                 fontSize: '16px',
@@ -309,7 +309,7 @@ const RegisterForm = () => {
                             placeholder="••••••••"
                             disabled={showLoading}
                             className={`w-full p-2.5 rounded-xl border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 ${
-                                hasSubmitted && errors.password ? 'border-red-400' : ''
+                                hasSubmitted && errors.firstName ? 'border-red-400' : ''
                             }`}
                             style={{
                                 fontSize: '16px',
@@ -334,8 +334,8 @@ const RegisterForm = () => {
                             onChange={handleInputChange}
                             placeholder="••••••••"
                             disabled={showLoading}
-                            className={`w-full p-2.5 rounded-xl border border-gray-500 bg-transparent text-black placeholder-gray-300 transition-all duration-200 max-w-full min-w-[200px] text-base font-normal focus:outline-none focus:border-red-500 ${
-                                hasSubmitted && errors.confirmPassword ? 'border-red-400' : ''
+                            className={`w-full p-2.5 rounded-xl border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 ${
+                                hasSubmitted && errors.firstName ? 'border-red-400' : ''
                             }`}
                             style={{
                                 fontSize: '16px',
@@ -374,7 +374,7 @@ const RegisterForm = () => {
                 <CircleButton
                     size="large"
                     variant="dark"
-                    className="border border-white/30 absolute -bottom-[60px] -right-[30px]"
+                    className="dark:bg-red-600 hover:dark:bg-black hover:dark:border hover:dark:border-white absolute -bottom-[60px] -right-[30px]"
                     style={{ 
                         marginTop: '2rem', 
                         marginLeft: 'auto', 

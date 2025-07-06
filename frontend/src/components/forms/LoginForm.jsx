@@ -141,22 +141,25 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
              style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
 
             {/* Main Login Card */}
-            <div className="bg-gray-50 rounded-3xl p-6 relative z-10 overflow-visible w-[75vw] min-w-[260px] max-w-[480px] h-fit absolute  left-1/2 transform -translate-x-1/2"
+            <div className="bg-gray-50 rounded-3xl p-6 relative z-10 overflow-visible w-[75vw] min-w-[260px] max-w-[480px] h-fit absolute left-1/2 transform -translate-x-1/2"
                  style={{ 
                      boxShadow: '0 4px 32px rgba(0, 0, 0, 0.3)'
                  }}>
                 
-                <h2 className="text-3xl font-bold text-center mb-8 text-black">login.</h2>
+                <h2 className="text-3xl font-bold text-center mb-7 text-black">login.</h2>
 
-                <div className="mb-8 relative">
+                <div className="mb-5 relative">
+                    <label htmlFor="email" className="relative left-2 block text-sans text-md text-black font-light">
+                            email
+                        </label>
                     <input
                         type="email"
                         name="email"
                         value={formData.email}
                         onChange={handleInputChange}
-                        placeholder="email"
-                        className={`w-full p-2.5 rounded-xl border  bg-transparent text-black border-gray-500 placeholder-gray-500 max-w-full min-w-[200px] text-base font-normal focus:outline-none focus:border-red-500 ${
-                            errors.email ? 'border-red-400' : ''
+                        placeholder="your@email.com"
+                        className={`w-full p-2.5 rounded-xl border bg-transparent text-black border-gray-500 placeholder-gray-300 transition-all duration-200 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 ${
+                            errors.password ? 'border-red-400' : ''
                         }`}
                         style={{
                             fontSize: '16px',
@@ -164,18 +167,21 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
                         }}
                     />
                     {hasSubmitted && errors.email && (
-                        <p className="absolute top-full right-0 text-sm text-red-600 z-20">{errors.email}</p>
+                        <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.email}</p>
                     )}
                 </div>
 
-                <div className="mb-8 relative">
+                <div className="mb-7 relative ">
+                    <label htmlFor="password" className="relative left-2 block text-sans text-md text-black font-light">
+                            password
+                    </label>
                     <input
                         type="password"
                         name="password"
                         value={formData.password}
                         onChange={handleInputChange}
-                        placeholder="password"
-                        className={`w-full p-2.5 rounded-xl border  bg-transparent text-black border-gray-500 placeholder-gray-500 transition-all duration-200 max-w-full min-w-[200px] text-base font-normal focus:outline-none focus:border-red-500 ${
+                        placeholder="••••••••"
+                        className={`w-full p-2.5 rounded-xl border bg-transparent text-black border-gray-500 placeholder-gray-300 transition-all duration-200 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 ${
                             errors.password ? 'border-red-400' : ''
                         }`}
                         style={{
@@ -184,7 +190,7 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
                         }}
                     />
                     {hasSubmitted && errors.password && (
-                        <p className="absolute top-full right-0 text-sm text-red-600 z-20">{errors.password}</p>
+                        <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.password}</p>
                     )}
                 </div>
 
