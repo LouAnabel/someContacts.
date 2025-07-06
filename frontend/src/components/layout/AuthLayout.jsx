@@ -1,4 +1,4 @@
-import AuthHeader from "./AuthHeader";
+import AuthNavbar from "./AuthNavbar";
 import { Outlet} from "react-router";
 import Footer from "./Footer";
 import { useLocation } from "react-router";
@@ -13,7 +13,7 @@ function AuthLayout() {
   
   return (
     <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white font-heading flex flex-col">
-      <AuthHeader />
+      <AuthNavbar />
       <main className="flex-grow items-center justify-center">
         <Outlet />
       </main>

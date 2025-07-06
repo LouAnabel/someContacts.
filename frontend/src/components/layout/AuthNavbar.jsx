@@ -1,6 +1,6 @@
 import ThemeToggle from '../theme/ThemeToggle';
 
-const AuthHeader = () => {
+const AuthNavbar = () => {
   return (
     <nav className="bg-white dark:bg-black fixed w-full z-50 top-0">
       <div className="max-w-screen-xl mx-auto px-4">
@@ -25,4 +25,4 @@ const AuthHeader = () => {
   );
 }
 
-export default AuthHeader;
+export default AuthNavbar;

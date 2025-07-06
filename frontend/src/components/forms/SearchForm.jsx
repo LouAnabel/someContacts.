@@ -90,9 +90,9 @@ const SearchForm = ({
         
       {/* Mobile Search Bar (dropdown) */}
       {isOpen && (
-        <div className="absolute top-15 right-2 z-50">
+        <div className="absolute top-19 mt-2 right-6 z-50">
           <form onSubmit={handleSubmit}>
-            <div className="p-4 flex items-center gap-0 relative" ref={dropdownRef}>
+            <div className="flex items-center gap-0 relative" ref={dropdownRef}>
               <button 
                 id="dropdown-button" 
                 onClick={toggleDropdown}
@@ -106,13 +106,13 @@ const SearchForm = ({
               </button>
 
               {isDropdownOpen && (
-                <div className="absolute bg-gray-50 rounded-xl shadow-sm shadow-gray-200 w-44 top-full left-3 z-10 mt-0 dark:bg-white">
-                  <ul className="py-3 text-sm text-black dark:text-black">
+                <div className="absolute bg-black bg-opacity-80 rounded-xl shadow-sm shadow-gray-200 w-44 top-full z-10 dark:bg-white">
+                  <ul className="py-4 text-sm font-light text-white dark:text-black tracking-wider ">
                     <li>
                       <button 
                         type="button" 
                         onClick={() => handleCategorySelect('Caster')}
-                        className="inline-flex w-full px-4 py-2 hover:text-red-500 dark:hover:text-red-500"
+                        className="inline-flex w-full px-4 py-2 hover:text-red-500  dark:hover:text-red-500"
                       >
                         Caster
                       </button>
