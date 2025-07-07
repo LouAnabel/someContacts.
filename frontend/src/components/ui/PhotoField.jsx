@@ -53,7 +53,7 @@ const PhotoField = ({ photo, name, onUpload, onTakePhoto, className = "" }) => {
                     {/* Upload link */}
                     <button 
                         onClick={handleUploadClick}
-                        className="flex w-[200px] h-[35px] justify-center items-center flex-shrink-0 bg-white/50 text-black font-light border border-red-100 dark:bg-white/10 dark:border-0 rounded-lg dark:text-white dark:font-light hover:border hover:border-red-300 dark:hover:bg-white/20 hover:text-red-500"
+                        className="flex w-[200px] h-[35px] justify-center items-center flex-shrink-0  bg-white/50 text-black font-light  dark:bg-white/10 dark:border-0 rounded-lg dark:text-white dark:font-light hover:bg-white/20 dark:hover:bg-white/20 hover:text-red-500"
                     >
                         <span className="text-sm font-md">upload photo.</span>
                     </button>
@@ -61,7 +61,7 @@ const PhotoField = ({ photo, name, onUpload, onTakePhoto, className = "" }) => {
                     {/* Take photo link */}
                     <button 
                         onClick={handleTakePhotoClick}
-                        className="flex w-[200px] h-[35px] justify-center items-center flex-shrink-0 bg-white/50 text-black font-light dark:bg-white/10 border border-red-100 dark:border-0 rounded-lg dark:text-white dark:font-light hover:border hover:border-red-300 dark:hover:bg-white/20 hover:text-red-500"
+                        className="flex w-[200px] h-[35px] justify-center items-center flex-shrink-0  text-black font-light bg-white/50 dark:bg-white/10  dark:border-0 rounded-lg dark:text-white hover:bg-white/20 dark:hover:bg-white/20 hover:text-red-500"
                     >
                         <span className="text-sm font-md">take photo.</span>
                     </button>

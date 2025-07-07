@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import CircleButton from '../ui/Buttons';
 import { useNavigate } from 'react-router-dom';
 
-const ContactForm = ({ contact = {}, onSubmit, onCancel }) => {
+const NewContactForm = ({ contact = {}, onSubmit, onCancel }) => {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         firstName: '',
@@ -953,4 +953,4 @@ const ContactForm = ({ contact = {}, onSubmit, onCancel }) => {
     );
 }
 
-export default ContactForm;
+export default NewContactForm;

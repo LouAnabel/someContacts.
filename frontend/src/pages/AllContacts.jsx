@@ -1,3 +1,5 @@
+import ContactCardSmall from "../components/layout/ContactCardSmall"
+
 export default function AllContacts() {
   return (
     <div className="container mx-auto px-4 py-8">
@@ -7,6 +9,10 @@ export default function AllContacts() {
       <p className="text-gray-600 dark:text-gray-300">
         Contact list will go here.
       </p>
+      <div className="">
+        <ContactCardSmall />
+      </div>
     </div>
   );
 }
+

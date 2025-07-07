@@ -1,5 +1,5 @@
 export const buttonStyles = {
-  base: "p-2 rounded-md",
+  base: "p-2 rounded-md dark:text-black",
   active: "text-red-500 dark:bg-black dark:text-red-500",
   normal: "text-gray-900 dark:text-white hover:text-red-500 dark:hover:text-red-500"
 };
