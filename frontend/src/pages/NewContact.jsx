@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import PhotoField from "../components/ui/PhotoField";
 import ContactForm from "../components/forms/ContactForm";
+import FavoritesStar from '../components/ui/FavoritesButton';
 
 const NewContact = () => {
     const [contactPhoto, setContactPhoto] = useState(null);
@@ -35,7 +36,7 @@ const NewContact = () => {
 
 
     return (
-        <div className="flex flex-col items-center justify-center px-6 mx-auto md:h-screen lg:py-0" 
+        <div className="flex flex-col items-center justify-center px-6 mx-auto lg:py-0" 
              style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
             
             {/* Photo Field - Full width at top */}

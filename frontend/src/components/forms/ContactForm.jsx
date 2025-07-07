@@ -12,7 +12,7 @@ const ContactForm = ({ contact = {}, onSubmit, onCancel }) => {
         phone: '',
         isFavorite: false,
         birthdate: '',
-        address: '',
+        streetAndNr: {},
         postalcode: '',
         city: '',
         country: '',
@@ -30,6 +30,16 @@ const ContactForm = ({ contact = {}, onSubmit, onCancel }) => {
     const [showContactDetails, setShowContactDetails] = useState(false);
     const [showLinks, setShowLinks] = useState(false);
     const [links, setLinks] = useState(['']);
+
+    const [categories, setCategories] = useState([
+        {id: 1, value: "caster"},
+        {id: 2, value: "producer"},
+        {id: 3, value: "friends"}
+    ]);
+    const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+    const [showAddCategory, setShowAddCategory] = useState(false);
+    const [newCategoryName, setNewCategoryName] = useState('');
+    const [isAddingCategory, setIsAddingCategory] = useState(false);
 
     const handleInputChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -64,6 +74,70 @@ const ContactForm = ({ contact = {}, onSubmit, onCancel }) => {
             setLinks(newLinks);
         }
     };
+
+    // LOADING CATEGORIES FROM DATABASE
+    // useEffect(() => {
+    //     const loadCategories = async () => {
+    //         try {
+    //             const response = await fetch('/api/categories');
+    //             const categoriesFromDB = await response.json();
+    //             setCategories(categoriesFromDB);
+    //         } catch (error) {
+    //             console.error('Failed to load categories:', error);
+    //         }
+    //     };
+    //     loadCategories();
+    // }, []);
+
+    const addCategory = async () => {
+        if (newCategoryName.trim() && !isAddingCategory) {
+            setIsAddingCategory(true);
+            
+            try {
+                // ADD CATEGORIES TO DATABASE
+                // const response = await fetch('/api/categories', {
+                //     method: 'POST',
+                //     headers: { 'Content-Type': 'application/json' },
+                //     body: JSON.stringify({ 
+                //         name: newCategoryName.trim(),
+                //         value: newCategoryName.toLowerCase().replace(/\s+/g, '_'),
+                //         label: `${newCategoryName.trim()}`
+                //     })
+                // });
+                
+                // if (!response.ok) throw new Error('Failed to add category');
+                // const newCategory = await response.json();
+                
+                // Simulate API call for demo
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                // Create new category object (in real app, this comes from API response)
+                const newCategory = {
+                    id: Date.now(), // In real app, this would come from your database
+                    value: newCategoryName.toLowerCase().replace(/\s+/g, '_')
+                };
+                
+                // Update local state
+                setCategories(prev => [...prev, newCategory]);
+                setFormData(prev => ({ ...prev, category: newCategory.value }));
+                
+                // Reset form
+                setNewCategoryName('');
+                setShowAddCategory(false);
+                setShowCategoryDropdown(false);
+                
+                console.log('New category added:', newCategory);
+                
+            } catch (error) {
+                console.error('Failed to add category:', error);
+                // TODO: Show user-friendly error message
+                alert('Failed to add category. Please try again.');
+            } finally {
+                setIsAddingCategory(false);
+            }
+        }
+    };
+
 
     const validateForm = () => {
         const newErrors = {};
@@ -162,32 +236,40 @@ const ContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                  style={{ 
                      boxShadow: '0 4px 32px rgba(0, 0, 0, 0.3)'
                  }}>
-                <h1 className="text-3xl font-bold text-center mb-4 text-black">
+                <h1 className="text-3xl font-bold text-center mb-2 text-black">
                     new contact.
                 </h1>
-                {/* Favorite Checkbox */}
-                <div className={`flex items-start space-x-3 relative mb-4 p-1 rounded-lg`}>
-                    <input 
-                        id="isFavorite" 
-                        type="checkbox" 
-                        name="isFavorite"
-                        checked={formData.isFavorite}
-                        onChange={handleInputChange}
-                        className="w-4 h-4 rounded mt-1 border-2 border-black-300 focus:ring-0 focus:ring-offset-0"
-                        style={{ 
-                            accentColor: 'black',
-                            backgroundColor: formData.isFavorite ? 'black' : 'transparent',
-                            borderColor: formData.isFavorite ? 'black' : '#d1d5db'
-                        }}
-                    />
-                    <label htmlFor="isFavorite" className="text-sm font-light text-black dark:text-black mt-0.5 cursor-pointer">
-                        <span className="text-red-500 font-semibold">add</span>
-                        <span> to favorites</span>
-                    </label>
-                </div>
 
-                {/* Contact Information */}
-                <div className="space-y-5">
+
+                {/* Favorite Checkbox */}
+                <div className="flex items-center w-full relative left-1 mb-6 rounded-lg">
+                        <button
+                            type="button"
+                            onClick={() => setFormData(prev => ({ ...prev, isFavorite: !prev.isFavorite }))}
+                            className="flex items-center space-x-2 hover:scale-110 transform"
+                            disabled={showLoading}
+                        >
+                            <svg 
+                                className={`w-7 h-7 ${
+                                    formData.isFavorite ? 'text-red-500 hover:text-yellow-300' : 'black hover:text-yellow-300'
+                                }`} 
+                                aria-hidden="true" 
+                                xmlns="http://www.w3.org/2000/svg" 
+                                fill="currentColor" 
+                                viewBox="0 0 22 20"
+                            >
+                                <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
+                            </svg>
+                            <span className="text-sm font-light text-black cursor-pointer">
+                                    {formData.isFavorite ? 'favorite contact' : 'not a favorite'}
+                            </span>
+                        </button>
+                    </div>
+
+
+
+                {/* Main Contact Information */}
+                <div className="space-y-3.5 mb-8">
                     {/* First Name Field */}
                     <div className="relative">
                         <label htmlFor="firstName" className="block relative left-2 text-sans text-base text-black font-light">
@@ -242,16 +324,16 @@ const ContactForm = ({ contact = {}, onSubmit, onCancel }) => {
 
                     {/* Category Field */}
                     <div className="relative">
-                        <label htmlFor="category" className="block relative left-2 text-sans text-base text-black font-light">
+                        <label className="block relative left-2 text-sans text-base text-black font-light">
                             category
                         </label>
-                        <select 
-                            name="category" 
-                            id="category" 
-                            value={formData.category}
-                            onChange={handleInputChange}
+                        
+                        {/* Custom Dropdown Button */}
+                        <button
+                            type="button"
+                            onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
                             disabled={showLoading}
-                            className={`w-full p-2.5 rounded-xl border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 ${
+                            className={`w-full p-2.5 rounded-xl border border-gray-500 bg-transparent text-black font-light max-w-full min-w-[200px] focus:outline-none focus:border-red-500 flex items-center justify-between ${
                                 hasSubmitted && errors.category ? 'border-red-400' : ''
                             }`}
                             style={{
@@ -259,20 +341,120 @@ const ContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                                 fontWeight: 300
                             }}
                         >
-                            <option value="">select category</option>
-                            <option value="family">family</option>
-                            <option value="friends">friends</option>
-                            <option value="work">work</option>
-                            <option value="business">business</option>
-                            <option value="other">other</option>
-                        </select>
+                            <span className={formData.category ? 'text-black' : 'text-gray-300'}>
+                                {formData.category 
+                                    ? categories.find(cat => cat.value === formData.category)?.label || formData.category
+                                    : 'select category'
+                                }
+                            </span>
+                            <svg 
+                                className={`w-4 h-4 transition-transform duration-200 ${showCategoryDropdown ? 'rotate-180' : ''}`}
+                                fill="none" 
+                                stroke="currentColor" 
+                                viewBox="0 0 24 24"
+                            >
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+
+                        {/* Custom Dropdown Menu */}
+                        {showCategoryDropdown && (
+                            <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-30 max-h-60 overflow-y-auto">
+                                {/* Category Options */}
+                                {categories.map((category) => (
+                                    <button
+                                        key={category.id}
+                                        type="button"
+                                        onClick={() => {
+                                            setFormData(prev => ({ ...prev, category: category.value }));
+                                            setShowCategoryDropdown(false);
+                                        }}
+                                        className="w-full text-left px-3 py-2 hover:bg-gray-50 hover:text-red-500 text-black font-light last:border-b-0"
+                                        style={{ fontSize: '16px', fontWeight: 300 }}
+                                    >
+                                        {category.value}
+                                    </button>
+                                ))}
+                                
+                                {/* Add Category Section */}
+                                <div className="border-t border-gray-100">
+                                    {!showAddCategory ? (
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowAddCategory(true)}
+                                            className="w-full text-left px-3 py-2 hover:bg-red-50 transition-colors duration-150 text-red-500 font-light flex items-center space-x-2"
+                                            style={{ fontSize: '16px', fontWeight: 300 }}
+                                        >
+                                            <span className="text-lg font-semibold">+</span>
+                                            <span>add new category</span>
+                                        </button>
+                                    ) : (
+                                        <div className="p-3 space-y-2">
+                                            <input
+                                                type="text"
+                                                value={newCategoryName.toLowerCase()}
+                                                onChange={(e) => setNewCategoryName(e.target.value)}
+                                                placeholder="enter category name"
+                                                className="w-full p-2 rounded-lg border border-gray-300 bg-transparent text-black font-light placeholder-gray-300 focus:outline-none focus:border-red-500"
+                                                style={{ fontSize: '15px', fontWeight: 300 }}
+                                                onKeyPress={(e) => {
+                                                    if (e.key === 'Enter') {
+                                                        addCategory();
+                                                    }
+                                                }}
+                                                autoFocus
+                                            />
+                                            <div className="flex space-x-2">
+                                                <button
+                                                    type="button"
+                                                    onClick={addCategory}
+                                                    disabled={isAddingCategory || !newCategoryName.trim()}
+                                                    className="flex-1 px-3 py-1.5 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:bg-red-300 disabled:cursor-not-allowed text-sm font-light"
+                                                >
+                                                    {isAddingCategory ? 'adding...' : 'add'}
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setShowAddCategory(false);
+                                                        setNewCategoryName('');
+                                                    }}
+                                                    disabled={isAddingCategory}
+                                                    className="flex-1 px-3 py-1.5 border border-gray-300 text-gray-600 rounded-lg hover:bg-gray-50 disabled:bg-gray-100 disabled:cursor-not-allowed transition-colors duration-150 text-sm font-light"
+                                                >
+                                                    cancel
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Click outside to close dropdown */}
+                        {showCategoryDropdown && (
+                            <div 
+                                className="fixed inset-0 z-20" 
+                                onClick={() => {
+                                    setShowCategoryDropdown(false);
+                                    setShowAddCategory(false);
+                                    setNewCategoryName('');
+                                }}
+                            />
+                        )}
+
                         {hasSubmitted && errors.category && (
                             <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.category}</p>
                         )}
                     </div>
+                </div>
 
+
+                {/* How to contact */}
+                <div className="space-y-3.5 mb-8">
                     {/* Email Field */}
                     <div className="relative">
+                        <p className="relative text-red-500 left-2 font-light">how to contact?</p>
                         <label htmlFor="email" className="block relative left-2 text-sans text-base text-black font-light">
                             email
                         </label>
@@ -308,7 +490,7 @@ const ContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                             id="phone" 
                             value={formData.phone}
                             onChange={handleInputChange}
-                            placeholder="+1 (555) 123-4567"
+                            placeholder="+49 1781234567"
                             disabled={showLoading}
                             className={`w-full p-2.5 rounded-xl border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 ${
                                 hasSubmitted && errors.phone ? 'border-red-400' : ''
@@ -322,7 +504,10 @@ const ContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                             <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.phone}</p>
                         )}
                     </div>
+                </div>
 
+                {/* Optional Toggle */}
+                <div className="space-y-3.5 mb-8">
                     {/* Birthdate Toggle and Field */}
                     <div className="space-y-2">
                         <div className="relative">
@@ -339,9 +524,10 @@ const ContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                             ) : (
                                 <div>
                                     <div className="flex items-center justify-between">
-                                        <label htmlFor="birthdate" className="block relative left-2 text-sans text-base text-black font-light">
+                                        <label htmlFor="birthdate" className="block relative left-2 text-sans text-black font-md">
                                             date of birth
                                         </label>
+                                        <span className="relative right-1 font-light">
                                         <button
                                             type="button"
                                             onClick={() => {
@@ -353,6 +539,7 @@ const ContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                                         >
                                             remove
                                         </button>
+                                        </span>
                                     </div>
                                     <input 
                                         type="date" 
@@ -361,7 +548,7 @@ const ContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                                         value={formData.birthdate}
                                         onChange={handleInputChange}
                                         disabled={showLoading}
-                                        className={`w-full p-2.5 rounded-xl border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 ${
+                                        className={`w-full p-2.5 rounded-xl mb-4 border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 ${
                                             hasSubmitted && errors.birthdate ? 'border-red-400' : ''
                                         }`}
                                         style={{
@@ -390,9 +577,9 @@ const ContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                                 </button>
                             ) : (
                                 <div className="space-y-2">
-                                    <div className="flex items-center justify-between mb-2">
-                                        <span className="relative left-2 text-sans text-base text-black font-light">
-                                            
+                                    <div className="flex items-center justify-between">
+                                        <span className="relative left-2 text-sans text-base text-black font-md">
+                                            address information
                                         </span>
                                         <button
                                             type="button"
@@ -406,7 +593,7 @@ const ContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                                                     country: '' 
                                                 }));
                                             }}
-                                            className="text-red-500 hover:text-red-700 transition-colors duration-200 text-sm"
+                                            className="relative right-1 text-red-500 hover:text-red-700 transition-colors duration-200 text-sm font-light"
                                             disabled={showLoading}
                                         >
                                             remove
@@ -416,7 +603,7 @@ const ContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                                     {/* Address Field */}
                                     <div className="relative">
                                         <label htmlFor="address" className="block relative left-2 text-sans text-base text-black font-light">
-                                            street address, nr°
+                                            street & nr°
                                         </label>
                                         <input 
                                             type="text" 
@@ -505,7 +692,7 @@ const ContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                                             onChange={handleInputChange}
                                             placeholder="germany"
                                             disabled={showLoading}
-                                            className={`w-full p-2.5 rounded-xl border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 ${
+                                            className={`w-full p-2.5 mb-5 rounded-xl border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 ${
                                                 hasSubmitted && errors.country ? 'border-red-400' : ''
                                             }`}
                                             style={{
@@ -520,12 +707,13 @@ const ContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                                 </div>
                             )}
                         </div>
+                </div>
 
-                        
-
+                {/* Notes */}
+                <div className="space-y-3.5 mb-8">   
                     {/* Notes Field */}
                     <div className="relative">
-                        <div className="flex items-center justify-between mt-4">
+                        <div className="flex items-center justify-between mt-5">
                             <label htmlFor="notes" className="block relative left-2 text-sans text-base text-black font-light">
                                 any notes or things to remember?
                             </label>
@@ -543,7 +731,7 @@ const ContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                             id="notes" 
                             value={formData.notes}
                             onChange={handleInputChange}
-                            placeholder="everything that matters.."
+                            placeholder="every thought matters.."
                             disabled={showLoading}
                             rows={expandedNotes ? 6 : 3}
                             className={`w-full p-2.5 mb-3 rounded-xl border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 transition-all duration-300 resize-none ${
@@ -559,47 +747,50 @@ const ContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                             <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.notes}</p>
                         )}
                     </div>
+                </div>
+
+
+                {/* Optional Toggle Field */}
+                <div className="space-y-2 mb-8">
                     {/* Contact Details Toggle and Fields */}
-                        <div className="relative">
-                            {!showContactDetails ? (
-                                <button
-                                    type="button"
-                                    onClick={() => setShowContactDetails(true)}
-                                    className="flex items-center space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-light"
-                                    disabled={showLoading}
-                                >
-                                    <span className="text-lg font-semibold">+</span>
-                                    <span className="text-base text-black hover:text-red-500">when and where did you meet? </span>
-                                </button>
-                            ) : (
-                                <div className="space-y-2">
-                                    <div className="flex items-center justify-between mb-2">
-                                        <span className="relative left-2 text-sans text-base text-black font-light">
-                                            
-                                        </span>
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                setShowContactDetails(false);
-                                                setFormData(prev => ({ 
-                                                    ...prev, 
-                                                    lastContactDate: '', 
-                                                    meetingPlace: '' 
-                                                }));
-                                            }}
-                                            className="text-red-500 hover:text-red-700 transition-colors duration-200 text-sm"
-                                            disabled={showLoading}
+                    <div className="relative">
+                        {!showContactDetails ? (
+                            <button
+                                type="button"
+                                onClick={() => setShowContactDetails(true)}
+                                className="flex items-center space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-light"
+                                disabled={showLoading}
+                            >
+                            <span className="text-lg font-semibold">+</span>
+                            <span className="text-base text-black hover:text-red-500">when and where did you meet? </span>
+                            </button>
+                        ) : (
+                            <div className="space-y-2">
+                                <div className="flex items-center justify-between">
+                                    <span className="relative left-2 text-sans text-black font-md">do you remember...</span>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setShowContactDetails(false);
+                                            setFormData(prev => ({ 
+                                                ...prev, 
+                                                lastContactDate: '', 
+                                                meetingPlace: '' 
+                                            }));
+                                        }}
+                                        className="relative right-1 font-light text-red-500 hover:text-red-700 transition-colors duration-200 text-sm"
+                                        disabled={showLoading}
                                         >
                                             remove
-                                        </button>
-                                    </div>
+                                    </button>
+                                </div>
                                     
-                                    {/* Last Contact Date Field */}
-                                    <div className="relative">
-                                        <label htmlFor="lastContactDate" className="block relative left-2 text-sans text-base text-black font-light">
-                                            date of last contact
-                                        </label>
-                                        <input 
+                                {/* Last Contact Date Field */}
+                                <div className="relative">
+                                    <label htmlFor="lastContactDate" className="block relative left-2 text-sans text-base text-black font-light">
+                                        the date of your last contact?
+                                    </label>
+                                    <input 
                                             type="date" 
                                             name="lastContactDate" 
                                             id="lastContactDate" 
@@ -613,18 +804,18 @@ const ContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                                                 fontSize: '16px',
                                                 fontWeight: 300
                                             }}
-                                        />
+                                    />
                                         {hasSubmitted && errors.lastContactDate && (
                                             <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.lastContactDate}</p>
                                         )}
-                                    </div>
+                                </div>
 
-                                    {/* Meeting Place Field */}
-                                    <div className="relative">
-                                        <label htmlFor="meetingPlace" className="block relative left-2 text-sans text-base text-black font-light">
-                                            place where you met
-                                        </label>
-                                        <input 
+                                {/* Meeting Place Field */}
+                                <div className="relative">
+                                    <label htmlFor="meetingPlace" className="block relative left-2 text-sans text-base text-black font-light">
+                                            the place where you met?
+                                    </label>
+                                    <input 
                                             type="text" 
                                             name="meetingPlace" 
                                             id="meetingPlace" 
@@ -632,22 +823,26 @@ const ContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                                             onChange={handleInputChange}
                                             placeholder="coffe shop, berlin ..."
                                             disabled={showLoading}
-                                            className={`w-full p-2.5 rounded-xl border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 ${
+                                            className={`w-full p-2.5 mb-4 rounded-xl border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 ${
                                                 hasSubmitted && errors.meetingPlace ? 'border-red-400' : ''
                                             }`}
                                             style={{
                                                 fontSize: '16px',
                                                 fontWeight: 300
                                             }}
-                                        />
+                                    />
                                         {hasSubmitted && errors.meetingPlace && (
                                             <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.meetingPlace}</p>
                                         )}
-                                    </div>
                                 </div>
-                            )}
-                        </div>
+                            </div>
+                        )}
+                    </div>
+                
 
+
+                    {/* optional links */}
+                    <div className="space-y-3">
                         {/* Links Toggle and Fields */}
                         <div className="relative">
                             {!showLinks ? (
@@ -719,7 +914,8 @@ const ContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                             )}
                         </div>
                     </div>    
-                </div>
+                </div> 
+
 
                 {/* Circle Button - Outside the space-y-6 div but inside the card */}
                 <CircleButton
@@ -733,30 +929,28 @@ const ContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                     }}
                     disabled={showLoading}
                     onClick={handleSubmit}>
-                    {showLoading ? '. . .' : 'next.'}
+                    {showLoading ? '. . .' : 'save.'}
                 </CircleButton>
             
-            </div>
+                </div>
+            
 
-            {/* Back Link */}
-            <div className="text-black dark:text-white font-light mt-2 relative w-full text-left left-14"
+            {/* Back Link - Positioned at bottom left of card */}
+            <div className="absolute bottom-[-30px] left-5 text-black dark:text-white font-light"
                  style={{ fontSize: '16px' }}>
                 want to cancel? {' '}
                 <button 
                     onClick={() => {
-                        if (onCancel) {
-                            onCancel();
-                        } else {
-                            navigate('/home');
-                        }
+                            navigate('/');
                     }}
                     className="font-light font-normal text-red-500 hover:underline bg-transparent border-none cursor-pointer"
                 >
                     go back.
                 </button>
             </div>
+            </div>
         </div>
     );
-};
+}
 
 export default ContactForm;
