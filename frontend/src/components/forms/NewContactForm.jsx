@@ -921,7 +921,7 @@ const NewContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                 <CircleButton
                     size="large"
                     variant="dark"
-                    className="dark:bg-red-600 hover:dark:bg-black hover:dark:border hover:dark:border-white absolute -bottom-[60px] -right-[30px]"
+                    className=" absolute -bottom-[60px] -right-[30px]"
                     style={{ 
                         marginTop: '2rem', 
                         marginLeft: 'auto', 
@@ -933,7 +933,7 @@ const NewContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                 </CircleButton>
             
                 </div>
-            
+            {/* dark:bg-red-600 hover:dark:bg-black hover:dark:border hover:dark:border-white */}
 
             {/* Back Link - Positioned at bottom left of card */}
             <div className="absolute bottom-[-30px] left-5 text-black dark:text-white font-light"

@@ -132,69 +132,69 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
     const showLoading = isLoading || apiLoading;
 
     return (
-        <div className="min-h-screen bg-white dark:bg-black p-6 absolute top-[180px]" 
+        <div className="min-h-screen bg-white dark:bg-black absolute top-[180px]" 
              style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
 
             {/* Main Login Card */}
-            <div className="bg-gray-50 rounded-3xl p-6 relative z-10 overflow-visible w-[75vw] min-w-[260px] max-w-[480px] h-fit absolute left-1/2 transform -translate-x-1/2"
+            <div className="bg-white rounded-3xl p-5 pt-6 relative z-10 overflow-visible w-[88vw] min-w-[260px] max-w-[480px] h-[280px] absolute left-1/2 transform -translate-x-1/2"
                  style={{ 
-                     boxShadow: '0 4px 32px rgba(0, 0, 0, 0.3)'
+                     boxShadow: '0 4px 32px rgba(109, 71, 71, 0.29)'
                  }}>
                 
-                <h2 className="text-3xl font-bold text-center mb-7 text-black">login.</h2>
-
-                <div className="mb-5 relative">
-                    <label htmlFor="email" className="relative left-2 block text-sans text-md text-black font-light">
+                <h2 className="text-3xl font-bold text-center mb-9 text-black">login.</h2>
+                <div className="space-y-7">
+                    <div className="mb-4 relative">
+                        <input
+                            type="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleInputChange}
+                            placeholder="your@email.com"
+                            className={`w-full rounded-xl border bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
+                                        hasSubmitted && errors.firstName ? 'border-red-500 shadow-lg' : 'border-gray-400 dark:border-gray-400'
+                            }`}
+                            style={{
+                                fontSize: '18px',
+                                fontWeight: 300
+                            }}
+                        />
+                        <label 
+                            htmlFor="firstName" 
+                            className="absolute -top-3 left-4 bg-white px-2 text-base text-black font-light"
+                        >
                             email
                         </label>
-                    <input
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        placeholder="your@email.com"
-                        className={`w-full p-2.5 rounded-xl border bg-transparent text-black border-gray-500 placeholder-gray-300 transition-all duration-200 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 ${
-                            errors.password ? 'border-red-400' : ''
-                        }`}
-                        style={{
-                            fontSize: '16px',
-                            fontWeight: 300
-                        }}
-                    />
-                    {hasSubmitted && errors.email && (
-                        <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.email}</p>
-                    )}
-                </div>
-
-                <div className="mb-7 relative ">
-                    <label htmlFor="password" className="relative left-2 block text-sans text-md text-black font-light">
-                            password
-                    </label>
-                    <input
-                        type="password"
-                        name="password"
-                        value={formData.password}
-                        onChange={handleInputChange}
-                        placeholder="••••••••"
-                        className={`w-full p-2.5 rounded-xl border bg-transparent text-black border-gray-500 placeholder-gray-300 transition-all duration-200 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 ${
-                            errors.password ? 'border-red-400' : ''
-                        }`}
-                        style={{
-                            fontSize: '16px',
-                            fontWeight: 300
-                        }}
-                    />
-                    {hasSubmitted && errors.password && (
-                        <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.password}</p>
-                    )}
-                </div>
-
-                {errors.submit && (
-                    <div className="mt-4 p-3 text-sm text-red-800 bg-red-100 rounded-lg">
-                        {errors.submit}
+                        {hasSubmitted && errors.email && (
+                            <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.email}</p>
+                        )}
                     </div>
-                )}
 
+                    <div className="mb-4 relative ">
+                        <input
+                            type="password"
+                            name="password"
+                            value={formData.password}
+                            onChange={handleInputChange}
+                            placeholder="••••••••"
+                            className={`w-full rounded-xl border bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
+                                        hasSubmitted && errors.firstName ? 'border-red-500 shadow-lg' : 'border-gray-400 dark:border-gray-400'
+                            }`}
+                                style={{
+                                    fontSize: '18px',
+                                    fontWeight: 300
+                            }}
+                        />
+                        <label 
+                            htmlFor="firstName" 
+                            className="absolute -top-3 left-4 bg-white px-2 text-base text-black font-light"
+                        >
+                            password
+                        </label>
+                        {hasSubmitted && errors.password && (
+                            <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.password}</p>
+                        )}
+                    </div>
+                </div>    
                 {/* Signup Link */}
                 <div className= "text-black dark:text-white font-light block absolute bottom-[-30px] left-[30px]"
                      style={{ fontSize: '16px' }}>
@@ -206,9 +206,9 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
 
                 {/* Circle Button */}
                 <CircleButton
-                    size="medium"
+                    size="xl"
                     variant="dark"
-                    className="border border-white/30 absolute -bottom-[60px] -right-[30px]"
+                    className="border border-white/30 absolute -bottom-[85px] -right-[10px]"
                     style={{ 
                         marginTop: '2rem', 
                         marginLeft: 'auto', 
@@ -221,7 +221,7 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
             </div>
 
             {/* Bottom Tagline */}
-            <div className="text-center text-black dark:text-white text-l absolute left-1/2 transform -translate-x-1/2 w-full min-[480px]:text-base min-[480px]:bottom-[30%]"
+            <div className="text-center text-black dark:text-white text-l absolute left-1/2 transform -translate-x-1/2 w-full min-[480px]:text-base min-[480px]:bottom-[28%]"
                  style={{
                      fontWeight: 300,
                      lineHeight: 1.4,

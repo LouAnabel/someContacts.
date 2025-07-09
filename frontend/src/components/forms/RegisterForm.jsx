@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import CircleButton from '../ui/Buttons';
 import { useNavigate } from 'react-router-dom';
 
@@ -16,29 +16,27 @@ const RegisterForm = () => {
     const [acceptTerms, setAcceptTerms] = useState(false);
     const [apiLoading, setApiLoading] = useState(false);
 
-    // Api function call - TEMPORARILY DISABLED FOR TESTING
+    // / Reset form on component mount/refresh
+    useEffect(() => {
+        setFormData({
+            firstName: '',
+            lastName: '',
+            email: '',
+            password: '',
+            confirmPassword: ''
+        });
+        setErrors({});
+        setHasSubmitted(false);
+        setAcceptTerms(false);
+        setApiLoading(false);
+    }, []);
+  
+
+    // API call
     const registerUser = async (registerData) => {
         try {
             setApiLoading(true);
             
-            // =================
-            // DEBUG MODE: Skip API call, just log the data
-            // =================
-            console.log('=== FORM DATA THAT WOULD BE SENT TO API ===');
-            console.log('Registration Data:', {
-                firstName: registerData.firstName,
-                lastName: registerData.lastName,
-                email: registerData.email,
-                password: ['HIDDEN']
-            });
-            console.log('Raw Form Data:', registerData);
-            console.log('Accept Terms:', acceptTerms);
-            console.log('============================================');
-            
-        
-            // ========================================
-            // COMMENTED OUT: ACTUAL API CALL
-            // ========================================
             
             const response = await fetch('http://127.0.0.1:5000/auth/register', {
                 method: 'POST',
@@ -77,6 +75,9 @@ const RegisterForm = () => {
                     password: '',
                     confirmPassword: ''
                 });
+
+                setAcceptTerms(false);
+                setHasSubmitted(false);
                 
                 alert('Registration successful! Check console for form data.');
                 navigate('/hello/login');
@@ -113,6 +114,15 @@ const RegisterForm = () => {
 
         if (errors.submit) {
             setErrors(prev => ({ ...prev, submit: '' }));
+        }
+    };
+
+    const handleTermsChange = (e) => {
+        setAcceptTerms(e.target.checked);
+        
+        // Clear terms error immediately when checkbox is checked
+        if (e.target.checked && errors.terms) {
+            setErrors(prev => ({ ...prev, terms: '' }));
         }
     };
 
@@ -153,11 +163,6 @@ const RegisterForm = () => {
         } else if (formData.password !== formData.confirmPassword) {
             newErrors.confirmPassword = 'Passwords do not match';
         }
-
-        // terms and conditions validation
-        if (!acceptTerms) {
-            newErrors.terms = 'You must accept the terms and conditions';
-        }
         
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -173,9 +178,6 @@ const RegisterForm = () => {
             return;
         }
         
-        // Form is valid, proceed with "API call" (debug mode)
-        console.log('✅ Form validation passed, proceeding with submission...');
-        
         await registerUser(formData);
     };
 
@@ -186,143 +188,165 @@ const RegisterForm = () => {
              style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
 
             {/* Main Register Card */}
-            <div className="bg-gray-50 rounded-3xl p-6 relative z-10 overflow-visible w-[75vw] min-w-[260px] max-w-[480px] h-fit absolute left-1/2 transform -translate-x-1/2"
+            <div className="bg-white rounded-3xl p-5 relative z-10 overflow-visible w-[88vw] min-w-[260px] max-w-[480px] h-fit absolute left-1/2 transform -translate-x-1/2"
                  style={{ 
-                     boxShadow: '0 4px 32px rgba(0, 0, 0, 0.3)'
+                     boxShadow: '0 4px 32px rgba(109, 71, 71, 0.29)'
                  }}>
-                <h1 className="text-3xl font-bold text-center mb-7 text-black">
+                <h1 className="text-3xl font-bold text-center mb-10 text-black">
                     create an account.
                 </h1>
 
-                <div className="space-y-5">
-                    {/* First Name Field */}
-                    <div className="relative">
-                        <label htmlFor="firstName" className="relative left-2  block font-text text-md text-black font-light ">
-                            first name
-                        </label>
-                        <input 
-                            type="text" 
-                            name="firstName" 
-                            id="firstName" 
-                            value={formData.firstName}
-                            onChange={handleInputChange}
-                            placeholder="meryl"
-                            disabled={showLoading}
-                            className={`w-full p-2.5 rounded-xl border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 ${
-                                hasSubmitted && errors.firstName ? 'border-red-400' : ''
-                            }`}
-                            style={{
-                                fontSize: '16px',
-                                fontWeight: 300
-                            }}
-                        />
-                        {hasSubmitted && errors.firstName && (
-                            <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.firstName}</p>
-                        )}
+                <div className="space-y-3">
+                    <div className="space-y-7">
+                        {/* First Name Field */}
+                        <div className="relative">
+                            <input 
+                                type="text" 
+                                name="firstName" 
+                                id="firstName" 
+                                value={formData.firstName}
+                                onChange={handleInputChange}
+                                placeholder="meryl"
+                                disabled={showLoading}
+                                className={`w-full rounded-xl border bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
+                                    hasSubmitted && errors.firstName ? 'border-red-500 shadow-lg' : 'border-gray-400 dark:border-gray-400'
+                                }`}
+                                style={{
+                                    fontSize: '18px',
+                                    fontWeight: 300
+                                }}
+                            />
+                            <label 
+                                htmlFor="firstName" 
+                                className="absolute -top-3 left-4 bg-white px-2 text-base text-black font-light"
+                            >
+                                first name
+                            </label>
+                            {hasSubmitted && errors.firstName && (
+                                <p className="absolute font-light top-full right-0 text-sm text-red-600 z-20">{errors.firstName}</p>
+                            )}
+                        </div>
+
+                        {/* Last Name Field */}
+                        <div className="relative">
+                            <input 
+                                type="text" 
+                                name="lastName" 
+                                id="lastName" 
+                                value={formData.lastName}
+                                onChange={handleInputChange}
+                                placeholder="streep"
+                                disabled={showLoading}
+                                className={`w-full rounded-xl border bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
+                                    hasSubmitted && errors.lastName ? 'border-red-500 shadow-lg' : 'border-gray-400 dark:border-gray-400'
+                                }`}
+                                style={{
+                                    fontSize: '18px',
+                                    fontWeight: 300
+                                }}
+                            />
+                            <label 
+                                htmlFor="lastName" 
+                                className="absolute -top-3 left-4 bg-white px-2 text-base text-black font-light"
+                            >
+                                last name
+                            </label>
+                            {hasSubmitted && errors.lastName && (
+                                <p className="absolute top-full font-light right-0 text-sm text-red-600 z-20">{errors.lastName}</p>
+                            )}
+                        </div>
                     </div>
 
-                    {/* Last Name Field */}
-                    <div className="relative">
-                        <label htmlFor="lastName" className="relative left-2  block text-sans text-md text-black font-light">
-                            last name
-                        </label>
-                        <input 
-                            type="text" 
-                            name="lastName" 
-                            id="lastName" 
-                            value={formData.lastName}
-                            onChange={handleInputChange}
-                            placeholder="streep"
-                            disabled={showLoading}
-                            className={`w-full p-2.5 rounded-xl border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 ${
-                                hasSubmitted && errors.firstName ? 'border-red-400' : ''
-                            }`}
-                            style={{
-                                fontSize: '16px',
-                                fontWeight: 300
-                            }}
-                        />
-                        {hasSubmitted && errors.lastName && (
-                            <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.lastName}</p>
-                        )}
-                    </div>
-
+                    
+                        
+                    <p className="relative text-red-500 left-2 font-light pt-6">how to login?</p>
                     {/* Email Field */}
-                    <div className="relative">
-                        <label htmlFor="email" className="relative left-2  block text-sans text-md text-black font-light">
-                            email
-                        </label>
-                        <input 
-                            type="email" 
-                            name="email" 
-                            id="email" 
-                            value={formData.email}
-                            onChange={handleInputChange}
-                            placeholder="your@email.com"
-                            disabled={showLoading}
-                            className={`w-full p-2.5 rounded-xl border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 ${
-                                hasSubmitted && errors.firstName ? 'border-red-400' : ''
-                            }`}
-                            style={{
-                                fontSize: '16px',
-                                fontWeight: 300
-                            }}
-                        />
-                        {hasSubmitted && errors.email && (
-                            <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.email}</p>
-                        )}
-                    </div>
+                    <div className="space-y-7">
+                        <div className="relative">
+                            <input 
+                                type="email" 
+                                name="email" 
+                                id="email" 
+                                value={formData.email}
+                                onChange={handleInputChange}
+                                placeholder="your@email.com"
+                                disabled={showLoading}
+                                className={`w-full rounded-xl border bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
+                                    hasSubmitted && errors.email ? 'border-red-500 shadow-lg' : 'border-gray-400 dark:border-gray-400'
+                                }`}
+                                style={{
+                                    fontSize: '18px',
+                                    fontWeight: 300
+                                }}
+                            />
+                            <label 
+                                htmlFor="email" 
+                                className="absolute -top-3 left-4 bg-white px-2 text-base text-black font-light"
+                            >
+                                email
+                            </label>
+                            {hasSubmitted && errors.email && (
+                                <p className="absolute top-full font-light right-0 text-sm font-light text-red-600 z-20">{errors.email}</p>
+                            )}
+                        </div>
 
-                    {/* Password Field */}
-                    <div className="relative">
-                        <label htmlFor="password" className="relative left-2 block text-sans text-md text-black font-light">
-                            password
-                        </label>
-                        <input 
-                            type="password" 
-                            name="password" 
-                            id="password" 
-                            value={formData.password}
-                            onChange={handleInputChange}
-                            placeholder="••••••••"
-                            disabled={showLoading}
-                            className={`w-full p-2.5 rounded-xl border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 ${
-                                hasSubmitted && errors.firstName ? 'border-red-400' : ''
-                            }`}
-                            style={{
-                                fontSize: '16px',
-                                fontWeight: 300
-                            }}
-                        />
-                        {hasSubmitted && errors.password && (
-                            <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.password}</p>
-                        )}
-                    </div>
+                        {/* Password Field */}
+                        <div className="relative">
+                            <input 
+                                type="password" 
+                                name="password" 
+                                id="password" 
+                                value={formData.password}
+                                onChange={handleInputChange}
+                                placeholder="••••••••"
+                                disabled={showLoading}
+                                className={`w-full rounded-xl border bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
+                                    hasSubmitted && errors.password ? 'border-red-500 shadow-lg' : 'border-gray-400 dark:border-gray-400'
+                                }`}
+                                style={{
+                                    fontSize: '18px',
+                                    fontWeight: 300
+                                }}
+                            />
+                            <label 
+                                htmlFor="password" 
+                                className="absolute -top-3 left-4 bg-white px-2 text-base text-black font-light"
+                            >
+                                password
+                            </label>
+                            {hasSubmitted && errors.password && (
+                                <p className="absolute top-full right-0 text-sm font-light text-red-600 z-20">{errors.password}</p>
+                            )}
+                        </div>
 
-                    {/* Confirm Password Field */}
-                    <div className="relative">
-                        <label htmlFor="confirmPassword" className="relative left-2  block text-md text-black font-light">
-                            confirm password
-                        </label>
-                        <input 
-                            type="password" 
-                            name="confirmPassword" 
-                            id="confirmPassword" 
-                            value={formData.confirmPassword}
-                            onChange={handleInputChange}
-                            placeholder="••••••••"
-                            disabled={showLoading}
-                            className={`w-full p-2.5 rounded-xl border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 ${
-                                hasSubmitted && errors.firstName ? 'border-red-400' : ''
-                            }`}
-                            style={{
-                                fontSize: '16px',
-                                fontWeight: 300
-                            }}
-                        />
-                        {hasSubmitted && errors.confirmPassword && (
-                            <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.confirmPassword}</p>
-                        )}
+                        {/* Confirm Password Field */}
+                        <div className="relative mt-6">
+                            <input 
+                                type="password" 
+                                name="confirmPassword" 
+                                id="confirmPassword" 
+                                value={formData.confirmPassword}
+                                onChange={handleInputChange}
+                                placeholder="••••••••"
+                                disabled={showLoading}
+                                className={`w-full rounded-xl border bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
+                                    hasSubmitted && errors.confirmPassword ? 'border-red-500 shadow-lg' : 'border-gray-400 dark:border-gray-400'
+                                }`}
+                                style={{
+                                    fontSize: '18px',
+                                    fontWeight: 300
+                                }}
+                            />
+                            <label 
+                                htmlFor="confirmPassword" 
+                                className="absolute -top-3 left-4 bg-white px-2 text-base text-black font-light"
+                            >
+                                confirm password
+                            </label>
+                            {hasSubmitted && errors.confirmPassword && (
+                                <p className="absolute top-full font-light right-0 text-sm text-red-600 z-20">{errors.confirmPassword}</p>
+                            )}
+                        </div>
                     </div>
 
                     {/* Terms and Conditions */}
@@ -331,7 +355,7 @@ const RegisterForm = () => {
                             id="terms" 
                             type="checkbox" 
                             checked={acceptTerms}
-                            onChange={(e) => setAcceptTerms(e.target.checked)}
+                            onChange={handleTermsChange}
                             className="w-4 h-4 rounded mt-1 border-2 border-black-300 focus:ring-0 focus:ring-offset-0"
                             style={{ 
                                 accentColor: 'black',
@@ -350,9 +374,9 @@ const RegisterForm = () => {
 
                 {/* Circle Button - Outside the space-y-6 div but inside the card */}
                 <CircleButton
-                    size="large"
+                    size="xl"
                     variant="dark"
-                    className="dark:bg-red-600 hover:dark:bg-black hover:dark:border hover:dark:border-white absolute -bottom-[60px] -right-[30px]"
+                    className="border border-white/30 absolute -bottom-[85px] -right-[10px]"
                     style={{ 
                         marginTop: '2rem', 
                         marginLeft: 'auto', 
@@ -366,7 +390,7 @@ const RegisterForm = () => {
             </div>
 
             {/* Signup Link */}
-            <div className="text-black dark:text-white font-light block mt-2 absolute left-[40px]"
+            <div className="text-black dark:text-white font-light block mt-3 absolute left-[40px]"
                  style={{ fontSize: '16px' }}>
                 already have an account? {' '}
                 <a href="login" className="font-light font-normal text-red-500 hover:underline">
@@ -374,6 +398,7 @@ const RegisterForm = () => {
                 </a>
             </div>
         </div>
-    )};
-    
+    );
+};
+
 export default RegisterForm;

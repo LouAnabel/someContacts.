@@ -11,7 +11,7 @@ const CircleButton = ({
     small: "w-18 h-18 text-xs",    // Increased from 16 to 18
     medium: "w-24 h-24 text-sm",   // Increased from 20 to 24
     large: "w-28 h-28 text-base",  // Increased from 24 to 28
-    xl: "w-32 h-32 text-lg"
+    xl: "w-32 h-32 text-3xl"
   };
 
   const textSpacing = {
@@ -37,12 +37,11 @@ const CircleButton = ({
         ${sizes[size]} 
         ${variants[variant]}
         font-medium rounded-full flex items-center justify-center 
-        transition-colors duration-200 
         ${className}
       `}
       {...props}
     >
-      <span className={`text-xl font-text font-semibold text-center leading-relaxed ${textSpacing[size]}`}>
+      <span className={`text-2xl font-text font-semibold text-center leading-relaxed ${textSpacing[size]}`}>
         {children}
       </span>
     </button>
