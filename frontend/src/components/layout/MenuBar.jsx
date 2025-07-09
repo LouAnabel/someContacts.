@@ -2,18 +2,27 @@ import { Link } from 'react-router-dom';
 import { HiMenu, HiX } from 'react-icons/hi';
 import { buttonStyles } from '../ui/ButtonStyles.jsx';
 import { useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuthContext } from "../../context/AuthContextProvider";
 
 const MenuBar = ({ isMenuOpen, setIsMenuOpen }) => {
   const menuRef = useRef(null);
+  const navigate = useNavigate();
+  const { logout } = useAuthContext(); // You forgot to destructure logout from the context!
+
+  const handleLogout = () => {
+    logout();
+    navigate('/hello/login', { replace: true });
+  };
 
   const menuItems = [
     { to: "/", secondPart: "home." },
     { to: "/contacts", firstPart: "all", secondPart: "Contacts." },
-    { to: "/addcontact", firstPart: "new", secondPart: "Contact." },
-    { to: "/goodbye/logout", secondPart: "logout."}
+    { to: "/newcontact", firstPart: "new", secondPart: "Contact." },
+    { action: "logout", firstPart: "log", secondPart: "out." }
   ];
 
-  const linkClasses = "block top-20 px-4 py-1 pt-6 font-sans font-semibold text-lg text-white dark:text-black hover:text-red-500 dark:hover:text-red-500 rounded";
+  const linkClasses = "block px-4 py-3 font-sans font-semibold text-lg text-white dark:text-black hover:text-red-500 dark:hover:text-red-500 rounded transition-colors duration-200";
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -49,18 +58,32 @@ const MenuBar = ({ isMenuOpen, setIsMenuOpen }) => {
 
       {/* Mobile Menu Dropdown */}
       {isMenuOpen && (
-        <div className="fixed top-20 right-0 h-80 w-40 bg-black dark:text-black dark:bg-white z-50 md:hidden transform ease-in-out shadow-lg rounded-l-lg border-radius">
+        <div className="fixed top-20 right-0 h-80 w-40 bg-black dark:bg-white z-50 md:hidden transform ease-in-out shadow-lg rounded-l-lg">
           <div className="space-y-2 p-2 tracking-wider">
             {menuItems.map((item) => (
-              <Link
-                key={item.to}
-                to={item.to}
-                className={linkClasses}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <span className="font-semibold">{item.firstPart}</span>
-                <span className="font-light">{item.secondPart}</span>
-              </Link>
+              item.action ? (
+                <button 
+                  key={item.action}
+                  onClick={() => {
+                    handleLogout();
+                    setIsMenuOpen(false);
+                  }}
+                  className={linkClasses}
+                >
+                  <span className="font-semibold">{item.firstPart || ''}</span>
+                  <span className="font-light">{item.secondPart}</span>
+                </button>
+              ) : (  
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  className={linkClasses}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <span className="font-semibold">{item.firstPart || ''}</span>
+                  <span className="font-light">{item.secondPart}</span>
+                </Link>
+              )
             ))}
           </div>
         </div>

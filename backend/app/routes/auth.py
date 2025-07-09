@@ -167,24 +167,37 @@ from app.services.token_service import revoke_user_access_tokens
 def refresh():
     try:
         current_user_id = get_jwt_identity()
-        try:
-            revoked_count = revoke_user_access_tokens(int(current_user_id))
-            logger.info(f"Revoked {revoked_count} old access tokens for user {current_user_id}")
         
+        # Get the current refresh token's JTI to revoke it specifically
+        current_jwt = get_jwt()
+        current_refresh_jti = current_jwt['jti']
+        
+        try:
+            # Revoke ALL old tokens for this user (both access AND refresh)
+            revoked_count = revoke_all_user_tokens(int(current_user_id))
+            logger.info(f"Revoked {revoked_count} old tokens for user {current_user_id}")
         except Exception as revoke_error:
-            logger.error(f"Failed to revoke old access tokens: {revoke_error}")
-            
-        new_access_token = create_access_token(identity=str(current_user_id))
-        # Store new access token in database
-        if not store_single_token(new_access_token, current_user_id):
+            logger.error(f"Failed to revoke old tokens: {revoke_error}")
             return jsonify({
                 'success': False,
-                'message': 'Failed to refresh token'
+                'message': 'Failed to revoke old tokens'
             }), 500
-            
+        
+        # Generate BOTH new access and refresh tokens
+        new_access_token = create_access_token(identity=str(current_user_id))
+        new_refresh_token = create_refresh_token(identity=str(current_user_id))
+        
+        # Store BOTH tokens in database using your existing function
+        if not store_token_pair(new_access_token, new_refresh_token, current_user_id):
+            return jsonify({
+                'success': False,
+                'message': 'Failed to store new tokens'
+            }), 500
+        
         return jsonify({
             'success': True,
-            'access_token': new_access_token
+            'access_token': new_access_token,
+            'refresh_token': new_refresh_token  # ← KEY CHANGE: Return new refresh token
         }), 200
         
     except Exception as e:

@@ -1,11 +1,12 @@
 import React from 'react'
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 
 const AuthContext = createContext()
 
 function AuthContextProvider({children}) {
     const [userData, setUserData] = useState(undefined)
     const [accessToken, setAccessToken] = useState(undefined)
+    const [ isLoading, setIsLoading ] = useState(true)
 
     useEffect(() => {
         let localUser = JSON.parse(localStorage.getItem('userData'))
@@ -17,10 +18,12 @@ function AuthContextProvider({children}) {
         if (localToken) {
             setAccessToken(localToken)
         }
+
+        setIsLoading(false) // after check localStorage
     }, [])
 
     const login = (token, user) => {
-        localStorage.setItems('authToken', token)
+        localStorage.setItem('authToken', token)
         localStorage.setItem('userData', JSON.stringify(user))
         setAccessToken(token)
         setUserData(user)
@@ -33,9 +36,17 @@ function AuthContextProvider({children}) {
         setUserData(undefined)
     }
 
-    
+
   return (
-    <AuthContext.Provider value={{userData, accessToken}}>
+    <AuthContext.Provider value={{
+        userData, 
+        accessToken,
+        isLoading,
+        login,
+        logout,
+        setUserData,
+        setAccessToken
+    }}>
         {children}
     </AuthContext.Provider>
 

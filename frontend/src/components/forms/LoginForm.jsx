@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import CircleButton from '../ui/Buttons';
 import { useNavigate } from 'react-router-dom';
+import { useAuthContext } from '../../context/AuthContextProvider';
 
 
 const LoginForm = ({ onSubmit, isLoading = false }) => {
@@ -11,6 +12,7 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
     const [errors, setErrors] = useState({});
     const [hasSubmitted, setHasSubmitted] = useState(false);
     const [apiLoading, setApiLoading] = useState(false);
+    const { login } = useAuthContext();
     
     const navigate = useNavigate();
 
@@ -35,13 +37,7 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
             if (response.ok) {
                 console.log('Login successful:', data);
 
-                if (data.access_token) {
-                    // Store token in localStorage or context
-                    localStorage.setItem('authToken', data.access_token);
-                }
-
-                // Store user data in localStorage or context   
-                localStorage.setItem('userData', JSON.stringify(data.user));
+                login(data.access_token, data.user)
                 
 
                 // clear any previous errors & clear form data
@@ -51,7 +47,6 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
                     password: ''
                 });
 
-                alert('Login successful! Check console for form data.');
                 // Redirect to contacts page    
                 navigate('/');
             

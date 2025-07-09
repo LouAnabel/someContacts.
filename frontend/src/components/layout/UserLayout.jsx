@@ -11,7 +11,7 @@ function UserLayout() {
 
   const location = useLocation();
   const navigate = useNavigate()
-  const { accessToken } = useAuthContext()
+  const { accessToken, isLoading } = useAuthContext()
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -19,13 +19,28 @@ function UserLayout() {
   
 
   useEffect(() => {
-    console.log('Access token:', accessToken);
-    if (!accessToken) {
-      console.log('no accessToken, redirecting to login');
-      navigate('/hello/login', { replace: true });
-    }
+    if (!isLoading) {
+      console.log('Access token:', accessToken);
+    
+      if (!accessToken) {
+        console.log('no accessToken, redirecting to login');
+        navigate('/hello/login', { replace: true });
+      } else {
+        console.log('AccessToken found, staying on protected route')
+      }
+    } 
   }, [accessToken, navigate]);
   
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-black dark:text-white">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white font-sans flex flex-col">
       <Navbar />

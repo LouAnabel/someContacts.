@@ -2,19 +2,15 @@ import { Button } from "flowbite-react";
 import { Link } from 'react-router-dom'
 import CircleButton from '../components/ui/Buttons';
 import { useNavigate } from 'react-router-dom';
+import { useAuthContext } from "../context/AuthContextProvider";
 
 function Home() {
 
   const navigate = useNavigate()
+  const { logout } = useAuthContext();
   const handleLogout = () => {
-    /* // Clear auth data
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('userData');*/
-    
-    // Navigate to login
+    logout();
     navigate('/hello/login');
-    /* // Optionally reload to reset app state
-     window.location.reload();*/
   }; 
 
   return (
