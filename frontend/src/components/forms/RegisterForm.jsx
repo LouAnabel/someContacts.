@@ -35,41 +35,19 @@ const RegisterForm = () => {
             console.log('Accept Terms:', acceptTerms);
             console.log('============================================');
             
-            // Simulate API delay
-            await new Promise(resolve => setTimeout(resolve, 1000));
+        
+            // ========================================
+            // COMMENTED OUT: ACTUAL API CALL
+            // ========================================
             
-            // Simulate successful response
-            console.log('✅ Simulated API Success');
-            
-            // Clear any previous errors & clear form data
-            setErrors({});
-            setFormData({
-                firstName: '',
-                lastName: '',
-                email: '',
-                password: '',
-                confirmPassword: ''
-            });
-            setAcceptTerms(false); // Also reset terms checkbox
-            
-            alert('Form submitted successfully! Check console for the data that would be sent to your API.');
-            
-            // Uncomment the line below when you want to redirect after testing
-            navigate('/hello/login');
-
-            /* 
-            ========================================
-            COMMENTED OUT: ACTUAL API CALL
-            ========================================
-            
-            const response = await fetch('http://localhost:3000/auth/register', {
+            const response = await fetch('http://127.0.0.1:5000/auth/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    firstName: registerData.firstName,
-                    lastName: registerData.lastName,
+                    first_name: registerData.firstName,
+                    last_name: registerData.lastName,
                     email: registerData.email,
                     password: registerData.password
                 })
@@ -101,7 +79,7 @@ const RegisterForm = () => {
                 });
                 
                 alert('Registration successful! Check console for form data.');
-                navigate('/login');
+                navigate('/hello/login');
 
             } else {
                 console.error('Registration failed:', data);
@@ -109,7 +87,7 @@ const RegisterForm = () => {
                     submit: data.message || 'Registration failed. Please try again.'
                 });
             }
-            */
+        
             
         } catch (error) {
             console.error('Network/API error:', error);

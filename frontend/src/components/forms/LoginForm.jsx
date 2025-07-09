@@ -12,15 +12,15 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
     const [hasSubmitted, setHasSubmitted] = useState(false);
     const [apiLoading, setApiLoading] = useState(false);
     
+    const navigate = useNavigate();
 
     // Api function call
     const loginUser = async (loginData) => {
-        const navigate = useNavigate();
         try {
             setApiLoading(true);
 
             // Simulate API call & replace with actual API logic
-            const response = await fetch('http://localhost:3000/auth/login', {
+            const response = await fetch('http://127.0.0.1:5000/auth/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -35,9 +35,9 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
             if (response.ok) {
                 console.log('Login successful:', data);
 
-                if (data.token) {
+                if (data.access_token) {
                     // Store token in localStorage or context
-                    localStorage.setItem('authToken', data.token);
+                    localStorage.setItem('authToken', data.access_token);
                 }
 
                 // Store user data in localStorage or context   

@@ -1,4 +1,5 @@
 from app import create_app, db
+from flask_cors import CORS
 from app.models.user import User  # Import User Model
 from app.models.contact import Contact  # Import contact model
 from app.models.category import Category
@@ -14,6 +15,7 @@ os.environ.setdefault('FLASK_ENV', 'development')
 
 # Create the Flask app
 app = create_app()
+CORS(app)
 
 # Initialize database for development
 # Create database tables
