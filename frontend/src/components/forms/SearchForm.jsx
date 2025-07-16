@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { HiSearch, HiX } from 'react-icons/hi';
-import { buttonStyles, searchStyles } from '../ui/ButtonStyles.jsx';
+import {buttonStyles} from '../ui/Buttons';
 
 const SearchForm = ({ 
   placeholder = "search...",
-  onSearch,
+  onSearch, 
   isMobile = true,
   className = ""
 }) => {

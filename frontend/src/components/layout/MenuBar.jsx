@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { HiMenu, HiX } from 'react-icons/hi';
-import { buttonStyles } from '../ui/ButtonStyles.jsx';
+import { buttonStyles } from '../ui/Buttons'; 
 import { useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from "../../context/AuthContextProvider";

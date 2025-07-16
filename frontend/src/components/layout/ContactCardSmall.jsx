@@ -20,7 +20,7 @@ const ContactCardSmall = ({contact}) => {
                   
                 <div className="flex justify-end px-5 pt-2"> 
                     {/* Photo Small */}
-                    <div class="flex flex-col items-center relative pb-1">
+                    <div className="flex flex-col items-center relative pb-1">
                         <ContactCardPhotoSmall 
                             photo={contactPhoto}
                             name="Contact"

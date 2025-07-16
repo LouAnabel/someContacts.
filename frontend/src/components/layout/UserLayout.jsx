@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 
 
 function UserLayout() {
-  console.log('11')
+  console.log('UserLayout rendered');
   const location = useLocation();
   const navigate = useNavigate()
   const { accessToken, isLoading } = useAuthContext()
@@ -19,15 +19,15 @@ function UserLayout() {
   
 
   useEffect(() => {
-    console.log('22')
+    console.log('accessToken gets checked.');
     if (!isLoading) {
-      console.log('Access token:', accessToken);
+      console.log('succesffull! access token:', accessToken);
     
       if (!accessToken) {
         console.log('no accessToken, redirecting to login');
         navigate('/login', { replace: true });
       } else {
-        console.log('AccessToken found, staying on protected route')
+        console.log('Staying on protected route')
       }
     } 
   }, [isLoading, accessToken, navigate]);

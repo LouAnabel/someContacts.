@@ -1,3 +1,15 @@
+export const buttonStyles = {
+  base: "p-2 rounded-md dark:text-black",
+  active: "text-red-500 dark:bg-black dark:text-red-500",
+  normal: "text-gray-900 dark:text-white hover:text-red-500 dark:hover:text-red-500"
+};
+
+export const searchStyles = {
+  desktop: "w-64 px-4 py-2 pl-10 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 text-gray-900 dark:text-white",
+  mobile: "w-full px-4 py-2 pl-10 bg-white dark:bg-white border border-gray-300 dark:border-gray-800 rounded-lg font-light text-gray-500 dark:gray-500"
+};
+
+
 const CircleButton = ({ 
   children, 
   onClick, 

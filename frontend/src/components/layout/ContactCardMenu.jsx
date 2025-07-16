@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { HiMenu, HiX } from 'react-icons/hi';
-import { buttonStyles } from '../ui/ButtonStyles.jsx';
+import { buttonStyles } from '../ui/Buttons';
 import { useRef, useEffect } from 'react';
 
 const ContactMenuBar = ({isMenuOpen, setIsMenuOpen}) => {
