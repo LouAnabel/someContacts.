@@ -10,11 +10,11 @@ function LandingPage() {
     };
 
     return (
-        <div className="container mx-auto px-4 py-40">
-        <h1 className="text-3xl font-heading font-light text-gray-900 dark:text-white mb-10">
-            welcome to <span className="text-red-500">someContacts.</span>
+        <div className="container mx-auto px-4 py-36">
+        <h1 className="text-2xl font-heading font-light text-gray-900 dark:text-white mb-10">
+            welcome to <span className="text-red-500 tracking-wide">someContacts.</span>
         </h1>
-        <container className="text-2xl font-text font-light text-black dark:text-white mb-6">
+        <container className="text-xl font-text font-light text-black dark:text-white mb-6">
             <p> keep all your contacts in one smart space. </p> 
             <p> personal notes meet professional handling, and everything stays effortlessly organized.</p> 
             <p>Just the way you need it. Whether it’s your best friend, your favorite client, or that one person you always forget – </p>

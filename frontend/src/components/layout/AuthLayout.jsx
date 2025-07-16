@@ -16,7 +16,7 @@ function AuthLayout() {
   return (
     <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white font-heading flex flex-col">
       <AuthNavbar />
-      <main className="flex-grow items-center justify-center">
+      <main className="p-3 items-center justify-center">
         <Outlet />
       </main>
       {/* <Footer /> */}
