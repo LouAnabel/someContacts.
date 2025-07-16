@@ -51,7 +51,7 @@ def validate_date(date_string):
 
 
 # CREATE - add a new Contact
-@contacts_bp.route('/', methods=['POST'])
+@contacts_bp.route('', methods=['POST'])
 @jwt_required()
 def create_contact():
     logger.info("Starting contact creation process...")
@@ -293,18 +293,23 @@ def get_contacts():
                         'Remove some filters to broaden your search'
                     ]
                 }
-            }), 404
+            }), 200
 
         # Check if no results found but no filters applied (user has no contacts at all)
         elif contacts.total == 0:
             return jsonify({
-                'success': False,
-                'message': 'You have no contacts yet',
-                'details': {
-                    'total_results': 0,
-                    'suggestion': 'Create your first contact to get started'
-                }
-            }), 404
+                'success': True,
+                'contacts': [],  # Empty array instead of error
+                'pagination': {
+                    'page': page,
+                    'per_page': per_page,
+                    'total': 0,
+                    'pages': 0,
+                    'has_next': False,
+                    'has_prev': False
+                },
+                'message': 'No contacts found'  # Optional message
+            }), 200
 
         # Success - return results
         logger.debug(f"Found {contacts.total} contacts matching criteria")

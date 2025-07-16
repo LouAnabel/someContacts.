@@ -17,7 +17,7 @@ jwt = JWTManager() #JSON Web Token authentication
 bcrypt = Bcrypt() #password hashing
 logger = logging.getLogger(__name__) 
 
-# initicatializes the APP
+# initializes the APP
 def create_app():
     app = Flask(__name__)
     
@@ -111,7 +111,7 @@ def create_app():
 
     # Import models (important for migrations)
     from app.models import user, contact, category
-    from app.models.token_block_list import TokenBlockList 
+    from app.models.token_block_list import TokenBlockList
 
     # Register blueprints - Import INSIDE the function to avoid circular imports
     from app.routes.auth import auth_bp

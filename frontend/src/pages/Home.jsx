@@ -6,64 +6,88 @@ import { useAuthContext } from "../context/AuthContextProvider";
 import { getContacts } from "../apiCalls/contactsApi";
 
 function Home() {
-
   const navigate = useNavigate()
-  const { accessToken } = useAuthContext();
-  const { logout } = useAuthContext();
+  const { accessToken, logout } = useAuthContext();
+  const [contacts, setContacts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
   const handleLogout = () => {
     logout();
     navigate('/login');
   }; 
 
-  const [contacts, setContacts] = useState([]);
-
   useEffect(() => {
     const fetchContacts = async () => {
       try {
+        setIsLoading(true);
+        
         if (!accessToken) {
           console.error("Access token is not available.");
+          setIsLoading(false);
           return;
         }
 
         const contactsData = await getContacts(accessToken);
-        setContacts(contactsData);
+        
+        // Debug: Check what we're getting
+        console.log('Contacts data:', contactsData);
+        console.log('Is array?', Array.isArray(contactsData));
+        
+        // Handle both possible response formats
+        const contactsArray = Array.isArray(contactsData) 
+          ? contactsData 
+          : contactsData.contacts || [];
+          
+        setContacts(contactsArray);
+        
       } catch (error) {
         console.error('Error fetching contacts:', error);
+        setContacts([]); // Set empty array on error
+      } finally {
+        setIsLoading(false);
       }
     };
+    
     fetchContacts();
   }, [accessToken]);
 
+  // Get contact count safely
+  const contactCount = Array.isArray(contacts) ? contacts.length : 0;
+
   return (
     <div className="container mx-auto px-4 py-20">
-        <h1 className="text-2xl font-heading font-light text-gray-900 dark:text-white mb-7">
-            hello <span className="text-red-500 font-medium">user.</span>
-        </h1>
-        <container className="text-xl font-text font-light text-black dark:text-white mb-6">
-          <p>welcome to your very own personal space.</p>
-            <p className="mb-10"> keep track of all your connections that matter to you. </p>
-            
-            <p className="text-xl font-text text-black dark:text-white mb-6">
-              you already have collected{" "}
-              <Link to="/myspace/contacts">
-                <span className="font-text font-semibold text-red dark:text-red hover:text-red-500 dark:hover:text-red-500">{contacts.length}</span>
-              </Link>
-              {" "}contacts.
-            </p>
-      </container>
+      <h1 className="text-2xl font-heading font-light text-gray-900 dark:text-white mb-7">
+        hello <span className="text-red-500 font-medium">user.</span>
+      </h1>
+      
+      <div className="text-xl font-text font-light text-black dark:text-white mb-6">
+        <p>welcome to your very own personal space.</p>
+        <p className="mb-10">keep track of all your connections that matter to you.</p>
+        
+        <p className="text-xl font-text text-black dark:text-white mb-6">
+          you already have collected{" "}
+          <Link to="/myspace/contacts">
+            <span className="font-text font-semibold text-red-500 dark:text-red-500 hover:text-red-600 dark:hover:text-red-600 transition-colors">
+              {isLoading ? '0' : contactCount}
+            </span>
+          </Link>
+          {" "}contact{contactCount !== 1 ? 's' : ''}.
+        </p>
+      </div>
+      
       <CircleButton 
         size="large"
         variant="dark"
-        className="border border-white/30 bg-red-500 hover:bg-red-600 dark:bg-red-500 dark:border-red-500 "
-            style={{ 
-                        marginTop: '3rem', 
-                        marginLeft: 'auto',
-                        display: 'block' 
-                    }}
-        onClick={handleLogout}>
+        className="border border-white/30 bg-red-500 hover:bg-red-600 dark:bg-red-500 dark:border-red-500"
+        style={{ 
+          marginTop: '3rem', 
+          marginLeft: 'auto',
+          display: 'block' 
+        }}
+        onClick={handleLogout}
+      >
         log out.
       </CircleButton>
-
     </div> 
   );
 }
