@@ -20,7 +20,7 @@ const CircleButton = ({
   ...props 
 }) => {
   const sizes = {
-    small: "w-18 h-18 text-xs",    // Increased from 16 to 18
+    small: "w-20 h-20 text-xs",    // Increased from 16 to 18
     medium: "w-24 h-24 text-sm",   // Increased from 20 to 24
     large: "w-28 h-28 text-base",  // Increased from 24 to 28
     xl: "w-32 h-32 text-3xl"
