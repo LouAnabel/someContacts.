@@ -1,5 +1,5 @@
 import ContactCardSmall from "../components/layout/ContactCardSmall"
-import { getContacts } from "../apiCalls/contact"
+import { getContacts } from "../ApiCalls/Contact";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "../context/AuthContextProvider";
 

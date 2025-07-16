@@ -30,7 +30,7 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-20">
           
           {/* someContacts. Title */}
-          <Link to="/yourspace/" className="flex items-center">
+          <Link to="/myspace/" className="flex items-center">
             <span className="p-3 text-3xl sm:text-3xl tracking-wide font-heading text-black hover:text-red-500 dark:text-white hover:dark:text-red-500">
               <span className="font-semibold">some</span>
               <span className="font-light">Contacts.</span>

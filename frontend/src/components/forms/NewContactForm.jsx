@@ -221,7 +221,7 @@ const NewContactForm = ({ contact = {}, onSubmit, onCancel }) => {
             setExpandedNotes(false);
             setLinks(['']);
             setHasSubmitted(false);
-            // navigate('/yourspace/contacts'); // Uncomment when ready to redirect
+            // navigate('/myspace/contacts'); // Uncomment when ready to redirect
         }, 1000);
     };
 

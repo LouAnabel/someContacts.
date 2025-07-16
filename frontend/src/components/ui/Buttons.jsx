@@ -22,7 +22,7 @@ const CircleButton = ({
   };
 
   const variants = {
-    dark: "bg-black hover:bg-red-500 text-white dark:bg-black dark:hover:bg-red-600",
+    dark: "bg-black hover:bg-red-500 text-white dark:red-500 dark:hover:bg-red-600",
     red: "bg-red-600 hover:bg-red-700 text-white",
     light: "bg-gray-200 hover:bg-gray-300 text-gray-900"
   };
@@ -36,12 +36,12 @@ const CircleButton = ({
       className={`
         ${sizes[size]} 
         ${variants[variant]}
-        font-medium rounded-full flex items-center justify-center 
+        rounded-full 
         ${className}
       `}
       {...props}
     >
-      <span className={`text-2xl font-text font-semibold text-center leading-relaxed ${textSpacing[size]}`}>
+      <span className={`text-2xl font-text font-semibold flex items-center justify-center px-3 py-3`}>
         {children}
       </span>
     </button>

@@ -16,9 +16,9 @@ const MenuBar = ({ isMenuOpen, setIsMenuOpen }) => {
   };
 
   const menuItems = [
-    { to: "/yourspace", secondPart: "home." },
-    { to: "/yourspace/contacts", firstPart: "all", secondPart: "Contacts." },
-    { to: "/yourspace/newcontact", firstPart: "new", secondPart: "Contact." },
+    { to: "/myspace", secondPart: "home." },
+    { to: "/myspace/contacts", firstPart: "all", secondPart: "Contacts." },
+    { to: "/myspace/newcontact", firstPart: "new", secondPart: "Contact." },
     { action: "logout", firstPart: "log", secondPart: "out." }
   ];
 

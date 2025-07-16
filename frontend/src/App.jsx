@@ -27,7 +27,7 @@ function App() {
             <Route path="login" element={<Login />} />
             <Route path="register" element={<Register />} />
           </Route>
-          <Route path="/yourspace/*" element={<UserLayout />}>  
+          <Route path="/myspace/*" element={<UserLayout />}>  
             <Route index element={<Home />} />
             {/* Nested routes for contacts */}
             <Route path="contacts" element={<AllContacts />} />

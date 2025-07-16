@@ -48,7 +48,7 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
                 });
 
                 // Redirect to contacts page    
-                navigate('/yourspace/', { replace: true });
+                navigate('/myspace/', { replace: true });
             
 
             } else {
