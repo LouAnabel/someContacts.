@@ -80,7 +80,7 @@ const RegisterForm = () => {
                 setHasSubmitted(false);
                 
                 alert('Registration successful! Check console for form data.');
-                navigate('/hello/login');
+                navigate('/login');
 
             } else {
                 console.error('Registration failed:', data);

@@ -36,7 +36,7 @@ const NewContact = () => {
 
 
     return (
-        <div className="flex flex-col items-center justify-center  mx-auto lg:py-0" 
+        <div className="flex flex-col items-center justify-center  mx-auto lg:py-0 mt-10" 
              style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
             
             {/* Photo Field - Full width at top */}

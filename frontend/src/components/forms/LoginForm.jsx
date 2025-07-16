@@ -48,7 +48,7 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
                 });
 
                 // Redirect to contacts page    
-                navigate('/');
+                navigate('/yourspace/', { replace: true });
             
 
             } else {
@@ -220,17 +220,6 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
                 </CircleButton>
             </div>
 
-            {/* Bottom Tagline */}
-            <div className="text-center text-black dark:text-white text-l absolute left-1/2 transform -translate-x-1/2 w-full min-[480px]:text-base min-[480px]:bottom-[28%]"
-                 style={{
-                     fontWeight: 300,
-                     lineHeight: 1.4,
-                     fontSize: typeof window !== 'undefined' && window.innerWidth >= 1024 ? '30px' : '24px',
-                               
-                 }}>
-                <p>Remember their names.</p>
-                <p>Know their faces.</p>
-            </div>
         </div>
     );
 };

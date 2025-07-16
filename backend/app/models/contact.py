@@ -13,7 +13,7 @@ class Contact(db.Model):
     # Basic Contact Information
     first_name = db.Column(db.String(100), nullable=False)
     last_name = db.Column(db.String(100), nullable=True)  # Optional
-    email = db.Column(db.String(255), index=True, nullable=True)  # Optional and removed unique constraint
+    email = db.Column(db.String(255), nullable=True)  # Optional and removed unique constraint
     phone = db.Column(db.String(20), nullable=True)
     is_favorite = db.Column(db.Boolean, default=False, nullable=False)
     

@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 
 
 function UserLayout() {
-
+  console.log('11')
   const location = useLocation();
   const navigate = useNavigate()
   const { accessToken, isLoading } = useAuthContext()
@@ -19,19 +19,20 @@ function UserLayout() {
   
 
   useEffect(() => {
+    console.log('22')
     if (!isLoading) {
       console.log('Access token:', accessToken);
     
       if (!accessToken) {
         console.log('no accessToken, redirecting to login');
-        navigate('/hello/login', { replace: true });
+        navigate('/login', { replace: true });
       } else {
         console.log('AccessToken found, staying on protected route')
       }
     } 
-  }, [accessToken, navigate]);
+  }, [isLoading, accessToken, navigate]);
   
-  if (isLoading) {
+  if (isLoading || accessToken === undefined) {
     return (
       <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">
         <div className="text-center">
@@ -44,6 +45,7 @@ function UserLayout() {
   return (
     <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white font-sans flex flex-col">
       <Navbar />
+      
       <main className="pt-16 flex-grow">
         <Outlet />
       </main>

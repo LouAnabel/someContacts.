@@ -12,13 +12,13 @@ const MenuBar = ({ isMenuOpen, setIsMenuOpen }) => {
 
   const handleLogout = () => {
     logout();
-    navigate('/hello/login', { replace: true });
+    navigate('/login', { replace: true });
   };
 
   const menuItems = [
-    { to: "/", secondPart: "home." },
-    { to: "/contacts", firstPart: "all", secondPart: "Contacts." },
-    { to: "/newcontact", firstPart: "new", secondPart: "Contact." },
+    { to: "/yourspace", secondPart: "home." },
+    { to: "/yourspace/contacts", firstPart: "all", secondPart: "Contacts." },
+    { to: "/yourspace/newcontact", firstPart: "new", secondPart: "Contact." },
     { action: "logout", firstPart: "log", secondPart: "out." }
   ];
 

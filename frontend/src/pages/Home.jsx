@@ -1,4 +1,3 @@
-import { Button } from "flowbite-react";
 import { Link } from 'react-router-dom'
 import CircleButton from '../components/ui/Buttons';
 import { useNavigate } from 'react-router-dom';
@@ -10,7 +9,7 @@ function Home() {
   const { logout } = useAuthContext();
   const handleLogout = () => {
     logout();
-    navigate('/hello/login');
+    navigate('/login');
   }; 
 
   return (
@@ -33,6 +32,7 @@ function Home() {
         onClick={handleLogout}>
         log out.
       </CircleButton>
+
     </div> 
   );
 }

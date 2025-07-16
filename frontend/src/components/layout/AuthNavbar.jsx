@@ -1,4 +1,5 @@
 import ThemeToggle from '../theme/ThemeToggle';
+import { Link } from 'react-router-dom';
 
 const AuthNavbar = () => {
   return (
@@ -6,13 +7,13 @@ const AuthNavbar = () => {
       <div className="max-w-screen-xl mx-auto px-4">
         <div className="flex justify-between items-center h-20">
           
-          {/* someContacts. Title - Left side */}
-          <div className="flex items-center">
-            <span className="p-3 text-3xl tracking-wide font-heading text-black hover:text-red-500 dark:text-white hover:dark:text-red-500">
+          {/* someContacts. Title */}
+          <Link to="/" className="flex items-center">
+            <span className="p-3 text-3xl sm:text-3xl tracking-wide font-heading text-black hover:text-red-500 dark:text-white hover:dark:text-red-500">
               <span className="font-semibold">some</span>
               <span className="font-light">Contacts.</span>
             </span>
-          </div>
+          </Link>
 
           {/* Theme Toggle - Right side */}
           <div className="flex items-center">

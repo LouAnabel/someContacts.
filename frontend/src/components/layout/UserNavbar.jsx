@@ -5,6 +5,7 @@ import SearchForm from '../forms/SearchForm.jsx'
 import MenuBar from './Menubar.jsx'
 
 const Navbar = () => {
+  console.log('Navbar rendered');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -13,14 +14,14 @@ const Navbar = () => {
     // Add your search logic here
     if (searchTerm.trim()) {
       // Navigate to all contacts page (you can handle the filtering there)
-      navigate('/contacts', { state: { searchTerm } });
+      navigate('/yourspace/contacts', { state: { searchTerm } });
     }
   };
 
   // Common navigation items for desktop
   const navItems = [
-  { to: "/contacts", firstPart: "all", secondPart: "Contacts." },
-  { to: "/newcontact", firstPart: "new", secondPart: "Contact." }
+  { to: "/yourspace/contacts", firstPart: "all", secondPart: "Contacts." },
+  { to: "/yourspace/newcontact", firstPart: "new", secondPart: "Contact." }
 ];
 
   return (
@@ -29,7 +30,7 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-20">
           
           {/* someContacts. Title */}
-          <Link to="/" className="flex items-center">
+          <Link to="/yourspace/" className="flex items-center">
             <span className="p-3 text-3xl sm:text-3xl tracking-wide font-heading text-black hover:text-red-500 dark:text-white hover:dark:text-red-500">
               <span className="font-semibold">some</span>
               <span className="font-light">Contacts.</span>

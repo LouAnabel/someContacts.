@@ -2,7 +2,7 @@ import { useState } from 'react';
 import ContactMenuBar from "./ContactCardMenu";
 import ContactCardPhotoSmall from '../ui/ContactCardPhoto';
 
-const ContactCardSmall = () => {
+const ContactCardSmall = ({contact}) => {
     // Add this state declaration
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [contactPhoto, setContactPhoto] = useState(null);

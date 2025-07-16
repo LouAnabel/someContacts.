@@ -19,7 +19,7 @@ function AuthLayout() {
       <main className="flex-grow items-center justify-center">
         <Outlet />
       </main>
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 }

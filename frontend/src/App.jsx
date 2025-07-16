@@ -13,6 +13,7 @@ import AllContacts from './pages/AllContacts';
 import NewContact from './pages/NewContact';
 import ShowContact from './pages/ShowContact';
 import UpdateContacts from './pages/UpdateContact';
+import LandingPage from './pages/LandingPage';
 
 
 function App() {
@@ -21,16 +22,18 @@ function App() {
       <Router>
         <Routes>
           {/* All routes now use UserLayout - no authentication needed */}
-          <Route path="/*" element={<UserLayout />}>
+          <Route path="/*" element={<AuthLayout />}>
+            <Route index element={<LandingPage />} />
+            <Route path="login" element={<Login />} />
+            <Route path="register" element={<Register />} />
+          </Route>
+          <Route path="/yourspace/*" element={<UserLayout />}>  
             <Route index element={<Home />} />
+            {/* Nested routes for contacts */}
             <Route path="contacts" element={<AllContacts />} />
             <Route path="newcontact" element={<NewContact />} />
             <Route path="contact/:id" element={<ShowContact />} />
             <Route path="updatecontact/:id" element={<UpdateContacts />} />
-          </Route>
-          <Route path="/hello/*" element={<AuthLayout />}>
-            <Route path="login" element={<Login />} />
-            <Route path="register" element={<Register />} />
           </Route>
         </Routes>
       </Router>
