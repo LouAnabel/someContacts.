@@ -136,7 +136,7 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
              style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
 
             {/* Main Login Card */}
-            <div className="bg-white rounded-3xl p-5 pt-6 relative z-10 overflow-visible w-[88vw] min-w-[260px] max-w-[480px] h-[280px] absolute left-1/2 transform -translate-x-1/2"
+            <div className="bg-white rounded-3xl p-5 pt-6 relative z-10 overflow-visible w-[88vw] min-w-[260px] max-w-[480px] h-[295px] absolute left-1/2 transform -translate-x-1/2"
                  style={{ 
                      boxShadow: '0 4px 32px rgba(109, 71, 71, 0.29)'
                  }}>

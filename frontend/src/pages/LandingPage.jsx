@@ -15,9 +15,9 @@ function LandingPage() {
             welcome to <span className="text-red-500 tracking-wide">someContacts.</span>
         </h1>
         <container className="text-xl font-text font-light text-black dark:text-white mb-6">
-            <p> keep all your contacts in one smart space. </p> 
-            <p> personal notes meet professional handling, and everything stays effortlessly organized.</p> 
-            <p>Just the way you need it. Whether it’s your best friend, your favorite client, or that one person you always forget – </p>
+            <p className="mb-3"> keep all your contacts in one smart space. </p> 
+            <p>collect personal notes, pictures, and every important detail while everything stays effortlessly organized.</p> 
+            <p>Just the way you need it. Whether it’s your best friend, your favorite client, or that one person's name you always forget – </p>
             <p>this App got you covered.</p>
             <p className="mt-10"> Wanna join? {" "}   
                 <Link to="/register">
