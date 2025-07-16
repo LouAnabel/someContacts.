@@ -155,6 +155,11 @@ const NewContactForm = ({ contact = {}, onSubmit, onCancel }) => {
         } else if (formData.lastName.trim().length < 2) {
             newErrors.lastName = 'Last name must be at least 2 characters';
         }
+
+        // category validation
+        if (!formData.category.trim()) {
+            newErrors.category = 'category is required';
+        }
         
         // Email validation
         if (!formData.email) {
@@ -228,13 +233,13 @@ const NewContactForm = ({ contact = {}, onSubmit, onCancel }) => {
     const showLoading = apiLoading;
 
     return (
-        <div className="w-full flex flex-col items-center" 
+        <div className="w-full flex flex-col items-center min-h-screen bg-white dark:bg-black" 
              style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
 
             {/* Main Edit Contact Card */}
-            <div className="bg-gray-50 rounded-3xl p-6 relative z-10 overflow-visible w-[75vw] min-w-[260px] max-w-[480px] h-fit mx-auto"
+            <div className="bg-white rounded-3xl p-6 relative z-10 overflow-visible w-[75vw] min-w-[260px] max-w-[480px] h-fit mx-auto"
                  style={{ 
-                     boxShadow: '0 4px 32px rgba(0, 0, 0, 0.3)'
+                     boxShadow: '0 4px 32px rgba(109, 71, 71, 0.29)'
                  }}>
                 <h1 className="text-3xl font-bold text-center mb-2 text-black">
                     new contact.
@@ -242,7 +247,7 @@ const NewContactForm = ({ contact = {}, onSubmit, onCancel }) => {
 
 
                 {/* Favorite Checkbox */}
-                <div className="flex items-center w-full relative left-1 mb-6 rounded-lg">
+                <div className="flex items-center w-full relative left-1 mt-3 mb-8 rounded-lg">
                         <button
                             type="button"
                             onClick={() => setFormData(prev => ({ ...prev, isFavorite: !prev.isFavorite }))}
@@ -269,12 +274,10 @@ const NewContactForm = ({ contact = {}, onSubmit, onCancel }) => {
 
 
                 {/* Main Contact Information */}
-                <div className="space-y-3.5 mb-8">
+                <div className="space-y-7 mb-8">
                     {/* First Name Field */}
                     <div className="relative">
-                        <label htmlFor="firstName" className="block relative left-2 text-sans text-base text-black font-light">
-                            first name
-                        </label>
+                        
                         <input 
                             type="text" 
                             name="firstName" 
@@ -283,14 +286,20 @@ const NewContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                             onChange={handleInputChange}
                             placeholder="meryl"
                             disabled={showLoading}
-                            className={`w-full p-2.5 rounded-xl border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 ${
-                                hasSubmitted && errors.firstName ? 'border-red-400' : ''
-                            }`}
-                            style={{
-                                fontSize: '16px',
-                                fontWeight: 300
-                            }}
-                        />
+                            className={`w-full rounded-xl border bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
+                                    hasSubmitted && errors.firstName ? 'border-red-500 shadow-lg' : 'border-gray-400 dark:border-gray-400'
+                                }`}
+                                style={{
+                                    fontSize: '18px',
+                                    fontWeight: 300
+                                }}
+                            />
+                            <label 
+                                htmlFor="firstName" 
+                                className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-light"
+                            >
+                                first name
+                            </label>
                         {hasSubmitted && errors.firstName && (
                             <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.firstName}</p>
                         )}
@@ -298,9 +307,6 @@ const NewContactForm = ({ contact = {}, onSubmit, onCancel }) => {
 
                     {/* Last Name Field */}
                     <div className="relative">
-                        <label htmlFor="lastName" className="block relative left-2 text-sans text-base text-black font-light">
-                            last name
-                        </label>
                         <input 
                             type="text" 
                             name="lastName" 
@@ -309,14 +315,20 @@ const NewContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                             onChange={handleInputChange}
                             placeholder="streep"
                             disabled={showLoading}
-                            className={`w-full p-2.5 rounded-xl border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 ${
-                                hasSubmitted && errors.lastName ? 'border-red-400' : ''
-                            }`}
-                            style={{
-                                fontSize: '16px',
-                                fontWeight: 300
-                            }}
-                        />
+                            className={`w-full rounded-xl border bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
+                                    hasSubmitted && errors.firstName ? 'border-red-500 shadow-lg' : 'border-gray-400 dark:border-gray-400'
+                                }`}
+                                style={{
+                                    fontSize: '18px',
+                                    fontWeight: 300
+                                }}
+                            />
+                            <label 
+                                htmlFor="lastName" 
+                                className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-light"
+                            >
+                                last name
+                            </label>
                         {hasSubmitted && errors.lastName && (
                             <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.lastName}</p>
                         )}
@@ -324,17 +336,18 @@ const NewContactForm = ({ contact = {}, onSubmit, onCancel }) => {
 
                     {/* Category Field */}
                     <div className="relative">
-                        <label className="block relative left-2 text-sans text-base text-black font-light">
+                        <label className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-light">
                             category
                         </label>
                         
                         {/* Custom Dropdown Button */}
                         <button
                             type="button"
-                            onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
+                            onClick={() => {
+                                setShowCategoryDropdown(!showCategoryDropdown)}}
                             disabled={showLoading}
-                            className={`w-full p-2.5 rounded-xl border border-gray-500 bg-transparent text-black font-light max-w-full min-w-[200px] focus:outline-none focus:border-red-500 flex items-center justify-between ${
-                                hasSubmitted && errors.category ? 'border-red-400' : ''
+                            className={`w-full p-2.5 rounded-xl border bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 font-light max-w-full min-w-[200px] focus:outline-none focus:border-red-500 flex items-center justify-between ${
+                                hasSubmitted && errors.category ? 'border-red-500 shadow-lg' : 'border-gray-400 dark:border-gray-400'
                             }`}
                             style={{
                                 fontSize: '16px',
@@ -366,7 +379,15 @@ const NewContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                                         key={category.id}
                                         type="button"
                                         onClick={() => {
+                                            // Update form data
                                             setFormData(prev => ({ ...prev, category: category.value }));
+                                            
+                                            // Clear error immediately (same as handleInputChange does)
+                                            if (hasSubmitted && errors.category) {
+                                                setErrors(prev => ({ ...prev, category: '' }));
+                                            }
+                                            
+                                            // Close dropdown
                                             setShowCategoryDropdown(false);
                                         }}
                                         className="w-full text-left px-3 py-2 hover:bg-gray-50 hover:text-red-500 text-black font-light last:border-b-0"
@@ -451,13 +472,16 @@ const NewContactForm = ({ contact = {}, onSubmit, onCancel }) => {
 
 
                 {/* How to contact */}
-                <div className="space-y-3.5 mb-8">
+                <div className="space-y-2 mb-8">
                     {/* Email Field */}
                     <div className="relative">
-                        <p className="relative text-red-500 left-2 font-light">how to contact?</p>
-                        <label htmlFor="email" className="block relative left-2 text-sans text-base text-black font-light">
-                            email
-                        </label>
+                        <p className="relative text-red-500 left-2 -mb-3 font-light">how to contact?</p>
+                        <label 
+                                htmlFor="email" 
+                                className="relative top-3 left-4 bg-white px-1 text-base text-black font-light"
+                            >
+                                email
+                            </label>
                         <input 
                             type="email" 
                             name="email" 
@@ -466,14 +490,15 @@ const NewContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                             onChange={handleInputChange}
                             placeholder="your@email.com"
                             disabled={showLoading}
-                            className={`w-full p-2.5 rounded-xl border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 ${
-                                hasSubmitted && errors.email ? 'border-red-400' : ''
-                            }`}
-                            style={{
-                                fontSize: '16px',
-                                fontWeight: 300
-                            }}
-                        />
+                            className={`w-full rounded-xl border bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
+                                    hasSubmitted && errors.firstName ? 'border-red-500 shadow-lg' : 'border-gray-400 dark:border-gray-400'
+                                }`}
+                                style={{
+                                    fontSize: '18px',
+                                    fontWeight: 300
+                                }}
+                            />
+                            
                         {hasSubmitted && errors.email && (
                             <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.email}</p>
                         )}
@@ -481,7 +506,7 @@ const NewContactForm = ({ contact = {}, onSubmit, onCancel }) => {
 
                     {/* Phone Field */}
                     <div className="relative">
-                        <label htmlFor="phone" className="block relative left-2 text-sans text-base text-black font-light">
+                        <label htmlFor="phone" className="relative top-3 left-4 bg-white px-1 text-base text-black font-light">
                             phone
                         </label>
                         <input 
@@ -492,8 +517,8 @@ const NewContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                             onChange={handleInputChange}
                             placeholder="+49 1781234567"
                             disabled={showLoading}
-                            className={`w-full p-2.5 rounded-xl border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 ${
-                                hasSubmitted && errors.phone ? 'border-red-400' : ''
+                            className={`w-full rounded-xl border bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
+                                hasSubmitted && errors.phone ? 'border-red-500 shadow-lg' : 'border-gray-400 dark:border-gray-400'
                             }`}
                             style={{
                                 fontSize: '16px',
@@ -507,7 +532,7 @@ const NewContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                 </div>
 
                 {/* Optional Toggle */}
-                <div className="space-y-3.5 mb-8">
+                <div className="space-y-4 mb-8">
                     {/* Birthdate Toggle and Field */}
                     <div className="space-y-2">
                         <div className="relative">
@@ -524,7 +549,7 @@ const NewContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                             ) : (
                                 <div>
                                     <div className="flex items-center justify-between">
-                                        <label htmlFor="birthdate" className="block relative left-2 text-sans text-black font-md">
+                                        <label htmlFor="birthdate" className="block relative left-2 top-3 left-4 bg-white px-1 text-sans text-black font-light">
                                             date of birth
                                         </label>
                                         <span className="relative right-1 font-light">
@@ -548,9 +573,8 @@ const NewContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                                         value={formData.birthdate}
                                         onChange={handleInputChange}
                                         disabled={showLoading}
-                                        className={`w-full p-2.5 rounded-xl mb-4 border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 ${
-                                            hasSubmitted && errors.birthdate ? 'border-red-400' : ''
-                                        }`}
+                                        className={`w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 
+                                            }`}
                                         style={{
                                             fontSize: '16px',
                                             fontWeight: 300
@@ -576,9 +600,9 @@ const NewContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                                     <span className="text-base text-black hover:text-red-500">add address</span>
                                 </button>
                             ) : (
-                                <div className="space-y-2">
+                                <div className="space-y-1 mt-7">
                                     <div className="flex items-center justify-between">
-                                        <span className="relative left-2 text-sans text-base text-black font-md">
+                                        <span className="relative left-2 mb-2 text-sans text-base text-black font-md">
                                             address information
                                         </span>
                                         <button
@@ -602,7 +626,7 @@ const NewContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                                     
                                     {/* Address Field */}
                                     <div className="relative">
-                                        <label htmlFor="address" className="block relative left-2 text-sans text-base text-black font-light">
+                                        <label htmlFor="address" className="absolute -top-3 left-4 bg-white px-1 text-sans text-base text-black font-light">
                                             street & nr°
                                         </label>
                                         <input 
@@ -613,11 +637,10 @@ const NewContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                                             onChange={handleInputChange}
                                             placeholder="greifwalder Str. 8"
                                             disabled={showLoading}
-                                            className={`w-full p-2.5 rounded-xl border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 ${
-                                                hasSubmitted && errors.address ? 'border-red-400' : ''
+                                            className={`w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 
                                             }`}
                                             style={{
-                                                fontSize: '16px',
+                                                fontSize: '18px',
                                                 fontWeight: 300
                                             }}
                                         />
@@ -629,7 +652,7 @@ const NewContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                                     {/* Postal Code and City in a row */}
                                     <div className="flex space-x-4">
                                         <div className="relative flex-1">
-                                            <label htmlFor="postalcode" className="block relative left-2 text-sans text-base text-black font-light">
+                                            <label htmlFor="postalcode" className="relative top-3 bg-white px-1 left-4 text-sans text-base text-black font-light">
                                                 postal code
                                             </label>
                                             <input 
@@ -640,8 +663,7 @@ const NewContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                                                 onChange={handleInputChange}
                                                 placeholder="10407"
                                                 disabled={showLoading}
-                                                className={`w-full p-2.5 rounded-xl border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 ${
-                                                    hasSubmitted && errors.postalcode ? 'border-red-400' : ''
+                                                className={`w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 
                                                 }`}
                                                 style={{
                                                     fontSize: '16px',
@@ -654,7 +676,7 @@ const NewContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                                         </div>
 
                                         <div className="relative flex-1">
-                                            <label htmlFor="city" className="block relative left-2 text-sans text-base text-black font-light">
+                                            <label htmlFor="city" className="relative top-3 bg-white px-1 left-4 text-sans text-base text-black font-light">
                                                 city
                                             </label>
                                             <input 
@@ -665,8 +687,7 @@ const NewContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                                                 onChange={handleInputChange}
                                                 placeholder="berlin"
                                                 disabled={showLoading}
-                                                className={`w-full p-2.5 rounded-xl border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 py-2.5 px-4 focus:outline-none focus:border-red-500 ${
-                                                    hasSubmitted && errors.city ? 'border-red-400' : ''
+                                                className={`w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 
                                                 }`}
                                                 style={{
                                                     fontSize: '16px',
@@ -681,7 +702,7 @@ const NewContactForm = ({ contact = {}, onSubmit, onCancel }) => {
 
                                     {/* Country Field */}
                                     <div className="relative">
-                                        <label htmlFor="country" className="block relative left-2 text-sans text-base text-black font-light">
+                                        <label htmlFor="country" className="relative top-3 bg-white px-1 left-4 text-sans text-base text-black font-light">
                                             country
                                         </label>
                                         <input 
@@ -692,8 +713,7 @@ const NewContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                                             onChange={handleInputChange}
                                             placeholder="germany"
                                             disabled={showLoading}
-                                            className={`w-full p-2.5 mb-5 rounded-xl border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 ${
-                                                hasSubmitted && errors.country ? 'border-red-400' : ''
+                                            className={`w-full rounded-xl mb-5 border border-gray-400 dark:border-gray-400 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 
                                             }`}
                                             style={{
                                                 fontSize: '16px',
@@ -713,18 +733,19 @@ const NewContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                 <div className="space-y-3.5 mb-8">   
                     {/* Notes Field */}
                     <div className="relative">
-                        <div className="flex items-center justify-between mt-5">
-                            <label htmlFor="notes" className="block relative left-2 text-sans text-base text-black font-light">
-                                any notes or things to remember?
+                        <p className="relative text-red-500 left-2 -mb-3 mt-5 font-light">notes?</p>
+                        <div className="flex items-center justify-between">
+                            <label htmlFor="notes" className="relative top-3 bg-white px-1 left-4 text-sans text-base text-black font-light">
+                                any important things to remember?
                             </label>
-                            <button
+                            {/* <button
                                 type="button"
                                 onClick={() => setExpandedNotes(!expandedNotes)}
                                 className="text-red-500 hover:text-red-600 relative right-1 text-sm font-light"
                                 disabled={showLoading}
                             >
                                 {expandedNotes ? 'show less' : 'show more'}
-                            </button>
+                            </button> */}
                         </div>
                         <textarea 
                             name="notes" 
@@ -734,8 +755,7 @@ const NewContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                             placeholder="every thought matters.."
                             disabled={showLoading}
                             rows={expandedNotes ? 6 : 3}
-                            className={`w-full p-2.5 mb-3 rounded-xl border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 transition-all duration-300 resize-none ${
-                                hasSubmitted && errors.notes ? 'border-red-400' : ''
+                            className={`w-full rounded-xl mb-5 border border-gray-400 dark:border-gray-400 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 
                             }`}
                             style={{
                                 fontSize: '16px',
@@ -766,8 +786,8 @@ const NewContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                             </button>
                         ) : (
                             <div className="space-y-2">
-                                <div className="flex items-center justify-between">
-                                    <span className="relative left-2 text-sans text-black font-md">do you remember...</span>
+                                <div className="flex items-center justify-between -mb-4">
+                                    <span className="relative left-2 text-sans text-red-500 font-light">do you remember...</span>
                                     <button
                                         type="button"
                                         onClick={() => {
@@ -787,7 +807,7 @@ const NewContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                                     
                                 {/* Last Contact Date Field */}
                                 <div className="relative">
-                                    <label htmlFor="lastContactDate" className="block relative left-2 text-sans text-base text-black font-light">
+                                    <label htmlFor="lastContactDate" className="relative left-2 top-3 left-4 bg-white px-1 text-sans text-base text-black font-light">
                                         the date of your last contact?
                                     </label>
                                     <input 
@@ -797,8 +817,7 @@ const NewContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                                             value={formData.lastContactDate}
                                             onChange={handleInputChange}
                                             disabled={showLoading}
-                                            className={`w-full p-2.5 rounded-xl border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 ${
-                                                hasSubmitted && errors.lastContactDate ? 'border-red-400' : ''
+                                            className={`w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 
                                             }`}
                                             style={{
                                                 fontSize: '16px',
@@ -812,7 +831,7 @@ const NewContactForm = ({ contact = {}, onSubmit, onCancel }) => {
 
                                 {/* Meeting Place Field */}
                                 <div className="relative">
-                                    <label htmlFor="meetingPlace" className="block relative left-2 text-sans text-base text-black font-light">
+                                    <label htmlFor="meetingPlace" className="relative left-2 top-3 left-4 bg-white px-1 text-sans text-base text-black font-light">
                                             the place where you met?
                                     </label>
                                     <input 
@@ -823,8 +842,7 @@ const NewContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                                             onChange={handleInputChange}
                                             placeholder="coffe shop, berlin ..."
                                             disabled={showLoading}
-                                            className={`w-full p-2.5 mb-4 rounded-xl border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 max-w-full min-w-[200px] focus:outline-none focus:border-red-500 ${
-                                                hasSubmitted && errors.meetingPlace ? 'border-red-400' : ''
+                                            className={`w-full mb-5 rounded-xl border border-gray-400 dark:border-gray-400 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 
                                             }`}
                                             style={{
                                                 fontSize: '16px',
@@ -882,10 +900,10 @@ const NewContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                                                 onChange={(e) => handleLinkChange(index, e.target.value)}
                                                 placeholder="https://example.com"
                                                 disabled={showLoading}
-                                                className="flex-1 p-2.5 rounded-xl border border-gray-500 bg-transparent text-black font-light placeholder-gray-300 focus:outline-none focus:border-red-500"
+                                                className="flex-1 p-2.5 w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500"
                                                 style={{
                                                     fontSize: '16px',
-                                                    fontWeight: 300
+                                                    fontWeight: 400
                                                 }}
                                             />
                                             {links.length > 1 && (
@@ -941,7 +959,7 @@ const NewContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                 want to cancel? {' '}
                 <button 
                     onClick={() => {
-                            navigate('/');
+                            navigate('/myspace/');
                     }}
                     className="font-light font-normal text-red-500 hover:underline bg-transparent border-none cursor-pointer"
                 >

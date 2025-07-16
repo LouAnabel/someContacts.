@@ -14,7 +14,7 @@ const Navbar = () => {
     // Add your search logic here
     if (searchTerm.trim()) {
       // Navigate to all contacts page (you can handle the filtering there)
-      navigate('/yourspace/contacts', { state: { searchTerm } });
+      navigate('/myspace/contacts', { state: { searchTerm } });
     }
   };
 

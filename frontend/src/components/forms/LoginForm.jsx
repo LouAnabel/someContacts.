@@ -141,7 +141,7 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
                      boxShadow: '0 4px 32px rgba(109, 71, 71, 0.29)'
                  }}>
                 
-                <h2 className="text-3xl font-bold text-center mb-9 text-black">login.</h2>
+                <h2 className="text-3xl font-bold text-center mb-12 text-black">login.</h2>
                 <div className="space-y-7">
                     <div className="mb-4 relative">
                         <input
@@ -160,7 +160,7 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
                         />
                         <label 
                             htmlFor="firstName" 
-                            className="absolute -top-3 left-4 bg-white px-2 text-base text-black font-light"
+                            className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-light"
                         >
                             email
                         </label>
@@ -169,14 +169,14 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
                         )}
                     </div>
 
-                    <div className="mb-4 relative ">
+                    <div className="relative ">
                         <input
                             type="password"
                             name="password"
                             value={formData.password}
                             onChange={handleInputChange}
                             placeholder="••••••••"
-                            className={`w-full rounded-xl border bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
+                            className={`w-full rounded-xl border bg-white mb-6 shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
                                         hasSubmitted && errors.firstName ? 'border-red-500 shadow-lg' : 'border-gray-400 dark:border-gray-400'
                             }`}
                                 style={{
@@ -186,7 +186,7 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
                         />
                         <label 
                             htmlFor="firstName" 
-                            className="absolute -top-3 left-4 bg-white px-2 text-base text-black font-light"
+                            className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-light"
                         >
                             password
                         </label>

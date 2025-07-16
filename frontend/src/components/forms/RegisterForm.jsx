@@ -192,7 +192,7 @@ const RegisterForm = () => {
                  style={{ 
                      boxShadow: '0 4px 32px rgba(109, 71, 71, 0.29)'
                  }}>
-                <h1 className="text-3xl font-bold text-center mb-10 text-black">
+                <h1 className="text-3xl font-bold text-center mb-12 text-black">
                     create an account.
                 </h1>
 
@@ -218,7 +218,7 @@ const RegisterForm = () => {
                             />
                             <label 
                                 htmlFor="firstName" 
-                                className="absolute -top-3 left-4 bg-white px-2 text-base text-black font-light"
+                                className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-light"
                             >
                                 first name
                             </label>
@@ -247,7 +247,7 @@ const RegisterForm = () => {
                             />
                             <label 
                                 htmlFor="lastName" 
-                                className="absolute -top-3 left-4 bg-white px-2 text-base text-black font-light"
+                                className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-light"
                             >
                                 last name
                             </label>
@@ -281,7 +281,7 @@ const RegisterForm = () => {
                             />
                             <label 
                                 htmlFor="email" 
-                                className="absolute -top-3 left-4 bg-white px-2 text-base text-black font-light"
+                                className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-light"
                             >
                                 email
                             </label>
@@ -310,7 +310,7 @@ const RegisterForm = () => {
                             />
                             <label 
                                 htmlFor="password" 
-                                className="absolute -top-3 left-4 bg-white px-2 text-base text-black font-light"
+                                className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-light"
                             >
                                 password
                             </label>
@@ -339,7 +339,7 @@ const RegisterForm = () => {
                             />
                             <label 
                                 htmlFor="confirmPassword" 
-                                className="absolute -top-3 left-4 bg-white px-2 text-base text-black font-light"
+                                className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-light"
                             >
                                 confirm password
                             </label>
