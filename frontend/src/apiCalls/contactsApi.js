@@ -2,7 +2,7 @@
 
 export async function getContacts(token) {
   try {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/myspace/contacts`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/contacts`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -15,20 +15,20 @@ export async function getContacts(token) {
     }   
     const data = await response.json();
     console.log('Fetched contacts:', data);
-    return data;
-    }
+    return data.contacts || []; // Ensure we return an array even if contacts is undefined
+  }
 
-    catch (error) {
-        alert(`Error fetching contacts: ${error.message}`);
-        console.error('Error fetching contacts:', error);
-        return [];
-    }   
+  catch (error) {
+      alert(`Error fetching contacts: ${error.message}`);
+      console.error('Error fetching contacts:', error);
+      return [];
+  }   
 }
 
 
 export async function getContactById(token, contactId) {
   try {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/myspace/contacts/${contactId}`, {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/contacts/${contactId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

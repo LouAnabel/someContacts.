@@ -51,7 +51,7 @@ def validate_date(date_string):
 
 
 # CREATE - add a new Contact
-@contacts_bp.route('', methods=['POST'])
+@contacts_bp.route('/', methods=['POST'])
 @jwt_required()
 def create_contact():
     logger.info("Starting contact creation process...")

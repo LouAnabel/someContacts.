@@ -1,5 +1,6 @@
 from app import create_app, db
 from flask_cors import CORS
+from flask import jsonify
 from app.models.user import User  # Import User Model
 from app.models.contact import Contact  # Import contact model
 from app.models.category import Category
@@ -15,7 +16,23 @@ os.environ.setdefault('FLASK_ENV', 'development')
 
 # Create the Flask app
 app = create_app()
-CORS(app)
+CORS(app,
+     origins=['http://localhost:5173', 'http://127.0.0.1:5173'],
+     allow_headers=['Content-Type', 'Authorization'],
+     methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+     supports_credentials=True
+)
+
+@app.route('/routes', methods=['GET'])
+def list_routes():
+    routes = []
+    for rule in app.url_map.iter_rules():
+        routes.append({
+            'endpoint': rule.endpoint,
+            'methods': list(rule.methods),
+            'rule': rule.rule
+        })
+    return jsonify(routes)
 
 # Initialize database for development
 # Create database tables

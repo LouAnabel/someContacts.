@@ -26,12 +26,12 @@ export default function AllContacts() {
         }
 
         const contactsData = await getContacts(accessToken);
+        
         setContacts(contactsData);
 
       } catch (error) {
         setError("Failed to fetch contacts. Please try again later.");
         console.error('Error fetching contacts:', error);
-
       } finally {
         setIsLoading(false);
       }
@@ -88,22 +88,22 @@ export default function AllContacts() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-20">
       <h1 className="w-full flex flex-col items-center justify-center text-3xl font-heading font-bold text-gray-900 dark:text-white mb-4">
-        All Contacts
+        All {contacts.length} Contacts 
       </h1>
-      <div className="">
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 -mt-10">
         {contacts.map((contact) => (
           <ContactCardSmall
-            key={contact._id || contact.id }
+            key={contact._id || contact.id}
             contact={contact}
-            className="mb-4"
           />
         ))}
       </div>
     </div>
-  )
-};
+  );
+}
 
 
 

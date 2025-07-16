@@ -3,15 +3,36 @@ import CircleButton from '../components/ui/Buttons';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useAuthContext } from "../context/AuthContextProvider";
+import { getContacts } from "../apiCalls/contactsApi";
 
 function Home() {
 
   const navigate = useNavigate()
+  const { accessToken } = useAuthContext();
   const { logout } = useAuthContext();
   const handleLogout = () => {
     logout();
     navigate('/login');
   }; 
+
+  const [contacts, setContacts] = useState([]);
+
+  useEffect(() => {
+    const fetchContacts = async () => {
+      try {
+        if (!accessToken) {
+          console.error("Access token is not available.");
+          return;
+        }
+
+        const contactsData = await getContacts(accessToken);
+        setContacts(contactsData);
+      } catch (error) {
+        console.error('Error fetching contacts:', error);
+      }
+    };
+    fetchContacts();
+  }, [accessToken]);
 
   return (
     <div className="container mx-auto px-4 py-20">
@@ -25,7 +46,7 @@ function Home() {
             <p className="text-xl font-text text-black dark:text-white mb-6">
               you already have collected{" "}
               <Link to="/myspace/contacts">
-                <span className="font-text font-semibold text-red dark:text-red hover:text-red-500 dark:hover:text-red-500"> 250</span>
+                <span className="font-text font-semibold text-red dark:text-red hover:text-red-500 dark:hover:text-red-500">{contacts.length}</span>
               </Link>
               {" "}contacts.
             </p>

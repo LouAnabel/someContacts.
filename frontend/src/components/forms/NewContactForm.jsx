@@ -237,11 +237,11 @@ const NewContactForm = ({ contact = {}, onSubmit, onCancel }) => {
              style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
 
             {/* Main Edit Contact Card */}
-            <div className="bg-white rounded-3xl p-6 relative z-10 overflow-visible w-[75vw] min-w-[260px] max-w-[480px] h-fit mx-auto"
+            <div className="bg-white rounded-3xl p-5 relative z-10 overflow-visible w-[88vw] min-w-[260px] max-w-[480px] h-fit mx-auto"
                  style={{ 
                      boxShadow: '0 4px 32px rgba(109, 71, 71, 0.29)'
                  }}>
-                <h1 className="text-3xl font-bold text-center mb-2 text-black">
+                <h1 className="text-3xl font-bold text-center mb-10 text-black">
                     new contact.
                 </h1>
 
@@ -937,9 +937,9 @@ const NewContactForm = ({ contact = {}, onSubmit, onCancel }) => {
 
                 {/* Circle Button - Outside the space-y-6 div but inside the card */}
                 <CircleButton
-                    size="large"
+                    size="xl"
                     variant="dark"
-                    className=" absolute -bottom-[60px] -right-[30px]"
+                    className="border border-white/30 absolute -bottom-[85px] -right-[10px]"
                     style={{ 
                         marginTop: '2rem', 
                         marginLeft: 'auto', 
@@ -954,7 +954,7 @@ const NewContactForm = ({ contact = {}, onSubmit, onCancel }) => {
             {/* dark:bg-red-600 hover:dark:bg-black hover:dark:border hover:dark:border-white */}
 
             {/* Back Link - Positioned at bottom left of card */}
-            <div className="absolute bottom-[-30px] left-5 text-black dark:text-white font-light"
+            <div className="text-black dark:text-white font-light block mt-8 absolute left-[20px]"
                  style={{ fontSize: '16px' }}>
                 want to cancel? {' '}
                 <button 
