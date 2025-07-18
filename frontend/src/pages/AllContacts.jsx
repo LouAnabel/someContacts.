@@ -1,4 +1,5 @@
 import ContactCardSmall from "../components/layout/ContactCardSmall"
+import ContactCardSmallPhoto from "../components/layout/ContactCardSmallPhoto";
 import { getContacts } from "../apiCalls/contactsApi";
 import { useEffect, useState } from "react";
 import { useAuthContext } from "../context/AuthContextProvider";
@@ -93,13 +94,21 @@ export default function AllContacts() {
         All {contacts.length} Contacts 
       </h1>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 md:gap-20 lg:gap-0 lg:mx-2 lg:px-16 xl:grid-cols-3 xl:gap-20 xl:px-4 -mt-10">
-        {contacts.map((contact) => (
-          <ContactCardSmall
-            key={contact._id || contact.id}
-            contact={contact}
-          />
-        ))}
+      <div className="">
+        <div className="grid grid-cols-1 md:grid-cols-2 md:gap-20 lg:gap-0 lg:mx-2 lg:px-16 xl:grid-cols-3 xl:gap-20 xl:px-4">
+          {contacts.map((contact) => (
+            <ContactCardSmall
+              key={contact._id || contact.id}
+              contact={contact}
+            />
+          ))}
+          {contacts.map((contact) => (
+              <ContactCardSmallPhoto
+                key={contact._id || contact.id}
+                contact={contact}
+              />
+            ))}
+        </div>  
       </div>
     </div>
   );

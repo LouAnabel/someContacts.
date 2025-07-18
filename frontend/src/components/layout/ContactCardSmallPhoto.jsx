@@ -3,7 +3,7 @@ import ContactMenuBar from "./ContactCardMenu";
 import ContactCardPhotoSmall from '../ui/ContactCardPhoto';
 import { useNavigate } from 'react-router';
 
-const ContactCardSmall = ({contact = {}}) => {
+const ContactCardSmallPhoto = ({contact = {}}) => {
     // Add this state declaration
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [contactPhoto, setContactPhoto] = useState(null);
@@ -25,27 +25,36 @@ const ContactCardSmall = ({contact = {}}) => {
          <div className="min-h-screen bg-white w-full dark:bg-black relative justify-items mx-auto px-4 py-10" 
              style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
 
-            {/* Main Login Card without Photo*/}
-            <div className="bg-gray-50 mt-10 rounded-3xl p-5 relative z-10 overflow-visible w-[88vw] min-w-[260px] max-w-[380px] h-fit absolute left-1/2 transform -translate-x-1/2"
+            {/* Main Login Card with Photo*/}
+            <div className="bg-gray-50 rounded-3xl p-5 relative z-10 overflow-visible w-[88vw] min-w-[260px] max-w-[380px] h-fit absolute left-1/2 transform -translate-x-1/2"
                  style={{ 
                      boxShadow: '0 4px 32px rgba(0, 0, 0, 0.3)'
                  }}>
-
-                 
-                <div className="flex items-center justify-between w-full ml-2 mt-2">
-                    {/* Name & Category */}
-                    <div className= "w-full relative justify-items">
-                        <h5 className="mb-1 text-2xl text-center ml-12 font-medium text-black">{contact.first_name} {contact.last_name}</h5>
-                    </div>
-                    <span className="flex justify-end px-5 pt-2 -mr-1">
-                    <ContactMenuBar 
-                            isMenuOpen={isMenuOpen} 
-                            setIsMenuOpen={setIsMenuOpen} 
+                   
+                 {/* Photo Field  */}
+                <div className="flex justify-end px-5 pt-2"> 
+                    {/* Photo Small */}
+                    <div className="flex flex-col items-center relative pb-1">
+                        <ContactCardPhotoSmall 
+                            photo={contactPhoto}
+                            name="Contact"
+                            className=""
                         />
+                    </div>
+                    {/* Dropdown Menu Button */}
+                    <span >
+                    <ContactMenuBar 
+                        isMenuOpen={isMenuOpen} 
+                        setIsMenuOpen={setIsMenuOpen} 
+                    />
                     </span>
                 </div>
-                <p className="text-lg text-black text-center -mt-2 mb-6">{contact.category.name}</p>
-                
+
+                {/* Name & Category */}
+                <div className= "w-full relative justify-items">
+                    <h5 className="mb-1 text-2xl text-center font-medium text-black hover:text-red-500" onClick="handleClickContact">{contact.first_name} {contact.last_name}</h5>
+                    <p className="text-lg text-black text-center -mt-2  hover:text-red-500">{contact.category.name}</p>
+                </div>
 
                 {/* Contact Details */}
                 <div className="w-full relative justify-items flex flex-col mt-5 mb-4 space-y-1">
@@ -61,7 +70,7 @@ const ContactCardSmall = ({contact = {}}) => {
                             aria-label={formData.isFavorite ? "Unmark as favorite" : "Mark as favorite"}
                         >
                             <svg 
-                                className={`w-6 h-6 mr-4 ${
+                                className={`w-6 h-6 mr-7 ${
                                     formData.isFavorite ? 'text-red-500 hover:text-yellow-300' : 'text-black hover:text-yellow-300'
                                 }`} 
                                 aria-hidden="true" 
@@ -88,9 +97,8 @@ const ContactCardSmall = ({contact = {}}) => {
                     </div>
                 </div>           
             </div>
-
         </div>
     )
 }
 
-export default ContactCardSmall;
+export default ContactCardSmallPhoto;

@@ -44,7 +44,7 @@ const ContactMenuBar = ({isMenuOpen, setIsMenuOpen}) => {
             }`}
             aria-label={isMenuOpen ? "Close menu" : "Open menu"}
         >
-            {isMenuOpen ? <HiX className="h-6 w-6" /> : <HiMenu className="h-6 w-6" />}
+            {isMenuOpen ? <HiX className="h-7 w-7" /> : <HiMenu className="h-7 w-7" />}
         </button>
 
         {isMenuOpen && (
