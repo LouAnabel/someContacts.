@@ -13,7 +13,7 @@ const ContactMenuBar = ({isMenuOpen, setIsMenuOpen}) => {
         { to: "/editcontact", firstPart: "edit", secondPart: "Contact." }
     ];
 
-    const linkClasses = "block top-20 px-4 py-1 pt-6 font-sans font-semibold text-lg dark:text-black hover:text-red-500 dark:hover:text-red-500 rounded-2xl ";
+    const linkClasses = "block px-3 pb-2 pt-1 font-sans font-semibold text-lg dark:text-black hover:text-red-500 dark:hover:text-red-500 rounded-2xl ";
 
     // Close menu when clicking outside
     useEffect(() => {
@@ -48,8 +48,8 @@ const ContactMenuBar = ({isMenuOpen, setIsMenuOpen}) => {
         </button>
 
         {isMenuOpen && (
-            <div className="fixed top-20 right-0 h-40 w-40 dark:text-black z-50 transform ease-in-out shadow-lg rounded-2xl border-radius">
-            <div className="space-y-2 p-2 tracking-wider">
+            <div className="fixed top-24 right-0 h-35 w-40 dark:text-black z-50 bg-white transform ease-in-out shadow-lg rounded-2xl border-radius">
+            <div className="space-y-2 p-3 tracking-wider">
                 {menuItems.map((item) => (
                 <Link
                     key={item.to}

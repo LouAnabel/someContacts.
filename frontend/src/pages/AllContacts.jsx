@@ -89,11 +89,11 @@ export default function AllContacts() {
 
   return (
     <div className="container mx-auto px-4 py-20">
-      <h1 className="w-full flex flex-col items-center justify-center text-3xl font-heading font-bold text-gray-900 dark:text-white mb-4">
+      <h1 className="w-full flex flex-col items-center justify-center text-3xl font-heading font-bold text-gray-900 dark:text-white mb-2 mt-6">
         All {contacts.length} Contacts 
       </h1>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 -mt-10">
+      <div className="grid grid-cols-1 md:grid-cols-2 md:gap-20 lg:gap-0 lg:mx-2 lg:px-16 xl:grid-cols-3 xl:gap-20 xl:px-4 -mt-10">
         {contacts.map((contact) => (
           <ContactCardSmall
             key={contact._id || contact.id}
