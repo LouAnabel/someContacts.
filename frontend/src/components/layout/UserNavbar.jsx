@@ -20,8 +20,8 @@ const Navbar = () => {
 
   // Common navigation items for desktop
   const navItems = [
-  { to: "/yourspace/contacts", firstPart: "all", secondPart: "Contacts." },
-  { to: "/yourspace/newcontact", firstPart: "new", secondPart: "Contact." }
+  { to: "/myspace/contacts", firstPart: "all", secondPart: "Contacts." },
+  { to: "/myspace/newcontact", firstPart: "new", secondPart: "Contact." }
 ];
 
   return (
@@ -60,7 +60,7 @@ const Navbar = () => {
               placeholder="search contacts..."
               onSearch={handleSearch}
             />
-            <div className="flex items-center text-lg space-x-5">
+            <div className="flex items-center text-xl space-x-5">
             {navItems.map((item) => (
               <Link 
                 key={item.to}
