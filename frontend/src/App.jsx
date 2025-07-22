@@ -6,7 +6,7 @@ import UserLayout from './components/layout/UserLayout';
 import AuthLayout from './components/layout/AuthLayout';  
 
 // Page components
-import Login from './pages/login';
+import Login from './pages/Login';
 import Register from './pages/Register';
 import Home from './pages/Home';
 import AllContacts from './pages/AllContacts';
@@ -32,7 +32,7 @@ function App() {
             {/* Nested routes for contacts */}
             <Route path="contacts" element={<AllContacts />} />
             <Route path="newcontact" element={<NewContact />} />
-            <Route path="contact" element={<ShowContact />} /> // Add :id param later
+            <Route path="contact" element={<ShowContact />} /> 
             <Route path="updatecontact/:id" element={<UpdateContacts />} />
           </Route>
         </Routes>

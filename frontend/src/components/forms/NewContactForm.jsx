@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import CircleButton from '../ui/Buttons';
 import { useNavigate } from 'react-router-dom';
+import { createContact } from '../../apiCalls/contactsApi';
 
-const NewContactForm = ({ contact = {}, onSubmit, onCancel }) => {
+const NewContactForm = ({onSubmit, onCancel }) => {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         firstName: '',
@@ -237,7 +238,7 @@ const NewContactForm = ({ contact = {}, onSubmit, onCancel }) => {
              style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
 
             {/* Main Edit Contact Card */}
-            <div className="bg-white rounded-3xl p-5 relative z-10 overflow-visible w-[88vw] min-w-[260px] max-w-[480px] lg:max-w-[720px] h-fit mx-auto"
+            <div className="bg-white rounded-3xl p-5 relative z-10 overflow-visible w-[88vw] min-w-[260px] max-w-[480px]  h-fit mx-auto"
                  style={{ 
                      boxShadow: '0 4px 32px rgba(109, 71, 71, 0.29)'
                  }}>

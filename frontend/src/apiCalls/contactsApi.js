@@ -48,3 +48,27 @@ export async function getContactById(token, contactId) {
     return null;
   }
 }
+
+
+export async function createContact(token, contactData) {
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/contacts`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(contactData)
+    });     
+    if (!response.ok) {
+      throw new Error(`Error: ${response.status} ${response.statusText}`);
+    }
+    const data = await response.json();
+    console.log('Contact created:', data);
+    return data;
+  } catch (error) {
+    alert(`Error creating contact: ${error.message}`);
+    console.error('Error creating contact:', error);
+    return null;
+  }
+} 
