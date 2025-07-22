@@ -51,7 +51,7 @@ const NewContact = () => {
             </div>
             
             {/* Contact Form */}
-            <div className="w-full pb-40">
+            <div className="w-full pb-40 border border-green-500">
                 <NewContactForm 
                     onSubmit={handleSubmit}
                     onCancel={handleCancel}

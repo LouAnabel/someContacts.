@@ -71,4 +71,5 @@ const PhotoField = ({ photo, name, onUpload, onTakePhoto, className = "" }) => {
     );
 };
 
+
 export default PhotoField;

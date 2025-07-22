@@ -43,10 +43,10 @@ function UserLayout() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white font-sans flex flex-col">
+    <div className="min-h-screen border-purple-500 border-4 bg-white dark:bg-black text-black dark:text-white font-sans flex flex-col">
       <Navbar />
       
-      <main className="pt-16 flex-grow">
+      <main className="pt-16 flex-grow w-full">
         <Outlet />
       </main>
       {/* <Footer /> */}

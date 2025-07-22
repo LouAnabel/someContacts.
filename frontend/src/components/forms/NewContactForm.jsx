@@ -237,7 +237,7 @@ const NewContactForm = ({ contact = {}, onSubmit, onCancel }) => {
              style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
 
             {/* Main Edit Contact Card */}
-            <div className="bg-white rounded-3xl p-5 relative z-10 overflow-visible w-[88vw] min-w-[260px] max-w-[480px] h-fit mx-auto"
+            <div className="bg-white rounded-3xl p-5 relative z-10 overflow-visible w-[88vw] min-w-[260px] max-w-[480px] lg:max-w-[720px] h-fit mx-auto"
                  style={{ 
                      boxShadow: '0 4px 32px rgba(109, 71, 71, 0.29)'
                  }}>
@@ -687,7 +687,7 @@ const NewContactForm = ({ contact = {}, onSubmit, onCancel }) => {
                                                 onChange={handleInputChange}
                                                 placeholder="berlin"
                                                 disabled={showLoading}
-                                                className={`w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 
+                                                className={`w-full rounded-xl border border-gray-400  dark:border-gray-400 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[150px] h-[48px] focus:outline-none focus:border-red-500 
                                                 }`}
                                                 style={{
                                                     fontSize: '16px',
