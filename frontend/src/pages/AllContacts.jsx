@@ -91,7 +91,7 @@ export default function AllContacts() {
 
   // Render contacts if available
   return (
-    <div className="w-full border border-green-500 2xl:flex 2xl:flex-col 2xl:items-center">
+    <div className="w-full 2xl:flex 2xl:flex-col 2xl:items-center">
       <h1 className="w-full justify-content pt-10 text-center text-3xl font-heading font-bold text-gray-900 dark:text-white mb-2 mt-6">
         All <span className="text-red-500">{contacts.length} </span> Contacts
       </h1>
