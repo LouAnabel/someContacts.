@@ -22,10 +22,10 @@ const ContactCardSmall = ({contact = {}}) => {
     }
 
     return (
-         <div className="bg-white dark:bg-black relative justify-items" 
+         <div className="bg-white dark:bg-black relative justify-items " //border border-purple-500
              style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
 
-            <div className="bg-gray-50 min-w-96 max-w-md rounded-3xl p-5 relative z-10 overflow-visible  h-fit absolute left-1/2 transform -translate-x-1/2"
+            <div className="relative bg-gray-50 min-w-96 max-w-md rounded-3xl p-5 z-10 overflow-visible  h-fit left-1/2 transform -translate-x-1/2"
                  style={{ 
                      boxShadow: '0 4px 32px rgba(0, 0, 0, 0.3)'
                  }}>

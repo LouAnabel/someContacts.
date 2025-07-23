@@ -96,7 +96,7 @@ export default function AllContacts() {
         All <span className="text-red-500">{contacts.length} </span> Contacts
       </h1>
       {/* <div className="p-10 gap-10 flex flex-col md:flex-row max-w-fit md:flex-wrap justify-center items-center border border-blue-500"> */}
-      <div className="p-10 gap-10 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 border border-blue-500 max-w-screen-2xl">
+      <div className="p-10 gap-10 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3  0 max-w-screen-2xl"> 
 
    {contacts.map((contact) => (
             <ContactCardSmall

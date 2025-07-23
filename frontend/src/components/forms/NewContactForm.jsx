@@ -176,7 +176,7 @@ useEffect(() => {
                 console.log('✅ Category added successfully:', newCategory.name);
                 
             } catch (error) {
-                console.error('❌ Failed to add category:', error);
+                console.error('Failed to add category:', error);
                 alert(`Failed to add category: ${error.message}`);
             } finally {
                 setIsAddingCategory(false);
@@ -427,7 +427,7 @@ useEffect(() => {
                                 setShowCategoryDropdown(!showCategoryDropdown);
                             }}
                             disabled={isLoading}
-                            className={`w-full p-2.5 rounded-xl border bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 font-light max-w-full min-w-[200px] focus:outline-none focus:border-red-500 flex items-center justify-between ${
+                            className={`w-full p-2.5 rounded-xl border bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black placeholder-gray-200 font-light max-w-full min-w-[200px] focus:outline-none focus:border-red-500 flex items-center justify-between ${
                                 hasSubmitted && errors.category ? 'border-red-500 shadow-lg' : 'border-gray-400 dark:border-gray-400'
                             }`}
                             style={{
@@ -646,7 +646,7 @@ useEffect(() => {
                             ) : (
                                 <div>
                                     <div className="flex items-center justify-between">
-                                        <label htmlFor="birthdate" className="block relative left-2 top-3 left-4 bg-white px-1 text-sans text-black font-light">
+                                        <label htmlFor="birthdate" className="block relative top-3 left-4 bg-white px-1 text-sans text-black font-light">
                                             date of birth
                                         </label>
                                         <span className="relative right-1 font-light">
@@ -890,7 +890,7 @@ useEffect(() => {
                                     
                                 {/* Last Contact Date Field */}
                                 <div className="relative">
-                                    <label htmlFor="lastContactDate" className="relative left-2 top-3 left-4 bg-white px-1 text-sans text-base text-black font-light">
+                                    <label htmlFor="lastContactDate" className="relative top-3 left-4 bg-white px-1 text-sans text-base text-black font-light">
                                         the date of your last contact?
                                     </label>
                                     <input 
@@ -913,7 +913,7 @@ useEffect(() => {
 
                                 {/* Meeting Place Field */}
                                 <div className="relative">
-                                    <label htmlFor="meetingPlace" className="relative left-2 top-3 left-4 bg-white px-1 text-sans text-base text-black font-light">
+                                    <label htmlFor="meetingPlace" className="relative top-3 left-4 bg-white px-1 text-sans text-base text-black font-light">
                                         the place where you met?
                                     </label>
                                     <input 
