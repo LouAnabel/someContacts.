@@ -901,7 +901,7 @@ const ShowContactForm = () => {
             size="xl"
             variant="dark"
           onClick={handleEdit}
-          className="border border-white/30 absolute -bottom-[85px] -right-[10px]"
+          className=" absolute -bottom-[85px] -right-[10px]"
           style={{ 
             marginTop: '2rem', 
             marginLeft: 'auto', 
