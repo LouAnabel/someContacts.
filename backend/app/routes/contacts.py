@@ -4,6 +4,7 @@ from app import db
 from app.models.user import User
 from app.models.contact import Contact
 from app.models.category import Category
+from app.models.contact_links import ContactLinks
 import re
 from datetime import datetime
 import logging
@@ -47,7 +48,16 @@ def validate_date(date_string):
         logger.debug(f"Date validation for '{date_string}': invalid format")
         return False
 
-
+def validate_url(url):
+    """Basic URL validation"""
+    url_pattern = re.compile(
+        r'^https?://'  # http:// or https://
+        r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+[A-Z]{2,6}\.?|'  # domain...
+        r'localhost|'  # localhost...
+        r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'  # ...or ip
+        r'(?::\d+)?'  # optional port
+        r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+    return url_pattern.match(url) is not None
 
 
 # CREATE - add a new Contact
@@ -130,6 +140,27 @@ def create_contact():
         )
         
         db.session.add(contact)
+        db.session.flush() # Get the Contact ID before committing
+
+        # Handle links if provided
+        links = data.get('links', [])
+        if links:
+            for link_url in links:
+                if link_url and link_url.strip():  # Skip empty links
+                    url = link_url.strip()
+
+                    # Add https:// if not present
+                    if not url.startswith(('http://', 'https://')):
+                        url = 'https://' + url
+
+                    # Validate URL format
+                    if validate_url(url):
+                        contact_link = ContactLinks(
+                            contact_id=contact.id,
+                            url=url
+                        )
+                        db.session.add(contact_link)
+
         db.session.commit()
         logger.info(f"Contact created successfully: {contact.first_name} {contact.last_name or ''} (ID: {contact.id})")
 
@@ -525,7 +556,30 @@ def update_contact(contact_id):
             contact.country = data['country'].strip() if data['country'] else None
         if 'notes' in data:
             contact.notes = data['notes'].strip() if data['notes'] else None
-        
+
+            # Handle links update if provided
+            if 'links' in data:
+                # Remove existing links
+                ContactLinks.query.filter_by(contact_id=contact_id).delete()
+
+                # Add new links
+                links = data.get('links', [])
+                for link_url in links:
+                    if link_url and link_url.strip():  # Skip empty links
+                        url = link_url.strip()
+
+                        # Add https:// if not present
+                        if not url.startswith(('http://', 'https://')):
+                            url = 'https://' + url
+
+                        # Validate URL format
+                        if validate_url(url):
+                            contact_link = ContactLinks(
+                                contact_id=contact_id,
+                                url=url
+                            )
+                            db.session.add(contact_link)
+
         # Update timestamp
         contact.updated_at = db.func.current_timestamp()
         
