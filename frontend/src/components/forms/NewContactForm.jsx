@@ -259,7 +259,7 @@ useEffect(() => {
 
             // navigate to the new contact page
             if (NewContactData && NewContactData.id) {
-                navigate(`/myspace/contact/${NewContactData.id}`, { replace: true });
+                navigate(`/myspace/contacts`, { replace: true });
                 // navigate(`/myspace/contact/${NewContactData.id}`, { replace: true });
             } else {
                 console.error('New contact data is missing ID:', NewContactData);
@@ -480,7 +480,7 @@ useEffect(() => {
                                                 className="w-full text-left px-3 py-2 hover:bg-gray-50 hover:text-red-500 text-black font-light last:border-b-0"
                                                 style={{ fontSize: '16px', fontWeight: 300 }}
                                             >
-                                                {category.name} <span className="text-xs text-gray-400">(ID: {category.id})</span>
+                                                {category.name} 
                                             </button>
                                         ))}
                                         
@@ -840,7 +840,7 @@ useEffect(() => {
                             placeholder="every thought matters.."
                             disabled={isLoading}
                             rows={expandedNotes ? 6 : 3}
-                            className={`w-full rounded-xl mb-5 border border-gray-400 dark:border-gray-400 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
+                            className={`w-full rounded-xl mb-5 pt-4 border border-gray-400 dark:border-gray-400 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
                             style={{
                                 fontSize: '16px',
                                 fontWeight: 300,
@@ -854,7 +854,7 @@ useEffect(() => {
                 </div>
 
                 {/* Optional Toggle Field */}
-                <div className="space-y-2 mb-8">
+                <div className="space-y-2 mb-8 -mt-5">
                     {/* Contact Details Toggle and Fields */}
                     <div className="relative">
                         {!showContactDetails ? (
