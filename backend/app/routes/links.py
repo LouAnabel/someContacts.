@@ -56,6 +56,7 @@ def get_contact_links(contact_id):
         return jsonify({'error': str(e)}), 500
 
 
+
 @contacts_bp.route('/contacts/<int:contact_id>/links', methods=['POST'])
 @jwt_required()
 def add_contact_link(contact_id):

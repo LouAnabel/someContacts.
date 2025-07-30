@@ -1,12 +1,11 @@
 from app import db
-from sqlalchemy import text
 from datetime import datetime, timezone
 
 class ContactLinks(db.Model):
     __tablename__ = 'contact_links'
 
     id = db.Column(db.Integer, primary_key=True)
-    contact_id = db.Column(db.Integer, db.ForeignKey('contact.id', ondelete='CASCADE'), nullable=False)
+    contact_id = db.Column(db.Integer, db.ForeignKey('contacts.id', ondelete='CASCADE'), nullable=False)
     url = db.Column(db.String(500), nullable=False)
     title = db.Column(db.String(100), nullable=True)
     link_type = db.Column(db.String(50), nullable=True)
@@ -22,11 +21,7 @@ class ContactLinks(db.Model):
         db.Index('idx_contact_links', 'contact_id'),
         # Ensure URL is not empty
         db.CheckConstraint('length(url) > 0', name='check_url_not_empty'),
-        # Basic URL format validation (starts with http/https)
-        db.CheckConstraint(
-            "url ~ '^https?://'",
-            name='check_url_format'
-        ),
+        db.CheckConstraint("url LIKE 'http%'", name='check_url_format'),
     )
 
     def to_dict(self):
