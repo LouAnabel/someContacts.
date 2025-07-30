@@ -188,7 +188,7 @@ const RegisterForm = () => {
              style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
 
             {/* Main Register Card */}
-            <div className="bg-white rounded-3xl p-5 relative z-10 overflow-visible w-[88vw] min-w-[260px] max-w-[480px] h-fit absolute left-1/2 transform -translate-x-1/2"
+            <div className="bg-white rounded-3xl p-5 relative z-10 overflow-visible w-[88vw] min-w-[260px] max-w-[480px] h-fit left-1/2 transform -translate-x-1/2"
                  style={{ 
                      boxShadow: '0 4px 32px rgba(109, 71, 71, 0.29)'
                  }}>
@@ -286,7 +286,7 @@ const RegisterForm = () => {
                                 email
                             </label>
                             {hasSubmitted && errors.email && (
-                                <p className="absolute top-full font-light right-0 text-sm font-light text-red-600 z-20">{errors.email}</p>
+                                <p className="absolute top-full font-light right-0 text-sm text-red-600 z-20">{errors.email}</p>
                             )}
                         </div>
 
@@ -393,7 +393,7 @@ const RegisterForm = () => {
             <div className="text-black dark:text-white font-light block mt-3 absolute left-[40px]"
                  style={{ fontSize: '16px' }}>
                 already have an account? {' '}
-                <a href="login" className="font-light font-normal text-red-500 hover:underline">
+                <a href="login" className="font-light text-red-500 hover:underline">
                      login here.
                 </a>
             </div>

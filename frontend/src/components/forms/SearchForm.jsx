@@ -146,7 +146,7 @@ const SearchForm = ({
               {/* Submit Button */}
               <button 
                 type="submit" 
-                className="py-2.5 px-2.5 text-sm font-medium bg-black bg-red-500 text-white rounded-e-md hover:bg-red-200 hover:text-red-500 dark:hover:bg-red-200 hover:dark:text-red-500"
+                className="py-2.5 px-2.5 text-sm font-medium bg-red-500 text-white rounded-e-md hover:bg-red-200 hover:text-red-500 dark:hover:bg-red-200 hover:dark:text-red-500"
               >
                 <svg className="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
                   <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
