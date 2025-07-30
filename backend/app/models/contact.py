@@ -1,3 +1,5 @@
+from typing import Dict, Any, List
+
 from app import db
 from sqlalchemy import text
 from datetime import datetime, timezone
@@ -15,10 +17,10 @@ class Contact(db.Model):
     last_name = db.Column(db.String(100), nullable=True)  # Optional
     email = db.Column(db.String(255), nullable=True)  # Optional and removed unique constraint
     phone = db.Column(db.String(20), nullable=True)
-    is_favorite = db.Column(db.Boolean, default=False, nullable=False)
+    is_favorite = db.Column(db.Boolean, default=False, nullable=True)
     
     # Additional fields that your to_dict() method expects
-    category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=True)
+    category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=False)
     birth_date = db.Column(db.Date,nullable=True)
     last_contact_date = db.Column(db.Date, nullable=True)
     last_contact_place = db.Column(db.String(200), nullable=True)
@@ -27,6 +29,7 @@ class Contact(db.Model):
     city = db.Column(db.String(100), nullable=True)
     country = db.Column(db.String(100), nullable=True)
     notes = db.Column(db.String(2000))
+    links = db.relationship('ContactLinks', backref='contact', lazy='dynamic', cascade='all, delete-orphan')
     
     # Timestamps
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
@@ -47,8 +50,8 @@ class Contact(db.Model):
         db.CheckConstraint('birth_date <= CURRENT_DATE', name='check_birth_date_not_future'),
     )
 
-    def to_dict(self, include_category=True):
-        data = {
+    def to_dict(self, include_category=True, include_links=True):
+        data: dict[str | Any, None | dict[str, Any] | list[Any] | Any] = {
             'id': self.id,
             'creator_id': self.creator_id,
             'first_name': self.first_name,
@@ -74,6 +77,9 @@ class Contact(db.Model):
                 'id': self.category.id,
                 'name': self.category.name
             }
+
+        if include_links:
+            data['links'] = [link.to_dict() for link in self.links.all()]
 
         return data
 
