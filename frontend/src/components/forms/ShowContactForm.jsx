@@ -319,7 +319,7 @@ const ShowContactForm = ({id}) => {
         links: links.filter(link => link.trim() !== '')
       };
       
-
+      console.log(updatedFormData)
       setFormData(updatedFormData);
       setContactData(ApiDataToFormData(updatedFormData));
       setIsEditing(false);
@@ -429,8 +429,8 @@ const ShowContactForm = ({id}) => {
                 style={{ 
                     boxShadow: '0 4px 32px rgba(109, 71, 71, 0.29)'
                 }}>
-                <h1 className="text-3xl font-bold text-center mb-10 text-black">
-                    edit.
+                <h1 className="text-3xl font-bold text-center mb-10 mt-6 text-black">
+                    edit <span className= "text-red-500"> {formData.firstName}.</span>
                 </h1>
 
                 {/* Favorite Checkbox */}
@@ -942,7 +942,7 @@ const ShowContactForm = ({id}) => {
             </div>
 
             {/* Back Link */}
-            <div className="text-black dark:text-white font-light block mt-3 relative -ml-64"
+            <div className="text-black dark:text-white font-light block mt-3 relative -ml-40 mb-36"
                 style={{ fontSize: '16px' }}>
                 want to cancel? {' '}
                 <button 
@@ -974,8 +974,8 @@ const ShowContactForm = ({id}) => {
         
         {/* Header with Name and Favorite */}
         <div className="text-center mb-8">
-          <div className="flex items-center justify-center space-x-4 mb-3 ml-5 mt-8">
-            <h1 className="text-3xl font-bold text-black">
+          <div className="flex items-center justify-center space-x-10 mb-3 ml-5 mt-8">
+            <h1 className="text-3xl ml-14 font-bold text-black">
               {formData.firstName} {formData.lastName}
             </h1>
           
@@ -1004,7 +1004,7 @@ const ShowContactForm = ({id}) => {
           
           
           {/* Category Badge */}
-          <span className="inline-block px-4 py-2 bg-red-100 text-red-600 rounded-full text-lg font-light">
+          <span className="inline-block px-4 py-2 bg-red-100 text-red-600 rounded-full text-base -mt-1 mb-2 font-light">
             {formData.category}
           </span>
         </div>
@@ -1014,14 +1014,14 @@ const ShowContactForm = ({id}) => {
         <div className="space-y-6 mb-8">
           {/* Contact Methods */}
           <div className="space-y-2">
-            <h3 className="text-red-500 font-light text-md ml-3 -mb-4">how to contact?</h3>
+            <h3 className="text-red-500 font-light text-sm ml-3 -mb-4">how to contact?</h3>
             
             {/* Email */}
             <div className="bg-gray-50 rounded-xl p-3">
               <div className="text-black font-light text-sm">email</div>
               <a 
                 href={`mailto:${formData.email}`}
-                className="text-black text-xl font-light hover:text-red-500 transition-colors"
+                className="text-black text-normal font-light hover:text-red-500 transition-colors"
               >
                 {formData.email}
               </a>
@@ -1033,7 +1033,7 @@ const ShowContactForm = ({id}) => {
                 <div className="text-black font-light text-sm">phone</div>
                 <a 
                   href={`tel:${formData.phone}`}
-                  className="text-black text-xl font-light hover:text-red-500 transition-colors"
+                  className="text-black text-normal font-light hover:text-red-500 transition-colors"
                 >
                   {formData.phone}
                 </a>
@@ -1044,9 +1044,9 @@ const ShowContactForm = ({id}) => {
           {/* Birthday */}
           {formData.birthdate && (
             <div className="space-y-2">
-              <h3 className="text-red-500 font-light text-base ml-3 -mb-4">date of birth</h3>
+              <h3 className="text-red-500 font-light text-sm ml-3 -mb-4">date of birth</h3>
               <div className="bg-gray-50 rounded-xl p-3">
-                <div className="text-black text-xl font-light">
+                <div className="text-black text-normal font-light">
                   {formatDate(formData.birthdate)}
                 </div>
               </div>
@@ -1056,9 +1056,9 @@ const ShowContactForm = ({id}) => {
           {/* Address */}
           {(formData.streetAndNr || formData.city || formData.country) && (
             <div className="space-y-2">
-              <h3 className="text-red-500 font-light text-base ml-3 -mb-4">address</h3>
+              <h3 className="text-red-500 font-light text-sm ml-3 -mb-4">address</h3>
               <div className="bg-gray-50 rounded-xl p-3">
-                <div className="text-black text-xl font-light -space-y-1">
+                <div className="text-black text-normal font-light -space-y-1">
                   {formData.streetAndNr && <div>{formData.streetAndNr},</div>}
                   <div>
                     {formData.postalcode && `${formData.postalcode} `}
@@ -1073,9 +1073,9 @@ const ShowContactForm = ({id}) => {
           {/* Notes */}
           {formData.notes && (
             <div className="space-y-2">
-              <h3 className="text-red-500 font-light text-base ml-3 -mb-4">notes</h3>
+              <h3 className="text-red-500 font-light text-sm ml-3 -mb-4">notes</h3>
               <div className="bg-gray-50 rounded-xl p-3 ">
-                <div className="text-black text-xl font-light whitespace-pre-wrap ">
+                <div className="text-black text-normal font-light whitespace-pre-wrap ">
                   {formData.notes}
                 </div>
               </div>
@@ -1085,12 +1085,12 @@ const ShowContactForm = ({id}) => {
           {/* Contact History */}
           {(formData.lastContactDate || formData.meetingPlace) && (
             <div className="space-y-2">
-              <h3 className="text-red-500 font-light text-base ml-3 -mb-4">contact history</h3>
+              <h3 className="text-red-500 font-light text-sm ml-3 -mb-4">contact history</h3>
               <div className="bg-gray-50 rounded-xl p-3 space-y-2">
                 {formData.lastContactDate && (
                   <div>
                     <span className="text-black font-light text-sm">last contact:</span>
-                    <span className="text-black text-xl font-light ml-6">
+                    <span className="text-black text-normal font-light ml-6">
                       {formatDate(formData.lastContactDate)}
                     </span>
                   </div>
@@ -1098,7 +1098,7 @@ const ShowContactForm = ({id}) => {
                 {formData.meetingPlace && (
                   <div>
                     <span className="text-black font-light text-sm">met at:</span>
-                    <span className="text-black text-xl font-light ml-14">
+                    <span className="text-black text-normal font-light ml-14">
                       {formData.meetingPlace}
                     </span>
                   </div>
@@ -1110,17 +1110,17 @@ const ShowContactForm = ({id}) => {
           {/* Links */}
           {formData.links && formData.links.length > 0 && (
             <div className="space-y-2">
-              <h3 className="text-red-500 font-light text-base ml-3 -mb-2">links</h3>
+              <h3 className="text-red-500 font-light text-sm ml-3 -mb-4">links</h3>
               <div className="space-y-2">
                 {formData.links.map((link, index) => (
                   <div key={index} className="bg-gray-50 rounded-xl p-3">
                     <a 
-                      href={link}
+                      href={link.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-black text-base font-light hover:text-red-500 transition-colors break-all"
+                      className="text-black text-normal font-light hover:text-red-500 transition-colors break-all"
                     >
-                      {link}
+                      {link.url}
                     </a>
                   </div>
                 ))}
@@ -1148,7 +1148,7 @@ const ShowContactForm = ({id}) => {
       </div>
 
       {/* Back Link */}
-      <div className="text-black dark:text-white font-light block mt-3 relative -ml-48"
+      <div className="text-black dark:text-white font-light block mt-3 relative -ml-56 mb-36"
           style={{ fontSize: '16px' }}>
         want to go back? {' '}
         <button 

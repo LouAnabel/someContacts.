@@ -1,11 +1,12 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { HiMenu, HiX } from 'react-icons/hi';
 import { buttonStyles } from '../ui/Buttons';
 import { useRef, useEffect } from 'react';
 
+
 const ContactMenuBar = ({isMenuOpen, setIsMenuOpen}) => {
     
-    // const navigate = useNavigate();
+    const navigate = useNavigate();
     const menuRef = useRef(null);
 
     const menuItems = [

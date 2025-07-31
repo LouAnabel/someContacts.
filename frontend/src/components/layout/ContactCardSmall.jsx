@@ -34,14 +34,21 @@ const ContactCardSmall = ({contact = {}}) => {
                 <div className="flex items-center justify-between w-full ml-2 mt-2">
                     {/* Name & Category */}
                     <div className= "w-full relative justify-items">
-                        <h5 className="mb-1 text-2xl text-center ml-12 font-medium text-black">{contact.first_name} {contact.last_name}</h5>
+                        <h5 className="mb-1 text-2xl text-center font-medium text-black">
+                            <a 
+                                href={`contacts/${contact.id}`}
+                                className=" hover:text-red-500 transition-colors"
+                                >
+                                {contact.first_name} {contact.last_name}
+                            </a>
+                        </h5>
                     </div>
-                    <span className="flex justify-end px-5 pt-2 -mr-1">
+                    {/* <span className="flex justify-end px-5 pt-2">
                     <ContactMenuBar 
                             isMenuOpen={isMenuOpen} 
                             setIsMenuOpen={setIsMenuOpen} 
                         />
-                    </span>
+                    </span> */}
                 </div>
                 <p className="text-lg text-black text-center -mt-2 mb-6">{contact.category.name}</p>
                 
@@ -56,7 +63,7 @@ const ContactCardSmall = ({contact = {}}) => {
                         <button
                             type="button"
                             onClick={() => setFormData(prev => ({ ...prev, isFavorite: !prev.isFavorite }))}
-                            className="flex items-center hover:scale-110 transform -mr-2"
+                            className="flex items-center hover:scale-110 transform -mr-3"
                             aria-label={formData.isFavorite ? "Unmark as favorite" : "Mark as favorite"}
                         >
                             <svg 
