@@ -70,9 +70,9 @@ export async function createContact(token, contactData) {
     console.log('Contact created:', data);
     return data;
   } catch (error) {
-    alert(`Error creating contact: ${error.message}`);
+    
     console.error('Error creating contact:', error);
-    return null;
+    throw error;
   }
 } 
 
@@ -89,23 +89,21 @@ export async function updateContact(token, contactId, contactData) {
       body: JSON.stringify(contactData)
     });  
     
+    console.log("In API File: Response status:", response.status)
+
     if (!response.ok) {
       throw new Error(`Error: ${response.status} ${response.statusText}`);
     }
 
     const data = await response.json();
-    console.log('Contact updated:', data);
-    return data;
+    console.log('Contact updated successfully:', data);
+    return data.contact || data;
 
   } catch (error) {
-    alert(`Error updating contact: ${error.message}`);
     console.error('Error creating contact:', error);
-    return null;
+    throw error;
   }
 } 
-
-
-
 
 
 

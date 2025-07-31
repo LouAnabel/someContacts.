@@ -4,6 +4,11 @@ import ContactCardPhotoSmall from '../ui/ContactCardPhoto';
 import { useNavigate } from 'react-router';
 
 const ContactCardSmall = ({contact = {}}) => {
+
+    console.log(contact)
+    console.log(contact.category)
+    console.log(contact.category?.name)
+
     // Add this state declaration
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [contactPhoto, setContactPhoto] = useState(null);
@@ -50,7 +55,7 @@ const ContactCardSmall = ({contact = {}}) => {
                         />
                     </span> */}
                 </div>
-                <p className="text-lg text-black text-center -mt-2 mb-6">{contact.category.name}</p>
+                <p className="text-lg text-black text-center -mt-2 mb-6">{contact.category?.name}</p>
                 
 
                 {/* Contact Details */}

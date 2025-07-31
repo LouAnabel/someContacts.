@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CircleButton from '../ui/Buttons';
 import { useAuthContext } from '../../context/AuthContextProvider';
-import { getContactById, getCategories } from '../../apiCalls/contactsApi';
+import { getContactById, getCategories, updateContact } from '../../apiCalls/contactsApi';
 
 
 const ShowContactForm = ({id}) => {
@@ -259,14 +259,23 @@ const ShowContactForm = ({id}) => {
     
     if (!formData.firstName?.trim()) newErrors.firstName = 'First name is required';
     if (!formData.lastName?.trim()) newErrors.lastName = 'Last name is required';
-    if (!formData.category) newErrors.category = 'Category is required';
+    
+    // Category validation for both string and object formats
+    const categoryValue = typeof formData.category === 'string' 
+      ? formData.category 
+      : formData.category?.name;
+    
+    if (!categoryValue) {
+      newErrors.category = 'Category is required';
+    }
+
     if (!formData.email?.trim()) {
       newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Please enter a valid email';
     }
     
-    // Phone validation (optional but if provided, should be valid)
+    // Phone validation 
     if (formData.phone && formData.phone.trim() && !/^\+?[\d\s\-\(\)]{10,}$/.test(formData.phone.trim())) {
         newErrors.phone = 'Please enter a valid phone number';
     }
@@ -291,55 +300,82 @@ const ShowContactForm = ({id}) => {
           throw new Error("Access token is not available.");
       }
 
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // // Update contact data with form data
-      // const updatedData = { ...formData };
-      // if (showLinks) {
-      //   updatedData.links = links.filter(link => link.trim() !== '');
-      // }
+      console.log('Current formData before save:', formData)
+
+      let categoryId = null;
+      if (formData.category) {
+        // if categor is string, find the category object
+        if (typeof formData.category === 'string') {
+          const selectedCategory = categories.find( cat => cat.name === formData.category);
+          categoryId = selectedCategory ? selectedCategory.id : null;
+        } else if (formData.category.id) {
+          // if category is an object with id
+          categoryId = formData.category.id;
+        }
+      }
 
       // Update contact data with form data
-      const updatedFormData = {
-        first_name : formData.firstName,
-        last_name : formData.lastName,
-        email : formData.email,
-        phone : formData.phone,
-        category_id : formData.category.id,
-        is_favorite : formData.isFavorite,
-        last_contact_date : formData.lastContactDate,
-        last_contact_place : formData.meetingPlace,
-        birth_date : formData.birthdate,
-        street_and_nr : formData.streetAndNr,
-        postal_code : formData.postalcode,
-        city : formData.city,
-        country : formData.country,
-        notes : formData.notes,
-        links: links.filter(link => link.trim() !== '')
+      const updatedContactData = {
+        first_name: formData.firstName?.trim(),
+        last_name: formData.lastName?.trim(),
+        email: formData.email?.trim(),
+        phone: formData.phone?.trim() || null,
+        category_id: categoryId,
+        is_favorite: formData.isFavorite || false,
+        birth_date: formData.birthdate || null,
+        last_contact_date: formData.lastContactDate || null,
+        last_contact_place: formData.meetingPlace?.trim() || null,
+        street_and_nr: formData.streetAndNr?.trim() || null,
+        postal_code: formData.postalcode?.trim() || null,
+        city: formData.city?.trim() || null,
+        country: formData.country?.trim() || null,
+        notes: formData.notes?.trim() || null,
+        links: showLinks ? links.filter(link => link && link.trim() !== '') : []
       };
       
-      console.log(updatedFormData)
+      console.log("Submitting updated data:", updatedContactData)
+      
+      // API Call to Update ContactData in Database
+      const apiResponse = await updateContact(accessToken, formData.id, updatedContactData);
+    
+      if (!apiResponse) {
+        throw new Error('Failed to update contact - no response from server');
+      }
+
+      console.log('API Response:', apiResponse);
+      
+      // Transform the API response back to form format
+      const updatedFormData = ApiDataToFormData(apiResponse);
+      
+      // Update form data (for editing)
       setFormData(updatedFormData);
-      setContactData(ApiDataToFormData(updatedFormData));
+      
+      // Update contact data (for display) - you can use the same data
+      setContactData(updatedFormData);
+      
+      // Exit edit mode
       setIsEditing(false);
       setHasSubmitted(false);
+      setErrors({});
       
-      console.log('Contact updated:', updatedData);
+      console.log('Contact updated successfully');
+      
     } catch (error) {
       console.error('Error updating contact:', error);
+      setError(`Failed to update contact: ${error.message}`);
+      
     } finally {
       setIsSaving(false);
     }
   };
 
-  const handleEdit = () => {
-    if (!formData) return;
+    const handleEdit = () => {
+      if (!formData) return;
 
-    setIsEditing(true);
-    setHasSubmitted(false);
-    setErrors({});
-  };
+      setIsEditing(true);
+      setHasSubmitted(false);
+      setErrors({});
+    };
 
   const handleCancel = () => {
     if (!formData) return;
@@ -356,17 +392,6 @@ const ShowContactForm = ({id}) => {
     setShowLinks(formData.links && formData.links.length > 0);
     setLinks(formData.links && formData.links.length > 0 ? formData.links : ['']);
   };
-
-  const formatDate = (dateString) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
-  };
-
 
   // Show loading state
   if (isLoading) {
@@ -386,37 +411,37 @@ const ShowContactForm = ({id}) => {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <p className="text-red-600 mb-4">{error}</p>
+          <p className="text-red-600 tracking-wider mb-4">{error}</p>
           <button 
-            onClick={() => navigate('/contacts')}
-            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+            onClick={() => navigate('/myspace/contacts')}
+            className="bg-red-500 text-white tracking-wider px-4 py-2 rounded-full hover:bg-black"
           >
-            Back to Contacts
+            Back to contacts.
           </button>
         </div>
       </div>
     );
   }
 
-  // Show not found state
+  // Not found state
   if (!contactData || !formData) {
     console.log("No Data found: No Contact Found Page Showing")
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <p className="text-gray-600 mb-4">Contact not found</p>
+          <p className="text-black tracking-wider text-lg font-light mb-4">Sorry! Your contact cannot be found.</p>
           <button 
-            onClick={() => navigate('/contacts')}
-            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+            onClick={() => navigate('/myspace/contacts')}
+            className="bg-red-500 text-white tracking-wide px-4 py-2 rounded-full hover:bg-black"
           >
-            Back to Contacts
+            Back to contacts.
           </button>
         </div>
       </div>
     );
   }
 
-
+  // Editing Mode
   if (isEditing) {
     console.log("Edit Mode Showing")
     return (
@@ -425,7 +450,7 @@ const ShowContactForm = ({id}) => {
             style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
 
             {/* Main Edit Contact Card */}
-            <div className="bg-white rounded-3xl p-5 relative z-10 overflow-visible w-[88vw] min-w-[260px] max-w-[480px] mx-auto"
+            <div className="bg-white rounded-3xl p-5 mt-10 relative z-10 overflow-visible w-[88vw] min-w-[260px] max-w-[480px] mx-auto"
                 style={{ 
                     boxShadow: '0 4px 32px rgba(109, 71, 71, 0.29)'
                 }}>
@@ -538,7 +563,10 @@ const ShowContactForm = ({id}) => {
                             }}
                         >
                             <span className={formData.category ? 'text-black' : 'text-gray-300'}>
-                                {formData.category || 'select category'}
+                              {formData.category 
+                                ? (typeof formData.category === 'string' ? formData.category : formData.category.name)
+                                : 'select category'
+                              }
                             </span>
                             <svg 
                                 className={`w-4 h-4 transition-transform duration-200 ${showCategoryDropdown ? 'rotate-180' : ''}`}
@@ -558,7 +586,9 @@ const ShowContactForm = ({id}) => {
                                         key={category.id}
                                         type="button"
                                         onClick={() => {
-                                            setFormData(prev => ({ ...prev, category: category.name }));
+                                            setFormData(prev => ({ ...prev, category: category.name, id: category.id }));
+                                            
+                                            // Clear error immediately (same as handleInputChange does)
                                             if (hasSubmitted && errors.category) {
                                                 setErrors(prev => ({ ...prev, category: '' }));
                                             }
@@ -922,6 +952,80 @@ const ShowContactForm = ({id}) => {
                     </div>
                 </div>
 
+                {/* Optional Links */}
+                <div className="space-y-3 -mt-5">
+                    {/* Links Toggle and Fields */}
+                    <div className="relative">
+                      {!showLinks ? (
+                          <button
+                            type="button"
+                            onClick={() => setShowLinks(true)}
+                            className="flex items-center space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-light"
+                            disabled={isLoading}
+                           >
+                            <span className="text-lg font-semibold">+</span>
+                            <span className="text-base text-black hover:text-red-500">add weblinks</span>
+                          </button>
+                      ) : (
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="relative left-2 text-sans text-base text-black font-light">
+                                websites & links
+                              </span>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setShowLinks(false);
+                                    setLinks(['']);
+                                  }}
+                                    className="text-red-500 hover:text-red-700 transition-colors duration-200 text-sm"
+                                    disabled={isLoading}
+                                  >
+                                    remove
+                                 </button>
+                                </div>
+                                    
+                                {links.map((link, index) => (
+                                  <div key={index} className="relative flex items-center space-x-2">
+                                    <input 
+                                      type="url" 
+                                      value={link}
+                                      onChange={(e) => handleLinkChange(index, e.target.value)}
+                                      placeholder="https://example.com"
+                                      disabled={isLoading}
+                                      className="flex-1 p-2.5 w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500"
+                                      style={{
+                                          fontSize: '16px',
+                                          fontWeight: 400
+                                      }}
+                                        />
+                                        {links.length > 1 && (
+                                            <button
+                                                type="button"
+                                                onClick={() => removeLink(index)}
+                                                className="text-red-500 hover:text-red-700 transition-colors duration-200 p-1"
+                                                disabled={isLoading}
+                                            >
+                                                ×
+                                            </button>
+                                        )}
+                                    </div>
+                                ))}
+                                
+                                <button
+                                    type="button"
+                                    onClick={addLink}
+                                    className="flex items-center space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-light text-sm"
+                                    disabled={isLoading}
+                                >
+                                    <span className="text-base">+</span>
+                                    <span className="text-black hover:text-red-500">add another link</span>
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
                 {/* Save and Cancel Buttons */}
                 <div className="flex space-x-4 items-center justify-center mt-8">
                     <CircleButton
@@ -1005,7 +1109,7 @@ const ShowContactForm = ({id}) => {
           
           {/* Category Badge */}
           <span className="inline-block px-4 py-2 bg-red-100 text-red-600 rounded-full text-base -mt-1 mb-2 font-light">
-            {formData.category}
+            {typeof formData.category === 'string' ? formData.category : formData.category?.name}
           </span>
         </div>
 
@@ -1047,7 +1151,7 @@ const ShowContactForm = ({id}) => {
               <h3 className="text-red-500 font-light text-sm ml-3 -mb-4">date of birth</h3>
               <div className="bg-gray-50 rounded-xl p-3">
                 <div className="text-black text-normal font-light">
-                  {formatDate(formData.birthdate)}
+                  {formData.birthdate}
                 </div>
               </div>
             </div>
@@ -1091,7 +1195,7 @@ const ShowContactForm = ({id}) => {
                   <div>
                     <span className="text-black font-light text-sm">last contact:</span>
                     <span className="text-black text-normal font-light ml-6">
-                      {formatDate(formData.lastContactDate)}
+                      {formData.lastContactDate}
                     </span>
                   </div>
                 )}

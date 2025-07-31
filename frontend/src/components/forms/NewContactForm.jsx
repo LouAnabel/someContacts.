@@ -198,7 +198,7 @@ const NewContactForm = ({onSubmit, onCancel }) => {
         }
 
         // // category validation
-        // if (!formData.category.trim()) {
+        // if (!formData.category.name.trim()) {
         //     newErrors.category = 'category is required';
         // }
         
@@ -267,11 +267,10 @@ const NewContactForm = ({onSubmit, onCancel }) => {
 
             // navigate to the new contact page
             if (NewContactData && NewContactData.id) {
-                navigate(`/myspace/contacts`, { replace: true });
-                // navigate(`/myspace/contact/${NewContactData.id}`, { replace: true });
+                navigate(`/myspace/contact/${NewContactData.id}`, { replace: true });
             } else {
-                console.error('New contact data is missing ID:', NewContactData);
-                navigate("myspace/contacts", { replace: true });
+                console.error('New contact data is missing ID:', NewContactData.id);
+                navigate("/myspace/contacts", { replace: true });
             }
 
         } catch (error) {
