@@ -16,14 +16,14 @@ const NewContactForm = ({onSubmit, onCancel }) => {
         phone: '',
         isFavorite: false,
         birthdate: '',
-        streetAndNr: {},
+        streetAndNr: '',
         postalcode: '',
         city: '',
         country: '',
         notes: '',
         lastContactDate: '',
-        meetingPlace: ''
-        // links: ['']
+        meetingPlace: '',
+        links: ['']
     });
 
     // Original Visual State 
@@ -46,28 +46,23 @@ const NewContactForm = ({onSubmit, onCancel }) => {
 
     // Load Categories on component mount
     useEffect(() => {
-    const loadCategories = async () => {
-        try {
-            if (accessToken) {
-                const categoriesData = await getCategories(accessToken);
-                console.log("categoriesData:", categoriesData)
-                setCategories(categoriesData); // Just empty array, no defaults
-            } else {
-                setCategories([]); // Empty array when no access token
+        const loadCategories = async () => {
+            try {
+                if (accessToken) {
+                    const categoriesData = await getCategories(accessToken);
+                    console.log("categoriesData:", categoriesData)
+                    setCategories(categoriesData); // Just empty array, no defaults
+                } else {
+                    setCategories([]); // Empty array when no access token
+                }
+            } catch (error) {   
+                console.error('Failed to load categories:', error);
+                setCategories([]); // Empty array on error
             }
-        } catch (error) {   
-            console.error('Failed to load categories:', error);
-            setCategories([]); // Empty array on error
-        }
-    };
+        };
 
-    loadCategories();
-}, [accessToken]);
-
-// Log categories state in a separate useEffect to see when it updates
-useEffect(() => {
-    console.log("Categories state updated:", categories);
-}, [categories]);
+        loadCategories();
+    }, [accessToken]);
 
 
     const handleInputChange = (e) => {
@@ -202,10 +197,10 @@ useEffect(() => {
             newErrors.lastName = 'Last name must be at least 2 characters';
         }
 
-        // category validation
-        if (!formData.category.trim()) {
-            newErrors.category = 'category is required';
-        }
+        // // category validation
+        // if (!formData.category.trim()) {
+        //     newErrors.category = 'category is required';
+        // }
         
         // Email validation
         if (!formData.email) {
@@ -241,8 +236,21 @@ useEffect(() => {
 
             // Prepare data for API call
             const contactData = {
-                ...formData,
-                links: links.filter(link => link.trim() !== '') // Filter out empty links
+                first_name : formData.firstName,
+                last_name : formData.lastName,
+                email : formData.email,
+                phone : formData.phone,
+                category_id : formData.category.id,
+                is_favorite : formData.isFavorite,
+                last_contact_date : formData.lastContactDate,
+                last_contact_place : formData.meetingPlace,
+                birth_date : formData.birthdate,
+                street_and_nr : formData.streetAndNr,
+                postal_code : formData.postalcode,
+                city : formData.city,
+                country : formData.country,
+                notes : formData.notes,
+                links: links.filter(link => link.trim() !== '')
             };
             console.log('Submitting contact data:', contactData);
 
@@ -285,7 +293,7 @@ useEffect(() => {
             phone: '',
             isFavorite: false,
             birthdate: '',
-            address: '',
+            streetAndNr: '',
             postalcode: '',
             city: '',
             country: '',
@@ -423,7 +431,7 @@ useEffect(() => {
                             type="button"
                             onClick={() => {
                                 console.log('Dropdown clicked. Current categories:', categories);
-                                console.log('Current selected category:', formData.category);
+                                console.log('Current selected category:', formData.category.name);
                                 setShowCategoryDropdown(!showCategoryDropdown);
                             }}
                             disabled={isLoading}
@@ -436,8 +444,8 @@ useEffect(() => {
                             }}
                         >
                             <span className={formData.category ? 'text-black' : 'text-gray-300'}>
-                                {formData.category 
-                                    ? formData.category
+                                {formData.category.name 
+                                    ? formData.category.name
                                     : categories.length === 0 
                                         ? 'create a category first'
                                         : 'select category'
@@ -467,7 +475,7 @@ useEffect(() => {
                                                 onClick={() => {
                                                     console.log('Category selected:', category);
                                                     // Update form data
-                                                    setFormData(prev => ({ ...prev, category: category.name }));
+                                                    setFormData(prev => ({ ...prev, category: {name: category.name, id : category.id} }));
                                                     
                                                     // Clear error immediately (same as handleInputChange does)
                                                     if (hasSubmitted && errors.category) {
@@ -707,7 +715,7 @@ useEffect(() => {
                                                 setShowAddress(false);
                                                 setFormData(prev => ({ 
                                                     ...prev, 
-                                                    address: '', 
+                                                    streetAndNr:'', 
                                                     postalcode: '', 
                                                     city: '', 
                                                     country: '' 
@@ -722,14 +730,14 @@ useEffect(() => {
                                     
                                     {/* Address Field */}
                                     <div className="relative">
-                                        <label htmlFor="address" className="absolute -top-3 left-4 bg-white px-1 text-sans text-base text-black font-light">
+                                        <label htmlFor="streetAndNr" className="absolute -top-3 left-4 bg-white px-1 text-sans text-base text-black font-light">
                                             street & nr°
                                         </label>
                                         <input 
                                             type="text" 
-                                            name="address" 
-                                            id="address" 
-                                            value={formData.address}
+                                            name="streetAndNr" 
+                                            id="streetAndNr" 
+                                            value={formData.streetAndNr}
                                             onChange={handleInputChange}
                                             placeholder="greifwalder Str. 8"
                                             disabled={isLoading}
@@ -739,8 +747,8 @@ useEffect(() => {
                                                 fontWeight: 300
                                             }}
                                         />
-                                        {hasSubmitted && errors.address && (
-                                            <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.address}</p>
+                                        {hasSubmitted && errors.streetAndNr && (
+                                            <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.streetAndNr}</p>
                                         )}
                                     </div>
 

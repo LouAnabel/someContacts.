@@ -1,8 +1,8 @@
 
-
+// READ all contacts
 export async function getContacts(token) {
   try {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/contacts`, {
+    const response = await fetch("http://127.0.0.1:5000/contacts", {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -25,23 +25,25 @@ export async function getContacts(token) {
   }   
 }
 
-
+// GET Contact By ID
 export async function getContactById(token, contactId) {
+  console.log("In API FILE: Fetching Data from User with ID", contactId)
   try {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/contacts/${contactId}`, {
+    const response = await fetch(`http://127.0.0.1:5000/contacts/${contactId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       }
+      
     });
 
     if (!response.ok) {
       throw new Error(`Error: ${response.status} ${response.statusText}`);
     }   
     const data = await response.json();
-    console.log('Fetched contact:', data);
     return data;
+
   } catch (error) {
     alert(`Error fetching contact: ${error.message}`);
     console.error('Error fetching contact:', error);
@@ -50,6 +52,7 @@ export async function getContactById(token, contactId) {
 }
 
 
+// CREATE a new Contact
 export async function createContact(token, contactData) {
   try {
     const response = await fetch('http://127.0.0.1:5000/contacts', {
@@ -74,6 +77,38 @@ export async function createContact(token, contactData) {
 } 
 
 
+// UPDATE contact
+export async function updateContact(token, contactId, contactData) {
+  try {
+    const response = await fetch(`http://127.0.0.1:5000/contacts/${contactId}`, {
+      method : 'PUT',
+      headers : {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(contactData)
+    });  
+    
+    if (!response.ok) {
+      throw new Error(`Error: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    console.log('Contact updated:', data);
+    return data;
+
+  } catch (error) {
+    alert(`Error updating contact: ${error.message}`);
+    console.error('Error creating contact:', error);
+    return null;
+  }
+} 
+
+
+
+
+
+
 // Get all Categories with ID validation
 export const getCategories = async (accessToken) => {
     try {
@@ -81,7 +116,7 @@ export const getCategories = async (accessToken) => {
             throw new Error('Access token is required')
         }
 
-        console.log("Trying to fetch GET")
+        console.log("In API FILE: Trying to GET Categories")
         const response = await fetch('http://127.0.0.1:5000/categories', {
             method: 'GET',
             headers: {
@@ -103,7 +138,7 @@ export const getCategories = async (accessToken) => {
             id: category.id || `fallback-${index}-${Date.now()}` // Ensure every category has an ID
         }));
         
-        console.log('Categories with IDs:', categoriesWithIds);
+        console.log('In API FILE: Categories with IDs:', categoriesWithIds);
         
         return categoriesWithIds;
         

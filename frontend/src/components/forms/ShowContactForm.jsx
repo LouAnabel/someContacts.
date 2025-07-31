@@ -1,64 +1,232 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import CircleButton from '../ui/Buttons';
+import { useAuthContext } from '../../context/AuthContextProvider';
+import { getContactById, getCategories } from '../../apiCalls/contactsApi';
 
 
-const ShowContactForm = () => {
-  const { id } = useParams();
+const ShowContactForm = ({id}) => {
+
   const navigate = useNavigate();
-  const [isEditing, setIsEditing] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [hasSubmitted, setHasSubmitted] = useState(false);
-  const [errors, setErrors] = useState({});
-  const [categories, setCategories] = useState([
-    { id: 1, name: 'friends' },
-    { id: 2, name: 'family' },
-    { id: 3, name: 'work' }
-  ]);
+  const { accessToken } = useAuthContext();
   
-  // Form states for edit mode
+  // Loading state and Error State
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
+
+  console.log("Load Default Contact Data")
+  const [contactData, setContactData] = useState({});
+  console.log("Load Default Form Data")
+  const [formData, setFormData] = useState({});
+
+  // Edit Mode states
+  const [isEditing, setIsEditing] = useState(false);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [errors, setErrors] = useState({}); // Why both?
+
+  // Form states for edit mode for Categories
+  const [categories, setCategories] = useState([]);
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const [showAddCategory, setShowAddCategory] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState('');
   const [isAddingCategory, setIsAddingCategory] = useState(false);
+
+  // Form states for edit mode
   const [showBirthdate, setShowBirthdate] = useState(false);
   const [showAddress, setShowAddress] = useState(false);
   const [showContactDetails, setShowContactDetails] = useState(false);
   const [showLinks, setShowLinks] = useState(false);
   const [links, setLinks] = useState(['']);
 
-  // Contact data
-  const [contactData, setContactData] = useState({
-    id: '1',
-    firstName: 'Meryl',
-    lastName: 'Streep',
-    category: 'work',
-    email: 'meryl@streep.com',
-    phone: '+49 1781234567',
-    isFavorite: true,
-    birthdate: '1949-06-22',
-    address: 'Greifwalder Str. 8',
-    postalcode: '10407',
-    city: 'Berlin',
-    country: 'Germany',
-    notes: 'Met at the film festival. Incredibly talented actress and very kind person. Loves talking about method acting.',
-    lastContactDate: '2024-12-15',
-    meetingPlace: 'Berlin International Film Festival',
-    links: ['https://www.imdb.com/name/nm0000658/', 'https://en.wikipedia.org/wiki/Meryl_Streep']
-  });
 
-  const [formData, setFormData] = useState({ ...contactData });
+  // helper funciton to transform API Format in UI Form Format
+  const ApiDataToFormData = (apiResponse) => {
+    console.log('apiResponse:', apiResponse)
 
+    const contact = apiResponse.contact || apiResponse;
+    console.log('Trasformed contact data. contact:', contact)
+    
+    return {
+      id: contact.id || '',
+      firstName: contact.first_name || '',
+      lastName: contact.last_name || '',
+      category: contact.category?.name || '',
+      email: contact.email || '',
+      phone: contact.phone || '',
+      isFavorite: contact.is_favorite || false,
+      birthdate: contact.birth_date || '',
+      streetAndNr: contact.street_and_nr || '',
+      postalcode: contact.postal_code || '',
+      city: contact.city || '',
+      country: contact.country || '',
+      notes: contact.notes || '',
+      lastContactDate: contact.last_contact_date || '',
+      meetingPlace: contact.last_contact_place || '',
+      links: contact.links || []
+      }
+    };
+
+
+  // Step 1: Loading Form Data from API with ID
+  console.log("Step 1: accessing API for contact with ID", id)
   useEffect(() => {
-    // Initialize optional sections based on existing data
-    setShowBirthdate(!!contactData.birthdate);
-    setShowAddress(!!contactData.address || !!contactData.city || !!contactData.country || !!contactData.postalcode);
-    setShowContactDetails(!!contactData.lastContactDate || !!contactData.meetingPlace);
-    setShowLinks(contactData.links && contactData.links.length > 0);
-    setLinks(contactData.links && contactData.links.length > 0 ? contactData.links : ['']);
-  }, [contactData]);
 
+    console.log("Calling LoadContact Function")
+    const fetchContactData = async () => {
+
+      // checking if token and ID exist 
+      console.log("See if accessToken and ID exist")
+        if (!accessToken || !id) {
+          setIsLoading(false);
+          return;
+        }
+        console.log("Successfull with token and ID")
+        try {
+          setIsLoading(true);
+          setError(null);
+
+          // fetching data and save it as apiContactData
+          console.log("Step 2: Fetching contactData with ID:", id) 
+          const apiContactData = await getContactById(accessToken, id);
+          console.log('received Contact Data to setContactData UseState:', apiContactData)
+          setContactData(apiContactData); // => original fetched ContactData for the user to see
+        
+          // transforming apiContact Data into UI Form Data
+          const newFormData = ApiDataToFormData(apiContactData);
+          console.log("transformed API Data for FormData:", newFormData)
+          setFormData(newFormData); // FormData
+
+        } catch (error) {
+          console.error('Failed to load contact data:', error);
+          setError(error.message || 'Failed to load contact data');
+          setContactData({});
+          setFormData({});
+
+        } finally {
+          setIsLoading(false);
+      }
+    };
+
+    fetchContactData();
+
+  },[accessToken, id]);
+
+
+  // Loading Categories
+  useEffect(() => {
+    const loadCategories = async () => {
+      if (!accessToken) return;
+
+      try {
+        if (accessToken) {
+            const categoriesData = await getCategories(accessToken);
+            console.log("categoriesData:", categoriesData)
+            setCategories(categoriesData); // Just empty array, no defaults
+        } else {
+            setCategories([]); // Empty array when no access token
+        }
+
+      } catch (error) {   
+          console.error('Failed to load categories:', error);
+          setCategories([]); // Empty array on error
+      }
+    };
+
+    loadCategories();
+  }, [accessToken]);
+
+
+  // Initialize optional sections when contact data loads
+  useEffect(() => {
+    if (!formData) return;
+
+    setShowBirthdate(!!formData.birthdate);
+    setShowAddress(
+      !!(formData.streetAndNr || formData.city || 
+         formData.country || formData.postalcode)
+    );
+    setShowContactDetails(
+      !!(formData.lastContactDate || formData.lastContactPlace)
+    );
+    
+    const hasLinks = formData.links && formData.links.length > 0;
+    setShowLinks(hasLinks);
+    setLinks(hasLinks ? formData.links.map(link => link.url || link) : ['']);
+  }, [formData]);
+
+  
+  // LOADING CATEGORIES TO DATABASE 
+    const addCategory = async () => {
+        if (newCategoryName.trim() && !isAddingCategory) {
+            setIsAddingCategory(true);
+            
+            try {
+                const categoryName = newCategoryName.charAt(0).toUpperCase() + newCategoryName.slice(1).trim();
+                console.log('Adding category:', categoryName);
+                
+                // ADD CATEGORIES TO DATABASE
+                const response = await fetch('http://127.0.0.1:5000/categories', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${accessToken}`
+                    },
+                    body: JSON.stringify({ 
+                        name: categoryName
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Error: ${response.status} ${response.statusText}`);
+                }
+                
+                const apiResponse = await response.json();
+                console.log('API Response for new category:', apiResponse);
+                
+                // Create a properly formatted category object
+                const newCategory = {
+                    id: apiResponse.id || apiResponse.category?.id || Date.now(),
+                    name: apiResponse.name || apiResponse.category?.name || categoryName,
+                    created_at: apiResponse.created_at || apiResponse.category?.created_at || new Date().toISOString(),
+                    creator_id: apiResponse.creator_id || apiResponse.category?.creator_id || 1
+                };
+                
+                console.log('Formatted new category:', newCategory);
+                console.log('Current categories before update:', categories);
+                
+                // Update categories state with the new category
+                setCategories(prevCategories => [...prevCategories, newCategory]);
+                
+                // Update form data to select the new category
+                setFormData(prevFormData => ({...prevFormData, category: newCategory.name }));
+                
+                // Clear category errors
+                if (hasSubmitted && errors.category) {
+                    setErrors(prev => ({ ...prev, category: '' }));
+                }
+                
+                // Reset add category form
+                setNewCategoryName('');
+                setShowAddCategory(false);
+                
+                // Brief delay before closing dropdown so user can see the selection
+                setTimeout(() => {
+                    setShowCategoryDropdown(false);
+                }, 800);
+                
+                console.log('Category added successfully:', newCategory.name);
+                
+            } catch (error) {
+                console.error('Failed to add category:', error);
+                alert(`Failed to add category: ${error.message}`);
+            } finally {
+                setIsAddingCategory(false);
+            }
+        }
+    };
+
+  // Form Handlers
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -85,43 +253,24 @@ const ShowContactForm = () => {
     }
   };
 
-  const addCategory = async () => {
-    if (!newCategoryName.trim()) return;
-    
-    setIsAddingCategory(true);
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      const newCategory = {
-        id: Date.now(),
-        name: newCategoryName.trim()
-      };
-      
-      setCategories(prev => [...prev, newCategory]);
-      setFormData(prev => ({ ...prev, category: newCategory.name }));
-      setNewCategoryName('');
-      setShowAddCategory(false);
-      setShowCategoryDropdown(false);
-    } catch (error) {
-      console.error('Error adding category:', error);
-    } finally {
-      setIsAddingCategory(false);
-    }
-  };
-
+  // UPDATE Contact with validation
   const validateForm = () => {
     const newErrors = {};
     
-    if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
-    if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
+    if (!formData.firstName?.trim()) newErrors.firstName = 'First name is required';
+    if (!formData.lastName?.trim()) newErrors.lastName = 'Last name is required';
     if (!formData.category) newErrors.category = 'Category is required';
-    if (!formData.email.trim()) {
+    if (!formData.email?.trim()) {
       newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Please enter a valid email';
     }
     
+    // Phone validation (optional but if provided, should be valid)
+    if (formData.phone && formData.phone.trim() && !/^\+?[\d\s\-\(\)]{10,}$/.test(formData.phone.trim())) {
+        newErrors.phone = 'Please enter a valid phone number';
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -130,20 +279,49 @@ const ShowContactForm = () => {
     e.preventDefault();
     setHasSubmitted(true);
     
-    if (!validateForm()) return;
+    if (!validateForm()) {
+      console.error('Form validation failed:', errors);
+      return;
+    }
     
     setIsSaving(true);
+
     try {
+      if (!accessToken) {
+          throw new Error("Access token is not available.");
+      }
+
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
+      // // Update contact data with form data
+      // const updatedData = { ...formData };
+      // if (showLinks) {
+      //   updatedData.links = links.filter(link => link.trim() !== '');
+      // }
+
       // Update contact data with form data
-      const updatedData = { ...formData };
-      if (showLinks) {
-        updatedData.links = links.filter(link => link.trim() !== '');
-      }
+      const updatedFormData = {
+        first_name : formData.firstName,
+        last_name : formData.lastName,
+        email : formData.email,
+        phone : formData.phone,
+        category_id : formData.category.id,
+        is_favorite : formData.isFavorite,
+        last_contact_date : formData.lastContactDate,
+        last_contact_place : formData.meetingPlace,
+        birth_date : formData.birthdate,
+        street_and_nr : formData.streetAndNr,
+        postal_code : formData.postalcode,
+        city : formData.city,
+        country : formData.country,
+        notes : formData.notes,
+        links: links.filter(link => link.trim() !== '')
+      };
       
-      setContactData(updatedData);
+
+      setFormData(updatedFormData);
+      setContactData(ApiDataToFormData(updatedFormData));
       setIsEditing(false);
       setHasSubmitted(false);
       
@@ -156,24 +334,27 @@ const ShowContactForm = () => {
   };
 
   const handleEdit = () => {
-    setFormData({ ...contactData });
+    if (!formData) return;
+
     setIsEditing(true);
     setHasSubmitted(false);
     setErrors({});
   };
 
   const handleCancel = () => {
-    setFormData({ ...contactData });
+    if (!formData) return;
+
+    setFormData({ ...formData });
     setIsEditing(false);
     setHasSubmitted(false);
     setErrors({});
     
     // Reset optional sections
-    setShowBirthdate(!!contactData.birthdate);
-    setShowAddress(!!contactData.address || !!contactData.city || !!contactData.country || !!contactData.postalcode);
-    setShowContactDetails(!!contactData.lastContactDate || !!contactData.meetingPlace);
-    setShowLinks(contactData.links && contactData.links.length > 0);
-    setLinks(contactData.links && contactData.links.length > 0 ? contactData.links : ['']);
+    setShowBirthdate(!!formData.birthdate);
+    setShowAddress(!!formData.streetAndNr || !!formData.city || !!formData.country || !!formData.postalcode);
+    setShowContactDetails(!!formData.lastContactDate || !!formData.meetingPlace);
+    setShowLinks(formData.links && formData.links.length > 0);
+    setLinks(formData.links && formData.links.length > 0 ? formData.links : ['']);
   };
 
   const formatDate = (dateString) => {
@@ -186,7 +367,58 @@ const ShowContactForm = () => {
     });
   };
 
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading contact...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    console.log("Error: Error Page Showing")
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">{error}</p>
+          <button 
+            onClick={() => navigate('/contacts')}
+            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+          >
+            Back to Contacts
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Show not found state
+  if (!contactData || !formData) {
+    console.log("No Data found: No Contact Found Page Showing")
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <p className="text-gray-600 mb-4">Contact not found</p>
+          <button 
+            onClick={() => navigate('/contacts')}
+            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+          >
+            Back to Contacts
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+
   if (isEditing) {
+    console.log("Edit Mode Showing")
     return (
       <form onSubmit={handleSave}>
         <div className="w-full flex flex-col items-center min-h-screen bg-white dark:bg-black" 
@@ -545,7 +777,7 @@ const ShowContactForm = () => {
                                                 setShowAddress(false);
                                                 setFormData(prev => ({ 
                                                     ...prev, 
-                                                    address: '', 
+                                                    streetAndNr: '', 
                                                     postalcode: '', 
                                                     city: '', 
                                                     country: '' 
@@ -560,14 +792,14 @@ const ShowContactForm = () => {
                                     
                                     {/* Address Field */}
                                     <div className="relative">
-                                        <label htmlFor="address" className="absolute -top-3 left-4 bg-white px-1 text-sans text-base text-black font-light">
+                                        <label htmlFor="streetAndNr" className="absolute -top-3 left-4 bg-white px-1 text-sans text-base text-black font-light">
                                             street & nr°
                                         </label>
                                         <input 
                                             type="text" 
-                                            name="address" 
-                                            id="address" 
-                                            value={formData.address}
+                                            name="streetAndNr" 
+                                            id="streetAndNr" 
+                                            value={formData.streetAndNr}
                                             onChange={handleInputChange}
                                             placeholder="greifwalder Str. 8"
                                             disabled={isLoading}
@@ -577,8 +809,8 @@ const ShowContactForm = () => {
                                                 fontWeight: 300
                                             }}
                                         />
-                                        {hasSubmitted && errors.address && (
-                                            <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.address}</p>
+                                        {hasSubmitted && errors.streetAndNr && (
+                                            <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.streetAndNr}</p>
                                         )}
                                     </div>
 
@@ -729,6 +961,7 @@ const ShowContactForm = () => {
 
 
   // VIEW MODE
+  console.log("Contact Mode Showing")
   return (
     <div className="w-full flex flex-col items-center min-h-screen bg-white dark:bg-black" 
         style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
@@ -743,7 +976,7 @@ const ShowContactForm = () => {
         <div className="text-center mb-8">
           <div className="flex items-center justify-center space-x-4 mb-3 ml-5 mt-8">
             <h1 className="text-3xl font-bold text-black">
-              {contactData.firstName} {contactData.lastName}
+              {formData.firstName} {formData.lastName}
             </h1>
           
             {/* Favorite Checkbox */}
@@ -756,7 +989,7 @@ const ShowContactForm = () => {
                 >
                     <svg 
                         className={`w-7 h-7 ${
-                            contactData.isFavorite ? 'text-red-500 hover:text-yellow-300' : 'text-black hover:text-yellow-300'
+                            formData.isFavorite ? 'text-red-500 hover:text-yellow-300' : 'text-black hover:text-yellow-300'
                         }`} 
                         aria-hidden="true" 
                         xmlns="http://www.w3.org/2000/svg" 
@@ -771,8 +1004,8 @@ const ShowContactForm = () => {
           
           
           {/* Category Badge */}
-          <span className="inline-block px-4 py-2 bg-red-100 text-red-600 rounded-full text-md font-light">
-            {contactData.category}
+          <span className="inline-block px-4 py-2 bg-red-100 text-red-600 rounded-full text-lg font-light">
+            {formData.category}
           </span>
         </div>
 
@@ -781,92 +1014,92 @@ const ShowContactForm = () => {
         <div className="space-y-6 mb-8">
           {/* Contact Methods */}
           <div className="space-y-2">
-            <h3 className="text-red-500 font-light text-base ml-3 -mb-2">how to contact?</h3>
+            <h3 className="text-red-500 font-light text-md ml-3 -mb-4">how to contact?</h3>
             
             {/* Email */}
             <div className="bg-gray-50 rounded-xl p-3">
               <div className="text-black font-light text-sm">email</div>
               <a 
-                href={`mailto:${contactData.email}`}
-                className="text-black text-lg font-light hover:text-red-500 transition-colors"
+                href={`mailto:${formData.email}`}
+                className="text-black text-xl font-light hover:text-red-500 transition-colors"
               >
-                {contactData.email}
+                {formData.email}
               </a>
             </div>
             
             {/* Phone */}
-            {contactData.phone && (
+            {formData.phone && (
               <div className="bg-gray-50 rounded-xl p-3">
                 <div className="text-black font-light text-sm">phone</div>
                 <a 
-                  href={`tel:${contactData.phone}`}
-                  className="text-black text-lg font-light hover:text-red-500 transition-colors"
+                  href={`tel:${formData.phone}`}
+                  className="text-black text-xl font-light hover:text-red-500 transition-colors"
                 >
-                  {contactData.phone}
+                  {formData.phone}
                 </a>
               </div>
             )}
           </div>
 
           {/* Birthday */}
-          {contactData.birthdate && (
+          {formData.birthdate && (
             <div className="space-y-2">
-              <h3 className="text-red-500 font-light text-base ml-3 -mb-2">date of birth</h3>
+              <h3 className="text-red-500 font-light text-base ml-3 -mb-4">date of birth</h3>
               <div className="bg-gray-50 rounded-xl p-3">
-                <div className="text-black text-lg font-light">
-                  {formatDate(contactData.birthdate)}
+                <div className="text-black text-xl font-light">
+                  {formatDate(formData.birthdate)}
                 </div>
               </div>
             </div>
           )}
 
           {/* Address */}
-          {(contactData.address || contactData.city || contactData.country) && (
+          {(formData.streetAndNr || formData.city || formData.country) && (
             <div className="space-y-2">
-              <h3 className="text-red-500 font-light text-base ml-3 -mb-2">address</h3>
+              <h3 className="text-red-500 font-light text-base ml-3 -mb-4">address</h3>
               <div className="bg-gray-50 rounded-xl p-3">
-                <div className="text-black text-lg font-light -space-y-1">
-                  {contactData.address && <div>{contactData.address}</div>}
+                <div className="text-black text-xl font-light -space-y-1">
+                  {formData.streetAndNr && <div>{formData.streetAndNr},</div>}
                   <div>
-                    {contactData.postalcode && `${contactData.postalcode} `}
-                    {contactData.city}
+                    {formData.postalcode && `${formData.postalcode} `}
+                    {formData.city},
                   </div>
-                  {contactData.country && <div>{contactData.country}</div>}
+                  {formData.country && <div>{formData.country}</div>}
                 </div>
               </div>
             </div>
           )}
 
           {/* Notes */}
-          {contactData.notes && (
+          {formData.notes && (
             <div className="space-y-2">
-              <h3 className="text-red-500 font-light text-base ml-3 -mb-2">notes</h3>
+              <h3 className="text-red-500 font-light text-base ml-3 -mb-4">notes</h3>
               <div className="bg-gray-50 rounded-xl p-3 ">
-                <div className="text-black text-lg font-light whitespace-pre-wrap ">
-                  {contactData.notes}
+                <div className="text-black text-xl font-light whitespace-pre-wrap ">
+                  {formData.notes}
                 </div>
               </div>
             </div>
           )}
 
           {/* Contact History */}
-          {(contactData.lastContactDate || contactData.meetingPlace) && (
+          {(formData.lastContactDate || formData.meetingPlace) && (
             <div className="space-y-2">
-              <h3 className="text-red-500 font-light text-base ml-3 -mb-2">contact history</h3>
+              <h3 className="text-red-500 font-light text-base ml-3 -mb-4">contact history</h3>
               <div className="bg-gray-50 rounded-xl p-3 space-y-2">
-                {contactData.lastContactDate && (
+                {formData.lastContactDate && (
                   <div>
                     <span className="text-black font-light text-sm">last contact:</span>
-                    <span className="text-black text-base font-light ml-6">
-                      {formatDate(contactData.lastContactDate)}
+                    <span className="text-black text-xl font-light ml-6">
+                      {formatDate(formData.lastContactDate)}
                     </span>
                   </div>
                 )}
-                {contactData.meetingPlace && (
+                {formData.meetingPlace && (
                   <div>
                     <span className="text-black font-light text-sm">met at:</span>
-                    <span className="text-black text-base font-light ml-14">
-                      {contactData.meetingPlace}
+                    <span className="text-black text-xl font-light ml-14">
+                      {formData.meetingPlace}
                     </span>
                   </div>
                 )}
@@ -875,11 +1108,11 @@ const ShowContactForm = () => {
           )}
 
           {/* Links */}
-          {contactData.links && contactData.links.length > 0 && (
+          {formData.links && formData.links.length > 0 && (
             <div className="space-y-2">
               <h3 className="text-red-500 font-light text-base ml-3 -mb-2">links</h3>
               <div className="space-y-2">
-                {contactData.links.map((link, index) => (
+                {formData.links.map((link, index) => (
                   <div key={index} className="bg-gray-50 rounded-xl p-3">
                     <a 
                       href={link}

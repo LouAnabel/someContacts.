@@ -32,7 +32,7 @@ function App() {
             {/* Nested routes for contacts */}
             <Route path="contacts" element={<AllContacts />} />
             <Route path="newcontact" element={<NewContact />} />
-            <Route path="contact" element={<ShowContact />} /> 
+            <Route path="contacts/:id" element={<ShowContact />} /> 
             <Route path="updatecontact/:id" element={<UpdateContacts />} />
           </Route>
         </Routes>
