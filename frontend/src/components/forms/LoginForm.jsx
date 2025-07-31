@@ -208,7 +208,7 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
                 <CircleButton
                     size="xl"
                     variant="dark"
-                    className="border border-white/30 absolute -bottom-[85px] -right-[10px]"
+                    className=" absolute -bottom-[85px] -right-[10px]"
                     style={{ 
                         marginTop: '2rem', 
                         marginLeft: 'auto', 

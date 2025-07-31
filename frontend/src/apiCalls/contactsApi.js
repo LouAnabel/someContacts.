@@ -19,7 +19,6 @@ export async function getContacts(token) {
   }
 
   catch (error) {
-      alert(`Error fetching contacts: ${error.message}`);
       console.error('Error fetching contacts:', error);
       return [];
   }   

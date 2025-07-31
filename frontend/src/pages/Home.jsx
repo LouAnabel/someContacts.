@@ -4,17 +4,37 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useAuthContext } from "../context/AuthContextProvider";
 import { getContacts } from "../apiCalls/contactsApi";
+import { authMe } from '../apiCalls/auth';
 
 function Home() {
   const navigate = useNavigate()
   const { accessToken, logout } = useAuthContext();
   const [contacts, setContacts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [userName, setUserName] = useState('');
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  }; 
+ 
+  const getUserName = async () => {
+    if (! accessToken) {
+      setIsLoading(false);
+        return;
+    }
+
+    try {
+      const userData = await authMe(accessToken);
+      const firstName = userData?.first_name || 'Friend';
+      setUserName(firstName);
+    } catch (error) {
+      console.log("Failed to load userData", error);
+      setUserName('Friend');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getUserName();
+  }, [accessToken]);
 
   useEffect(() => {
     const fetchContacts = async () => {
@@ -54,10 +74,16 @@ function Home() {
   // Get contact count safely
   const contactCount = Array.isArray(contacts) ? contacts.length : 0;
 
+
+  const handleLogout = () => {
+  logout();
+  navigate('/login');
+  };
+
   return (
     <div className="container mx-auto px-4 py-20">
       <h1 className="text-2xl font-heading font-light text-gray-900 dark:text-white mb-7">
-        hello <span className="text-red-500 font-medium">user.</span>
+        hello <span className="text-red-500 font-medium">{userName}.</span>
       </h1>
       
       <div className="text-xl font-text font-light text-black dark:text-white mb-6">
