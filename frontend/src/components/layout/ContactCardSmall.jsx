@@ -39,7 +39,7 @@ const ContactCardSmall = ({contact = {}}) => {
                 <div className="flex items-center justify-between w-full ml-2 mt-2">
                     {/* Name & Category */}
                     <div className= "w-full relative justify-items">
-                        <h5 className="mb-1 text-2xl text-center font-medium text-black">
+                        <h5 className="mb-1 ml-14 text-2xl text-center font-medium text-black">
                             <a 
                                 href={`contacts/${contact.id}`}
                                 className=" hover:text-red-500 transition-colors"
@@ -48,12 +48,12 @@ const ContactCardSmall = ({contact = {}}) => {
                             </a>
                         </h5>
                     </div>
-                    {/* <span className="flex justify-end px-5 pt-2">
+                    <span className="flex justify-end px-5 pt-2">
                     <ContactMenuBar 
                             isMenuOpen={isMenuOpen} 
                             setIsMenuOpen={setIsMenuOpen} 
                         />
-                    </span> */}
+                    </span>
                 </div>
                 <p className="text-lg text-black text-center -mt-2 mb-6">{contact.category?.name}</p>
                 

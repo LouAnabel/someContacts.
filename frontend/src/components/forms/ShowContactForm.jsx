@@ -942,7 +942,7 @@ const ShowContactForm = ({id}) => {
                             placeholder="every thought matters.."
                             disabled={isSaving}
                             rows={6}
-                            className={`w-full rounded-xl mb-4 border pt-5 border-gray-400 dark:border-gray-400 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] focus:outline-none focus:border-red-500`}
+                            className={`w-full rounded-xl mb-4 pt-5 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] focus:outline-none focus:border-red-500`}
                             style={{
                                 fontSize: '16px',
                                 fontWeight: 300,
@@ -1032,7 +1032,7 @@ const ShowContactForm = ({id}) => {
                         size="xl"
                         variant="dark"
                         type="submit"
-                        className="border border-white/30 absolute -bottom-[85px] -right-[10px]"
+                        className=" absolute -bottom-[85px] -right-[10px]"
                             style={{ 
                                 marginTop: '2rem', 
                                 marginLeft: 'auto', 
@@ -1071,7 +1071,7 @@ const ShowContactForm = ({id}) => {
         style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
       
       {/* Main Contact Display Card */}
-      <div className="bg-white rounded-3xl p-5 relative z-10 overflow-visible w-[88vw] min-w-[260px] max-w-[480px] h-fit mx-auto"
+      <div className="bg-white rounded-3xl p-5 relative z-10 overflow-visible w-[88vw] min-w-[260px] max-w-[480px] h-fit mx-auto mt-10 "
           style={{ 
               boxShadow: '0 4px 32px rgba(109, 71, 71, 0.29)'
           }}>

@@ -256,7 +256,7 @@ const NewContactForm = ({onSubmit, onCancel }) => {
 
             // Call API to create contact
             const NewContactData = await createContact(accessToken, contactData);
-            console.log('New contact created:', NewContactData);
+            console.log('New contact created, newContactData:', NewContactData);
 
             // Call the onSubmit prop if provided
             if (onSubmit) {
@@ -266,10 +266,10 @@ const NewContactForm = ({onSubmit, onCancel }) => {
             resetForm();
 
             // navigate to the new contact page
-            if (NewContactData && NewContactData.id) {
-                navigate(`/myspace/contact/${NewContactData.id}`, { replace: true });
+            if (NewContactData && NewContactData?.contact.id) {
+                navigate(`/myspace/contacts/${NewContactData?.contact.id}`, { replace: true });
             } else {
-                console.error('New contact data is missing ID:', NewContactData.id);
+                console.error('New contact data is missing ID:', NewContactData?.contact.id);
                 navigate("/myspace/contacts", { replace: true });
             }
 

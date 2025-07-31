@@ -10,11 +10,11 @@ const ContactMenuBar = ({isMenuOpen, setIsMenuOpen}) => {
     const menuRef = useRef(null);
 
     const menuItems = [
-        { to: "/contact", firstPart: "open", secondPart: "Contact." },
-        { to: "/editcontact", firstPart: "edit", secondPart: "Contact." }
+        { firstPart: "open", secondPart: "Contact." },
+        { firstPart: "delete", secondPart: "Contact." }
     ];
 
-    const linkClasses = "block px-3 pb-2 pt-1 font-sans font-semibold text-lg dark:text-black hover:text-red-500 dark:hover:text-red-500 rounded-2xl ";
+    const linkClasses = "block px-1 pb-2 pt-1 font-sans font-semibold text-lg dark:text-black hover:text-red-500 dark:hover:text-red-500 rounded-2xl ";
 
     // Close menu when clicking outside
     useEffect(() => {
