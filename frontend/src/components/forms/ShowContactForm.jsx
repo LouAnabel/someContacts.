@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import CircleButton from '../ui/Buttons';
 import { useAuthContext } from '../../context/AuthContextProvider';
 import { getContactById, getCategories, updateContact } from '../../apiCalls/contactsApi';
+import { formatDateForBackend, formatDateForFrontend } from '../../apiCalls/dateConversion'
 
 
 const ShowContactForm = ({id}) => {
@@ -47,6 +48,9 @@ const ShowContactForm = ({id}) => {
     const contact = apiResponse.contact || apiResponse;
     console.log('Trasformed contact data. contact:', contact)
     
+    const birthdateForForm = contact.birth_date ? formatDateForFrontend(contact.birth_date) : contact.birth_date;
+    const contactDateForForm = contact.last_contact_date ? formatDateForFrontend(contact.last_contact_date) : contact.last_contact_date;
+    
     return {
       id: contact.id || '',
       firstName: contact.first_name || '',
@@ -55,13 +59,13 @@ const ShowContactForm = ({id}) => {
       email: contact.email || '',
       phone: contact.phone || '',
       isFavorite: contact.is_favorite || false,
-      birthdate: contact.birth_date || '',
+      birthdate: birthdateForForm || '',
       streetAndNr: contact.street_and_nr || '',
       postalcode: contact.postal_code || '',
       city: contact.city || '',
       country: contact.country || '',
       notes: contact.notes || '',
-      lastContactDate: contact.last_contact_date || '',
+      lastContactDate: contactDateForForm || '',
       meetingPlace: contact.last_contact_place || '',
       links: contact.links || []
       }
@@ -314,6 +318,9 @@ const ShowContactForm = ({id}) => {
         }
       }
 
+      const formattedBirthdate = formData.birthdate ? formatDateForBackend(formData.birthdate) : null;
+      const formattedContactDate = formData.lastContactDate ? formatDateForBackend(formData.lastContactDate) : null;
+
       // Update contact data with form data
       const updatedContactData = {
         first_name: formData.firstName?.trim(),
@@ -322,8 +329,8 @@ const ShowContactForm = ({id}) => {
         phone: formData.phone?.trim() || null,
         category_id: categoryId,
         is_favorite: formData.isFavorite || false,
-        birth_date: formData.birthdate || null,
-        last_contact_date: formData.lastContactDate || null,
+        birth_date: formattedBirthdate || null,
+        last_contact_date: formattedContactDate || null,
         last_contact_place: formData.meetingPlace?.trim() || null,
         street_and_nr: formData.streetAndNr?.trim() || null,
         postal_code: formData.postalcode?.trim() || null,

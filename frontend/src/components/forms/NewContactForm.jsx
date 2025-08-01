@@ -3,7 +3,7 @@ import CircleButton from '../ui/Buttons';
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../context/AuthContextProvider';
 import { createContact, getCategories } from '../../apiCalls/contactsApi';
-import { formatDateForBackend, formatDateForFrontend } from '../../apiCalls/dateConversion'
+import { formatDateForBackend } from '../../apiCalls/dateConversion'
 
 const NewContactForm = ({onSubmit, onCancel }) => {
     const navigate = useNavigate();
