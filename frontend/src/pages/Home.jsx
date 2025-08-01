@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useAuthContext } from "../context/AuthContextProvider";
 import { getContacts } from "../apiCalls/contactsApi";
-import { authMe } from '../apiCalls/auth';
+import { authMe } from '../apiCalls/authApi';
 
 function Home() {
   const navigate = useNavigate()

@@ -3,6 +3,7 @@ import CircleButton from '../ui/Buttons';
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../context/AuthContextProvider';
 import { createContact, getCategories } from '../../apiCalls/contactsApi';
+import { formatDateForBackend, formatDateForFrontend } from '../../apiCalls/dateConversion'
 
 const NewContactForm = ({onSubmit, onCancel }) => {
     const navigate = useNavigate();
@@ -31,9 +32,11 @@ const NewContactForm = ({onSubmit, onCancel }) => {
     const [hasSubmitted, setHasSubmitted] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [showBirthdate, setShowBirthdate] = useState(false);
+
     const [showAddress, setShowAddress] = useState(false);
     const [expandedNotes, setExpandedNotes] = useState(false);
     const [showContactDetails, setShowContactDetails] = useState(false);
+
     const [showLinks, setShowLinks] = useState(false);
     const [links, setLinks] = useState(['']);
 
@@ -234,6 +237,10 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                 throw new Error("Access token is not available.");
             }
 
+            const formattedBirthdate = formData.birthdate ? formatDateForBackend(formData.birthdate) : null;
+            const formattedContactDate = formData.lastContactDate ? formatDateForBackend(formData.lastContactDate) : null;
+
+
             // Prepare data for API call
             const contactData = {
                 first_name : formData.firstName,
@@ -242,9 +249,9 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                 phone : formData.phone,
                 category_id : formData.category.id,
                 is_favorite : formData.isFavorite,
-                last_contact_date : formData.lastContactDate,
+                last_contact_date : formattedContactDate,
                 last_contact_place : formData.meetingPlace,
-                birth_date : formData.birthdate,
+                birth_date : formattedBirthdate,
                 street_and_nr : formData.streetAndNr,
                 postal_code : formData.postalcode,
                 city : formData.city,
@@ -253,6 +260,11 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                 links: links.filter(link => link.trim() !== '')
             };
             console.log('Submitting contact data:', contactData);
+            console.log('Original dates:', { 
+                birthdate: formData.birthdate, 
+                lastContactDate: formData.lastContactDate 
+            });
+            console.log('Formatted dates:', {formattedBirthdate,formattedContactDate});
 
             // Call API to create contact
             const NewContactData = await createContact(accessToken, contactData);
@@ -303,9 +315,9 @@ const NewContactForm = ({onSubmit, onCancel }) => {
         setShowBirthdate(false);
         setShowAddress(false);
         setShowContactDetails(false);
-        // setShowLinks(false);
+        setShowLinks(false);
         setExpandedNotes(false);
-        // setLinks(['']);
+        setLinks(['']);
         setHasSubmitted(false);
         setErrors({});
       
