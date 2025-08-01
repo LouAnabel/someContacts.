@@ -20,7 +20,7 @@ const CircleButton = ({
   ...props 
 }) => {
   const sizes = {
-    small: "w-20 h-20 text-xs",    // Increased from 16 to 18
+    small: "w-16 h-16 text-xs",    // Increased from 16 to 18
     medium: "w-24 h-24 text-sm",   // Increased from 20 to 24
     large: "w-28 h-28 text-base",  // Increased from 24 to 28
     xl: "w-32 h-32 text-3xl"
@@ -53,7 +53,7 @@ const CircleButton = ({
       `}
       {...props}
     >
-      <span className={`text-2xl font-text font-semibold flex items-center justify-center px-3 py-3`}>
+      <span className={`flex items-center justify-center px-3 py-3`}>
         {children}
       </span>
     </button>

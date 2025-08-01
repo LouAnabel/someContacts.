@@ -104,6 +104,29 @@ export async function updateContact(token, contactId, contactData) {
   }
 } 
 
+// DELETE contact
+export async function deleteContactById(token, contactId) {
+  console.log("In API FILE: Accessing Data from User with ID", contactId)
+  try {
+    const response = await fetch(`http://127.0.0.1:5000/contacts/${contactId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+      
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error: ${response.status} ${response.statusText}`);
+    }   
+    const deleteMessage = await response.json();
+    return deleteMessage;
+
+  } catch (error) {
+    console.error('Error deleting contact:', error);
+    throw error;
+  }
+}
 
 
 // Get all Categories with ID validation

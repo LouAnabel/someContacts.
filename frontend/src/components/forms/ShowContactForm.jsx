@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import CircleButton from '../ui/Buttons';
 import { useAuthContext } from '../../context/AuthContextProvider';
-import { getContactById, getCategories, updateContact } from '../../apiCalls/contactsApi';
+import { getContactById, getCategories, updateContact, deleteContactById } from '../../apiCalls/contactsApi';
 import { formatDateForBackend, formatDateForFrontend } from '../../apiCalls/dateConversion'
 
 
@@ -24,7 +24,10 @@ const ShowContactForm = ({id}) => {
   // Edit Mode states
   const [isEditing, setIsEditing] = useState(false);
   const [hasSubmitted, setHasSubmitted] = useState(false);
-  const [errors, setErrors] = useState({}); // Why both?
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [errors, setErrors] = useState({}); 
+
 
   // Form states for edit mode for Categories
   const [categories, setCategories] = useState([]);
@@ -256,6 +259,35 @@ const ShowContactForm = ({id}) => {
       setLinks(links.filter((_, i) => i !== index));
     }
   };
+
+  // DELETING THE CONTACT
+  const handleDeleteContact = async () => {
+    setIsDeleting(true);
+
+    try {
+      if(!accessToken) {
+        throw new Error("AccessToken is not valid")
+      }
+
+      // call delete API
+      console.log("Deleting contact with ID:", formData.id)
+      const deleteMessage = await deleteContactById(accessToken, formData.id);
+      console.log('Contact deleted successfully:', deleteMessage);
+    
+      // Navigate back to contacts list after successful deletion
+      navigate('/myspace/contacts', { replace: true });
+    
+    } catch (error) {
+      console.error('Error deleting contact:', error);
+      // Show user-friendly error message
+      setErrors(prev => ({ ...prev, submit: `Failed to delete contact: ${error.message}` }));
+    
+    } finally {
+    setIsDeleting(false);
+    setShowDeleteConfirmation(false);
+    }
+  };
+
 
   // UPDATE Contact with validation
   const validateForm = () => {
@@ -1039,7 +1071,7 @@ const ShowContactForm = ({id}) => {
                         size="xl"
                         variant="dark"
                         type="submit"
-                        className=" absolute -bottom-[85px] -right-[10px]"
+                        className=" absolute -bottom-[85px] -right-[10px] text-2xl font-semibold"
                             style={{ 
                                 marginTop: '2rem', 
                                 marginLeft: 'auto', 
@@ -1050,15 +1082,111 @@ const ShowContactForm = ({id}) => {
                         {isSaving ? 'saving...' : 'save.'}
                     </CircleButton>
                 </div>
+                
+                {/* Deleting Button with Confirmation */}
+                <CircleButton
+                    type="button"
+                    size="medium"
+                    onClick={() => setShowDeleteConfirmation(true)}
+                    className="absolute -bottom-[74px] ml-64 text-xl font-light"
+                    style={{ 
+                      marginTop: '2rem', 
+                      marginRight: 'auto', 
+                      display: 'block',
+                      backgroundColor: '#ef4444', // red background
+                      color: 'white',
+                      border: 'none'
+                    }}
+                    disabled={isSaving || isDeleting}
+                  >
+                    delete.
+                  </CircleButton>
+
+                  {/* Delete Confirmation Modal */}
+                  {showDeleteConfirmation && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+                        style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
+                      <div className="bg-white rounded-3xl p-8 relative overflow-visible w-[85vw] min-w-[280px] max-w-[400px] mx-auto"
+                          style={{ 
+                            boxShadow: '0 8px 48px rgba(109, 71, 71, 0.35)'
+                          }}>
+                        
+                        {/* Warning Icon */}
+                        <div className="flex justify-center mb-6">
+                          <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center">
+                            <svg 
+                              className="w-8 h-8 text-red-500" 
+                              fill="none" 
+                              stroke="currentColor" 
+                              viewBox="0 0 24 24"
+                            >
+                              <path 
+                                strokeLinecap="round" 
+                                strokeLinejoin="round" 
+                                strokeWidth={2} 
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" 
+                              />
+                            </svg>
+                          </div>
+                        </div>
+
+                        {/* Title */}
+                        <h2 className="text-2xl font-bold text-center mb-4 text-black">
+                          delete <span className="text-red-500">{formData.firstName}?</span>
+                        </h2>
+                        
+                        {/* Message */}
+                        <p className="text-center text-black tracking-wider font-light mb-8 leading-relaxed">
+                          this action cannot be undone. all contact information, notes, and history will be permanently removed.
+                        </p>
+                        
+                        {/* Action Buttons */}
+                        <div className="flex space-x-4">
+                          {/* Cancel Button */}
+                          <button
+                            type="button"
+                            onClick={() => setShowDeleteConfirmation(false)}
+                            disabled={isDeleting}
+                            className="flex-1 py-3 px-6 rounded-xl border-2 border-gray-300 text-black tracking-wide font-md hover:bg-gray-50 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                            style={{ fontSize: '16px' }}
+                          >
+                            cancel.
+                          </button>
+                          
+                          {/* Delete Button */}
+                          <button
+                            type="button"
+                            onClick={handleDeleteContact}
+                            disabled={isDeleting}
+                            className="flex-1 py-3 px-6 rounded-xl bg-red-500 text-white font-md tracking-wide hover:bg-red-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                            style={{ fontSize: '16px' }}
+                          >
+                            {isDeleting ? (
+                              <>
+                                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 0 1 8-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 0 1 4 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                deleting...
+                              </>
+                            ) : (
+                              'delete forever.'
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
             </div>
 
             {/* Back Link */}
-            <div className="text-black dark:text-white font-light block mt-3 relative -ml-40 mb-36"
+            <div className="text-black dark:text-white font-light block mt-2 relative -ml-48 mb-36"
                 style={{ fontSize: '16px' }}>
                 want to cancel? {' '}
                 <button 
                     onClick={handleCancel}
-                    className="font-light text-red-500 hover:underline bg-transparent border-none cursor-pointer"
+                    className="font-normal text-red-500 hover:underline bg-transparent border-none cursor-pointer"
                     disabled={isSaving}
                 >
                     back to contact.
@@ -1245,7 +1373,7 @@ const ShowContactForm = ({id}) => {
             size="xl"
             variant="dark"
           onClick={handleEdit}
-          className=" absolute -bottom-[85px] -right-[10px]"
+          className="absolute -bottom-[85px] -right-[10px] font-semibold"
           style={{ 
             marginTop: '2rem', 
             marginLeft: 'auto', 
@@ -1264,7 +1392,7 @@ const ShowContactForm = ({id}) => {
         want to go back? {' '}
         <button 
           onClick={() => navigate('/myspace/contacts')}
-          className="font-light text-red-500 hover:underline bg-transparent border-none cursor-pointer"
+          className="font-normal text-red-500 hover:underline bg-transparent border-none cursor-pointer"
         >
         all contacts.
         </button>
