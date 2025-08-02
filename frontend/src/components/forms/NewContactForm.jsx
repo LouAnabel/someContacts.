@@ -137,7 +137,8 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                     id: apiResponse.id || apiResponse.category?.id || Date.now(),
                     name: apiResponse.name || apiResponse.category?.name || categoryName,
                     created_at: apiResponse.created_at || apiResponse.category?.created_at || new Date().toISOString(),
-                    creator_id: apiResponse.creator_id || apiResponse.category?.creator_id || 1
+                    creator_id: apiResponse.creator_id || apiResponse.category?.creator_id || 1,
+                    contact_count: apiResponse.contact_count || apiResponse.category?.contact_count || 0 
                 };
                 
                 console.log('Formatted new category:', newCategory);
@@ -152,10 +153,16 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                 
                 // Update form data to select the new category
                 setFormData(prevFormData => {
-                    const updatedFormData = { ...prevFormData, category: newCategory.name };
-                    console.log('Updated form data:', updatedFormData);
-                    return updatedFormData;
-                });
+                    const updatedFormData = { 
+                        ...prevFormData, 
+                        category: { 
+                            name: newCategory.name, 
+                            id: newCategory.id 
+                        }}
+                        console.log('Updated form data:', updatedFormData);
+                        return updatedFormData;
+                    });
+
                 
                 // Clear category errors
                 if (hasSubmitted && errors.category) {
@@ -165,11 +172,8 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                 // Reset add category form
                 setNewCategoryName('');
                 setShowAddCategory(false);
-                
-                // Brief delay before closing dropdown so user can see the selection
-                setTimeout(() => {
-                    setShowCategoryDropdown(false);
-                }, 800);
+                setShowCategoryDropdown(false);
+               
                 
                 console.log('✅ Category added successfully:', newCategory.name);
                 

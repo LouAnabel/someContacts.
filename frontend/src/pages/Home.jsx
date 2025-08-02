@@ -104,7 +104,7 @@ function Home() {
       <CircleButton 
         size="large"
         variant="dark"
-        className="border border-white/30 bg-red-500 hover:bg-red-600 dark:bg-red-500 dark:border-red-500"
+        className="font-semibold bg-red-500 hover:bg-red-600 dark:bg-red-500 dark:border-red-500"
         style={{ 
           marginTop: '3rem', 
           marginLeft: 'auto',

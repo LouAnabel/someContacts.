@@ -137,7 +137,7 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
              style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
 
             {/* Main Login Card */}
-            <div className="bg-white rounded-3xl p-5 pt-6 relative z-10 overflow-visible w-[88vw] min-w-[260px] max-w-[480px] h-[295px] absolute left-1/2 transform -translate-x-1/2"
+            <div className="bg-white rounded-3xl p-5 pt-6 relative z-10 overflow-visible w-[88vw] min-w-[260px] max-w-[480px] h-[295px] left-1/2 transform -translate-x-1/2"
                  style={{ 
                      boxShadow: '0 4px 32px rgba(109, 71, 71, 0.29)'
                  }}>
@@ -235,7 +235,7 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
             </div>
             
             {/* Bottom Tagline */}
-            <div className="text-center mt-60 text-black dark:text-white text-l absolute left-1/2 transform -translate-x-1/2 w-full min-[480px]:text-base"
+            <div className="text-center text-black dark:text-white mt-36 text-l relative left-1/2 transform -translate-x-1/2 w-full min-[480px]:text-base"
                 style={{
                     fontWeight: 300,
                     lineHeight: 1.4,
