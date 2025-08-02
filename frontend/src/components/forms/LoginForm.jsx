@@ -2,7 +2,7 @@ import { useState } from 'react';
 import CircleButton from '../ui/Buttons';
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../context/AuthContextProvider';
-
+import { sendLoginData } from '../../apiCalls/authApi';
 
 const LoginForm = ({ onSubmit, isLoading = false }) => {
     const [formData, setFormData] = useState({
@@ -21,24 +21,12 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
         try {
             setApiLoading(true);
 
-            // Simulate API call & replace with actual API logic
-            const response = await fetch('http://127.0.0.1:5000/auth/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    email: loginData.email,
-                    password: loginData.password
-                })
-            });
+            // call API call
+            const data = await sendLoginData(loginData);
 
-            const data = await response.json();
-            if (response.ok) {
-                console.log('Login successful:', data);
-
+            if (data && data.access_token) {
                 login(data.access_token, data.user)
-                
+                console.log("Login successfull!")
 
                 // clear any previous errors & clear form data
                 setErrors({});
@@ -49,9 +37,8 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
 
                 // Redirect to contacts page    
                 navigate('/myspace/', { replace: true });
+            }  else {
             
-
-            } else {
                 // Error case - backend validation failed
                 console.error('Login failed:', data);
 
@@ -62,11 +49,25 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
             }
 
         } catch (error) {
-            // Network error
-            console.error('Network/API error:', error);
-            setErrors({
-                submit: 'Unable to connect to server. Please try again later.'
-            });
+            console.error('Login error:', error);
+            
+            // Handle different types of errors
+            if (error.status >= 400 && error.status < 500) {
+                // Client errors (401, 400, etc.) - usually authentication failures
+                setErrors({
+                    submit: 'Invalid email or password.'
+                });
+            } else if (error.status >= 500) {
+                // Server errors
+                setErrors({
+                    submit: 'Server error. Please try again later.'
+                });
+            } else {
+                // Network or other errors
+                setErrors({
+                    submit: 'Unable to connect to server. Please check your connection.'
+                });
+            }
         } finally {
             setApiLoading(false);
         }
@@ -112,7 +113,7 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setHasSubmitted(true); // Mark that form has been submitted
+        setHasSubmitted(true);
         
         // Validate form before submitting
         if (!validateForm()) {
@@ -141,17 +142,20 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
                      boxShadow: '0 4px 32px rgba(109, 71, 71, 0.29)'
                  }}>
                 
-                <h2 className="text-3xl font-bold text-center mb-12 text-black">login.</h2>
+                <h2 className="text-3xl font-bold text-center mb-8 text-black">login.</h2>
+                
+                {/* Input Fields */}
                 <div className="space-y-7">
                     <div className="mb-4 relative">
                         <input
                             type="email"
                             name="email"
+                            id="email"
                             value={formData.email}
                             onChange={handleInputChange}
                             placeholder="your@email.com"
                             className={`w-full rounded-xl border bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
-                                        hasSubmitted && errors.firstName ? 'border-red-500 shadow-lg' : 'border-gray-400 dark:border-gray-400'
+                                        hasSubmitted && errors.email ? 'border-red-500 shadow-lg' : 'border-gray-400 dark:border-gray-400'
                             }`}
                             style={{
                                 fontSize: '18px',
@@ -159,7 +163,7 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
                             }}
                         />
                         <label 
-                            htmlFor="firstName" 
+                            htmlFor="email" 
                             className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-light"
                         >
                             email
@@ -169,69 +173,77 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
                         )}
                     </div>
 
-                    <div className="relative ">
+                    <div className="relative">
                         <input
                             type="password"
                             name="password"
+                            id="password"
                             value={formData.password}
                             onChange={handleInputChange}
                             placeholder="••••••••"
-                            className={`w-full rounded-xl border bg-white mb-6 shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
-                                        hasSubmitted && errors.firstName ? 'border-red-500 shadow-lg' : 'border-gray-400 dark:border-gray-400'
+                            className={`w-full rounded-xl border bg-white -mb-3 shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
+                                        hasSubmitted && errors.password ? 'border-red-500 shadow-lg' : 'border-gray-400 dark:border-gray-400'
                             }`}
-                                style={{
-                                    fontSize: '18px',
-                                    fontWeight: 300
+                            style={{
+                                fontSize: '18px',
+                                fontWeight: 300
                             }}
                         />
                         <label 
-                            htmlFor="firstName" 
+                            htmlFor="password" 
                             className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-light"
                         >
                             password
                         </label>
                         {hasSubmitted && errors.password && (
-                            <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.password}</p>
+                            <p className="absolute top-full mt-3 right-1 text-sm text-red-600 z-20">{errors.password}</p>
                         )}
                     </div>
+
+                    {/* Login Error Message */}
+                    {errors.submit && (
+                        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                            <p className="text-sm text-red-600 text-center font-light">{errors.submit}</p>
+                        </div>
+                    )}
+
                 </div>    
+                
                 {/* Signup Link */}
-                <div className= "text-black dark:text-white font-light block absolute bottom-[-30px] left-[30px]"
+                <div className="text-black dark:text-white font-light block absolute bottom-[-30px] left-[30px]"
                      style={{ fontSize: '16px' }}>
                     no account? {' '}
-                            <a href="register" className="font-light font-normal text-red-500 hover:underline">
-                                sign in here
-                            </a>
+                    <a href="register" className="font-normal text-red-500 hover:underline">
+                        sign up.
+                    </a>
                 </div>
 
                 {/* Circle Button */}
                 <CircleButton
                     size="xl"
                     variant="dark"
-                    className=" absolute -bottom-[85px] -right-[10px]"
+                    className="absolute font-semibold -bottom-[85px] -right-[10px]"
                     style={{ 
                         marginTop: '2rem', 
                         marginLeft: 'auto', 
                         display: 'block' 
                     }}
-                    disabled={isLoading}
+                    disabled={showLoading}
                     onClick={handleSubmit}>
-                    {isLoading ? '. . .' : 'get in.'}
+                    {showLoading ? '. . .' : 'get in.'}
                 </CircleButton>
-                </div>
-                {/* Bottom Tagline */}
-                <div className="text-center mt-40 text-black dark:text-white text-l absolute left-1/2 transform -translate-x-1/2 w-full min-[480px]:text-base"
-                    style={{
-                        fontWeight: 300,
-                        lineHeight: 1.4,
-                        fontSize: typeof window !== 'undefined' && window.innerWidth >= 1024 ? '30px' : '24px',
-                                
-                    }}>
-                    <p>Remember their names.</p>
-                    <p>Know their faces.</p>
-                </div>
+            </div>
             
-
+            {/* Bottom Tagline */}
+            <div className="text-center mt-60 text-black dark:text-white text-l absolute left-1/2 transform -translate-x-1/2 w-full min-[480px]:text-base"
+                style={{
+                    fontWeight: 300,
+                    lineHeight: 1.4,
+                    fontSize: typeof window !== 'undefined' && window.innerWidth >= 1024 ? '30px' : '24px',
+                }}>
+                <p>Remember their names.</p>
+                <p>Know their faces.</p>
+            </div>
         </div>
     );
 };

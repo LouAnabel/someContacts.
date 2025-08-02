@@ -188,7 +188,7 @@ const RegisterForm = () => {
              style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
 
             {/* Main Register Card */}
-            <div className="bg-white rounded-3xl p-5 relative z-10 overflow-visible w-[88vw] min-w-[260px] max-w-[480px] h-fit left-1/2 transform -translate-x-1/2"
+            <div className="bg-white rounded-3xl p-5 relative z-10 overflow-visible w-[88vw] min-w-[260px] max-w-[480px] left-1/2 transform -translate-x-1/2"
                  style={{ 
                      boxShadow: '0 4px 32px rgba(109, 71, 71, 0.29)'
                  }}>
@@ -196,7 +196,7 @@ const RegisterForm = () => {
                     create an account.
                 </h1>
 
-                <div className="space-y-3">
+                <div className="space-y-3 pb-12">
                     <div className="space-y-7">
                         {/* First Name Field */}
                         <div className="relative">
@@ -259,7 +259,7 @@ const RegisterForm = () => {
 
                     
                         
-                    <p className="relative text-red-500 left-2 font-light pt-6">how to login?</p>
+                    <p className="relative text-red-500 left-2 font-light pt-6 ">how to login?</p>
                     {/* Email Field */}
                     <div className="space-y-7">
                         <div className="relative">
@@ -349,8 +349,15 @@ const RegisterForm = () => {
                         </div>
                     </div>
 
-                    {/* Terms and Conditions */}
-                    <div className={`flex items-start space-x-3 relative mt-8 p-1 rounded-lg ${hasSubmitted && errors.terms ? 'ring-2 ring-red-500' : ''}`}>
+                    {/* Login Error Message */}
+                    {errors.submit && (
+                        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                            <p className="text-sm text-red-600 text-center font-light">{errors.submit}</p>
+                        </div>
+                    )}
+
+                    {/* Terms and Conditions
+                    <div className={`flex items-start space-x-3 relative p-1 rounded-lg ${hasSubmitted && errors.terms ? 'ring-2 ring-red-500' : ''}`}>
                         <input 
                             id="terms" 
                             type="checkbox" 
@@ -369,14 +376,14 @@ const RegisterForm = () => {
                                 terms and conditions.
                             </a>
                         </label>
-                    </div>
+                    </div> */}
                 </div>
 
                 {/* Circle Button - Outside the space-y-6 div but inside the card */}
                 <CircleButton
                     size="xl"
                     variant="dark"
-                    className="border border-white/30 absolute -bottom-[85px] -right-[10px]"
+                    className=" absolute font-semibold -bottom-[85px] -right-[10px]"
                     style={{ 
                         marginTop: '2rem', 
                         marginLeft: 'auto', 
@@ -392,9 +399,9 @@ const RegisterForm = () => {
             {/* Signup Link */}
             <div className="text-black dark:text-white font-light block mt-3 absolute left-[40px]"
                  style={{ fontSize: '16px' }}>
-                already have an account? {' '}
-                <a href="login" className="font-light text-red-500 hover:underline">
-                     login here.
+                have an account? {' '}
+                <a href="login" className="font-normal text-red-500 hover:underline">
+                     login.
                 </a>
             </div>
         </div>

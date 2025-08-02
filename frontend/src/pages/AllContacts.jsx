@@ -27,6 +27,7 @@ export default function AllContacts() {
         }
 
         const contactsData = await getContacts(accessToken);
+        console.log('Contacts data:', contactsData); // Debug log to check the structure
 
         setContacts(contactsData);
 
@@ -52,6 +53,7 @@ export default function AllContacts() {
       </div>
     );
   }
+  
   if (error) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -95,28 +97,23 @@ export default function AllContacts() {
       <h1 className="w-full justify-content pt-10 text-center text-3xl font-heading font-bold text-gray-900 dark:text-white mb-2 mt-6">
         All <span className="text-red-500">{contacts.length} </span> Contacts
       </h1>
-      {/* <div className="p-10 gap-10 flex flex-col md:flex-row max-w-fit md:flex-wrap justify-center items-center border border-blue-500"> */}
-      <div className="p-10 gap-10 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3  0 max-w-screen-2xl"> 
-
-   {contacts.map((contact) => (
+      
+      <div className="p-10 gap-10 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 max-w-screen-2xl"> 
+        {contacts.map((contact, index) => {
+          // Create a more reliable key
+          const contactKey = contact.id || contact._id || `contact-${index}`;
+          
+          // Debug log to check what keys are being generated
+          console.log('Contact key:', contactKey, 'for contact:', contact.first_name);
+          
+          return (
             <ContactCardSmall
-              key={contact._id || contact.id}
+              key={contactKey}
               contact={contact}
             />
-          ))}
-    
-        {/* <div className="grid md:grid-cols-2 md:gap-10 lg:px-16 xl:grid-cols-3 -mb-80">
-            {contacts.map((contact) => (
-                <ContactCardSmallPhoto
-                  key={contact._id || contact.id}
-                  contact={contact}
-                />
-              ))} 
-        </div> */}
+          );
+        })}
       </div>
     </div>
   );
 }
-
-
-
