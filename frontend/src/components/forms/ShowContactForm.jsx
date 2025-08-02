@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import CircleButton from '../ui/Buttons';
 import { useAuthContext } from '../../context/AuthContextProvider';
 import { getContactById, getCategories, updateContact, deleteContactById } from '../../apiCalls/contactsApi';
-import { formatDateForBackend, formatDateForFrontend } from '../../apiCalls/dateConversion'
+import FormDataToApiData from '../helperFunctions/FormToApiData'
+import ApiDataToFormData from '../helperFunctions/ApiToFormData'
+import CircleButton from '../ui/Buttons';
+
 
 
 const ShowContactForm = ({id}) => {
@@ -28,7 +30,6 @@ const ShowContactForm = ({id}) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [errors, setErrors] = useState({}); 
 
-
   // Form states for edit mode for Categories
   const [categories, setCategories] = useState([]);
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
@@ -42,37 +43,6 @@ const ShowContactForm = ({id}) => {
   const [showContactDetails, setShowContactDetails] = useState(false);
   const [showLinks, setShowLinks] = useState(false);
   const [links, setLinks] = useState(['']);
-
-
-  // helper funciton to transform API Format in UI Form Format
-  const ApiDataToFormData = (apiResponse) => {
-    console.log('apiResponse:', apiResponse)
-
-    const contact = apiResponse.contact || apiResponse;
-    console.log('Trasformed contact data. contact:', contact)
-    
-    const birthdateForForm = contact.birth_date ? formatDateForFrontend(contact.birth_date) : contact.birth_date;
-    const contactDateForForm = contact.last_contact_date ? formatDateForFrontend(contact.last_contact_date) : contact.last_contact_date;
-    
-    return {
-      id: contact.id || '',
-      firstName: contact.first_name || '',
-      lastName: contact.last_name || '',
-      category: contact.category?.name || '',
-      email: contact.email || '',
-      phone: contact.phone || '',
-      isFavorite: contact.is_favorite || false,
-      birthdate: birthdateForForm || '',
-      streetAndNr: contact.street_and_nr || '',
-      postalcode: contact.postal_code || '',
-      city: contact.city || '',
-      country: contact.country || '',
-      notes: contact.notes || '',
-      lastContactDate: contactDateForForm || '',
-      meetingPlace: contact.last_contact_place || '',
-      links: contact.links || []
-      }
-    };
 
 
   // Step 1: Loading Form Data from API with ID
@@ -233,6 +203,7 @@ const ShowContactForm = ({id}) => {
         }
     };
 
+
   // Form Handlers
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -287,6 +258,43 @@ const ShowContactForm = ({id}) => {
     setShowDeleteConfirmation(false);
     }
   };
+ 
+
+  // FAVORITE TOGGLE
+  const handleFavoriteToggle = async () => {
+    try {
+      const newFavoriteState = !formData.isFavorite;
+      
+      // Update the UI
+      setFormData(prev => ({ ...prev, isFavorite: newFavoriteState }));
+      
+      if (!accessToken) {
+        throw new Error("Access token is not available.");
+      }
+
+      // Prepare data with the new favorite state
+      const updatedContactData = FormDataToApiData({ formData, categories,
+        is_favorite: newFavoriteState 
+      });
+
+      console.log("Updating favorite status:", newFavoriteState);
+      
+      const apiResponse = await updateContact(accessToken, formData.id, updatedContactData);
+      
+      if (!apiResponse) {
+        throw new Error('Failed to update favorite status');
+      }
+
+      console.log('Favorite status updated successfully');
+      setContactData(prev => ({ ...prev, isFavorite: newFavoriteState }));
+      
+    } catch (error) {
+      console.error('Error updating favorite status:', error);
+      // Revert the UI change on error
+      setFormData(prev => ({ ...prev, isFavorite: !newFavoriteState }));
+      setError(`Failed to update favorite status: ${error.message}`);
+    }
+  };
 
 
   // UPDATE Contact with validation
@@ -320,6 +328,17 @@ const ShowContactForm = ({id}) => {
     return Object.keys(newErrors).length === 0;
   };
 
+  // Initializing EDIT MODE
+  const handleEdit = () => {
+    if (!formData) return;
+
+    setIsEditing(true);
+    setHasSubmitted(false);
+    setErrors({});
+  };
+
+
+  // Handle Saving the Data after Edit Mode
   const handleSave = async (e) => {
     e.preventDefault();
     setHasSubmitted(true);
@@ -333,48 +352,18 @@ const ShowContactForm = ({id}) => {
 
     try {
       if (!accessToken) {
-          throw new Error("Access token is not available.");
+        throw new Error("Access token is not available.");
       }
 
-      console.log('Current formData before save:', formData)
+      console.log('Current formData before save:', formData);
 
-      let categoryId = null;
-      if (formData.category) {
-        // if categor is string, find the category object
-        if (typeof formData.category === 'string') {
-          const selectedCategory = categories.find( cat => cat.name === formData.category);
-          categoryId = selectedCategory ? selectedCategory.id : null;
-        } else if (formData.category.id) {
-          // if category is an object with id
-          categoryId = formData.category.id;
-        }
-      }
-
-      const formattedBirthdate = formData.birthdate ? formatDateForBackend(formData.birthdate) : null;
-      const formattedContactDate = formData.lastContactDate ? formatDateForBackend(formData.lastContactDate) : null;
-
-      // Update contact data with form data
-      const updatedContactData = {
-        first_name: formData.firstName?.trim(),
-        last_name: formData.lastName?.trim(),
-        email: formData.email?.trim(),
-        phone: formData.phone?.trim() || null,
-        category_id: categoryId,
-        is_favorite: formData.isFavorite || false,
-        birth_date: formattedBirthdate || null,
-        last_contact_date: formattedContactDate || null,
-        last_contact_place: formData.meetingPlace?.trim() || null,
-        street_and_nr: formData.streetAndNr?.trim() || null,
-        postal_code: formData.postalcode?.trim() || null,
-        city: formData.city?.trim() || null,
-        country: formData.country?.trim() || null,
-        notes: formData.notes?.trim() || null,
+      // Use the helper function to prepare data
+      const updatedContactData = FormDataToApiData(formData, categories, { 
         links: showLinks ? links.filter(link => link && link.trim() !== '') : []
-      };
+        });
       
-      console.log("Submitting updated data:", updatedContactData)
+      console.log("Submitting updated data:", updatedContactData);
       
-      // API Call to Update ContactData in Database
       const apiResponse = await updateContact(accessToken, formData.id, updatedContactData);
     
       if (!apiResponse) {
@@ -383,16 +372,10 @@ const ShowContactForm = ({id}) => {
 
       console.log('API Response:', apiResponse);
       
-      // Transform the API response back to form format
       const updatedFormData = ApiDataToFormData(apiResponse);
-      
-      // Update form data (for editing)
       setFormData(updatedFormData);
-      
-      // Update contact data (for display) - you can use the same data
       setContactData(updatedFormData);
       
-      // Exit edit mode
       setIsEditing(false);
       setHasSubmitted(false);
       setErrors({});
@@ -402,35 +385,28 @@ const ShowContactForm = ({id}) => {
     } catch (error) {
       console.error('Error updating contact:', error);
       setError(`Failed to update contact: ${error.message}`);
-      
     } finally {
       setIsSaving(false);
     }
   };
 
-    const handleEdit = () => {
+  const handleCancel = () => {
       if (!formData) return;
 
-      setIsEditing(true);
+      setFormData({ ...formData });
+      setIsEditing(false);
       setHasSubmitted(false);
       setErrors({});
-    };
-
-  const handleCancel = () => {
-    if (!formData) return;
-
-    setFormData({ ...formData });
-    setIsEditing(false);
-    setHasSubmitted(false);
-    setErrors({});
-    
-    // Reset optional sections
-    setShowBirthdate(!!formData.birthdate);
-    setShowAddress(!!formData.streetAndNr || !!formData.city || !!formData.country || !!formData.postalcode);
-    setShowContactDetails(!!formData.lastContactDate || !!formData.meetingPlace);
-    setShowLinks(formData.links && formData.links.length > 0);
-    setLinks(formData.links && formData.links.length > 0 ? formData.links : ['']);
+      
+      // Reset optional sections
+      setShowBirthdate(!!formData.birthdate);
+      setShowAddress(!!formData.streetAndNr || !!formData.city || !!formData.country || !!formData.postalcode);
+      setShowContactDetails(!!formData.lastContactDate || !!formData.meetingPlace);
+      setShowLinks(formData.links && formData.links.length > 0);
+      setLinks(formData.links && formData.links.length > 0 ? formData.links : ['']);
   };
+
+  
 
   // Show loading state
   if (isLoading) {
@@ -501,9 +477,9 @@ const ShowContactForm = ({id}) => {
                 <div className="flex items-center w-full relative left-1 mt-3 mb-8 rounded-lg">
                     <button
                         type="button"
-                        onClick={() => setFormData(prev => ({ ...prev, isFavorite: !prev.isFavorite }))}
-                        className="flex items-center space-x-2 hover:scale-110 transform"
-                        disabled={isSaving}
+                        onClick={handleFavoriteToggle}  // Changed from setFormData
+                        className="flex items-center hover:scale-110 transform"
+                        disabled={isLoading}
                     >
                         <svg 
                             className={`w-7 h-7 ${
@@ -1221,11 +1197,11 @@ const ShowContactForm = ({id}) => {
             {/* Favorite Checkbox */}
             <div className="flex items-center">
                 <button
-                    type="button"
-                    onClick={() => setContactData(prev => ({ ...prev, isFavorite: !prev.isFavorite }))}
-                    className="flex items-center hover:scale-110 transform"
-                    disabled={isLoading}
-                >
+                        type="button"
+                        onClick={handleFavoriteToggle}  // Changed from setFormData
+                        className="flex items-center hover:scale-110 transform"
+                        disabled={isLoading}
+                    >
                     <svg 
                         className={`w-7 h-7 ${
                             formData.isFavorite ? 'text-red-500 hover:text-yellow-300' : 'text-black hover:text-yellow-300'

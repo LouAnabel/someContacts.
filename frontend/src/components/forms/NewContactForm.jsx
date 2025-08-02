@@ -3,7 +3,7 @@ import CircleButton from '../ui/Buttons';
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../context/AuthContextProvider';
 import { createContact, getCategories } from '../../apiCalls/contactsApi';
-import { formatDateForBackend } from '../../apiCalls/dateConversion'
+import { formatDateForBackend } from '../helperFunctions/dateConversion'
 
 const NewContactForm = ({onSubmit, onCancel }) => {
     const navigate = useNavigate();
@@ -46,6 +46,7 @@ const NewContactForm = ({onSubmit, onCancel }) => {
     const [showAddCategory, setShowAddCategory] = useState(false);
     const [newCategoryName, setNewCategoryName] = useState('');
     const [isAddingCategory, setIsAddingCategory] = useState(false);
+
 
     // Load Categories on component mount
     useEffect(() => {
@@ -101,6 +102,7 @@ const NewContactForm = ({onSubmit, onCancel }) => {
             setLinks(newLinks);
         }
     };
+
 
     // LOADING CATEGORIES TO DATABASE 
     const addCategory = async () => {
@@ -204,10 +206,10 @@ const NewContactForm = ({onSubmit, onCancel }) => {
             newErrors.lastName = 'Last name must be at least 2 characters';
         }
 
-        // // category validation
-        // if (!formData.category.name.trim()) {
-        //     newErrors.category = 'category is required';
-        // }
+        // category validation
+        if (!formData.category.name) {
+             newErrors.category = 'category is required';
+        }
         
         // Email validation
         if (!formData.email) {
@@ -1042,7 +1044,7 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                     type="submit"
                     size="xl"
                     variant="dark"
-                    className=" absolute -bottom-[85px] -right-[10px]"
+                    className=" font-semibold absolute -bottom-[85px] -right-[10px]"
                     style={{ 
                         marginTop: '2rem', 
                         marginLeft: 'auto', 
