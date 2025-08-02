@@ -5,22 +5,18 @@ import { useNavigate, Link } from 'react-router';
 
 const ContactCardSmall = ({contact = {}}) => {
 
-    console.log(contact)
-    console.log(contact.category)
-    console.log(contact.category?.name)
-
     // Add this state declaration
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [contactPhoto, setContactPhoto] = useState(null);
     const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
         isFavorite: contact.is_favorite || false
         });
 
-    const handleClickCategory = () => {
-        navigate(`myspace/category/${contact.category?.id}`, { replace: true });
-    }
+    // const [contactPhoto, setContactPhoto] = useState(null);
+    // const handleClickCategory = () => {
+    //     navigate(`myspace/category/${contact.category?.id}`, { replace: true });
+    // }
 
     return (
          <div className="bg-white dark:bg-black relative justify-items" // Fixed comment syntax

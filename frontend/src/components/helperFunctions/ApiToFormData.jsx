@@ -4,10 +4,9 @@ import { formatDateForFrontend } from '../helperFunctions/dateConversion'
 // to transform API Format in UI Form Format
 
 const ApiDataToFormData = (apiResponse) => {
-    console.log('apiResponse:', apiResponse)
-
+  console.log("ApiResponse to transform:", apiResponse)
+    // exttacting just the contact data from API response
     const contact = apiResponse.contact || apiResponse;
-    console.log('Trasformed contact data. contact:', contact)
     
     const birthdateForForm = contact.birth_date ? formatDateForFrontend(contact.birth_date) : contact.birth_date;
     const contactDateForForm = contact.last_contact_date ? formatDateForFrontend(contact.last_contact_date) : contact.last_contact_date;

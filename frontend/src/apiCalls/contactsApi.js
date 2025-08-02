@@ -41,6 +41,7 @@ export async function getContactById(token, contactId) {
       throw new Error(`Error: ${response.status} ${response.statusText}`);
     }   
     const data = await response.json();
+    console.log("Sending Contact Data to ShowContact")
     return data;
 
   } catch (error) {
@@ -67,6 +68,7 @@ export async function createContact(token, contactData) {
     }
     const data = await response.json();
     console.log('Contact created:', data);
+
     return data;
   } catch (error) {
     
@@ -136,7 +138,7 @@ export const getCategories = async (accessToken) => {
             throw new Error('Access token is required')
         }
 
-        console.log("In API FILE: Trying to GET Categories")
+        console.log("In API FILE: Fetching all Categories")
         const response = await fetch('http://127.0.0.1:5000/categories', {
             method: 'GET',
             headers: {
@@ -148,8 +150,7 @@ export const getCategories = async (accessToken) => {
         if (!response.ok) {
           throw new Error(`Error: ${response.status} ${response.statusText}`);
         }
-        
-        console.log("fetching successful, creating categories in json")
+        console.log("Sending Categories Data to ShowContact")
         const categoriesData = await response.json();
         
         // Ensure all categories have unique IDs

@@ -6,10 +6,7 @@ import FormDataToApiData from '../helperFunctions/FormToApiData'
 import ApiDataToFormData from '../helperFunctions/ApiToFormData'
 import CircleButton from '../ui/Buttons';
 
-
-
 const ShowContactForm = ({id}) => {
-
   const navigate = useNavigate();
   const { accessToken } = useAuthContext();
   
@@ -18,9 +15,7 @@ const ShowContactForm = ({id}) => {
   const [error, setError] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
 
-  console.log("Load Default Contact Data")
   const [contactData, setContactData] = useState({});
-  console.log("Load Default Form Data")
   const [formData, setFormData] = useState({});
 
   // Edit Mode states
@@ -44,172 +39,124 @@ const ShowContactForm = ({id}) => {
   const [showLinks, setShowLinks] = useState(false);
   const [links, setLinks] = useState(['']);
 
-
-  // Step 1: Loading Form Data from API with ID
-  console.log("Step 1: accessing API for contact with ID", id)
+  // FIXED: Contact data fetching
   useEffect(() => {
-
-    console.log("Calling LoadContact Function")
     const fetchContactData = async () => {
+      if (!accessToken || !id) {
+        setIsLoading(false);
+        return;
+      }
+      
+      try {
+        setIsLoading(true);
+        setError(null);
 
-      // checking if token and ID exist 
-      console.log("See if accessToken and ID exist")
-        if (!accessToken || !id) {
-          setIsLoading(false);
-          return;
-        }
-        console.log("Successfull with token and ID")
-        try {
-          setIsLoading(true);
-          setError(null);
-
-          // fetching data and save it as apiContactData
-          console.log("Step 2: Fetching contactData with ID:", id) 
-          const apiContactData = await getContactById(accessToken, id);
-          console.log('received Contact Data to setContactData UseState:', apiContactData)
-          setContactData(apiContactData); // => original fetched ContactData for the user to see
+        const apiContactData = await getContactById(accessToken, id);
+        setContactData(apiContactData);
         
-          // transforming apiContact Data into UI Form Data
-          const newFormData = ApiDataToFormData(apiContactData);
-          console.log("transformed API Data for FormData:", newFormData)
-          setFormData(newFormData); // FormData
+        const newFormData = ApiDataToFormData(apiContactData);
+        setFormData(newFormData);
 
-        } catch (error) {
-          console.error('Failed to load contact data:', error);
-          setError(error.message || 'Failed to load contact data');
-          setContactData({});
-          setFormData({});
+        // FIXED: Initialize optional sections with the NEW form data
+        setShowBirthdate(!!newFormData.birthdate);
+        setShowAddress(
+          !!(newFormData.streetAndNr || newFormData.city || 
+            newFormData.country || newFormData.postalcode)
+        );
+        setShowContactDetails(
+          !!(newFormData.lastContactDate || newFormData.lastContactPlace)
+        );
+        
+        const hasLinks = newFormData.links && newFormData.links.length > 0;
+        setShowLinks(hasLinks);
+        setLinks(hasLinks ? newFormData.links.map(link => link.url || link) : ['']);
 
-        } finally {
-          setIsLoading(false);
+      } catch (error) {
+        console.error('Failed to load contact data:', error);
+        setError(error.message || 'Failed to load contact data');
+        setContactData({});
+        setFormData({});
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchContactData();
+  }, [accessToken, id]);
 
-  },[accessToken, id]);
-
-
-  // Loading Categories
+  // FIXED: Categories loading - proper dependencies
   useEffect(() => {
     const loadCategories = async () => {
       if (!accessToken) return;
 
       try {
-        if (accessToken) {
-            const categoriesData = await getCategories(accessToken);
-            console.log("categoriesData:", categoriesData)
-            setCategories(categoriesData); // Just empty array, no defaults
-        } else {
-            setCategories([]); // Empty array when no access token
-        }
-
+        const categoriesData = await getCategories(accessToken);
+        setCategories(categoriesData);
       } catch (error) {   
-          console.error('Failed to load categories:', error);
-          setCategories([]); // Empty array on error
+        console.error('Failed to load categories:', error);
+        setCategories([]);
       }
     };
 
     loadCategories();
-  }, [accessToken]);
+  }, [accessToken]); // FIXED: Only depend on accessToken, not contactData
 
+  // REMOVED: The problematic "other" useEffect entirely
 
-  // Initialize optional sections when contact data loads
-  useEffect(() => {
-    if (!formData) return;
-
-    setShowBirthdate(!!formData.birthdate);
-    setShowAddress(
-      !!(formData.streetAndNr || formData.city || 
-         formData.country || formData.postalcode)
-    );
-    setShowContactDetails(
-      !!(formData.lastContactDate || formData.lastContactPlace)
-    );
-    
-    const hasLinks = formData.links && formData.links.length > 0;
-    setShowLinks(hasLinks);
-    setLinks(hasLinks ? formData.links.map(link => link.url || link) : ['']);
-  }, [formData]);
-
-  
-  // LOADING CATEGORIES TO DATABASE 
-    const addCategory = async () => {
-        if (newCategoryName.trim() && !isAddingCategory) {
-            setIsAddingCategory(true);
-            
-            try {
-                const categoryName = newCategoryName.charAt(0).toUpperCase() + newCategoryName.slice(1).trim();
-                console.log('Adding category:', categoryName);
-                
-                // ADD CATEGORIES TO DATABASE
-                const response = await fetch('http://127.0.0.1:5000/categories', {
-                    method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${accessToken}`
-                    },
-                    body: JSON.stringify({ 
-                        name: categoryName
-                    })
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`Error: ${response.status} ${response.statusText}`);
-                }
-                
-                const apiResponse = await response.json();
-                console.log('API Response for new category:', apiResponse);
-                
-                // Create a properly formatted category object
-                const newCategory = {
-                    id: apiResponse.id || apiResponse.category?.id || Date.now(),
-                    name: apiResponse.name || apiResponse.category?.name || categoryName,
-                    created_at: apiResponse.created_at || apiResponse.category?.created_at || new Date().toISOString(),
-                    creator_id: apiResponse.creator_id || apiResponse.category?.creator_id || 1
-                };
-                
-                console.log('Formatted new category:', newCategory);
-                console.log('Current categories before update:', categories);
-                
-                // Update categories state with the new category
-                setCategories(prevCategories => [...prevCategories, newCategory]);
-                
-                // Update form data to select the new category
-                setFormData(prevFormData => ({...prevFormData, category: newCategory.name }));
-                
-                // Clear category errors
-                if (hasSubmitted && errors.category) {
-                    setErrors(prev => ({ ...prev, category: '' }));
-                }
-                
-                // Reset add category form
-                setNewCategoryName('');
-                setShowAddCategory(false);
-                
-                // Brief delay before closing dropdown so user can see the selection
-                setTimeout(() => {
-                    setShowCategoryDropdown(false);
-                }, 800);
-                
-                console.log('Category added successfully:', newCategory.name);
-                
-            } catch (error) {
-                console.error('Failed to add category:', error);
-                alert(`Failed to add category: ${error.message}`);
-            } finally {
-                setIsAddingCategory(false);
-            }
+  // Rest of your functions stay the same...
+  const addCategory = async () => {
+    if (newCategoryName.trim() && !isAddingCategory) {
+      setIsAddingCategory(true);
+      
+      try {
+        const categoryName = newCategoryName.charAt(0).toUpperCase() + newCategoryName.slice(1).trim();
+        
+        const response = await fetch('http://127.0.0.1:5000/categories', {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`
+          },
+          body: JSON.stringify({ name: categoryName })
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status} ${response.statusText}`);
         }
-    };
+        
+        const apiResponse = await response.json();
+        
+        const newCategory = {
+          id: apiResponse.id || apiResponse.category?.id || Date.now(),
+          name: apiResponse.name || apiResponse.category?.name || categoryName,
+          created_at: apiResponse.created_at || apiResponse.category?.created_at || new Date().toISOString(),
+          creator_id: apiResponse.creator_id || apiResponse.category?.creator_id || 1
+        };
+        
+        setCategories(prevCategories => [...prevCategories, newCategory]);
+        setFormData(prevFormData => ({...prevFormData, category: newCategory.name }));
+        
+        if (hasSubmitted && errors.category) {
+          setErrors(prev => ({ ...prev, category: '' }));
+        }
+        
+        setNewCategoryName('');
+        setShowAddCategory(false);
+        setShowCategoryDropdown(false);
+        
+      } catch (error) {
+        console.error('Failed to add category:', error);
+        alert(`Failed to add category: ${error.message}`);
+      } finally {
+        setIsAddingCategory(false);
+      }
+    }
+  };
 
-
-  // Form Handlers
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
     
-    // Clear error when user starts typing
     if (hasSubmitted && errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
@@ -231,80 +178,58 @@ const ShowContactForm = ({id}) => {
     }
   };
 
-  // DELETING THE CONTACT
   const handleDeleteContact = async () => {
     setIsDeleting(true);
-
     try {
       if(!accessToken) {
         throw new Error("AccessToken is not valid")
       }
 
-      // call delete API
-      console.log("Deleting contact with ID:", formData.id)
       const deleteMessage = await deleteContactById(accessToken, formData.id);
-      console.log('Contact deleted successfully:', deleteMessage);
-    
-      // Navigate back to contacts list after successful deletion
       navigate('/myspace/contacts', { replace: true });
-    
     } catch (error) {
       console.error('Error deleting contact:', error);
-      // Show user-friendly error message
       setErrors(prev => ({ ...prev, submit: `Failed to delete contact: ${error.message}` }));
-    
     } finally {
-    setIsDeleting(false);
-    setShowDeleteConfirmation(false);
+      setIsDeleting(false);
+      setShowDeleteConfirmation(false);
     }
   };
- 
 
-  // FAVORITE TOGGLE
   const handleFavoriteToggle = async () => {
     try {
       const newFavoriteState = !formData.isFavorite;
-      
-      // Update the UI
       setFormData(prev => ({ ...prev, isFavorite: newFavoriteState }));
       
       if (!accessToken) {
         throw new Error("Access token is not available.");
       }
 
-      // Prepare data with the new favorite state
-      const updatedContactData = FormDataToApiData({ formData, categories,
+      const updatedContactData = FormDataToApiData(formData, categories, {
         is_favorite: newFavoriteState 
       });
 
-      console.log("Updating favorite status:", newFavoriteState);
-      
       const apiResponse = await updateContact(accessToken, formData.id, updatedContactData);
       
       if (!apiResponse) {
         throw new Error('Failed to update favorite status');
       }
 
-      console.log('Favorite status updated successfully');
       setContactData(prev => ({ ...prev, isFavorite: newFavoriteState }));
       
     } catch (error) {
       console.error('Error updating favorite status:', error);
-      // Revert the UI change on error
       setFormData(prev => ({ ...prev, isFavorite: !newFavoriteState }));
       setError(`Failed to update favorite status: ${error.message}`);
     }
   };
 
-
-  // UPDATE Contact with validation
   const validateForm = () => {
     const newErrors = {};
     
     if (!formData.firstName?.trim()) newErrors.firstName = 'First name is required';
     if (!formData.lastName?.trim()) newErrors.lastName = 'Last name is required';
     
-    // Category validation for both string and object formats
     const categoryValue = typeof formData.category === 'string' 
       ? formData.category 
       : formData.category?.name;
@@ -319,32 +244,26 @@ const ShowContactForm = ({id}) => {
       newErrors.email = 'Please enter a valid email';
     }
     
-    // Phone validation 
     if (formData.phone && formData.phone.trim() && !/^\+?[\d\s\-\(\)]{10,}$/.test(formData.phone.trim())) {
-        newErrors.phone = 'Please enter a valid phone number';
+      newErrors.phone = 'Please enter a valid phone number';
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // Initializing EDIT MODE
   const handleEdit = () => {
     if (!formData) return;
-
     setIsEditing(true);
     setHasSubmitted(false);
     setErrors({});
   };
 
-
-  // Handle Saving the Data after Edit Mode
   const handleSave = async (e) => {
     e.preventDefault();
     setHasSubmitted(true);
     
     if (!validateForm()) {
-      console.error('Form validation failed:', errors);
       return;
     }
     
@@ -355,22 +274,15 @@ const ShowContactForm = ({id}) => {
         throw new Error("Access token is not available.");
       }
 
-      console.log('Current formData before save:', formData);
-
-      // Use the helper function to prepare data
       const updatedContactData = FormDataToApiData(formData, categories, { 
         links: showLinks ? links.filter(link => link && link.trim() !== '') : []
-        });
-      
-      console.log("Submitting updated data:", updatedContactData);
+      });
       
       const apiResponse = await updateContact(accessToken, formData.id, updatedContactData);
     
       if (!apiResponse) {
         throw new Error('Failed to update contact - no response from server');
       }
-
-      console.log('API Response:', apiResponse);
       
       const updatedFormData = ApiDataToFormData(apiResponse);
       setFormData(updatedFormData);
@@ -379,8 +291,6 @@ const ShowContactForm = ({id}) => {
       setIsEditing(false);
       setHasSubmitted(false);
       setErrors({});
-      
-      console.log('Contact updated successfully');
       
     } catch (error) {
       console.error('Error updating contact:', error);
@@ -391,19 +301,18 @@ const ShowContactForm = ({id}) => {
   };
 
   const handleCancel = () => {
-      if (!formData) return;
+    if (!formData) return;
 
-      setFormData({ ...formData });
-      setIsEditing(false);
-      setHasSubmitted(false);
-      setErrors({});
-      
-      // Reset optional sections
-      setShowBirthdate(!!formData.birthdate);
-      setShowAddress(!!formData.streetAndNr || !!formData.city || !!formData.country || !!formData.postalcode);
-      setShowContactDetails(!!formData.lastContactDate || !!formData.meetingPlace);
-      setShowLinks(formData.links && formData.links.length > 0);
-      setLinks(formData.links && formData.links.length > 0 ? formData.links : ['']);
+    setFormData({ ...formData });
+    setIsEditing(false);
+    setHasSubmitted(false);
+    setErrors({});
+    
+    setShowBirthdate(!!formData.birthdate);
+    setShowAddress(!!formData.streetAndNr || !!formData.city || !!formData.country || !!formData.postalcode);
+    setShowContactDetails(!!formData.lastContactDate || !!formData.meetingPlace);
+    setShowLinks(formData.links && formData.links.length > 0);
+    setLinks(formData.links && formData.links.length > 0 ? formData.links : ['']);
   };
 
   

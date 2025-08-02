@@ -5,7 +5,7 @@ import SearchForm from '../forms/SearchForm.jsx'
 import MenuBar from './Menubar.jsx'
 
 const Navbar = () => {
-  console.log('Navbar rendered');
+  // console.log('Navbar rendered');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
 

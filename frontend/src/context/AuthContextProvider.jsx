@@ -1,12 +1,11 @@
-import React from 'react'
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useState, useMemo } from 'react'
 
 const AuthContext = createContext()
 
 function AuthContextProvider({children}) {
     const [userData, setUserData] = useState(undefined)
     const [accessToken, setAccessToken] = useState(undefined)
-    const [ isLoading, setIsLoading ] = useState(true)
+    const [isLoading, setIsLoading] = useState(true)
 
     useEffect(() => {
         let localUser = JSON.parse(localStorage.getItem('userData'))
@@ -22,6 +21,7 @@ function AuthContextProvider({children}) {
         setIsLoading(false) // after check localStorage
     }, [])
 
+
     const login = (token, user) => {
         localStorage.setItem('authToken', token)
         localStorage.setItem('userData', JSON.stringify(user))
@@ -29,16 +29,16 @@ function AuthContextProvider({children}) {
         setUserData(user)
     }
 
-    const logout= () => {
+
+    const logout = () => {
         localStorage.removeItem('authToken')
         localStorage.removeItem('userData')
         setAccessToken(undefined)
         setUserData(undefined)
     }
 
-
-  return (
-    <AuthContext.Provider value={{
+    // Use useMemo to prevent unnecessary re-renders
+    const contextValue = useMemo(() => ({
         userData, 
         accessToken,
         isLoading,
@@ -46,11 +46,13 @@ function AuthContextProvider({children}) {
         logout,
         setUserData,
         setAccessToken
-    }}>
-        {children}
-    </AuthContext.Provider>
+    }), [userData, accessToken, isLoading]) // Only recreate when these values actually change
 
-  )
+    return (
+        <AuthContext.Provider value={contextValue}>
+            {children}
+        </AuthContext.Provider>
+    )
 }
 
 export default AuthContextProvider
