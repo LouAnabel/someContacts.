@@ -15,7 +15,7 @@ const ContactCloud = ({ contacts }) => {
         { left: 2, top: 1, fontSizeClass: 'text-3xl', fontWeightClass: 'font-light', rotation: 0, },
         { left: 18, top: 10, fontSizeClass: 'text-4xl', rotation: 0 },
         { left: 0, top: 90, fontSizeClass: 'text-3xl', rotation: 270},
-        { left: 10, top: 78, fontSizeClass: 'text-2xl', fontWeightClass: 'font-light', rotation: 270 },
+        { left: 8, top: 78, fontSizeClass: 'text-2xl', fontWeightClass: 'font-light', rotation: 270 },
         { left: 12, top: 88, fontSizeClass: 'text-4xl', fontWeightClass: 'font-light', rotation: 0 },
         
         { left: 50, top: 28, fontSizeClass: 'text-3xl', fontWeightClass: 'font-light', rotation: 0 },

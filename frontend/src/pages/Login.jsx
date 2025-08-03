@@ -7,7 +7,7 @@ const Login = () => {
                 <LoginForm />
             </div>
             {/* Bottom Tagline */}
-            <div className="text-center text-black dark:text-white text-l absolute bottom-[78px] left-1/2 transform -translate-x-1/2 w-full min-[480px]:text-base"
+            <div className="text-center text-black dark:text-white text-l absolute bottom-[34px] left-1/2 transform -translate-x-1/2 w-full min-[480px]:text-base"
                 style={{
                     fontWeight: 300,
                     lineHeight: 1.4,

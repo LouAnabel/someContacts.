@@ -71,6 +71,10 @@ function Home() {
   navigate('/login');
   };
 
+  const handleCreateButton = () => {
+    navigate('/myspace/newcontact')
+  };
+
   const contactsCount = contacts.length
 
 
@@ -108,7 +112,7 @@ function Home() {
         <div className="relative z-20 -mb-12">
           {/* Conditional tooltip */}
           {showTooltip && (
-            <div className="absolute font-text text-right top-11 right-10 tracking-wider -translate-x-1/2 px-3  text-red-500 text-base rounded-lg whitespace-nowrap z-10">
+            <div className="absolute font-text text-right font-semibold top-11 right-10 tracking-wider -translate-x-1/2 px-3  text-red-500 text-base rounded-lg whitespace-nowrap z-10">
               new contact.
             </div>
           )}
@@ -116,13 +120,13 @@ function Home() {
           <CircleButton 
             size="large"
             variant="dark"
-            className="font-light font-text text-2xl bg-red-500 hover:bg-red-600 dark:bg-red-500 dark:border-red-500"
+            className="font-base font-text text-2xl bg-red-500 hover:bg-red-600 dark:bg-red-500 dark:border-red-500"
             style={{ 
               marginTop: '3rem', 
               marginLeft: 'auto',
               display: 'block' 
             }}
-            onClick={handleLogout}
+            onClick={handleCreateButton}
             onMouseEnter={() => setShowTooltip(true)}
             onMouseLeave={() => setShowTooltip(false)}
           >
@@ -141,7 +145,7 @@ function Home() {
             <CircleButton 
               size="large"
               variant="dark"
-              className="font-light font-text bg-black hover:bg-red-600 dark:bg-red-500 dark:border-red-500"
+              className="font-base font-text bg-black hover:bg-red-600 dark:bg-red-500 dark:border-red-500"
               style={{ 
                 marginTop: '3rem', 
                 marginLeft: 'auto',
