@@ -14,7 +14,8 @@ export async function getContacts(token) {
       throw new Error(`Error: ${response.status} ${response.statusText}`);
     }   
     const data = await response.json();
-    console.log('Fetched contacts:', data);
+    console.log('In API FILE: Fetched contacts:', data);
+    console.log("In API FILE: sending only contactsData:", data.contacts)
     return data.contacts || []; // Ensure we return an array even if contacts is undefined
   }
 

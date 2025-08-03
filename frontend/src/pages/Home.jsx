@@ -1,78 +1,69 @@
 import { Link } from 'react-router-dom'
 import CircleButton from '../components/ui/Buttons';
 import { useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useAuthContext } from "../context/AuthContextProvider";
 import { getContacts } from "../apiCalls/contactsApi";
 import { authMe } from '../apiCalls/authApi';
+import ContactCloud from '../components/ui/ContactCloud';
+
+
 
 function Home() {
+
   const navigate = useNavigate()
   const { accessToken, logout } = useAuthContext();
   const [contacts, setContacts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [userName, setUserName] = useState('');
 
- 
-  const getUserName = async () => {
-    if (! accessToken) {
-      setIsLoading(false);
-        return;
-    }
+  // Guard to prevent duplicate API Calls
+  const dataFetched = useRef(false);
+  const lastAccessToken = useRef(null);
 
-    try {
-      const userData = await authMe(accessToken);
-      const firstName = userData?.first_name || 'Friend';
-      setUserName(firstName);
-    } catch (error) {
-      console.log("Failed to load userData", error);
-      setUserName('Friend');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // Hover Create Contact Button
+  const [showTooltip, setShowTooltip] = useState(false)
+
 
   useEffect(() => {
-    getUserName();
-  }, [accessToken]);
+    const fetchData = async () => {
+      if (lastAccessToken.current !== accessToken) {
+        dataFetched.current = false;
+        lastAccessToken.current = accessToken;
+      }
 
-  useEffect(() => {
-    const fetchContacts = async () => {
+      // Guard against duplicate calls
+      if (!accessToken || dataFetched.current) return;
+      dataFetched.current = true;
+
       try {
         setIsLoading(true);
-        
-        if (!accessToken) {
-          console.error("Access token is not available.");
-          setIsLoading(false);
-          return;
-        }
 
-        const contactsData = await getContacts(accessToken);
+        const [userData, contactsData] = await Promise.all ([
+          authMe(accessToken).catch(() => { 
+            return {first_name: 'Friend'};
+          }), 
+          getContacts(accessToken).catch(() => [])
+        ]);
         
-        // Debug: Check what we're getting
-        console.log('Contacts data:', contactsData);
-        console.log('Is array?', Array.isArray(contactsData));
-        
-        // Handle both possible response formats
-        const contactsArray = Array.isArray(contactsData) 
-          ? contactsData 
-          : contactsData.contacts || [];
-          
-        setContacts(contactsArray);
-        
+        console.log("Data successfully fetched!")
+        const firstName = userData?.first_name || 'Friend';
+        setUserName(firstName);
+
+        //set Contacts
+        setContacts(contactsData || []);
+
       } catch (error) {
-        console.error('Error fetching contacts:', error);
-        setContacts([]); // Set empty array on error
+        console.error('Error fetching initial data:', error);
+        setUserName('Friend');
+        setContacts([]);
       } finally {
         setIsLoading(false);
       }
     };
-    
-    fetchContacts();
-  }, [accessToken]);
 
-  // Get contact count safely
-  const contactCount = Array.isArray(contacts) ? contacts.length : 0;
+    fetchData();
+  }, [accessToken]);
 
 
   const handleLogout = () => {
@@ -80,40 +71,89 @@ function Home() {
   navigate('/login');
   };
 
+  const contactsCount = contacts.length
+
+
+
   return (
     <div className="container mx-auto px-4 py-20">
+
+      {/* Header */}
       <h1 className="text-2xl font-heading font-light text-gray-900 dark:text-white mb-7">
-        hello <span className="text-red-500 font-medium">{userName}.</span>
+        hello <span className="text-red-500 text-3xl font-medium">{userName}.</span>
       </h1>
       
-      <div className="text-xl font-text font-light text-black dark:text-white mb-6">
+      {/* Main Part */}
+      <div className="text-2xl font-text font-light text-black dark:text-white mb-6">
         <p>welcome to your very own personal space.</p>
         <p className="mb-10">keep track of all your connections that matter to you.</p>
         
-        <p className="text-xl font-text text-black dark:text-white mb-6">
+        <p className="text-2xl font-text text-black dark:text-white mb-6">
           you already have collected{" "}
           <Link to="/myspace/contacts">
             <span className="font-text font-semibold text-red-500 dark:text-red-500 hover:text-red-600 dark:hover:text-red-600 transition-colors">
-              {isLoading ? '0' : contactCount}
+              {isLoading ? '0' : contactsCount}
             </span>
           </Link>
-          {" "}contact{contactCount !== 1 ? 's' : ''}.
+          {" "}contact{contactsCount !== 1 ? 's' : ''}.
         </p>
       </div>
+
+      <div className="flex items-center font-text font-light text-xl absolute right-[50px]">
+        
+      </div>
+        
+      {/* Contact Cloud Component */}  
+      <div className="mt-28">
+        <div className="relative z-20 -mb-12">
+          {/* Conditional tooltip */}
+          {showTooltip && (
+            <div className="absolute font-text text-right top-11 right-10 tracking-wider -translate-x-1/2 px-3  text-red-500 text-base rounded-lg whitespace-nowrap z-10">
+              new contact.
+            </div>
+          )}
+
+          <CircleButton 
+            size="large"
+            variant="dark"
+            className="font-light font-text text-2xl bg-red-500 hover:bg-red-600 dark:bg-red-500 dark:border-red-500"
+            style={{ 
+              marginTop: '3rem', 
+              marginLeft: 'auto',
+              display: 'block' 
+            }}
+            onClick={handleLogout}
+            onMouseEnter={() => setShowTooltip(true)}
+            onMouseLeave={() => setShowTooltip(false)}
+          >
+            create.
+          </CircleButton>
+          
+          
+        </div>
+
+        <div className="relative z-0">
+            {/* Contact Cloud Component */}
+            {!isLoading && <ContactCloud contacts={contacts} />}
+       </div>
+
+       <div className="relative -mt-24 relativ z-10">
+            <CircleButton 
+              size="large"
+              variant="dark"
+              className="font-light font-text bg-black hover:bg-red-600 dark:bg-red-500 dark:border-red-500"
+              style={{ 
+                marginTop: '3rem', 
+                marginLeft: 'auto',
+                display: 'block' 
+              }}
+              onClick={handleLogout}
+            >
+              log out.
+            </CircleButton>
+      </div>
       
-      <CircleButton 
-        size="large"
-        variant="dark"
-        className="font-semibold bg-red-500 hover:bg-red-600 dark:bg-red-500 dark:border-red-500"
-        style={{ 
-          marginTop: '3rem', 
-          marginLeft: 'auto',
-          display: 'block' 
-        }}
-        onClick={handleLogout}
-      >
-        log out.
-      </CircleButton>
+      </div>
     </div> 
   );
 }
