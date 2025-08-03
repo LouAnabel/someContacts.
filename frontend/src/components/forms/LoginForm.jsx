@@ -12,6 +12,7 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
     const [errors, setErrors] = useState({});
     const [hasSubmitted, setHasSubmitted] = useState(false);
     const [apiLoading, setApiLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
     const { login } = useAuthContext();
     
     const navigate = useNavigate();
@@ -73,7 +74,9 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
         }
     };    
 
-
+    const togglePasswordVisibility = () => {
+        setShowPassword(!showPassword);
+    }
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -174,8 +177,14 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
                     </div>
 
                     <div className="relative">
+                        <label 
+                            htmlFor="password" 
+                            className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-light"
+                        >
+                            password
+                        </label>
                         <input
-                            type="password"
+                            type={showPassword ? "text" : "password"}
                             name="password"
                             id="password"
                             value={formData.password}
@@ -189,12 +198,32 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
                                 fontWeight: 300
                             }}
                         />
-                        <label 
-                            htmlFor="password" 
-                            className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-light"
-                        >
-                            password
-                        </label>
+                        <button 
+                            type="button"
+                            onClick={togglePasswordVisibility}
+                            className="absolute inset-y-0 end-0 mt-2 flex items-center z-20 px-3 cursor-pointer text-gray-400 hover:text-red-500 rounded-e-md focus:outline-hidden focus:text-red-500 dark:text-neutral-600 dark:focus:text-red-500">
+                        
+                            <svg className="shrink-0 size-3.5" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                {showPassword ? (
+                                    <>
+                                        <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"></path>
+                                        <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"></path>
+                                        <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"></path>
+                                        <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"></path>
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                    </>
+                                ) : (
+                                    // Eye closed (password hidden)
+                                    <>
+                                        <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"></path>
+                                        <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"></path>
+                                        <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"></path>
+                                        <line x1="2" x2="22" y1="2" y2="22"></line>
+                                    </>
+                                )}
+                            </svg>
+                        </button>
+                        
                         {hasSubmitted && errors.password && (
                             <p className="absolute top-full mt-3 right-1 text-sm text-red-600 z-20">{errors.password}</p>
                         )}
