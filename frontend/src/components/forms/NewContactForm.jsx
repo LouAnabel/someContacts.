@@ -365,7 +365,7 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                     >
                         <svg 
                             className={`w-7 h-7 ${
-                                formData.isFavorite ? 'text-red-500 hover:text-yellow-300' : 'black hover:text-yellow-300'
+                                formData.isFavorite ? 'text-red-500 hover:text-yellow-300' : 'text-black hover:text-yellow-300'
                             }`} 
                             aria-hidden="true" 
                             xmlns="http://www.w3.org/2000/svg" 

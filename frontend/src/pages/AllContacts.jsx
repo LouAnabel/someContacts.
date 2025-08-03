@@ -1,7 +1,7 @@
 import ContactCardSmall from "../components/layout/ContactCardSmall"
 import ContactCardSmallPhoto from "../components/layout/ContactCardSmallPhoto";
 import { getContacts } from "../apiCalls/contactsApi";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useAuthContext } from "../context/AuthContextProvider";
 import { useNavigate } from "react-router";
 import CircleButton from "../components/ui/Buttons";
@@ -28,26 +28,33 @@ export default function AllContacts() {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
+  // GUARDS to prevent duplicate API calls
+  const contactsFetched = useRef(false);
+
   useEffect(() => {
     const fetchContacts = async () => {
+      
+      if (!accessToken ) {
+        console.log("accessToken is not available")
+        setIsLoading(false);
+        return;
+      }
+
+      contactsFetched.current = true; // Mark as fetching
+        
       try {
         setIsLoading(true);
         setError(null);
 
-        if (!accessToken) {
-          setError("Access token is not available.");
-          setIsLoading(false);
-          return;
-        }
-
         const contactsData = await getContacts(accessToken);
-        console.log('Contacts data:', contactsData); // Debug log to check the structure
-
+        console.log('Contacts data:', contactsData); 
         setContacts(contactsData);
 
       } catch (error) {
         setError("Failed to fetch contacts. Please try again later.");
         console.error('Error fetching contacts:', error);
+        contactsFetched.current = false;
+      
       } finally {
         setIsLoading(false);
       }
@@ -126,7 +133,7 @@ export default function AllContacts() {
                         className="size-6"
                         fill="currentColor"
                     >
-                    <path fillRule="evenodd" d="M9.53 2.47a.75.75 0 0 1 0 1.06L4.81 8.25H15a6.75 6.75 0 0 1 0 13.5h-3a.75.75 0 0 1 0-1.5h3a5.25 5.25 0 1 0 0-10.5H4.81l4.72 4.72a.75.75 0 1 1-1.06 1.06l-6-6a.75.75 0 0 1 0-1.06l6-6a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
+                    <path fillRule="evenodd" d="M9.53 2.47a.75.75 0 0 1 0 1.06L4.81 8.25H15a6.75 6.75 0 0 1 0 13.5h-3a.75.75 0 0 1 0-1.5h3a5.25 5.25 0 1 0 0-10.5H4.81l4.72 4.72a.75.75 0 1 1-1.06 1.06l-6-6a.75.75 0 0 1 0-1.06l6-6a.75.75 0 0 1 1.06 0Z" clipRule="evenodd" />
                   </svg>
                 </Button>
           </span>
@@ -139,9 +146,6 @@ export default function AllContacts() {
         {contacts.map((contact, index) => {
           // Create a more reliable key
           const contactKey = contact.id || contact._id || `contact-${index}`;
-          
-          // Debug log to check what keys are being generated
-          console.log('Contact key:', contactKey, 'for contact:', contact.first_name);
           
           return (
             <ContactCardSmall
