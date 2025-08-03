@@ -80,84 +80,82 @@ function Home() {
 
 
   return (
-    <div className="container mx-auto px-4 py-20">
-
-      {/* Header */}
-      <h1 className="text-2xl font-heading font-light text-gray-900 dark:text-white mb-7">
-        hello <span className="text-red-500 text-3xl font-medium">{userName}.</span>
-      </h1>
+    <div className="border border-yellow-500 container mx-auto px-5 py-20 ">
       
-      {/* Main Part */}
-      <div className="text-2xl font-text font-light text-black dark:text-white mb-6">
-        <p>welcome to your very own personal space.</p>
-        <p className="mb-10">keep track of all your connections that matter to you.</p>
-        
-        <p className="text-2xl font-text text-black dark:text-white mb-6">
-          you already have collected{" "}
-          <Link to="/myspace/contacts">
-            <span className="font-text font-semibold text-red-500 dark:text-red-500 hover:text-red-600 dark:hover:text-red-600 transition-colors">
-              {isLoading ? '0' : contactsCount}
-            </span>
-          </Link>
-          {" "}contact{contactsCount !== 1 ? 's' : ''}.
-        </p>
-      </div>
-
-      <div className="flex items-center font-text font-light text-xl absolute right-[50px]">
-        
-      </div>
-        
-      {/* Contact Cloud Component */}  
-      <div className="mt-28">
-        <div className="relative z-20 -mb-12">
-          {/* Conditional tooltip */}
-          {showTooltip && (
-            <div className="absolute font-text text-right font-semibold top-11 right-10 tracking-wider -translate-x-1/2 px-3  text-red-500 text-base rounded-lg whitespace-nowrap z-10">
-              new contact.
-            </div>
-          )}
-
-          <CircleButton 
-            size="large"
-            variant="dark"
-            className="font-base font-text text-2xl bg-red-500 hover:bg-red-600 dark:bg-red-500 dark:border-red-500"
-            style={{ 
-              marginTop: '3rem', 
-              marginLeft: 'auto',
-              display: 'block' 
-            }}
-            onClick={handleCreateButton}
-            onMouseEnter={() => setShowTooltip(true)}
-            onMouseLeave={() => setShowTooltip(false)}
-          >
-            create.
-          </CircleButton>
-          
-          
+      {/* 1. Part: Text Section */}
+      <div className="border border-green-500">
+        {/* Header */}
+        <h1 className="text-2xl font-heading font-light text-gray-900 dark:text-white mb-7">
+          hello <span className="text-red-500 text-3xl font-medium">{userName}.</span>
+        </h1>
+      
+        {/* Main Part */}
+        <div className="border border-blue-500 text-2xl font-text font-light text-black dark:text-white mb-7">
+          <p>welcome to your very own personal space.</p>
+          <p className="mb-10">keep track of all your connections that matter to you.</p>
+          <p className="text-2xl font-text text-black dark:text-white">
+            you already have collected{" "}
+            <Link to="/myspace/contacts">
+              <span className="font-text font-semibold text-red-500 dark:text-red-500 hover:text-red-600 dark:hover:text-red-600 transition-colors">
+                {isLoading ? '0' : contactsCount}
+              </span>
+            </Link>
+            {" "}contact{contactsCount !== 1 ? 's' : ''}.
+          </p>
         </div>
+      </div>
+        
+      {/* 2. Part: Form Section */}
+      <div className = "">
+        {/* Contact Cloud Component */}  
+        <div className=" pb-16 min-w-[470px] max-w-[880px] mx-auto">
+          <div className="relative z-20 -mb-12">
+            {/* Conditional tooltip */}
+            {showTooltip && (
+              <div className="absolute font-text text-right font-semibold top-11 right-10 tracking-wider -translate-x-1/2 px-3  text-red-500 text-base rounded-lg whitespace-nowrap z-10">
+                new contact.
+              </div>
+            )}
 
-        <div className="relative z-0">
-            {/* Contact Cloud Component */}
-            {!isLoading && <ContactCloud contacts={contacts} />}
-       </div>
-
-       <div className="relative -mt-24 relativ z-10">
             <CircleButton 
               size="large"
               variant="dark"
-              className="font-base font-text bg-black hover:bg-red-600 dark:bg-red-500 dark:border-red-500"
+              className="font-base font-text text-2xl bg-red-500 hover:bg-red-600 dark:bg-red-500 dark:border-red-500"
               style={{ 
                 marginTop: '3rem', 
                 marginLeft: 'auto',
                 display: 'block' 
               }}
-              onClick={handleLogout}
+              onClick={handleCreateButton}
+              onMouseEnter={() => setShowTooltip(true)}
+              onMouseLeave={() => setShowTooltip(false)}
             >
-              log out.
+              create.
             </CircleButton>
-      </div>
-      
-      </div>
+          </div>
+
+          <div className="relative z-0">
+              {/* Contact Cloud Component */}
+              {!isLoading && <ContactCloud contacts={contacts} />}
+          </div>
+
+          <div className="relative -mt-24 relativ z-10">
+                <CircleButton 
+                  size="large"
+                  variant="dark"
+                  className="font-base font-text bg-black hover:bg-red-600 dark:bg-red-500 dark:border-red-500"
+                  style={{ 
+                    marginTop: '3rem', 
+                    marginLeft: 'auto',
+                    display: 'block' 
+                  }}
+                  onClick={handleLogout}
+                >
+                  log out.
+                </CircleButton>
+          </div>
+        </div>
+      </div>  
     </div> 
   );
 }

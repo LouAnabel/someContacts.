@@ -50,10 +50,10 @@ function UserLayout() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white font-sans flex flex-col">
+    <div className="border border-red-500 min-h-screen bg-white dark:bg-black text-black dark:text-white font-sans flex flex-col">
       <Navbar />
       
-      <main className="pt-16 flex-grow w-full">
+      <main className="border border-pink-500 pt-16 flex-grow w-full">
         <Outlet />
       </main>
       {/* <Footer /> */}

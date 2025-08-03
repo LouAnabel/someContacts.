@@ -8,7 +8,7 @@ import { useAuthContext } from "../../context/AuthContextProvider";
 const MenuBar = ({ isMenuOpen, setIsMenuOpen }) => {
   const menuRef = useRef(null);
   const navigate = useNavigate();
-  const { logout } = useAuthContext(); // You forgot to destructure logout from the context!
+  const { logout } = useAuthContext(); 
 
   const handleLogout = () => {
     logout();
