@@ -45,10 +45,10 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className="border border-purple-500 bg-white font-text dark:bg-black fixed w-full z-50 top-0">
-      <div className="border border-purple-300 max-w-screen-xl mx-auto px-5 relative">
+    <nav className=" bg-white font-text dark:bg-black fixed w-full z-50 top-0">
+      <div className=" max-w-screen-xl mx-auto px-8 relative">
         
-        <div className="border border-green-500 flex justify-between items-center h-20">
+        <div className=" flex justify-between items-center h-20">
           {/* someContacts. Title */}
           <Link to="/myspace/" className="flex items-center">
             <span className="text-3xl sm:text-3xl tracking-wide font-heading text-black hover:text-red-500 dark:text-white hover:dark:text-red-500">
@@ -58,7 +58,7 @@ const Navbar = () => {
           </Link>
 
           {/* Small screens: Mobile search + Theme + Menu toggle */}
-          <div className="border border-pink-500 flex items-center px-0 md:hidden">
+          <div className="flex items-center px-0 md:hidden">
             
             <SearchForm 
               isMobile={true}

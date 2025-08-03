@@ -80,17 +80,17 @@ function Home() {
 
 
   return (
-    <div className="border border-yellow-500 container mx-auto px-5 py-20 ">
+    <div className="container mx-auto px-8 py-28 ">
       
       {/* 1. Part: Text Section */}
-      <div className="border border-green-500">
+      <div className="">
         {/* Header */}
         <h1 className="text-2xl font-heading font-light text-gray-900 dark:text-white mb-7">
           hello <span className="text-red-500 text-3xl font-medium">{userName}.</span>
         </h1>
       
         {/* Main Part */}
-        <div className="border border-blue-500 text-2xl font-text font-light text-black dark:text-white mb-7">
+        <div className="text-2xl font-text font-light text-black dark:text-white mb-7">
           <p>welcome to your very own personal space.</p>
           <p className="mb-10">keep track of all your connections that matter to you.</p>
           <p className="text-2xl font-text text-black dark:text-white">
@@ -106,13 +106,12 @@ function Home() {
       </div>
         
       {/* 2. Part: Form Section */}
-      <div className = "">
         {/* Contact Cloud Component */}  
-        <div className=" pb-16 min-w-[470px] max-w-[880px] mx-auto">
-          <div className="relative z-20 -mb-12">
+        <div className=" pt-9 pb-16 min-w-[420px] max-w-[650px]">
+          <div className="relative z-10 -mb-12 w-fit ml-auto">
             {/* Conditional tooltip */}
             {showTooltip && (
-              <div className="absolute font-text text-right font-semibold top-11 right-10 tracking-wider -translate-x-1/2 px-3  text-red-500 text-base rounded-lg whitespace-nowrap z-10">
+              <div className="absolute font-text text-right font-normal top-10 right-10 tracking-wider -translate-x-1/2 px-3  text-red-500 text-base rounded-lg whitespace-nowrap z-10">
                 new contact.
               </div>
             )}
@@ -120,7 +119,7 @@ function Home() {
             <CircleButton 
               size="large"
               variant="dark"
-              className="font-base font-text text-2xl bg-red-500 hover:bg-red-600 dark:bg-red-500 dark:border-red-500"
+              className="font-semibold font-text text-2xl bg-red-500 hover:bg-red-600 dark:bg-red-500 dark:border-red-500"
               style={{ 
                 marginTop: '3rem', 
                 marginLeft: 'auto',
@@ -134,12 +133,12 @@ function Home() {
             </CircleButton>
           </div>
 
-          <div className="relative z-0">
+          <div className="relative">
               {/* Contact Cloud Component */}
               {!isLoading && <ContactCloud contacts={contacts} />}
           </div>
 
-          <div className="relative -mt-24 relativ z-10">
+          <div className="relative -mt-24 relativ z-10 w-fit ml-auto">
                 <CircleButton 
                   size="large"
                   variant="dark"
@@ -154,8 +153,7 @@ function Home() {
                   log out.
                 </CircleButton>
           </div>
-        </div>
-      </div>  
+        </div> 
     </div> 
   );
 }

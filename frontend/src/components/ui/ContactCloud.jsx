@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate, Link } from 'react-router';
+
 
 
 // Component for the random contact cloud
@@ -18,8 +19,8 @@ const ContactCloud = ({ contacts }) => {
         { left: 8, top: 78, fontSizeClass: 'text-2xl', fontWeightClass: 'font-light', rotation: 270 },
         { left: 12, top: 88, fontSizeClass: 'text-4xl', fontWeightClass: 'font-light', rotation: 0 },
         
-        { left: 50, top: 28, fontSizeClass: 'text-3xl', fontWeightClass: 'font-light', rotation: 0 },
-        { left: 63, top: 36, fontSizeClass: 'text-xl', fontWeightClass: 'font-light', rotation: 0 },
+        { left: 40, top: 28, fontSizeClass: 'text-3xl', fontWeightClass: 'font-light', rotation: 0 },
+        { left: 50, top: 36, fontSizeClass: 'text-xl', fontWeightClass: 'font-light', rotation: 0 },
         { left: 60, top: 77, fontSizeClass: 'text-xl', fontWeightClass: 'font-light', rotation: 0 },
         { left: 45, top: 68, fontSizeClass: 'text-2xl', fontWeightClass: 'font-light', rotation: 0 },
         { left: 25, top: 52, fontSizeClass: 'text-3xl', fontWeightClass: 'font-light', rotation: 0 }
@@ -85,13 +86,14 @@ const ContactCloud = ({ contacts }) => {
   }
 
   return (
-    <div className="bg-white text-black rounded-3xl border border-red-200 p-8 mb-8 min-h-[360px] relative overflow-hidden">
+    <div className="bg-white text-black rounded-3xl border border-red-200 min-h-[360px] relative overflow-hidden">
       {gridItems
         .filter(item => item.isVisible) // Only render items with contacts
         .map((item) => (
-          <div
+          <Link
             key={item.id}
-            className={`absolute font-text select-none pointer-events-none ${item.fontSizeClass} ${item.fontWeightClass}`}
+            to={`/myspace/contacts/${item.id}`}
+            className={`absolute font-text select-none pointer-events-auto hover:text-red-500 z-10 hover:z-50 ${item.fontSizeClass} ${item.fontWeightClass} ${Math.abs(item.rotation) === 90 ? 'px-4 py-8' : 'px-2 py-2'}`}
             style={{
               left: item.right !== undefined 
                 ? `${100 - Math.max(0, Math.min(20, item.right)) - 5}%`  // Subtract 5% buffer for right positioning
@@ -101,11 +103,10 @@ const ContactCloud = ({ contacts }) => {
               transformOrigin: item.right !== undefined ? 'top right' : 'top left',
               whiteSpace: 'nowrap', 
               overflow: 'hidden'
-           
             }}
           >
             {item.name}
-          </div>
+          </Link>
         ))}
         
     </div>
