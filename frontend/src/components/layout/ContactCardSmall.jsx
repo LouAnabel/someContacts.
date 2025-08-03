@@ -67,7 +67,7 @@ const ContactCardSmall = ({contact = {}, onContactUpdate}) => {
         <div className="bg-white dark:bg-black relative justify-items"
              style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
 
-            <div className="relative bg-white border border-red-100 min-w-96 max-w-[479] rounded-3xl p-3 z-10 overflow-visible h-fit left-1/2 transform -translate-x-1/2"
+            <div className="relative bg-white border border-red-100 min-w-96 max-w-[480px] rounded-3xl p-3 z-10 overflow-visible h-fit left-1/2 transform -translate-x-1/2"
                  style={{ 
                      boxShadow: '0 2px 20px rgba(0, 0, 0, 0.2)'
                  }}
