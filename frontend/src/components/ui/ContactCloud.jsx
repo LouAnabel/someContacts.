@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router';
 
 
 // Component for the random contact cloud
 const ContactCloud = ({ contacts }) => {
   const [gridItems, setGridItems] = useState([]);
+  const navigate = useNavigate()
 
   useEffect(() => {
     // Debug logging
@@ -13,12 +15,12 @@ const ContactCloud = ({ contacts }) => {
         { left: 2, top: 1, fontSizeClass: 'text-3xl', fontWeightClass: 'font-light', rotation: 0, },
         { left: 18, top: 10, fontSizeClass: 'text-4xl', rotation: 0 },
         { left: 0, top: 90, fontSizeClass: 'text-3xl', rotation: 270},
-        { left: 8, top: 78, fontSizeClass: 'text-2xl', fontWeightClass: 'font-light', rotation: 270 },
+        { left: 10, top: 78, fontSizeClass: 'text-2xl', fontWeightClass: 'font-light', rotation: 270 },
         { left: 12, top: 88, fontSizeClass: 'text-4xl', fontWeightClass: 'font-light', rotation: 0 },
         
         { left: 50, top: 28, fontSizeClass: 'text-3xl', fontWeightClass: 'font-light', rotation: 0 },
-        { left: 35, top: 38, fontSizeClass: 'text-xl', fontWeightClass: 'font-light', rotation: 0 },
-        { left: 60, top: 79, fontSizeClass: 'text-xl', fontWeightClass: 'font-light', rotation: 0 },
+        { left: 63, top: 36, fontSizeClass: 'text-xl', fontWeightClass: 'font-light', rotation: 0 },
+        { left: 60, top: 77, fontSizeClass: 'text-xl', fontWeightClass: 'font-light', rotation: 0 },
         { left: 45, top: 68, fontSizeClass: 'text-2xl', fontWeightClass: 'font-light', rotation: 0 },
         { left: 25, top: 52, fontSizeClass: 'text-3xl', fontWeightClass: 'font-light', rotation: 0 }
 
@@ -76,14 +78,14 @@ const ContactCloud = ({ contacts }) => {
 
   if (!contacts || contacts.length === 0) {
     return (
-      <div className="bg-white dark:bg-gray-100 rounded-3xl p-12 mb-8 min-h-[250px] flex items-center justify-center">
-        <p className="text-red-500 text-lg tracking-wide">no favorite contacts yet...</p>
+      <div className="bg-white dark:bg-gray-100 border border-red-200 rounded-3xl p-12 mb-8 min-h-[150px] flex items-center justify-center">
+        <p className="text-red-500 text-normal font-light tracking-wide"> empty spaces need to be filled. create your first contact above.</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white text-black tracking-wide rounded-3xl border border-red-200 p-8 mb-8 min-h-[360px] relative overflow-hidden">
+    <div className="bg-white text-black rounded-3xl border border-red-200 p-8 mb-8 min-h-[360px] relative overflow-hidden">
       {gridItems
         .filter(item => item.isVisible) // Only render items with contacts
         .map((item) => (
