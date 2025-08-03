@@ -284,6 +284,11 @@ const ShowContactForm = ({id}) => {
     setErrors({});
   };
 
+  const handleGoBack = () => {
+  navigate(-1);
+  };
+
+
   const handleSave = async (e) => {
     e.preventDefault();
     setHasSubmitted(true);
@@ -380,10 +385,10 @@ const ShowContactForm = ({id}) => {
         <div className="text-center">
           <p className="text-black tracking-wider text-lg font-light mb-4">Sorry! Your contact cannot be found.</p>
           <button 
-            onClick={() => navigate('/myspace/contacts')}
+            onClick={handleGoBack}
             className="bg-red-500 text-white tracking-wide px-4 py-2 rounded-full hover:bg-black"
           >
-            Back to contacts.
+            go back.
           </button>
         </div>
       </div>
@@ -1376,19 +1381,30 @@ const ShowContactForm = ({id}) => {
         >
           edit.
         </CircleButton>
-        
       </div>
 
-      {/* Back Link */}
-      <div className="text-black dark:text-white font-light block mt-3 relative -ml-56 mb-36"
-          style={{ fontSize: '16px' }}>
-        want to go back? {' '}
-        <button 
-          onClick={() => navigate('/myspace/contacts')}
-          className="font-normal text-red-500 hover:underline bg-transparent border-none cursor-pointer"
-        >
-        all contacts.
-        </button>
+      {/* Back Links */}
+      <div className="w-full px-8 pt-1 space-y-0.25 max-w-[480px]">
+        <div className="text-black dark:text-white font-light block relative"
+            style={{ fontSize: '16px' }}>
+          want to go {' '}
+          <button 
+            onClick={() => navigate('/myspace/contacts')}
+            className="font-normal text-red-500 hover:underline bg-transparent border-none cursor-pointer"
+          >
+          to contacts?
+          </button>
+        </div>
+        <div className="text-black dark:text-white font-light block -mt-2 relative"
+            style={{ fontSize: '16px' }}>
+          or go {' '}
+          <button 
+            onClick={handleGoBack}
+            className="font-normal text-red-500 hover:underline bg-transparent border-none cursor-pointer"
+          >
+          back
+          </button>
+        </div>
       </div>
     </div>
   );

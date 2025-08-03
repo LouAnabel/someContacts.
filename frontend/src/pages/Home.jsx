@@ -24,7 +24,11 @@ function Home() {
   // Hover Create Contact Button
   const [showTooltip, setShowTooltip] = useState(false)
 
-
+  useEffect(() => {
+    // This will run every time the Home component mounts
+    window.scrollTo(0, 0);
+  }, []);
+  
   useEffect(() => {
     const fetchData = async () => {
       if (lastAccessToken.current !== accessToken) {
@@ -142,7 +146,7 @@ function Home() {
                 <CircleButton 
                   size="large"
                   variant="dark"
-                  className="font-base font-text bg-black hover:bg-red-600 dark:bg-red-500 dark:border-red-500"
+                  className="font-semibold font-text bg-black hover:bg-red-600 dark:bg-red-500 dark:border-red-500"
                   style={{ 
                     marginTop: '3rem', 
                     marginLeft: 'auto',

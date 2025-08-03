@@ -103,6 +103,9 @@ const NewContactForm = ({onSubmit, onCancel }) => {
         }
     };
 
+    const handleGoBack = () => {
+        navigate(-1);
+    }
 
     // LOADING CATEGORIES TO DATABASE 
     const addCategory = async () => {
@@ -1056,19 +1059,29 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                 </CircleButton>
             </div>
 
-            {/* Back Link - Positioned at bottom left of card */}
-            <div className="text-black dark:text-white font-light block mt-3 relative -ml-64"
-                style={{ fontSize: '16px' }}>
-                want to cancel? {' '}
+            {/* Back Links */}
+            <div className="w-full px-8 pt-1 space-y-0.25 max-w-[480px]">
+                <div className="text-black dark:text-white font-light block relative"
+                    style={{ fontSize: '16px' }}>
+                want to go {' '}
                 <button 
-                    onClick={() => {
-                        navigate('/myspace/contacts');
-                    }}
-                    className="font-light text-red-500 hover:underline bg-transparent border-none cursor-pointer"
+                    onClick={() => navigate('/myspace/contacts')}
+                    className="font-normal text-red-500 hover:underline bg-transparent border-none cursor-pointer"
                 >
-                    go back.
+                to contacts?
                 </button>
-            </div> 
+                </div>
+                <div className="text-black dark:text-white font-light block -mt-2 relative"
+                    style={{ fontSize: '16px' }}>
+                or go {' '}
+                <button 
+                    onClick={handleGoBack}
+                    className="font-normal text-red-500 hover:underline bg-transparent border-none cursor-pointer"
+                >
+                back
+                </button>
+                </div>
+            </div>
         </div>
     </form>
     )

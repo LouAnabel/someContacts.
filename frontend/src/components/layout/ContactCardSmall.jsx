@@ -22,10 +22,11 @@ const ContactCardSmall = ({contact = {}}) => {
          <div className="bg-white dark:bg-black relative justify-items" // Fixed comment syntax
              style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
 
-            <div className="relative bg-gray-50 min-w-96 max-w-md rounded-3xl p-5 z-10 overflow-visible h-fit left-1/2 transform -translate-x-1/2"
+            <div className="relative bg-white border border-red-100 min-w-96 max-w-md rounded-3xl p-3 z-10 overflow-visible h-fit left-1/2 transform -translate-x-1/2"
                  style={{ 
-                     boxShadow: '0 4px 32px rgba(0, 0, 0, 0.3)'
-                 }}>
+                     boxShadow: '0 2px 20px rgba(0, 0, 0, 0.2)'
+                 }}
+                >
 
                  
                 <div className="flex items-center justify-between w-full ml-2 mt-2">
@@ -57,7 +58,10 @@ const ContactCardSmall = ({contact = {}}) => {
                     <div className="flex items-center justify-between w-full mb-1">
                         {/* City and Country */}
                         <span className="text-black font-text text-normal font-light ml-4">
-                            {contact.city || "no city"}, {contact.country || "no country"} {/* Fixed typo */}
+                            {contact.city && contact.country 
+                                ? `${contact.city}, ${contact.country}` 
+                                : contact.city || contact.country || ""
+                            } 
                         </span>
                         
                         {/* Favorite Star */}
