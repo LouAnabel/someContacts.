@@ -4,7 +4,6 @@ import { formatDateForFrontend } from '../helperFunctions/dateConversion'
 // to transform API Format in UI Form Format
 
 const ApiDataToFormData = (apiResponse) => {
-  console.log("ApiResponse to transform:", apiResponse)
     // exttacting just the contact data from API response
     const contact = apiResponse.contact || apiResponse;
     
@@ -32,4 +31,5 @@ const ApiDataToFormData = (apiResponse) => {
 };
 
 export default ApiDataToFormData;
+
 

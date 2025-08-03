@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, useMemo } from 'react'
+import { createContext, useContext, useEffect, useState, useMemo, useRef } from 'react'
 
 const AuthContext = createContext()
 
@@ -6,8 +6,13 @@ function AuthContextProvider({children}) {
     const [userData, setUserData] = useState(undefined)
     const [accessToken, setAccessToken] = useState(undefined)
     const [isLoading, setIsLoading] = useState(true)
+    const initialized = useRef(false); // Add this
 
     useEffect(() => {
+        // Prevent double execution in Strict Mode
+        if (initialized.current) return;
+        initialized.current = true;
+
         let localUser = JSON.parse(localStorage.getItem('userData'))
         let localToken = localStorage.getItem('authToken')
 
@@ -18,7 +23,7 @@ function AuthContextProvider({children}) {
             setAccessToken(localToken)
         }
 
-        setIsLoading(false) // after check localStorage
+        setIsLoading(false)
     }, [])
 
 
@@ -46,13 +51,13 @@ function AuthContextProvider({children}) {
         logout,
         setUserData,
         setAccessToken
-    }), [userData, accessToken, isLoading]) // Only recreate when these values actually change
+    }), [userData, accessToken, isLoading]); // Only recreate when these actually change
 
     return (
         <AuthContext.Provider value={contextValue}>
             {children}
         </AuthContext.Provider>
-    )
+    );
 }
 
 export default AuthContextProvider

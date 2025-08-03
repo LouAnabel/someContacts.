@@ -16,38 +16,28 @@ function UserLayout() {
   const renderCount = useRef(0);
   renderCount.current++;
   
-  console.log(`🔄 USER LAYOUT gets rendered #${renderCount.current}:`, {
-    isLoading,
+  console.log('USER LAYOUT rendered:', {
+    isLoading: isLoading,
     hasToken: !!accessToken,
-    pathname: location.pathname,
-    willShowLoading: isLoading || accessToken === undefined
   });
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location.pathname]);
   
-  
-  useEffect(() => {
-    console.log('USER LAYOUT: accessToken gets checked. & ', `🔄 USER LAYOUT render #${renderCount.current}:`,
-    {
-    isLoading,
-    hasToken: !!accessToken,
-    pathname: location.pathname,
-    willShowLoading: isLoading || accessToken === undefined
-    });
+  const authChecked = useRef(false);
 
-    if (!isLoading) {
-      console.log('USER LAYOUT: succesffull! access token:', accessToken);
-    
-      if (!accessToken) {
-        console.log('USER LAYOUT: no accessToken, redirecting to login');
-        navigate('/login', { replace: true });
-      } else {
-        console.log('USER LAYOUT: Staying on protected route')
-      }
-    } 
-  }, [isLoading, accessToken]);
+  useEffect(() => {
+    if (isLoading || authChecked.current) return;
+  
+    console.log('USER LAYOUT: accessToken gets checked.');
+    if (!accessToken) {
+      navigate('/login', { replace: true });
+    } else {
+      authChecked.current = true; // Mark as checked
+    }
+}, [isLoading, accessToken]);
+
   
   if (isLoading || accessToken === undefined) {
     return (

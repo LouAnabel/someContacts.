@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../context/AuthContextProvider';
 import { getContactById, getCategories, updateContact, deleteContactById } from '../../apiCalls/contactsApi';
@@ -39,32 +40,42 @@ const ShowContactForm = ({id}) => {
   const [showLinks, setShowLinks] = useState(false);
   const [links, setLinks] = useState(['']);
 
-  // FIXED: Contact data fetching
+
+  // GUARDS to prevent duplicate API calls
+  const contactFetched = useRef(false);
+  const categoriesFetched = useRef(false);
+
+
+  // Contact data fetching with guard
   useEffect(() => {
     const fetchContactData = async () => {
-      if (!accessToken || !id) {
-        setIsLoading(false);
-        return;
-      }
+      // GUARD: Prevent duplicate calls
+      if (!accessToken || !id || contactFetched.current) return;
       
+      console.log('ShowContact: Starting contact fetch for ID:', id);
+      contactFetched.current = true; // Mark as fetching
+      
+
       try {
         setIsLoading(true);
         setError(null);
 
         const apiContactData = await getContactById(accessToken, id);
+        console.log('Contact data received:', apiContactData);
         setContactData(apiContactData);
         
         const newFormData = ApiDataToFormData(apiContactData);
+        console.log('Form data transformed:', newFormData);
         setFormData(newFormData);
 
-        // FIXED: Initialize optional sections with the NEW form data
+        // Initialize optional sections with the NEW form data
         setShowBirthdate(!!newFormData.birthdate);
         setShowAddress(
           !!(newFormData.streetAndNr || newFormData.city || 
             newFormData.country || newFormData.postalcode)
         );
         setShowContactDetails(
-          !!(newFormData.lastContactDate || newFormData.lastContactPlace)
+          !!(newFormData.lastContactDate || newFormData.meetingPlace)
         );
         
         const hasLinks = newFormData.links && newFormData.links.length > 0;
@@ -72,38 +83,52 @@ const ShowContactForm = ({id}) => {
         setLinks(hasLinks ? newFormData.links.map(link => link.url || link) : ['']);
 
       } catch (error) {
-        console.error('Failed to load contact data:', error);
+        console.error('Contact fetch failed:', error);
         setError(error.message || 'Failed to load contact data');
         setContactData({});
         setFormData({});
+        contactFetched.current = false; // Reset on error
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchContactData();
-  }, [accessToken, id]);
+  }, [accessToken, id]); // Only depend on accessToken and id
 
-  // FIXED: Categories loading - proper dependencies
+
+  // Categories loading with guard
   useEffect(() => {
     const loadCategories = async () => {
-      if (!accessToken) return;
+      // GUARD: Prevent duplicate calls
+      if (!accessToken || categoriesFetched.current) return;
+      
+      console.log('ShowContact: starting categories fetch');
+      categoriesFetched.current = true; // Mark as fetching
 
       try {
         const categoriesData = await getCategories(accessToken);
+        console.log('Categories data received:', categoriesData);
         setCategories(categoriesData);
       } catch (error) {   
-        console.error('Failed to load categories:', error);
+        console.error('Categories fetch failed:', error);
         setCategories([]);
+        categoriesFetched.current = false; // Reset on error
       }
     };
 
     loadCategories();
-  }, [accessToken]); // FIXED: Only depend on accessToken, not contactData
+  }, [accessToken]); 
 
-  // REMOVED: The problematic "other" useEffect entirely
+  // Reset guards when component unmounts or ID changes
+  useEffect(() => {
+    return () => {
+      contactFetched.current = false;
+      categoriesFetched.current = false;
+    };
+  }, [id]);
 
-  // Rest of your functions stay the same...
+
   const addCategory = async () => {
     if (newCategoryName.trim() && !isAddingCategory) {
       setIsAddingCategory(true);
@@ -843,9 +868,6 @@ const ShowContactForm = ({id}) => {
                                 </div>
                             )}
                         </div>
-
-                        {/* Continue with address, contact details, and links sections using the same pattern... */}
-                        {/* For brevity, I'll include the key sections. The full implementation would include all sections from your original form */}
                     </div>
                 </div>
 
@@ -874,6 +896,92 @@ const ShowContactForm = ({id}) => {
                             }}
                         />
                     </div>
+                </div>
+
+                {/* Optional Toggle Field */}
+                <div className="space-y-2 mb-8 -mt-5">
+                    {/* Contact Details Toggle and Fields */}
+                    <div className="relative">
+                        {!showContactDetails ? (
+                          <button
+                              type="button"
+                              onClick={() => setShowContactDetails(true)}
+                              className="flex items-center space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-light"
+                              disabled={isLoading}
+                          >
+                              <span className="text-lg font-semibold">+</span>
+                              <span className="text-base text-black hover:text-red-500">when and where did you meet? </span>
+                          </button>
+                      ) : (
+                          <div className="space-y-2">
+                              <div className="flex items-center justify-between -mb-4">
+                                  <span className="relative left-2 text-sans text-red-500 font-light">do you remember...</span>
+                                  <button
+                                      type="button"
+                                      onClick={() => {
+                                          setShowContactDetails(false);
+                                          setFormData(prev => ({ 
+                                              ...prev, 
+                                              lastContactDate: '', 
+                                              meetingPlace: '' 
+                                          }));
+                                      }}
+                                      className="relative right-1 font-light text-red-500 hover:text-red-700 transition-colors duration-200 text-sm"
+                                      disabled={isLoading}
+                                  >
+                                      remove
+                                  </button>
+                              </div>
+                                  
+                              {/* Last Contact Date Field */}
+                              <div className="relative">
+                                  <label htmlFor="lastContactDate" className="relative top-3 left-4 bg-white px-1 text-sans text-base text-black font-light">
+                                      the date of your last contact?
+                                  </label>
+                                  <input 
+                                      type="date" 
+                                      name="lastContactDate" 
+                                      id="lastContactDate" 
+                                      value={formData.lastContactDate}
+                                      onChange={handleInputChange}
+                                      disabled={isLoading}
+                                      className={`w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
+                                      style={{
+                                          fontSize: '16px',
+                                          fontWeight: 300
+                                      }}
+                                  />
+                                  {hasSubmitted && errors.lastContactDate && (
+                                      <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.lastContactDate}</p>
+                                  )}
+                              </div>
+
+                              {/* Meeting Place Field */}
+                              <div className="relative">
+                                  <label htmlFor="meetingPlace" className="relative top-3 left-4 bg-white px-1 text-sans text-base text-black font-light">
+                                      the place where you met?
+                                  </label>
+                                  <input 
+                                      type="text" 
+                                      name="meetingPlace" 
+                                      id="meetingPlace" 
+                                      value={formData.meetingPlace}
+                                      onChange={handleInputChange}
+                                      placeholder="coffe shop, berlin ..."
+                                      disabled={isLoading}
+                                      className={`w-full mb-5 rounded-xl border border-gray-400 dark:border-gray-400 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
+                                      style={{
+                                          fontSize: '16px',
+                                          fontWeight: 300
+                                      }}
+                                  />
+                                  {hasSubmitted && errors.meetingPlace && (
+                                      <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.meetingPlace}</p>
+                                  )}
+                              </div>
+                          </div>
+                      )}
+                  </div>
                 </div>
 
                 {/* Optional Links */}
@@ -1207,7 +1315,7 @@ const ShowContactForm = ({id}) => {
           )}
 
           {/* Contact History */}
-          {(formData.lastContactDate || formData.meetingPlace) && (
+          {formData.lastContactDate || formData.meetingPlace && (
             <div className="space-y-2">
               <h3 className="text-red-500 font-light text-sm ml-3 -mb-4">contact history</h3>
               <div className="bg-gray-50 rounded-xl p-3 space-y-2">
@@ -1219,11 +1327,11 @@ const ShowContactForm = ({id}) => {
                     </span>
                   </div>
                 )}
-                {formData.meetingPlace && (
+                {meetingPlace && (
                   <div>
                     <span className="text-black font-light text-sm">met at:</span>
                     <span className="text-black text-normal font-light ml-14">
-                      {formData.meetingPlace}
+                      {meetingPlace}
                     </span>
                   </div>
                 )}
