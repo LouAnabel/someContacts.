@@ -38,52 +38,49 @@ const formatDateForFrontend = (backendDate) => {
 
 
 // Date Validation
-const validateDate = (isoDate, validationType) => {
-    if (!isoDate) {
-        return { isValid: true, error: null};
-    }
-
-    try {
-        const date = new Date(isoDate);
-        const today = new Date();
-
-        if (isNaN(date.getTime())) {
-            return { isValid: false, error: 'Invalid date format' };
+    const validateDate = (dateString, fieldName, mustBePast = false) => {
+        if (!dateString?.trim()) {
+            return `${fieldName} is required`;
         }
         
-        switch (validationType) {
-        case 'birthdate':
-            if (date > today) {
-            return { isValid: false, error: 'Birth date cannot be in the future' };
-            }
-            const maxAge = new Date();
-            maxAge.setFullYear(maxAge.getFullYear() - 150);
-            if (date < maxAge) {
-            return { isValid: false, error: 'Birth date seems too far in the past' };
-            }
-            break;
-            
-        case 'future':
-            if (date < today) {
-            return { isValid: false, error: 'Date must be in the future' };
-            }
-            break;
-            
-        case 'past':
-            if (date > today) {
-            return { isValid: false, error: 'Date must be in the past' };
-            }
-            break;
-            
-        default:
-            // No additional validation for 'any' type
-            break;
+        // Check format: DD.MM.YYYY
+        const datePattern = /^(\d{2})\.(\d{2})\.(\d{4})$/;
+        const match = dateString.trim().match(datePattern);
+        
+        if (!match) {
+            return `${fieldName} must be in format DD.MM.YYYY`;
         }
         
-        return { isValid: true, error: null };
-    } catch (error) {
-        return { isValid: false, error: 'Invalid date' };
-  }
-};
+        const day = parseInt(match[1], 10);
+        const month = parseInt(match[2], 10);
+        const year = parseInt(match[3], 10);
+        
+        // Validate date components
+        if (month < 1 || month > 12) {
+            return `${fieldName} contains invalid month`;
+        }
+        
+        if (day < 1 || day > 31) {
+            return `${fieldName} contains invalid day`;
+        }
+        
+        // Create date object and check if it's valid
+        const date = new Date(year, month - 1, day);
+        if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) {
+            return `${fieldName} is not a valid date`;
+        }
+        
+        // Check if date must be in the past
+        if (mustBePast) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Reset time to compare only dates
+            
+            if (date >= today) {
+                return `${fieldName} must be in the past`;
+            }
+        }
+        
+        return null; // No error
+    };
 
 export { formatDateForBackend, formatDateForFrontend, validateDate };

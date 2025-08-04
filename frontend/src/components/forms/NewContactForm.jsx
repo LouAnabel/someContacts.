@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../context/AuthContextProvider';
 import { createContact, getCategories } from '../../apiCalls/contactsApi';
 import FormDataToApiData from '../helperFunctions/FormToApiData';
+import { validateDate } from '../helperFunctions/dateConversion';
 
 
 const NewContactForm = ({onSubmit, onCancel }) => {
@@ -211,7 +212,7 @@ const NewContactForm = ({onSubmit, onCancel }) => {
 
     const validateForm = () => {
         const newErrors = {};
-        
+
         // First name validation
         if (!formData.firstName.trim()) {
             newErrors.firstName = 'First name is required';
@@ -225,7 +226,7 @@ const NewContactForm = ({onSubmit, onCancel }) => {
 
         // category validation
         if (!formData.category || !formData.category.name || !formData.category.id) {
-            newErrors.category = 'category is required';
+            newErrors.category = 'Category is required';
         }
         
         // Email validation
@@ -240,16 +241,22 @@ const NewContactForm = ({onSubmit, onCancel }) => {
             newErrors.phone = 'Please enter a valid phone number';
         }
 
-        // Date validation (optional) - CHECK FOR DD.MM.YYYY FORMAT
-        if (formData.birthdate && !/^\d{2}\.\d{2}\.\d{4}$/.test(formData.birthdate)) {
-            newErrors.birthdate = 'Please use format: DD.MM.YYYY';
+        // Validate birthdate (must be in the past)
+        const birthdateError = validateDate(formData.birthdate, 'Birthdate', true);
+        if (birthdateError) {
+            newErrors.birthdate = birthdateError;
         }
         
-        if (formData.contactDate && !/^\d{2}\.\d{2}\.\d{4}$/.test(formData.contactDate)) {
-            newErrors.contactDate = 'Please use format: DD.MM.YYYY';
+        // Validate contactDate (format only, doesn't need to be in past)
+        if (formData.contactDate?.trim()) {
+            const contactDateError = validateDate(formData.contactDate, 'Contact date', false);
+            if (contactDateError) {
+                newErrors.contactDate = contactDateError;
+            }
         }
         
         setErrors(newErrors);
+        console.log(newErrors)
         return Object.keys(newErrors).length === 0;
     };
     

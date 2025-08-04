@@ -203,7 +203,7 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
                             onClick={togglePasswordVisibility}
                             className="absolute inset-y-0 end-0 mt-2 flex items-center z-20 px-3 cursor-pointer text-gray-400 hover:text-red-500 rounded-e-md focus:outline-hidden focus:text-red-500 dark:text-neutral-600 dark:focus:text-red-500">
                         
-                            <svg className="shrink-0 size-3.5" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg className="shrink-0 size-3.5" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                 {showPassword ? (
                                     <>
                                         <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"></path>

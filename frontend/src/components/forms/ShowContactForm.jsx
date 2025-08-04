@@ -3,8 +3,9 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../context/AuthContextProvider';
 import { getContactById, getCategories, updateContact, deleteContactById } from '../../apiCalls/contactsApi';
-import FormDataToApiData from '../helperFunctions/FormToApiData'
-import ApiDataToFormData from '../helperFunctions/ApiToFormData'
+import FormDataToApiData from '../helperFunctions/FormToApiData';
+import ApiDataToFormData from '../helperFunctions/ApiToFormData';
+import { validateDate } from '../helperFunctions/dateConversion';
 import CircleButton from '../ui/Buttons';
 
 const ShowContactForm = ({id}) => {
@@ -76,7 +77,7 @@ const ShowContactForm = ({id}) => {
             newFormData.country || newFormData.postalcode)
         );
         setShowContactDetails(
-          !!(newFormData.lastContactDate || newFormData.meetingPlace)
+          !!(newFormData.contactDate || newFormData.meetingPlace)
         );
         
         const hasLinks = newFormData.links && newFormData.links.length > 0;
@@ -273,25 +274,65 @@ const ShowContactForm = ({id}) => {
   };
 
   const validateForm = () => {
-    const newErrors = {};
+    const newErrors = {};       
     
-    if (!formData.firstName?.trim()) newErrors.firstName = 'First name is required';
-    if (!formData.lastName?.trim()) newErrors.lastName = 'Last name is required';
+    // First name validation
+    if (!formData.firstName.trim()) {
+        newErrors.firstName = 'First name is required';
+    } else if (formData.firstName.trim().length < 2) {
+        newErrors.firstName = 'First name must be at least 2 characters';
+    }
     
+    if (formData.lastName && formData.lastName.trim() && formData.lastName.trim().length < 2) {
+        newErrors.lastName = 'Last name must be at least 2 characters';
+    }
+
+    // category validation
     if (!formData.category || !formData.category.name || !formData.category.id) {
-      newErrors.category = 'Category is required';
-    }
-
-    if (!formData.email?.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email';
+        newErrors.category = 'Category is required';
     }
     
+    // Email validation
+    if (!formData.email) {
+        newErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+        newErrors.email = 'Email is invalid';
+    }
+    
+    // Phone validation (optional but if provided, should be valid)
     if (formData.phone && formData.phone.trim() && !/^\+?[\d\s\-\(\)]{10,}$/.test(formData.phone.trim())) {
-      newErrors.phone = 'Please enter a valid phone number';
+        newErrors.phone = 'Please enter a valid phone number';
     }
 
+    // Validate birthdate (must be in the past)
+    if (formData.birthdate && formData.birthdate.trim()) {
+        const birthdateError = validateDate(formData.birthdate, 'Birthdate', true);
+        if (birthdateError) {
+            newErrors.birthdate = birthdateError;
+        }
+    }
+
+    // Validate contactDate (format only, doesn't need to be in past)
+    if (formData.contactDate && formData.contactDate.trim()) {
+        const contactDateError = validateDate(formData.contactDate, 'Contact date', false);
+        if (contactDateError) {
+            newErrors.contactDate = contactDateError;
+        }
+    }
+
+    // Validate links - URL must have a title
+    if (showLinks && links) {
+        links.forEach((link, index) => {
+            const hasUrl = link.url && link.url.trim();
+            const hasTitle = link.title && link.title.trim();
+            
+            if (hasUrl && !hasTitle) {
+                newErrors[`link_${index}`] = 'title for url required.';
+            }
+        });
+    }
+    
+    console.log('Validation errors:', newErrors);
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -364,7 +405,7 @@ const ShowContactForm = ({id}) => {
         originalFormData.country || originalFormData.postalcode)
     );
     setShowContactDetails(
-      !!(originalFormData.lastContactDate || originalFormData.meetingPlace)
+      !!(originalFormData.contactDate || originalFormData.meetingPlace)
     );
     
     const hasLinks = originalFormData.links && originalFormData.links.length > 0;
@@ -756,7 +797,7 @@ const ShowContactForm = ({id}) => {
                                         id="birthdate" 
                                         value={formData.birthdate}
                                         onChange={handleInputChange}
-                                        placeholder="14-04-2024"
+                                        placeholder="19.05.1998"
                                         disabled={isSaving}
                                         className={`w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
                                         style={{
@@ -764,6 +805,9 @@ const ShowContactForm = ({id}) => {
                                             fontWeight: 300
                                         }}
                                     />
+                                    {hasSubmitted && errors.birthdate && (
+                                        <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.birthdate}</p>
+                                    )}
                                 </div>
                             )}
                         </div>
@@ -842,7 +886,7 @@ const ShowContactForm = ({id}) => {
                                                 onChange={handleInputChange}
                                                 placeholder="10407"
                                                 disabled={isLoading}
-                                                className={`w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
+                                                className={`w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[120px] h-[48px] focus:outline-none focus:border-red-500`}
                                                 style={{
                                                     fontSize: '16px',
                                                     fontWeight: 300
@@ -865,7 +909,8 @@ const ShowContactForm = ({id}) => {
                                                 onChange={handleInputChange}
                                                 placeholder="berlin"
                                                 disabled={isLoading}
-                                                className={`w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[150px] h-[48px] focus:outline-none focus:border-red-500`}
+                                                className={`flex p-2.5 w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[80px] h-[48px] focus:outline-none focus:border-red-500`}
+                                                // flex p-2.5 w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[120px] h-[48px] focus:outline-none focus:border-red-500"
                                                 style={{
                                                     fontSize: '16px',
                                                     fontWeight: 300
@@ -957,7 +1002,7 @@ const ShowContactForm = ({id}) => {
                                           setShowContactDetails(false);
                                           setFormData(prev => ({ 
                                               ...prev, 
-                                              lastContactDate: '', 
+                                              ContactDate: '', 
                                               meetingPlace: '' 
                                           }));
                                       }}
@@ -970,14 +1015,14 @@ const ShowContactForm = ({id}) => {
                                   
                               {/* Last Contact Date Field */}
                               <div className="relative">
-                                  <label htmlFor="lastContactDate" className="relative top-3 left-4 bg-white px-1 text-sans text-base text-black font-light">
+                                  <label htmlFor="contactDate" className="relative top-3 left-4 bg-white px-1 text-sans text-base text-black font-light">
                                       the date of your last contact?
                                   </label>
                                   <input 
                                       type="text" 
-                                      name="lastContactDate" 
-                                      id="lastContactDate" 
-                                      value={formData.lastContactDate}
+                                      name="contactDate" 
+                                      id="contactDate" 
+                                      value={formData.contactDate}
                                       onChange={handleInputChange}
                                       disabled={isLoading}
                                       className={`w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
@@ -986,8 +1031,8 @@ const ShowContactForm = ({id}) => {
                                           fontWeight: 300
                                       }}
                                   />
-                                  {hasSubmitted && errors.lastContactDate && (
-                                      <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.lastContactDate}</p>
+                                  {hasSubmitted && errors.contactDate && (
+                                      <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.contactDate}</p>
                                   )}
                               </div>
 
@@ -1071,7 +1116,7 @@ const ShowContactForm = ({id}) => {
                                                 onChange={(e) => handleLinkChange(index, 'url', e.target.value)}
                                                 placeholder="www.google.com or https://example.com"
                                                 disabled={isSaving}
-                                                className="flex p-2.5 w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500"
+                                                className="flex p-2.5 w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[120px] h-[48px] focus:outline-none focus:border-red-500"
                                                 style={{
                                                     fontSize: '16px',
                                                     fontWeight: 300
@@ -1085,7 +1130,10 @@ const ShowContactForm = ({id}) => {
                                                     disabled={isSaving}
                                                 >
                                                     ×
-                                                </button>
+                                                </button>  
+                                            )}
+                                            {hasSubmitted && errors[`link_${index}`] && (
+                                                <p className="absolute top-full right-8 text-sm text-red-600 z-20">{errors[`link_${index}`]}</p>
                                             )}
                                         </div>
                                     ))}
@@ -1112,7 +1160,7 @@ const ShowContactForm = ({id}) => {
                     type="button"
                     size="medium"
                     onClick={() => setShowDeleteConfirmation(true)}
-                    className="absolute -bottom-[74px] ml-56 text-xl font-light hover:bg-red-700"
+                    className="absolute -bottom-[74px] right-[100px] text-xl font-light hover:bg-red-700"
                     style={{ 
                       marginTop: '2rem', 
                       marginRight: 'auto', 
@@ -1361,22 +1409,22 @@ const ShowContactForm = ({id}) => {
           )}
 
           {/* Contact History */}
-          {(formData.lastContactDate || formData.meetingPlace) && (
+          {(formData.contactDate || formData.meetingPlace) && (
             <div className="space-y-2">
               <h3 className="text-red-500 font-light text-sm ml-3 -mb-4">contact history</h3>
               <div className="bg-gray-50 rounded-xl p-3 space-y-2">
-                {formData.lastContactDate && (
+                {formData.contactDate && (
                   <div>
-                    <span className="text-black font-light text-sm">last contact:</span>
-                    <span className="text-black text-normal font-light ml-3">
-                      {formData.lastContactDate}
+                    <span className="text-black font-light text-sm">date:</span>
+                    <span className="text-black text-normal font-light ml-5">
+                      {formData.contactDate}
                     </span>
                   </div>
                 )}
                 {formData.meetingPlace && (
                   <div>
-                    <span className="text-black font-light text-sm">met at:</span>
-                    <span className="text-black text-normal font-light ml-10">
+                    <span className="text-black font-light text-sm">place:</span>
+                    <span className="text-black text-normal font-light ml-4">
                       {formData.meetingPlace}
                     </span>
                   </div>
