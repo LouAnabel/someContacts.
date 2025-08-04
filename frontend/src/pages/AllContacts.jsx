@@ -126,7 +126,7 @@ export default function AllContacts() {
         <h1 className="pt-10 text-3xl font-heading font-bold text-gray-900 dark:text-white mb-2 mt-6">
           <span className="px-2">
             <Button 
-                  onClick={handleGoBack}
+                  onClick={() => navigate('/myspace/')}
                   className="text-black dark:text-white hover:text-red-500"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" 
