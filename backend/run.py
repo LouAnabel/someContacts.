@@ -1,10 +1,6 @@
 from app import create_app, db
 from flask_cors import CORS
 from flask import jsonify
-from app.models.user import User  # Import User Model
-from app.models.contact import Contact  # Import contact model
-from app.models.category import Category
-from app.models.contact_links import ContactLinks
 from sqlalchemy import text
 from dotenv import load_dotenv
 import os
