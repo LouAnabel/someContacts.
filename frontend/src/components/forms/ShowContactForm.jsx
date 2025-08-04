@@ -38,7 +38,7 @@ const ShowContactForm = ({id}) => {
   const [showAddress, setShowAddress] = useState(false);
   const [showContactDetails, setShowContactDetails] = useState(false);
   const [showLinks, setShowLinks] = useState(false);
-  const [links, setLinks] = useState(['']);
+  const [links, setLinks] = useState([{ title: '', url: '' }]);
 
 
   // GUARDS to prevent duplicate API calls
@@ -80,7 +80,7 @@ const ShowContactForm = ({id}) => {
         
         const hasLinks = newFormData.links && newFormData.links.length > 0;
         setShowLinks(hasLinks);
-        setLinks(hasLinks ? newFormData.links.map(link => link.url || link) : ['']);
+        setLinks(hasLinks ? newFormData.links : [{ title: '', url: '' }]);
 
       } catch (error) {
         console.error('Contact fetch failed:', error);
@@ -104,7 +104,7 @@ const ShowContactForm = ({id}) => {
       if (!accessToken || categoriesFetched.current) return;
       
       console.log('ShowContact: starting categories fetch');
-      categoriesFetched.current = true; // Mark as fetching
+      categoriesFetched.current = true;
 
       try {
         const categoriesData = await getCategories(accessToken);
@@ -113,7 +113,7 @@ const ShowContactForm = ({id}) => {
       } catch (error) {   
         console.error('Categories fetch failed:', error);
         setCategories([]);
-        categoriesFetched.current = false; // Reset on error
+        categoriesFetched.current = false;
       }
     };
 
@@ -159,8 +159,11 @@ const ShowContactForm = ({id}) => {
         };
         
         setCategories(prevCategories => [...prevCategories, newCategory]);
-        setFormData(prevFormData => ({...prevFormData, category: newCategory.name }));
-        
+        setFormData(prevFormData => ({
+          ...prevFormData, 
+          category: { name: newCategory.name, id: newCategory.id }
+        }));
+
         if (hasSubmitted && errors.category) {
           setErrors(prev => ({ ...prev, category: '' }));
         }
@@ -187,14 +190,29 @@ const ShowContactForm = ({id}) => {
     }
   };
 
-  const handleLinkChange = (index, value) => {
+  const handleLinkChange = (index, field, value) => {
     const newLinks = [...links];
-    newLinks[index] = value;
+    
+    // If it's a URL field, auto-format it
+    if (field === 'url' && value.trim()) {
+      // Check if URL already has protocol
+      if (!value.startsWith('http://') && !value.startsWith('https://')) {
+        // Add https:// if it looks like a URL (contains a dot)
+        if (value.includes('.')) {
+          value = 'https://' + value;
+        }
+      }
+    }
+    
+    newLinks[index] = {
+      ...newLinks[index],
+      [field]: value
+    };
     setLinks(newLinks);
   };
 
   const addLink = () => {
-    setLinks([...links, '']);
+    setLinks([...links, { title: '', url: '' }]);
   };
 
   const removeLink = (index) => {
@@ -222,32 +240,40 @@ const ShowContactForm = ({id}) => {
   };
 
   const handleFavoriteToggle = async () => {
+    const newFavoriteState = !formData.isFavorite;
     try {
-      const newFavoriteState = !formData.isFavorite;
-      setFormData(prev => ({ ...prev, isFavorite: newFavoriteState }));
-      
-      if (!accessToken) {
-        throw new Error("Access token is not available.");
-      }
-
-      const updatedContactData = FormDataToApiData(formData, categories, {
-        is_favorite: newFavoriteState 
-      });
-
-      const apiResponse = await updateContact(accessToken, formData.id, updatedContactData);
-      
-      if (!apiResponse) {
-        throw new Error('Failed to update favorite status');
-      }
-
-      setContactData(prev => ({ ...prev, isFavorite: newFavoriteState }));
-      
-    } catch (error) {
-      console.error('Error updating favorite status:', error);
-      setFormData(prev => ({ ...prev, isFavorite: !newFavoriteState }));
-      setError(`Failed to update favorite status: ${error.message}`);
+    // Optimistically update UI first
+    setFormData(prev => ({ ...prev, isFavorite: newFavoriteState }));
+    
+    if (!accessToken) {
+      throw new Error("Access token is not available.");
     }
-  };
+
+    // Use the updated form data for API call
+    const updatedContactData = FormDataToApiData(
+      { ...formData, isFavorite: newFavoriteState }, 
+      categories, 
+      links
+    );
+
+    console.log('Updating favorite status:', updatedContactData);
+
+    const apiResponse = await updateContact(accessToken, formData.id, updatedContactData);
+    
+    if (!apiResponse) {
+      throw new Error('Failed to update favorite status');
+    }
+
+    // Update contact data to match
+    setContactData(prev => ({ ...prev, isFavorite: newFavoriteState }));
+    
+  } catch (error) {
+    console.error('Error updating favorite status:', error);
+    // Revert the UI change if API call failed
+    setFormData(prev => ({ ...prev, isFavorite: !newFavoriteState })); // Now this works
+    setError(`Failed to update favorite status: ${error.message}`);
+  }
+};
 
   const validateForm = () => {
     const newErrors = {};
@@ -255,11 +281,7 @@ const ShowContactForm = ({id}) => {
     if (!formData.firstName?.trim()) newErrors.firstName = 'First name is required';
     if (!formData.lastName?.trim()) newErrors.lastName = 'Last name is required';
     
-    const categoryValue = typeof formData.category === 'string' 
-      ? formData.category 
-      : formData.category?.name;
-    
-    if (!categoryValue) {
+    if (!formData.category || !formData.category.name || !formData.category.id) {
       newErrors.category = 'Category is required';
     }
 
@@ -304,9 +326,7 @@ const ShowContactForm = ({id}) => {
         throw new Error("Access token is not available.");
       }
 
-      const updatedContactData = FormDataToApiData(formData, categories, { 
-        links: showLinks ? links.filter(link => link && link.trim() !== '') : []
-      });
+      const updatedContactData = FormDataToApiData(formData, categories, links);
       
       const apiResponse = await updateContact(accessToken, formData.id, updatedContactData);
     
@@ -333,17 +353,29 @@ const ShowContactForm = ({id}) => {
   const handleCancel = () => {
     if (!formData) return;
 
-    setFormData({ ...formData });
+    const originalFormData = ApiDataToFormData(contactData);
+    setFormData(originalFormData);
+
     setIsEditing(false);
     setHasSubmitted(false);
     setErrors({});
     
-    setShowBirthdate(!!formData.birthdate);
-    setShowAddress(!!formData.streetAndNr || !!formData.city || !!formData.country || !!formData.postalcode);
-    setShowContactDetails(!!formData.lastContactDate || !!formData.meetingPlace);
-    setShowLinks(formData.links && formData.links.length > 0);
-    setLinks(formData.links && formData.links.length > 0 ? formData.links : ['']);
+    // Reset UI states based on original data
+    setShowBirthdate(!!originalFormData.birthdate);
+    setShowAddress(
+      !!(originalFormData.streetAndNr || originalFormData.city || 
+        originalFormData.country || originalFormData.postalcode)
+    );
+    setShowContactDetails(
+      !!(originalFormData.lastContactDate || originalFormData.meetingPlace)
+    );
+    
+    const hasLinks = originalFormData.links && originalFormData.links.length > 0;
+    setShowLinks(hasLinks);
+    setLinks(hasLinks ? originalFormData.links : [{ title: '', url: '' }]);
+  
   };
+
 
   
 
@@ -516,11 +548,8 @@ const ShowContactForm = ({id}) => {
                                 fontWeight: 300
                             }}
                         >
-                            <span className={formData.category ? 'text-black' : 'text-gray-300'}>
-                              {formData.category 
-                                ? (typeof formData.category === 'string' ? formData.category : formData.category.name)
-                                : 'select category'
-                              }
+                            <span className={formData.category?.name ? 'text-black' : 'text-gray-300'}>
+                              {formData.category?.name || 'select category'}
                             </span>
                             <svg 
                                 className={`w-4 h-4 transition-transform duration-200 ${showCategoryDropdown ? 'rotate-180' : ''}`}
@@ -540,7 +569,10 @@ const ShowContactForm = ({id}) => {
                                         key={category.id}
                                         type="button"
                                         onClick={() => {
-                                            setFormData(prev => ({ ...prev, category: category.name, id: category.id }));
+                                            setFormData(prev => ({ 
+                                              ...prev, 
+                                              category: { name: category.name, id: category.id }
+                                            }));
                                             
                                             // Clear error immediately (same as handleInputChange does)
                                             if (hasSubmitted && errors.category) {
@@ -722,11 +754,12 @@ const ShowContactForm = ({id}) => {
                                         </span>
                                     </div>
                                     <input 
-                                        type="date" 
+                                        type="text" 
                                         name="birthdate" 
                                         id="birthdate" 
                                         value={formData.birthdate}
                                         onChange={handleInputChange}
+                                        placeholder="14-04-2024"
                                         disabled={isSaving}
                                         className={`w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
                                         style={{
@@ -944,7 +977,7 @@ const ShowContactForm = ({id}) => {
                                       the date of your last contact?
                                   </label>
                                   <input 
-                                      type="date" 
+                                      type="text" 
                                       name="lastContactDate" 
                                       id="lastContactDate" 
                                       value={formData.lastContactDate}
@@ -990,78 +1023,89 @@ const ShowContactForm = ({id}) => {
                 </div>
 
                 {/* Optional Links */}
-                <div className="space-y-3 -mt-5">
-                    {/* Links Toggle and Fields */}
-                    <div className="relative">
-                      {!showLinks ? (
-                          <button
-                            type="button"
-                            onClick={() => setShowLinks(true)}
-                            className="flex items-center space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-light"
-                            disabled={isLoading}
-                           >
-                            <span className="text-lg font-semibold">+</span>
-                            <span className="text-base text-black hover:text-red-500">add weblinks</span>
-                          </button>
-                      ) : (
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="relative left-2 text-sans text-base text-black font-light">
-                                websites & links
-                              </span>
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setShowLinks(false);
-                                    setLinks(['']);
-                                  }}
-                                    className="text-red-500 hover:text-red-700 transition-colors duration-200 text-sm"
-                                    disabled={isLoading}
-                                  >
-                                    remove
-                                 </button>
-                                </div>
-                                    
-                                {links.map((link, index) => (
-                                  <div key={index} className="relative flex items-center space-x-2">
-                                    <input 
-                                      type="url" 
-                                      value={link}
-                                      onChange={(e) => handleLinkChange(index, e.target.value)}
-                                      placeholder="https://example.com"
-                                      disabled={isLoading}
-                                      className="flex-1 p-2.5 w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500"
-                                      style={{
-                                          fontSize: '16px',
-                                          fontWeight: 400
-                                      }}
-                                        />
-                                        {links.length > 1 && (
-                                            <button
-                                                type="button"
-                                                onClick={() => removeLink(index)}
-                                                className="text-red-500 hover:text-red-700 transition-colors duration-200 p-1"
-                                                disabled={isLoading}
-                                            >
-                                                ×
-                                            </button>
-                                        )}
-                                    </div>
-                                ))}
-                                
+                <div className="space-y-3">
+                        <div className="relative">
+                            {!showLinks ? (
                                 <button
                                     type="button"
-                                    onClick={addLink}
-                                    className="flex items-center space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-light text-sm"
-                                    disabled={isLoading}
+                                    onClick={() => setShowLinks(true)}
+                                    className="flex items-center space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-light"
+                                    disabled={isSaving}
                                 >
-                                    <span className="text-base">+</span>
-                                    <span className="text-black hover:text-red-500">add another link</span>
+                                    <span className="text-lg font-semibold">+</span>
+                                    <span className="text-base text-black hover:text-red-500">add weblinks</span>
                                 </button>
-                            </div>
-                        )}
+                            ) : (
+                                <div className="space-y-2">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <span className="relative left-2 text-sans text-base text-black font-light">
+                                            websites & links
+                                        </span>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setShowLinks(false);
+                                                setLinks([{ title: '', url: '' }]);
+                                            }}
+                                            className="text-red-500 hover:text-red-700 transition-colors duration-200 text-sm"
+                                            disabled={isSaving}
+                                        >
+                                            remove
+                                        </button>
+                                    </div>
+                                    
+                                    {links.map((link, index) => (
+                                        <div key={index} className="relative flex items-center space-x-2">
+                                            <input 
+                                                type="text" 
+                                                value={link.title}
+                                                onChange={(e) => handleLinkChange(index, 'title', e.target.value)}
+                                                placeholder="website"
+                                                disabled={isSaving}
+                                                className="flex relative p-2.5 w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 min-w-[100px] max-w-[120px] h-[48px] focus:outline-none focus:border-red-500"
+                                                style={{
+                                                    fontSize: '16px',
+                                                    fontWeight: 300
+                                                }}
+                                            />
+                                            <input 
+                                                type="text" 
+                                                value={link.url}
+                                                onChange={(e) => handleLinkChange(index, 'url', e.target.value)}
+                                                placeholder="www.google.com or https://example.com"
+                                                disabled={isSaving}
+                                                className="flex p-2.5 w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500"
+                                                style={{
+                                                    fontSize: '16px',
+                                                    fontWeight: 300
+                                                }}
+                                            />
+                                            {links.length > 1 && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeLink(index)}
+                                                    className="text-red-500 hover:text-red-700 transition-colors duration-200 p-1"
+                                                    disabled={isSaving}
+                                                >
+                                                    ×
+                                                </button>
+                                            )}
+                                        </div>
+                                    ))}
+                                    
+                                    <button
+                                        type="button"
+                                        onClick={addLink}
+                                        className="flex items-center space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-light text-sm"
+                                        disabled={isSaving}
+                                    >
+                                        <span className="text-base">+</span>
+                                        <span className="text-black hover:text-red-500">add another link</span>
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     </div>
-                </div>
 
                 {/* Save and Cancel Buttons */}
                 
@@ -1087,6 +1131,7 @@ const ShowContactForm = ({id}) => {
                         size="xl"
                         variant="dark"
                         type="submit"
+                        onClick={handleSave}
                         className=" absolute -bottom-[85px] -right-[10px] text-2xl font-semibold"
                             style={{ 
                                 marginTop: '2rem', 
@@ -1210,16 +1255,16 @@ const ShowContactForm = ({id}) => {
         
         {/* Header with Name and Favorite */}
         <div className="text-center mb-8">
-          <div className="flex items-center justify-center space-x-10 mb-3 ml-5 mt-8">
+          <div className="flex items-center justify-center space-x-10 mb-3 mt-8">
             <h1 className="text-3xl ml-14 font-bold text-black">
               {formData.firstName} {formData.lastName}
             </h1>
           
             {/* Favorite Checkbox */}
-            <div className="flex items-center">
+            <div className="flex items-center pr-2">
                 <button
                         type="button"
-                        onClick={handleFavoriteToggle}  // Changed from setFormData
+                        onClick={handleFavoriteToggle} 
                         className="flex items-center hover:scale-110 transform"
                         disabled={isLoading}
                     >
@@ -1356,7 +1401,7 @@ const ShowContactForm = ({id}) => {
                       rel="noopener noreferrer"
                       className="text-black text-normal font-light hover:text-red-500 transition-colors break-all"
                     >
-                      {link.url}
+                      {link.title}
                     </a>
                   </div>
                 ))}

@@ -36,5 +36,5 @@ class ContactLinks(db.Model):
         }
 
     def __repr__(self):
-        return f'<ContactLink {self.url}>'
+        return f'<ContactLink {self.title}: {self.url}>'
 

@@ -3,7 +3,8 @@ import CircleButton from '../ui/Buttons';
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../context/AuthContextProvider';
 import { createContact, getCategories } from '../../apiCalls/contactsApi';
-import { formatDateForBackend } from '../helperFunctions/dateConversion'
+import FormDataToApiData from '../helperFunctions/FormToApiData';
+
 
 const NewContactForm = ({onSubmit, onCancel }) => {
     const navigate = useNavigate();
@@ -12,7 +13,7 @@ const NewContactForm = ({onSubmit, onCancel }) => {
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
-        category: '',
+        category: {name: '', id: null},
         email: '',
         phone: '',
         isFavorite: false,
@@ -24,7 +25,7 @@ const NewContactForm = ({onSubmit, onCancel }) => {
         notes: '',
         lastContactDate: '',
         meetingPlace: '',
-        links: ['']
+        links: []
     });
 
     // Original Visual State 
@@ -38,7 +39,7 @@ const NewContactForm = ({onSubmit, onCancel }) => {
     const [showContactDetails, setShowContactDetails] = useState(false);
 
     const [showLinks, setShowLinks] = useState(false);
-    const [links, setLinks] = useState(['']);
+    const [links, setLinks] = useState([{ title: '', url: '' }]);
 
     // Category State
     const [categories, setCategories] = useState([]);
@@ -86,14 +87,29 @@ const NewContactForm = ({onSubmit, onCancel }) => {
         }
     };
 
-    const handleLinkChange = (index, value) => {
-        const newLinks = [...links];
-        newLinks[index] = value;
+    const handleLinkChange = (index, field, value) => {
+    const newLinks = [...links];
+    
+        // If it's a URL field, auto-format it
+        if (field === 'url' && value.trim()) {
+            // Check if URL already has protocol
+            if (!value.startsWith('http://') && !value.startsWith('https://')) {
+                // Add https:// if it looks like a URL (contains a dot)
+                if (value.includes('.')) {
+                    value = 'https://' + value;
+                }
+            }
+        }
+        
+        newLinks[index] = {
+            ...newLinks[index],
+            [field]: value
+        };
         setLinks(newLinks);
     };
 
     const addLink = () => {
-        setLinks([...links, '']);
+        setLinks([...links, { title: '', url: '' }]);
     };
 
     const removeLink = (index) => {
@@ -210,8 +226,8 @@ const NewContactForm = ({onSubmit, onCancel }) => {
         }
 
         // category validation
-        if (!formData.category.name) {
-             newErrors.category = 'category is required';
+        if (!formData.category || !formData.category.name || !formData.category.id) {
+            newErrors.category = 'category is required';
         }
         
         // Email validation
@@ -246,34 +262,9 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                 throw new Error("Access token is not available.");
             }
 
-            const formattedBirthdate = formData.birthdate ? formatDateForBackend(formData.birthdate) : null;
-            const formattedContactDate = formData.lastContactDate ? formatDateForBackend(formData.lastContactDate) : null;
-
-
-            // Prepare data for API call
-            const contactData = {
-                first_name : formData.firstName,
-                last_name : formData.lastName,
-                email : formData.email,
-                phone : formData.phone,
-                category_id : formData.category.id,
-                is_favorite : formData.isFavorite,
-                last_contact_date : formattedContactDate,
-                last_contact_place : formData.meetingPlace,
-                birth_date : formattedBirthdate,
-                street_and_nr : formData.streetAndNr,
-                postal_code : formData.postalcode,
-                city : formData.city,
-                country : formData.country,
-                notes : formData.notes,
-                links: links.filter(link => link.trim() !== '')
-            };
-            console.log('Submitting contact data:', contactData);
-            console.log('Original dates:', { 
-                birthdate: formData.birthdate, 
-                lastContactDate: formData.lastContactDate 
-            });
-            console.log('Formatted dates:', {formattedBirthdate,formattedContactDate});
+            // Prepare data for API call in HelperFunction
+            const contactData = FormDataToApiData(formData, categories, links);
+                console.log('Submitting contact data:', contactData);
 
             // Call API to create contact
             const NewContactData = await createContact(accessToken, contactData);
@@ -295,20 +286,19 @@ const NewContactForm = ({onSubmit, onCancel }) => {
             }
 
         } catch (error) {
-            setErrors(prev => ({ ...prev, submit: `Failed to create contact: ${error.message}` }));
-            console.error('Error creating contact:', error);
+        setErrors(prev => ({ ...prev, submit: `Failed to create contact: ${error.message}` }));
+        console.error('Error creating contact:', error);
         } finally {
             setIsLoading(false);
         }
-
-    };  
+    };
 
     const resetForm = () => {
         // Reset form after successful creation
         setFormData({
             firstName: '',
             lastName: '',
-            category: '',
+            category: { name: '', id: null },
             email: '',
             phone: '',
             isFavorite: false,
@@ -326,7 +316,7 @@ const NewContactForm = ({onSubmit, onCancel }) => {
         setShowContactDetails(false);
         setShowLinks(false);
         setExpandedNotes(false);
-        setLinks(['']);
+        setLinks([{ title: '', url: '' }]);
         setHasSubmitted(false);
         setErrors({});
       
@@ -451,7 +441,7 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                             type="button"
                             onClick={() => {
                                 console.log('Dropdown clicked. Current categories:', categories);
-                                console.log('Current selected category:', formData.category.name);
+                                console.log('Current selected category:', formData.category?.name || 'none selected'); // ← FIXED
                                 setShowCategoryDropdown(!showCategoryDropdown);
                             }}
                             disabled={isLoading}
@@ -463,8 +453,8 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                                 fontWeight: 300
                             }}
                         >
-                            <span className={formData.category ? 'text-black' : 'text-gray-300'}>
-                                {formData.category.name 
+                            <span className={formData.category?.name ? 'text-black' : 'text-gray-300'}> {/* ← FIXED */}
+                                {formData.category?.name 
                                     ? formData.category.name
                                     : categories.length === 0 
                                         ? 'create a category first'
@@ -990,9 +980,9 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                                         <button
                                             type="button"
                                             onClick={() => {
-                                                setShowLinks(false);
-                                                setLinks(['']);
-                                            }}
+                                            setShowLinks(false);
+                                            setLinks([{ title: '', url: '' }]);
+                                        }}
                                             className="text-red-500 hover:text-red-700 transition-colors duration-200 text-sm"
                                             disabled={isLoading}
                                         >
@@ -1003,15 +993,27 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                                     {links.map((link, index) => (
                                         <div key={index} className="relative flex items-center space-x-2">
                                             <input 
-                                                type="url" 
-                                                value={link}
-                                                onChange={(e) => handleLinkChange(index, e.target.value)}
-                                                placeholder="https://example.com"
+                                                type="text" 
+                                                value={link.title}
+                                                onChange={(e) => handleLinkChange(index, 'title', e.target.value)}
+                                                placeholder="website"
                                                 disabled={isLoading}
-                                                className="flex-1 p-2.5 w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500"
+                                                className="flex relative p-2.5 w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 min-w-[100px] max-w-[120px] h-[48px] focus:outline-none focus:border-red-500"
                                                 style={{
                                                     fontSize: '16px',
-                                                    fontWeight: 400
+                                                    fontWeight: 300
+                                                }}
+                                            />
+                                            <input 
+                                                type="url" 
+                                                value={link.url}
+                                                onChange={(e) => handleLinkChange(index, 'url', e.target.value)}
+                                                placeholder="https://example.com"
+                                                disabled={isLoading}
+                                                className="flex p-2.5 w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500"
+                                                style={{
+                                                    fontSize: '16px',
+                                                    fontWeight: 300
                                                 }}
                                             />
                                             {links.length > 1 && (

@@ -60,16 +60,16 @@ class Contact(db.Model):
             'phone': self.phone,
             'is_favorite': self.is_favorite,
             'category_id': self.category_id,
-            'birth_date': self.birth_date.strftime('%d-%m-%Y') if self.birth_date else None,
-            'last_contact_date': self.last_contact_date.strftime('%d-%m-%Y') if self.last_contact_date else None,
+            'birth_date': self.birth_date.strftime('%d.%m.%Y') if self.birth_date else None,
+            'last_contact_date': self.last_contact_date.strftime('%d.%m.%Y') if self.last_contact_date else None,
             'last_contact_place': self.last_contact_place,
             'street_and_nr': self.street_and_nr,
             'postal_code': self.postal_code,
             'city': self.city,
             'country': self.country,
             'notes': self.notes,
-            'created_at': self.created_at.strftime('%d-%m-%Y %H:%M:%S') if self.created_at else None,
-            'updated_at': self.updated_at.strftime('%d-%m-%Y %H:%M:%S') if self.updated_at else None,
+            'created_at': self.created_at.strftime('%d.%m.%Y %H:%M:%S') if self.created_at else None,
+            'updated_at': self.updated_at.strftime('%d.%m.%Y %H:%M:%S') if self.updated_at else None,
         }
     
         if include_category and hasattr(self, 'category') and self.category:

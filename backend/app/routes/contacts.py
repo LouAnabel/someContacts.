@@ -145,10 +145,17 @@ def create_contact():
         # Handle links if provided
         links = data.get('links', [])
         if links:
-            for link_url in links:
-                if link_url and link_url.strip():  # Skip empty links
-                    url = link_url.strip()
+            for link_data in links:
+                if isinstance(link_data, dict):
+                    # New format: {title: "instagram", url: "https://..."}
+                    url = link_data.get('url', '').strip()
+                    title = link_data.get('title', '').strip()
+                else:
+                    # Fallback for old format: just URL string
+                    url = link_data.strip() if link_data else ''
+                    title = ''
 
+                if url:
                     # Add https:// if not present
                     if not url.startswith(('http://', 'https://')):
                         url = 'https://' + url
@@ -157,7 +164,8 @@ def create_contact():
                     if validate_url(url):
                         contact_link = ContactLinks(
                             contact_id=contact.id,
-                            url=url
+                            url=url,
+                            title=title
                         )
                         db.session.add(contact_link)
 
