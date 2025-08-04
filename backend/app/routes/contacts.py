@@ -41,7 +41,7 @@ def validate_date(date_string):
     if not date_string:
         return True
     try:
-        datetime.strptime(date_string, '%d-%m-%Y')
+        datetime.strptime(date_string, '%d.%m.%Y')  # ← Changed to dots
         logger.debug(f"Date validation for '{date_string}': valid")
         return True
     except ValueError:
@@ -89,18 +89,16 @@ def create_contact():
         birth_date = None
         if data.get('birth_date'):
             try:
-                birth_date = datetime.strptime(data['birth_date'], '%d-%m-%Y').date()
+                birth_date = datetime.strptime(data['birth_date'], '%d.%m.%Y').date()  # ← Changed to dots
             except ValueError as e:
-                return jsonify({'error': 'Invalid birth date format. Use DD-MM-YYYY (e.g., 15-05-1990)'}), 400
+                return jsonify({'error': 'Invalid birth date format. Use DD.MM.YYYY (e.g., 21.05.2000)'}), 400
 
-
-        last_contact_date = None
-        if data.get('last_contact_date'):
+        contact_date = None
+        if data.get('contact_date'):
             try:
-                last_contact_date = datetime.strptime(data['last_contact_date'], '%d-%m-%Y').date()
+                contact_date = datetime.strptime(data['contact_date'], '%d.%m.%Y').date()  # ← Changed to dots
             except ValueError as e:
-                return jsonify({'error': 'Invalid last contact date format. Use DD-MM-YYYY (e.g., 03-05-2025)'}), 400
-
+                return jsonify({'error': 'Invalid last contact date format. Use DD.MM.YYYY (e.g., 03.05.2025)'}), 400
 
         # Validate category if provided
         category_id = data.get('category_id')
@@ -130,8 +128,8 @@ def create_contact():
             is_favorite=data.get('is_favorite', False),
             category_id=category_id,
             birth_date=birth_date,
-            last_contact_date=last_contact_date,
-            last_contact_place=data.get('last_contact_place', '').strip() if data.get('last_contact_place') else None,
+            contact_date=contact_date,
+            contact_place=data.get('contact_place', '').strip() if data.get('contact_place') else None,
             street_and_nr=data.get('street_and_nr', '').strip() if data.get('street_and_nr') else None,
             postal_code=data.get('postal_code', '').strip() if data.get('postal_code') else None,
             city=data.get('city', '').strip() if data.get('city') else None,
@@ -144,30 +142,31 @@ def create_contact():
 
         # Handle links if provided
         links = data.get('links', [])
-        if links:
-            for link_data in links:
-                if isinstance(link_data, dict):
-                    # New format: {title: "instagram", url: "https://..."}
-                    url = link_data.get('url', '').strip()
-                    title = link_data.get('title', '').strip()
-                else:
-                    # Fallback for old format: just URL string
-                    url = link_data.strip() if link_data else ''
-                    title = ''
+        for link_item in links:
+            # Handle object format from frontend
+            if isinstance(link_item, dict):
+                link_url = link_item.get('url', '').strip()
+                link_title = link_item.get('title', '').strip()
+            elif isinstance(link_item, str):
+                # Handle legacy string format
+                link_url = link_item.strip()
+                link_title = ''
+            else:
+                continue
 
-                if url:
-                    # Add https:// if not present
-                    if not url.startswith(('http://', 'https://')):
-                        url = 'https://' + url
+            if link_url:  # Only process if URL exists
+                # Add https:// if not present
+                if not link_url.startswith(('http://', 'https://')):
+                    link_url = 'https://' + link_url
 
-                    # Validate URL format
-                    if validate_url(url):
-                        contact_link = ContactLinks(
-                            contact_id=contact.id,
-                            url=url,
-                            title=title
-                        )
-                        db.session.add(contact_link)
+                # Validate URL format
+                if validate_url(link_url):
+                    contact_link = ContactLinks(
+                        contact_id=contact_id,
+                        url=link_url,
+                        title=link_title  # Make sure your ContactLinks model has this field
+                    )
+                    db.session.add(contact_link)
 
         db.session.commit()
         logger.info(f"Contact created successfully: {contact.first_name} {contact.last_name or ''} (ID: {contact.id})")
@@ -273,7 +272,7 @@ def get_contacts():
                     Contact.first_name.ilike(search_term),
                     Contact.last_name.ilike(search_term),
                     Contact.email.ilike(search_term),
-                    Contact.last_contact_place.ilike(search_term),
+                    Contact.contact_place.ilike(search_term),
                     Contact.city.ilike(search_term),
                     Contact.country.ilike(search_term),
                     Contact.notes.ilike(search_term)
@@ -412,7 +411,7 @@ def get_contacts():
                     Contact.first_name.ilike(search_term),
                     Contact.last_name.ilike(search_term),
                     Contact.email.ilike(search_term),
-                    Contact.last_contact_place.ilike(search_term),
+                    Contact.contact_place.ilike(search_term),
                     Contact.city.ilike(search_term),
                     Contact.country.ilike(search_term)
                 )
@@ -474,7 +473,7 @@ def update_contact(contact_id):
         creator_id_str = get_jwt_identity()
         creator_id = int(creator_id_str)
         logger.info(f"Updating contact {contact_id} for user ID: {creator_id}")
-        
+
         data = request.get_json()
         if not data:
             logger.warning("Update failed: No data provided")
@@ -482,7 +481,7 @@ def update_contact(contact_id):
                 'success': False,
                 'message': 'No data provided'
             }), 400
-        
+
         # Find the contact
         contact = Contact.query.filter_by(id=contact_id, creator_id=creator_id).first()
 
@@ -492,27 +491,28 @@ def update_contact(contact_id):
                 'success': False,
                 'message': 'Contact not found'
             }), 404
-        
+
         logger.debug(f"Found contact: {contact.first_name} {contact.last_name or ''}")
 
         # Validate required fields
         if 'first_name' in data and not data['first_name'].strip():
             return jsonify({'error': 'First name cannot be empty'}), 400
-        
+
         # Validate email format if provided
         if 'email' in data and data['email'] and not validate_email(data['email']):
             return jsonify({'error': 'Invalid email format'}), 400
-            
+
         # Validate phone format if provided
         if 'phone' in data and data['phone'] and not validate_phone(data['phone']):
             return jsonify({'error': 'Invalid phone number format'}), 400
 
         # Validate date formats if provided
         if 'birth_date' in data and data['birth_date'] and not validate_date(data['birth_date']):
-            return jsonify({'error': 'Invalid birth date format. Use DD-MM-YYYY (e.g., 15-05-1990)'}), 400
+            return jsonify(
+                {'error': 'Invalid birth date format. Use DD.MM.YYYY (e.g., 15.05.1990)'}), 400
 
-        if 'last_contact_date' in data and data['last_contact_date'] and not validate_date(data['last_contact_date']):
-            return jsonify({'error': 'Invalid last contact date format. Use DD-MM-YYYY (e.g., 03-05-2025)'}), 400
+        if 'contact_date' in data and data['contact_date'] and not validate_date(data['contact_date']):
+            return jsonify({'error': 'Invalid last contact date format. Use DD.MM.YYYY (e.g., 03.05.2025)'}), 400
 
         # Validate category if provided
         if 'category_id' in data:
@@ -520,7 +520,7 @@ def update_contact(contact_id):
             if category_id is not None:
                 # Verify category belongs to user
                 category = Category.query.filter_by(
-                    id=category_id, 
+                    id=category_id,
                     creator_id=creator_id
                 ).first()
                 if not category:
@@ -529,7 +529,6 @@ def update_contact(contact_id):
                         'message': 'Invalid category'
                     }), 400
                 logger.debug(f"Category validation successful: {category.name}")
-
 
         # Update basic fields
         if 'first_name' in data:
@@ -542,18 +541,20 @@ def update_contact(contact_id):
             contact.phone = data['phone'].strip() if data['phone'] else None
         if 'is_favorite' in data:
             contact.is_favorite = bool(data['is_favorite'])
-        
+
         # Update category
         if 'category_id' in data:
             contact.category_id = data['category_id']
-        
-        # Update extended fields (if your Contact model has them)
+
+        # Update extended fields
         if 'birth_date' in data:
-            contact.birth_date = datetime.strptime(data['birth_date'], '%d-%m-%Y').date() if data['birth_date'] else None
-        if 'last_contact_date' in data:
-            contact.last_contact_date = datetime.strptime(data['last_contact_date'], '%d-%m-%Y').date() if data['last_contact_date'] else None
-        if 'last_contact_place' in data:
-            contact.last_contact_place = data['last_contact_place'].strip() if data['last_contact_place'] else None
+            contact.birth_date = datetime.strptime(data['birth_date'], '%d.%m.%Y').date() if data[
+                'birth_date'] else None
+        if 'contact_date' in data:
+            contact.contact_date = datetime.strptime(data['contact_date'], '%d.%m.%Y').date() if data[
+                'contact_date'] else None
+        if 'contact_place' in data:
+            contact.contact_place = data['contact_place'].strip() if data['contact_place'] else None
         if 'street_and_nr' in data:
             contact.street_and_nr = data['street_and_nr'].strip() if data['street_and_nr'] else None
         if 'postal_code' in data:
@@ -565,45 +566,55 @@ def update_contact(contact_id):
         if 'notes' in data:
             contact.notes = data['notes'].strip() if data['notes'] else None
 
-            # Handle links update if provided
-            if 'links' in data:
-                # Remove existing links
-                ContactLinks.query.filter_by(contact_id=contact_id).delete()
+        # Handle links update if provided (FIXED: moved outside notes block)
+        if 'links' in data:
+            # Remove existing links
+            ContactLinks.query.filter_by(contact_id=contact_id).delete()
 
-                # Add new links
-                links = data.get('links', [])
-                for link_url in links:
-                    if link_url and link_url.strip():  # Skip empty links
-                        url = link_url.strip()
+            # Add new links
+            links = data.get('links', [])
+            for link_item in links:
+                # Handle object format from frontend
+                if isinstance(link_item, dict):
+                    link_url = link_item.get('url', '').strip()
+                    link_title = link_item.get('title', '').strip()
+                elif isinstance(link_item, str):
+                    # Handle legacy string format
+                    link_url = link_item.strip()
+                    link_title = ''
+                else:
+                    continue
 
-                        # Add https:// if not present
-                        if not url.startswith(('http://', 'https://')):
-                            url = 'https://' + url
+                if link_url:  # Only process if URL exists
+                    # Add https:// if not present
+                    if not link_url.startswith(('http://', 'https://')):
+                        link_url = 'https://' + link_url
 
-                        # Validate URL format
-                        if validate_url(url):
-                            contact_link = ContactLinks(
-                                contact_id=contact_id,
-                                url=url
-                            )
-                            db.session.add(contact_link)
+                    # Validate URL format
+                    if validate_url(link_url):
+                        contact_link = ContactLinks(
+                            contact_id=contact_id,
+                            url=link_url,
+                            title=link_title  # Make sure your ContactLinks model has this field
+                        )
+                        db.session.add(contact_link)
 
         # Update timestamp
         contact.updated_at = db.func.current_timestamp()
-        
+
         db.session.commit()
-        
+
         return jsonify({
             'success': True,
             'message': 'Contact updated successfully',
             'contact': contact.to_dict()
         }), 200
-    
+
     except ValueError as e:
         logger.error(f"ValueError in update_contact: {e}")
         return jsonify({
             'success': False,
-            'message': 'Invalid date format. Use DD-MM-YYYY'
+            'message': 'Invalid date format. Use DD.MM.YYYY'
         }), 400
     except Exception as e:
         db.session.rollback()
@@ -613,7 +624,6 @@ def update_contact(contact_id):
             'message': 'Failed to update contact',
             'error': str(e)
         }), 500
-
 
 
 # DELETE - Delete a contact

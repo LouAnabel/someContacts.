@@ -7,13 +7,11 @@ const NewContact = () => {
     const [contactPhoto, setContactPhoto] = useState(null);
 
     const handleSubmit = (formData) => {
-        console.log('New contact data submitted:', formData);
         // Include photo in the submission
         const contactWithPhoto = {
             ...formData,
             photo: contactPhoto
         };
-        console.log('Complete contact data with photo:', contactWithPhoto);
         // Handle the form submission here
         // Make API calls to create the contact, etc.
     };

@@ -55,6 +55,7 @@ function Home() {
         setUserName(firstName);
 
         //set Contacts
+        console.log("data:", contactsData)
         setContacts(contactsData || []);
 
       } catch (error) {
@@ -80,7 +81,8 @@ function Home() {
   };
 
   const contactsCount = contacts.length
-
+  const favoriteContacts = contacts.filter(contact => contact.is_favorite)
+  console.log("favorite contacts:", favoriteContacts)
 
 
   return (
@@ -139,7 +141,7 @@ function Home() {
 
           <div className="relative">
               {/* Contact Cloud Component */}
-              {!isLoading && <ContactCloud contacts={contacts} />}
+              {!isLoading && <ContactCloud contacts={favoriteContacts} />}
           </div>
 
           <div className="relative -mt-24 relativ z-10 w-fit ml-auto">

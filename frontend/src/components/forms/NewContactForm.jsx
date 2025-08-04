@@ -23,7 +23,7 @@ const NewContactForm = ({onSubmit, onCancel }) => {
         city: '',
         country: '',
         notes: '',
-        lastContactDate: '',
+        contactDate: '',
         meetingPlace: '',
         links: []
     });
@@ -86,6 +86,7 @@ const NewContactForm = ({onSubmit, onCancel }) => {
             setErrors(prev => ({ ...prev, submit: '' }));
         }
     };
+
 
     const handleLinkChange = (index, field, value) => {
     const newLinks = [...links];
@@ -196,7 +197,7 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                 setShowCategoryDropdown(false);
                
                 
-                console.log('✅ Category added successfully:', newCategory.name);
+                console.log('Category added successfully:', newCategory.name);
                 
             } catch (error) {
                 console.error('Failed to add category:', error);
@@ -218,10 +219,7 @@ const NewContactForm = ({onSubmit, onCancel }) => {
             newErrors.firstName = 'First name must be at least 2 characters';
         }
         
-        // Last name validation
-        if (!formData.lastName.trim()) {
-            newErrors.lastName = 'Last name is required';
-        } else if (formData.lastName.trim().length < 2) {
+        if (formData.lastName && formData.lastName.trim() && formData.lastName.trim().length < 2) {
             newErrors.lastName = 'Last name must be at least 2 characters';
         }
 
@@ -241,10 +239,20 @@ const NewContactForm = ({onSubmit, onCancel }) => {
         if (formData.phone && formData.phone.trim() && !/^\+?[\d\s\-\(\)]{10,}$/.test(formData.phone.trim())) {
             newErrors.phone = 'Please enter a valid phone number';
         }
+
+        // Date validation (optional) - CHECK FOR DD.MM.YYYY FORMAT
+        if (formData.birthdate && !/^\d{2}\.\d{2}\.\d{4}$/.test(formData.birthdate)) {
+            newErrors.birthdate = 'Please use format: DD.MM.YYYY';
+        }
+        
+        if (formData.contactDate && !/^\d{2}\.\d{2}\.\d{4}$/.test(formData.contactDate)) {
+            newErrors.contactDate = 'Please use format: DD.MM.YYYY';
+        }
         
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
+    
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -308,7 +316,7 @@ const NewContactForm = ({onSubmit, onCancel }) => {
             city: '',
             country: '',
             notes: '',
-            lastContactDate: '',
+            contactDate: '',
             meetingPlace: ''
         });
         setShowBirthdate(false);
@@ -682,11 +690,12 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                                         </span>
                                     </div>
                                     <input 
-                                        type="date" 
+                                        type="text" 
                                         name="birthdate" 
                                         id="birthdate" 
                                         value={formData.birthdate}
                                         onChange={handleInputChange}
+                                        placeholder="18.04.1995"
                                         disabled={isLoading}
                                         className={`w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
                                         style={{
@@ -871,6 +880,7 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                     </div>
                 </div>
 
+
                 {/* Optional Toggle Field */}
                 <div className="space-y-2 mb-8 -mt-5">
                     {/* Contact Details Toggle and Fields */}
@@ -883,7 +893,7 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                                 disabled={isLoading}
                             >
                                 <span className="text-lg font-semibold">+</span>
-                                <span className="text-base text-black hover:text-red-500">when and where did you meet? </span>
+                                <span className="text-base text-black hover:text-red-500">when and where did/will you meet? </span>
                             </button>
                         ) : (
                             <div className="space-y-2">
@@ -895,7 +905,7 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                                             setShowContactDetails(false);
                                             setFormData(prev => ({ 
                                                 ...prev, 
-                                                lastContactDate: '', 
+                                                contactDate: '', 
                                                 meetingPlace: '' 
                                             }));
                                         }}
@@ -908,15 +918,16 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                                     
                                 {/* Last Contact Date Field */}
                                 <div className="relative">
-                                    <label htmlFor="lastContactDate" className="relative top-3 left-4 bg-white px-1 text-sans text-base text-black font-light">
-                                        the date of your last contact?
+                                    <label htmlFor="contactDate" className="relative top-3 left-4 bg-white px-1 text-sans text-base text-black font-light">
+                                        the date?
                                     </label>
                                     <input 
-                                        type="date" 
-                                        name="lastContactDate" 
-                                        id="lastContactDate" 
-                                        value={formData.lastContactDate}
+                                        type="text" 
+                                        name="contactDate" 
+                                        id="contactDate" 
+                                        value={formData.contactDate}
                                         onChange={handleInputChange}
+                                        placeholder="19.05.2025"
                                         disabled={isLoading}
                                         className={`w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
                                         style={{
@@ -924,15 +935,15 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                                             fontWeight: 300
                                         }}
                                     />
-                                    {hasSubmitted && errors.lastContactDate && (
-                                        <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.lastContactDate}</p>
+                                    {hasSubmitted && errors.contactDate && (
+                                        <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.contactDate}</p>
                                     )}
                                 </div>
 
                                 {/* Meeting Place Field */}
                                 <div className="relative">
                                     <label htmlFor="meetingPlace" className="relative top-3 left-4 bg-white px-1 text-sans text-base text-black font-light">
-                                        the place where you met?
+                                        the place?
                                     </label>
                                     <input 
                                         type="text" 

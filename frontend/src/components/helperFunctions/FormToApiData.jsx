@@ -3,12 +3,12 @@ import { formatDateForBackend } from '../helperFunctions/dateConversion'
 // Helper Function
 // Prepare Data for API call
 
-const FormDataToApiData = (formData, categories, overrides = {}) => {
+const FormDataToApiData = (formData, categories, links, overrides = {}) => {
     // Get Category ID
     let categoryId = null;
     if (formData.category) {
-        // if category is string, find the category object
         if (typeof formData.category === 'string') {
+            // if category is string, find the category object
             const selectedCategory = categories.find(cat => cat.name === formData.category);
             categoryId = selectedCategory ? selectedCategory.id : null;
         } else if (formData.category.id) {
@@ -17,11 +17,15 @@ const FormDataToApiData = (formData, categories, overrides = {}) => {
         }
     }
 
-    // Format Date for Backend
-    const formattedBirthdate = formData.birthdate ? formatDateForBackend(formData.birthdate) : null;
-    const formattedContactDate = formData.lastContactDate ? formatDateForBackend(formData.lastContactDate) : null;
+    // Format links properly - filter out empty ones and structure them correctly
+    const formattedLinks = links ? links
+        .filter(link => link.url?.trim()) // Only include links with URLs (title is optional)
+        .map(link => ({
+            title: link.title?.trim() || '', // Title can be empty
+            url: link.url.trim()
+        })) : [];
 
-    // Update contact data with form data
+    // Return API data - dates are already in DD.MM.YYYY format, no conversion needed
     return {
         first_name: formData.firstName?.trim(),
         last_name: formData.lastName?.trim(),
@@ -29,18 +33,15 @@ const FormDataToApiData = (formData, categories, overrides = {}) => {
         phone: formData.phone?.trim() || null,
         category_id: categoryId,
         is_favorite: formData.isFavorite || false,
-        birth_date: formattedBirthdate || null,
-        last_contact_date: formattedContactDate || null,
-        last_contact_place: formData.meetingPlace?.trim() || null,
+        birth_date: formData.birthdate?.trim() || null, // Send as-is (DD.MM.YYYY)
+        contact_date: formData.contactDate?.trim() || null, // Send as-is (DD.MM.YYYY)
+        contact_place: formData.meetingPlace?.trim() || null,
         street_and_nr: formData.streetAndNr?.trim() || null,
         postal_code: formData.postalcode?.trim() || null,
         city: formData.city?.trim() || null,
         country: formData.country?.trim() || null,
         notes: formData.notes?.trim() || null,
-        links: formData.links ? formData.links.filter(link => {
-            const url = typeof link === 'string' ? link : link.url;
-            return url && url.trim() !== '';
-        }) : [],
+        links: formattedLinks,
         ...overrides
     };
 };

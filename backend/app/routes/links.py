@@ -92,8 +92,7 @@ def add_contact_link(contact_id):
         new_link = ContactLinks(
             contact_id=contact_id,
             url=url,
-            title=data.get('title', '').strip() or None,
-            link_type=data.get('link_type', '').strip() or None
+            title=data.get('title', '').strip() or None
         )
 
         db.session.add(new_link)

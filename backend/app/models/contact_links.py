@@ -8,7 +8,6 @@ class ContactLinks(db.Model):
     contact_id = db.Column(db.Integer, db.ForeignKey('contacts.id', ondelete='CASCADE'), nullable=False)
     url = db.Column(db.String(500), nullable=False)
     title = db.Column(db.String(100), nullable=True)
-    link_type = db.Column(db.String(50), nullable=True)
 
     #Timestamps
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
@@ -30,7 +29,6 @@ class ContactLinks(db.Model):
             'contact_id': self.contact_id,
             'url': self.url,
             'title': self.title,
-            'link_type': self.link_type,
             'created_at': self.created_at.strftime('%d-%m-%Y %H:%M:%S') if self.created_at else None,
             'updated_at': self.updated_at.strftime('%d-%m-%Y %H:%M:%S') if self.updated_at else None,
         }

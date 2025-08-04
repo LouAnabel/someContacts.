@@ -12,7 +12,7 @@ const formatDateForBackend = (isoDate) => {
         const month = String(date.getMonth()+1).padStart(2,'0');
         const year = date.getFullYear();
 
-        return `${day}-${month}-${year}`;
+        return `${day}.${month}.${year}`; 
     } catch (error) {
         return null;
     }
@@ -21,7 +21,7 @@ const formatDateForBackend = (isoDate) => {
 
 // convert date formate for UI Form
 const formatDateForFrontend = (backendDate) => {
-    if(!backendDate) return null;
+    if(!backendDate) return '';
 
     try {
       const [day, month, year] = backendDate.split('-');

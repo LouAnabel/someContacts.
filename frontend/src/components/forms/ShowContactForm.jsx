@@ -18,6 +18,7 @@ const ShowContactForm = ({id}) => {
 
   const [contactData, setContactData] = useState({});
   const [formData, setFormData] = useState({});
+  
 
   // Edit Mode states
   const [isEditing, setIsEditing] = useState(false);
@@ -55,7 +56,6 @@ const ShowContactForm = ({id}) => {
       console.log('ShowContact: Starting contact fetch for ID:', id);
       contactFetched.current = true; // Mark as fetching
       
-
       try {
         setIsLoading(true);
         setError(null);
@@ -66,6 +66,7 @@ const ShowContactForm = ({id}) => {
         
         const newFormData = ApiDataToFormData(apiContactData);
         console.log('Form data transformed:', newFormData);
+        
         setFormData(newFormData);
 
         // Initialize optional sections with the NEW form data
@@ -81,6 +82,7 @@ const ShowContactForm = ({id}) => {
         const hasLinks = newFormData.links && newFormData.links.length > 0;
         setShowLinks(hasLinks);
         setLinks(hasLinks ? newFormData.links : [{ title: '', url: '' }]);
+
 
       } catch (error) {
         console.error('Contact fetch failed:', error);
@@ -103,12 +105,10 @@ const ShowContactForm = ({id}) => {
       // GUARD: Prevent duplicate calls
       if (!accessToken || categoriesFetched.current) return;
       
-      console.log('ShowContact: starting categories fetch');
       categoriesFetched.current = true;
 
       try {
         const categoriesData = await getCategories(accessToken);
-        console.log('Categories data received:', categoriesData);
         setCategories(categoriesData);
       } catch (error) {   
         console.error('Categories fetch failed:', error);
@@ -240,40 +240,37 @@ const ShowContactForm = ({id}) => {
   };
 
   const handleFavoriteToggle = async () => {
-    const newFavoriteState = !formData.isFavorite;
-    try {
-    // Optimistically update UI first
-    setFormData(prev => ({ ...prev, isFavorite: newFavoriteState }));
-    
-    if (!accessToken) {
-      throw new Error("Access token is not available.");
-    }
+      const newFavoriteState = !formData.isFavorite;
 
-    // Use the updated form data for API call
-    const updatedContactData = FormDataToApiData(
-      { ...formData, isFavorite: newFavoriteState }, 
-      categories, 
-      links
-    );
+      try {
+          setFormData(prev => ({...prev, isFavorite: newFavoriteState}));
+          
+          if (!accessToken) {
+              throw new Error("Access token is not available.");
+          }
 
-    console.log('Updating favorite status:', updatedContactData);
+          // Send ONLY the favorite status - minimal payload!
+          const minimalUpdateData = {
+              is_favorite: newFavoriteState
+          };
 
-    const apiResponse = await updateContact(accessToken, formData.id, updatedContactData);
-    
-    if (!apiResponse) {
-      throw new Error('Failed to update favorite status');
-    }
+          console.log("Minimal data sent to API:", minimalUpdateData);
+          const apiResponse = await updateContact(accessToken, formData.id, minimalUpdateData);
+          
+          if (!apiResponse) {
+              throw new Error('Failed to update favorite status');
+          }
 
-    // Update contact data to match
-    setContactData(prev => ({ ...prev, isFavorite: newFavoriteState }));
-    
-  } catch (error) {
-    console.error('Error updating favorite status:', error);
-    // Revert the UI change if API call failed
-    setFormData(prev => ({ ...prev, isFavorite: !newFavoriteState })); // Now this works
-    setError(`Failed to update favorite status: ${error.message}`);
-  }
-};
+          // Update contact data to match
+          setContactData(prev => ({ ...prev, isFavorite: newFavoriteState }));
+          
+      } catch (error) {
+          console.error('Error updating favorite status:', error);
+          // Revert the UI change if API call failed
+          setFormData(prev => ({ ...prev, isFavorite: !newFavoriteState }));
+          setError(`Failed to update favorite status: ${error.message}`);
+      }
+  };
 
   const validateForm = () => {
     const newErrors = {};
@@ -327,7 +324,7 @@ const ShowContactForm = ({id}) => {
       }
 
       const updatedContactData = FormDataToApiData(formData, categories, links);
-      
+
       const apiResponse = await updateContact(accessToken, formData.id, updatedContactData);
     
       if (!apiResponse) {
@@ -1364,23 +1361,23 @@ const ShowContactForm = ({id}) => {
           )}
 
           {/* Contact History */}
-          {formData.lastContactDate || formData.meetingPlace && (
+          {(formData.lastContactDate || formData.meetingPlace) && (
             <div className="space-y-2">
               <h3 className="text-red-500 font-light text-sm ml-3 -mb-4">contact history</h3>
               <div className="bg-gray-50 rounded-xl p-3 space-y-2">
                 {formData.lastContactDate && (
                   <div>
                     <span className="text-black font-light text-sm">last contact:</span>
-                    <span className="text-black text-normal font-light ml-6">
+                    <span className="text-black text-normal font-light ml-3">
                       {formData.lastContactDate}
                     </span>
                   </div>
                 )}
-                {meetingPlace && (
+                {formData.meetingPlace && (
                   <div>
                     <span className="text-black font-light text-sm">met at:</span>
-                    <span className="text-black text-normal font-light ml-14">
-                      {meetingPlace}
+                    <span className="text-black text-normal font-light ml-10">
+                      {formData.meetingPlace}
                     </span>
                   </div>
                 )}
@@ -1394,7 +1391,7 @@ const ShowContactForm = ({id}) => {
               <h3 className="text-red-500 font-light text-sm ml-3 -mb-4">links</h3>
               <div className="space-y-2">
                 {formData.links.map((link, index) => (
-                  <div key={index} className="bg-gray-50 rounded-xl p-3">
+                  <div key={index} className="bg-gray-50 rounded-xl p-3 hover:text-red-500">
                     <a 
                       href={link.url}
                       target="_blank"
@@ -1428,7 +1425,7 @@ const ShowContactForm = ({id}) => {
       </div>
 
       {/* Back Links */}
-      <div className="w-full px-8 pt-1 space-y-0.25 max-w-[480px]">
+      <div className="w-full px-8 pt-1 space-y-0.25 max-w-[480px] pb-28">
         <div className="text-black dark:text-white font-light block relative"
             style={{ fontSize: '16px' }}>
           want to go {' '}
