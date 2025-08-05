@@ -6,14 +6,16 @@ import { useAuthContext } from '../../context/AuthContextProvider';
 import { updateContact } from '../../apiCalls/contactsApi';
 import FormDataToApiData from '../helperFunctions/FormToApiData'   
 
-const ContactCardSmall = ({contact = {}, onContactUpdate}) => {
+const ContactCardSmall = ({contact = {}, onContactUpdate, onDeleteRequest}) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [error, setError] = useState(null);
     const [isUpdating, setIsUpdating] = useState(false);
     const { accessToken } = useAuthContext();
+    
 
     // Local state to track favorite status
     const [localContact, setLocalContact] = useState(contact);
+    const [formData, setFormData ] = useState({});
 
     const handleFavoriteToggle = async () => {
         if (isUpdating) return; // Prevent multiple simultaneous updates
@@ -97,7 +99,7 @@ const ContactCardSmall = ({contact = {}, onContactUpdate}) => {
                             isMenuOpen={isMenuOpen}
                             setIsMenuOpen={setIsMenuOpen}
                             id={contact.id}
-                            contactName={contact.first_name} 
+                            onDeleteRequest={onDeleteRequest} 
                         />
                     </span>
                 </div>
