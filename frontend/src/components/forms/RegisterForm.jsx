@@ -153,8 +153,14 @@ const RegisterForm = () => {
         // password validation
         if (!formData.password) {
             newErrors.password = 'Password is required';
-        } else if (formData.password.length < 6) {
-            newErrors.password = 'Password must be at least 6 characters';
+        } else if (formData.password.length < 8) {
+            newErrors.password = 'Password must be at least 8 characters';
+        } else if (!/[A-Z]/.test(formData.password)) {
+            newErrors.password = 'Password must contain an uppercase letter';
+        } else if (!/[a-z]/.test(formData.password)) {
+            newErrors.password = 'Password must contain a lowercase letter';
+        } else if (!/\d/.test(formData.password)) {
+            newErrors.password = 'Password must contain a number';
         }
 
         // confirm password validation

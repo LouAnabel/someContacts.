@@ -1029,7 +1029,7 @@ const ShowContactForm = ({id}) => {
                               {/* Last Contact Date Field */}
                               <div className="relative">
                                   <label htmlFor="contactDate" className="relative top-3 left-4 bg-white px-1 text-sans text-base text-black font-light">
-                                      the date of your last contact?
+                                      date of contact
                                   </label>
                                   <input 
                                       type="text" 
@@ -1052,7 +1052,7 @@ const ShowContactForm = ({id}) => {
                               {/* Meeting Place Field */}
                               <div className="relative">
                                   <label htmlFor="meetingPlace" className="relative top-3 left-4 bg-white px-1 text-sans text-base text-black font-light">
-                                      the place where you met?
+                                      place of contact
                                   </label>
                                   <input 
                                       type="text" 

@@ -93,11 +93,11 @@ const Navbar = () => {
 
           {/* Bigger screens: Mobile search + Nav links + Theme */}
           <div className="hidden md:flex items-center space-x-6 tracking-wider">
-            {/* <SearchForm 
+            <SearchForm 
               isMobile={true}
               placeholder="search contacts..."
               onSearch={handleSearch}
-            /> */}
+            />
             <div className="flex items-center text-xl space-x-5">
             {navItems.map((item) => (
               <Link 
