@@ -242,9 +242,11 @@ const NewContactForm = ({onSubmit, onCancel }) => {
         }
 
         // Validate birthdate (must be in the past)
-        const birthdateError = validateDate(formData.birthdate, 'Birthdate', true);
-        if (birthdateError) {
-            newErrors.birthdate = birthdateError;
+        if (formData.birthdate) {
+            const birthdateError = validateDate(formData.birthdate, 'Birthdate', true);
+            if (birthdateError) {
+                newErrors.birthdate = birthdateError;
+            }
         }
         
         // Validate contactDate (format only, doesn't need to be in past)

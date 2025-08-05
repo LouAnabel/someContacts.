@@ -162,7 +162,7 @@ def create_contact():
                 # Validate URL format
                 if validate_url(link_url):
                     contact_link = ContactLinks(
-                        contact_id=contact_id,
+                        contact_id=contact.id,
                         url=link_url,
                         title=link_title  # Make sure your ContactLinks model has this field
                     )
