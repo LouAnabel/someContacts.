@@ -115,6 +115,7 @@ function Home() {
         {/* Contact Cloud Component */}  
         <div className=" pt-9 pb-16 min-w-[420px] max-w-[650px]">
           <div className="relative z-10 -mb-12 w-fit ml-auto">
+            
             {/* Conditional tooltip */}
             {showTooltip && (
               <div className="absolute font-text text-right font-normal top-10 right-10 tracking-wider -translate-x-1/2 px-3  text-red-500 text-base rounded-lg whitespace-nowrap z-10">
