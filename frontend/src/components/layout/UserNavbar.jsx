@@ -45,10 +45,10 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className=" bg-white font-text dark:bg-black fixed w-full z-50 top-0">
+    <nav className="bg-white font-text dark:bg-black fixed w-full z-50 top-0">
       <div className=" max-w-screen-xl mx-auto px-8 relative">
         
-        <div className=" flex justify-between items-center h-20">
+        <div className="flex justify-between items-center h-20">
           {/* someContacts. Title */}
           <Link to="/myspace/" className="flex items-center">
             <span className="text-3xl sm:text-3xl tracking-wide font-heading text-black hover:text-red-500 dark:text-white hover:dark:text-red-500">
@@ -93,11 +93,11 @@ const Navbar = () => {
 
           {/* Bigger screens: Mobile search + Nav links + Theme */}
           <div className="hidden md:flex items-center space-x-6 tracking-wider">
-            <SearchForm 
+            {/* <SearchForm 
               isMobile={true}
               placeholder="search contacts..."
               onSearch={handleSearch}
-            />
+            /> */}
             <div className="flex items-center text-xl space-x-5">
             {navItems.map((item) => (
               <Link 

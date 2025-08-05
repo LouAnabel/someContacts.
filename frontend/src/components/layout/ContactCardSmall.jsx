@@ -74,13 +74,6 @@ const ContactCardSmall = ({contact = {}, onContactUpdate, onDeleteRequest}) => {
                      boxShadow: '0 2px 20px rgba(0, 0, 0, 0.2)'
                  }}
                 >
-
-                {/* Error message */}
-                {error && (
-                    <div className="absolute top-2 left-2 right-2 bg-red-100 border border-red-400 text-red-700 px-3 py-2 rounded text-sm z-20">
-                        {error}
-                    </div>
-                )}
                  
                 <div className="flex items-center justify-between w-full ml-2 mt-2">
                     {/* Name & Category */}
@@ -103,7 +96,7 @@ const ContactCardSmall = ({contact = {}, onContactUpdate, onDeleteRequest}) => {
                         />
                     </span>
                 </div>
-                <p className="text-lg text-black text-center -mt-2 mb-6">{contact.category?.name}</p>
+                <p className="text-lg font-light text-black text-center tracking-wide -mt-2 mb-3">{contact.category?.name}</p>
                 
 
                 {/* Contact Details */}

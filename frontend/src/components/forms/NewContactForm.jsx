@@ -352,6 +352,7 @@ const NewContactForm = ({onSubmit, onCancel }) => {
     <form onSubmit={handleSubmit}>
         <div className="w-full flex flex-col items-center min-h-screen bg-white dark:bg-black" 
             style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
+            
 
             {/* Main Edit Contact Card */}
             <div className="bg-white rounded-3xl p-5 relative z-10 overflow-visible w-[88vw] min-w-[260px] max-w-[480px] mx-auto"

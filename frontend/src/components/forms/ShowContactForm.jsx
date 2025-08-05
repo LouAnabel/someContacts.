@@ -8,6 +8,19 @@ import ApiDataToFormData from '../helperFunctions/ApiToFormData';
 import { validateDate } from '../helperFunctions/dateConversion';
 import CircleButton from '../ui/Buttons';
 
+
+const Button = ({ children, onClick, className = "", ...props }) => {
+  return (
+    <button
+      onClick={onClick}
+      className={` text-black dark:text-white hover:text-red-500 dark:hover:text-red-500 transition-colors duration-200 ${className}`}
+      {...props}
+    >
+      {children}
+    </button>
+  );
+};
+
 const ShowContactForm = ({id}) => {
   const navigate = useNavigate();
   const { accessToken } = useAuthContext();
@@ -1289,9 +1302,20 @@ const ShowContactForm = ({id}) => {
   // VIEW MODE
   console.log("Contact Mode Showing")
   return (
-    <div className="w-full flex flex-col items-center min-h-screen bg-white dark:bg-black" 
+    <div className=" flex flex-col items-center min-h-screen bg-white dark:bg-black" 
         style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
       
+                  <div className="relative mt-6 -mb-6  ">
+                <Button 
+                    onClick={() => navigate(-1)}
+                    className="text-black dark:text-white hover:text-red-500"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
+                        <path fill-rule="evenodd" d="M17 10a.75.75 0 0 1-.75.75H5.612l4.158 3.96a.75.75 0 1 1-1.04 1.08l-5.5-5.25a.75.75 0 0 1 0-1.08l5.5-5.25a.75.75 0 1 1 1.04 1.08L5.612 9.25H16.25A.75.75 0 0 1 17 10Z" clip-rule="evenodd" />
+                        </svg>
+                    </Button>
+            </div>
+
       {/* Main Contact Display Card */}
       <div className="bg-white rounded-3xl p-5 relative z-10 overflow-visible w-[88vw] min-w-[260px] max-w-[480px] h-fit mx-auto mt-10 "
           style={{ 
@@ -1434,22 +1458,24 @@ const ShowContactForm = ({id}) => {
           )}
 
           {/* Links */}
-          {formData.links && formData.links.length > 0 && (
+          {formData.links && formData.links.some(link => link.url?.trim() && link.title?.trim()) && (
             <div className="space-y-2">
               <h3 className="text-red-500 font-light text-sm ml-3 -mb-4">links</h3>
               <div className="space-y-2">
-                {formData.links.map((link, index) => (
-                  <div key={index} className="bg-gray-50 rounded-xl p-3 hover:text-red-500">
-                    <a 
-                      href={link.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-black text-normal font-light hover:text-red-500 transition-colors break-all"
-                    >
-                      {link.title}
-                    </a>
-                  </div>
-                ))}
+                {formData.links
+                  .filter(link => link.url?.trim() && link.title?.trim()) // Only show links with both URL and title
+                  .map((link, index) => (
+                    <div key={index} className="bg-gray-50 rounded-xl p-3 hover:text-red-500">
+                      <a 
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-black text-normal font-light hover:text-red-500 transition-colors break-all"
+                      >
+                        {link.title}
+                      </a>
+                    </div>
+                  ))}
               </div>
             </div>
           )}

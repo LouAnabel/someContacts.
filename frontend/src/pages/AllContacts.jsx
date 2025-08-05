@@ -6,6 +6,7 @@ import { useAuthContext } from "../context/AuthContextProvider";
 import { useNavigate } from "react-router";
 import CircleButton from "../components/ui/Buttons";
 
+
 const Button = ({ children, onClick, className = "", ...props }) => {
   return (
     <button
@@ -141,23 +142,20 @@ export default function AllContacts() {
   // Render contacts if available
   return (
     <div className="w-full 2xl:flex 2xl:flex-col 2xl:items-center">
+      
       {/* Header Part */}
       <div className="w-full justify-content text-center">
-        <h1 className="pt-10 text-3xl font-heading font-bold text-gray-900 dark:text-white mb-2 mt-6">
-          <span className="px-2">
+        <div className="relative items-center mt-14 -mb-14">
             <Button 
                   onClick={() => navigate('/myspace/')}
                   className="text-black dark:text-white hover:text-red-500"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" 
-                        viewBox="0 0 24 24" 
-                        className="size-6"
-                        fill="currentColor"
-                    >
-                    <path fillRule="evenodd" d="M9.53 2.47a.75.75 0 0 1 0 1.06L4.81 8.25H15a6.75 6.75 0 0 1 0 13.5h-3a.75.75 0 0 1 0-1.5h3a5.25 5.25 0 1 0 0-10.5H4.81l4.72 4.72a.75.75 0 1 1-1.06 1.06l-6-6a.75.75 0 0 1 0-1.06l6-6a.75.75 0 0 1 1.06 0Z" clipRule="evenodd" />
-                  </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
+                      <path fill-rule="evenodd" d="M17 10a.75.75 0 0 1-.75.75H5.612l4.158 3.96a.75.75 0 1 1-1.04 1.08l-5.5-5.25a.75.75 0 0 1 0-1.08l5.5-5.25a.75.75 0 1 1 1.04 1.08L5.612 9.25H16.25A.75.75 0 0 1 17 10Z" clip-rule="evenodd" />
+                    </svg>
                 </Button>
-          </span>
+          </div>
+        <h1 className="pt-10 text-3xl font-heading font-bold text-gray-900 dark:text-white mb-2 mt-6">
           All <span className="text-red-500">{contacts.length} </span> Contacts
         </h1>
       </div>
