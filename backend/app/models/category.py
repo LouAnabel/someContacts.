@@ -7,8 +7,6 @@ class Category(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     creator_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-   
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
     # Relationship with user
     creator = db.relationship('User', backref='categories')
@@ -23,7 +21,6 @@ class Category(db.Model):
             'id': self.id,
             'name': self.name,
             'creator_id': self.creator_id,
-            'created_at': self.created_at.isoformat() if self.created_at else None,
             'contact_count': self.contacts.count()
         }
     

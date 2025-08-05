@@ -6,7 +6,6 @@ from app.models.token_block_list import TokenBlockList
 from app.services.token_service import store_token_pair, store_single_token, revoke_current_token, revoke_all_user_tokens
 import re
 import logging
-from datetime import datetime, timezone
 from app import jwt
 
 
@@ -23,8 +22,8 @@ def validate_email(email):
 # Validate password strength requirements
 def validate_password(password):
     
-    if len(password) < 8:
-        return False, "Password must be at least 8 characters"
+    if len(password) < 6:
+        return False, "Password must be at least 6 characters"
     if not re.search(r'[A-Z]', password):
         return False, "Password must contain an uppercase letter"
     if not re.search(r'[a-z]', password):

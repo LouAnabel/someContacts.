@@ -22,8 +22,9 @@ class Contact(db.Model):
     # Additional fields that your to_dict() method expects
     category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=False)
     birth_date = db.Column(db.Date,nullable=True)
-    contact_date = db.Column(db.Date, nullable=True)
-    contact_place = db.Column(db.String(200), nullable=True)
+    last_contact_date = db.Column(db.String(200), nullable=True)
+    next_contact_date = db.Column(db.String(200), nullable=True)
+    contacted = db.Column(db.Boolean, default=False, nullable=True)
     street_and_nr = db.Column(db.String(200), nullable=True)
     postal_code = db.Column(db.String(100), nullable=True)
     city = db.Column(db.String(100), nullable=True)
@@ -39,9 +40,9 @@ class Contact(db.Model):
 
     # Constraints for data integrity
     __table_args__ = (
-        # Ensure email uniqueness per user (if provided)
-        db.Index('idx_creator_email', 'creator_id', 'email', unique=True, 
-                postgresql_where=db.text('email IS NOT NULL')),
+        # Index for creator_id and email queries (allows duplicates)
+        db.Index('idx_creator_email', 'creator_id', 'email', unique=False,
+                 postgresql_where=db.text('email IS NOT NULL')),
         # Index for common queries
         db.Index('idx_creator_category', 'creator_id', 'category_id'),
         db.Index('idx_creator_favorite', 'creator_id', 'is_favorite'),
@@ -61,8 +62,9 @@ class Contact(db.Model):
             'is_favorite': self.is_favorite,
             'category_id': self.category_id,
             'birth_date': self.birth_date.strftime('%d.%m.%Y') if self.birth_date else None,
-            'contact_date': self.contact_date.strftime('%d.%m.%Y') if self.contact_date else None,
-            'contact_place': self.contact_place,
+            'last_contact_date': self.last_contact_date,
+            'next_contact_date': self.next_contact_date,
+            'contacted': self.contacted,
             'street_and_nr': self.street_and_nr,
             'postal_code': self.postal_code,
             'city': self.city,

@@ -1,7 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from app import db
-from app.models.user import User
 from app.models.contact import Contact
 from app.models.category import Category
 from app.models.contact_links import ContactLinks
@@ -93,13 +92,6 @@ def create_contact():
             except ValueError as e:
                 return jsonify({'error': 'Invalid birth date format. Use DD.MM.YYYY (e.g., 21.05.2000)'}), 400
 
-        contact_date = None
-        if data.get('contact_date'):
-            try:
-                contact_date = datetime.strptime(data['contact_date'], '%d.%m.%Y').date()  # ← Changed to dots
-            except ValueError as e:
-                return jsonify({'error': 'Invalid last contact date format. Use DD.MM.YYYY (e.g., 03.05.2025)'}), 400
-
         # Validate category if provided
         category_id = data.get('category_id')
         if category_id:
@@ -128,8 +120,9 @@ def create_contact():
             is_favorite=data.get('is_favorite', False),
             category_id=category_id,
             birth_date=birth_date,
-            contact_date=contact_date,
-            contact_place=data.get('contact_place', '').strip() if data.get('contact_place') else None,
+            last_contact_date=data.get('last_contact_date', '').strip() if data.get('last_contact_date') else None,
+            next_contact_date=data.get('next_contact_date', '').strip() if data.get('next_contact_date') else None,
+            contacted=data.get('contacted', False),
             street_and_nr=data.get('street_and_nr', '').strip() if data.get('street_and_nr') else None,
             postal_code=data.get('postal_code', '').strip() if data.get('postal_code') else None,
             city=data.get('city', '').strip() if data.get('city') else None,
@@ -511,9 +504,6 @@ def update_contact(contact_id):
             return jsonify(
                 {'error': 'Invalid birth date format. Use DD.MM.YYYY (e.g., 15.05.1990)'}), 400
 
-        if 'contact_date' in data and data['contact_date'] and not validate_date(data['contact_date']):
-            return jsonify({'error': 'Invalid last contact date format. Use DD.MM.YYYY (e.g., 03.05.2025)'}), 400
-
         # Validate category if provided
         if 'category_id' in data:
             category_id = data['category_id']
@@ -550,11 +540,12 @@ def update_contact(contact_id):
         if 'birth_date' in data:
             contact.birth_date = datetime.strptime(data['birth_date'], '%d.%m.%Y').date() if data[
                 'birth_date'] else None
-        if 'contact_date' in data:
-            contact.contact_date = datetime.strptime(data['contact_date'], '%d.%m.%Y').date() if data[
-                'contact_date'] else None
-        if 'contact_place' in data:
-            contact.contact_place = data['contact_place'].strip() if data['contact_place'] else None
+        if 'last_contact_date' in data:
+            contact.last_contact_date = data['last_contact_date'].strip() if data['last_contact_date'] else None
+        if 'next_contact_date' in data:
+            contact.next_contact_date = data['next_contact_date'].strip() if data['next_contact_date'] else None
+        if 'contacted' in data:
+            contact.contacted = bool(data['contacted'])
         if 'street_and_nr' in data:
             contact.street_and_nr = data['street_and_nr'].strip() if data['street_and_nr'] else None
         if 'postal_code' in data:
