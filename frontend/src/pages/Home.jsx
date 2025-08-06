@@ -113,7 +113,7 @@ function Home() {
         
       {/* 2. Part: Form Section */}
         {/* Contact Cloud Component */}  
-        <div className=" pt-9 pb-16 min-w-[420px] max-w-[650px]">
+        <div className=" pt-9 pb-16 min-w-[400px] max-w-[650px]">
           <div className="relative z-10 -mb-12 w-fit ml-auto">
             
             {/* Conditional tooltip */}

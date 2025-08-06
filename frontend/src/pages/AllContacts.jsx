@@ -126,12 +126,24 @@ export default function AllContacts() {
     setContacts(filtered); // Update the contacts that are displayed
   };
 
-  // Clear search function
+  const clearSearchTerm = () => {
+    handleSearch('', currentCategory);
+    setResetSearchForm(prev => prev + 1); // Trigger SearchForm reset
+  };
+
+  const clearCategory = () => {
+    handleSearch(currentSearchTerm, null);
+    setResetSearchForm(prev => prev + 1); // Trigger SearchForm reset
+  };
+
+  // Update the clearSearch function to also trigger reset:
   const clearSearch = () => {
     setCurrentSearchTerm('');
     setCurrentCategory(null);
     setFilteredContacts(allContacts);
     setContacts(allContacts);
+    // Trigger SearchForm reset
+    setResetSearchForm(prev => prev + 1);
 
     // Trigger SearchForm reset by incrementing the reset counter
     setResetSearchForm(prev => prev + 1);
@@ -255,7 +267,7 @@ export default function AllContacts() {
                 <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-light tracking-wide dark:bg-white bg-red-300 text-black">
                   {currentSearchTerm}
                   <button
-                    onClick={() => handleSearch('', currentCategory)}
+                    onClick={clearSearchTerm}  // Changed this
                     className="ml-1 text-lg text-blue-600 font-medium hover:text-red-500"
                   >
                     ×
@@ -266,15 +278,15 @@ export default function AllContacts() {
                 <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-light tracking-wide bg-red-200 dark:bg-white text-black">
                   {currentCategory.name}
                   <button
-                    onClick={() => handleSearch(currentSearchTerm, null)}
-                    className="ml-1 text-lg font-medium text-green-600 hover:text-red-500 "
+                    onClick={clearCategory}  // Changed this
+                    className="ml-1 text-lg font-medium text-green-600 hover:text-red-500"
                   >
                     ×
                   </button>
                 </span>
               )}
               <button
-                onClick={clearSearch}
+                onClick={clearSearch}  // This already triggers reset
                 className="text-sm tracking-wide font-light text-gray-600 dark:text-white hover:text-red-500 dark:hover:text-red-500 underline"
               >
                 Clear all
@@ -411,4 +423,4 @@ export default function AllContacts() {
       )}
     </div>
   );
-}
+};

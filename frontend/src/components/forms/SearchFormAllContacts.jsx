@@ -54,7 +54,7 @@ const SearchFormAllContacts = ({ onSearch, resetTrigger }) => {
   useEffect(() => {
     if (resetTrigger > 0) {
       setSearchTerm('');
-      setFormData({});
+      setFormData(prev => ({ ...prev, category: null }));;
       setShowCategoryDropdown(false);
     }
   }, [resetTrigger]);
@@ -110,7 +110,7 @@ const SearchFormAllContacts = ({ onSearch, resetTrigger }) => {
           <button 
             type="button"
             onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
-            className="inline-flex -mr-2 items-center py-2.5 px-4 text-sm font-light text-center text-black bg-red-200 rounded-s-lg hover:bg-red-200 hover:text-red-500 hover:dark:bg-red-200 hover:dark:text-red-500" 
+            className="inline-flex -mr-2 items-center py-2.5 px-4 text-sm font-light text-center text-black bg-red-200 dark:bg-red-500 dark:text-white rounded-s-lg hover:bg-red-200 hover:text-red-500 hover:dark:bg-red-200 hover:dark:text-red-500" 
           >
             <span className="font-light tracking-wider">
               {formData.category ? formData.category.name : 'Categories'}
