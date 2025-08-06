@@ -12,10 +12,8 @@ const ContactCardSmall = ({contact = {}, onContactUpdate, onDeleteRequest}) => {
     const [isUpdating, setIsUpdating] = useState(false);
     const { accessToken } = useAuthContext();
     
-
     // Local state to track favorite status
     const [localContact, setLocalContact] = useState(contact);
-    const [formData, setFormData ] = useState({});
 
     const handleFavoriteToggle = async () => {
     if (isUpdating) return; // Prevent multiple simultaneous updates

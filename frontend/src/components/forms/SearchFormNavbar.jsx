@@ -17,7 +17,14 @@ const SearchForm = ({ onSearch }) => {
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const [categories, setCategories] = useState([])
 
-
+  const handleSearch = (value) => {
+    console.log('Searching for:', value);
+    setSearchTerm(value);
+    if (onSearch) {
+      onSearch(value, formData.category);
+    }
+  };
+  
   // LOAD CATEGORIES FOR TOGGLE MENU
     useEffect(() => {
         const loadCategories = async () => {
@@ -38,13 +45,7 @@ const SearchForm = ({ onSearch }) => {
     }, [accessToken]);
 
 
-  const handleSearch = (value) => {
-    console.log('Searching for:', value);
-    setSearchTerm(value);
-    if (onSearch) {
-      onSearch(value, formData.category);
-    }
-  };
+  
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -142,7 +143,7 @@ return (
               <button 
                 type="button"
                 onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
-                className="inline-flex -mr-2 items-center py-2 px-4 text-sm font-light text-center text-white bg-red-500 rounded-s-lg hover:bg-red-200 hover:text-red-500 hover:dark:bg-red-200 hover:dark:text-red-500" 
+                className="inline-flex -mr-2 items-center py-2.5 px-4 text-sm font-light text-center text-white bg-red-500 rounded-s-lg hover:bg-red-200 hover:text-red-500 hover:dark:bg-red-200 hover:dark:text-red-500" 
               >
                 <span className="font-light tracking-wider">
                   {formData.category ? formData.category.name : 'Categories'}
@@ -193,8 +194,8 @@ return (
                   id="search-dropdown" 
                   value={searchTerm}
                   onChange={(e) => handleSearch(e.target.value)}
-                  className="rounded-xl py-2 px-4 w-full text-normal font-light border-gray-200 text-black placeholder-gray-400 placeholder-font-light placeholder-text-sm bg-white dark:bg-white dark:placeholder-gray-300" 
-                  placeholder="Search..."
+                  className="rounded-xl py-2 px-4 w-full text-normal font-light border-gray-200 text-black placeholder-gray-200 placeholder-font-light placeholder-text-sm bg-white dark:bg-white dark:placeholder-gray-300" 
+                  placeholder="search..."
                 />
                 
                 {/* Show selected category indicator in input */}
@@ -217,7 +218,7 @@ return (
                 )}
               </div>
 
-              {/* Search Submit Button */}
+              {/* Search Submit Button
               <button 
                 type="submit" 
                 className="py-2.5 px-3 text-sm -ml-1 font-medium bg-red-500 text-white rounded-e-lg hover:bg-red-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500"
@@ -226,7 +227,7 @@ return (
                   <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
                 </svg>
                 <span className="sr-only">Search</span>
-              </button>
+              </button> */}
             </div>
           </form>
         </div>

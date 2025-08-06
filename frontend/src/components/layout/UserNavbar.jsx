@@ -29,6 +29,14 @@ const Navbar = () => {
     navigate('/login', { replace: true });
   };
 
+  const goToAllContacts = () => {
+    navigate('/myspace/contacts', { replace: true });
+  };
+
+  const goToNewContact = () => {
+    navigate('/myspace/newcontact');
+  }
+
   const handleSearch = (searchTerm) => {
     console.log('Searching for:', searchTerm);
     // Add your search logic here
@@ -46,7 +54,7 @@ const Navbar = () => {
 
   return (
     <nav className="bg-white font-text dark:bg-black fixed w-full z-50 top-0">
-      <div className=" max-w-screen-xl mx-auto px-8 relative">
+      <div className=" max-w-screen-xl mx-auto px-8 pr-9 relative">
         
         <div className="flex justify-between items-center h-20">
           {/* someContacts. Title */}
@@ -60,21 +68,46 @@ const Navbar = () => {
           {/* search + Theme + Menu toggle */}
           <div className="flex items-center px-0 md:hidden">
             
-            <SearchForm 
+            {/* <SearchForm 
               onSearch={handleSearch}
-            />
-            
-            <ThemeToggle />
+            /> */}
+
+                      {/* <ThemeToggle />
             <MenuBar 
               isMenuOpen={isMenuOpen} 
               setIsMenuOpen={setIsMenuOpen} 
-            />
+            /> */}
 
+            {/* Go to AllContacts/Search */}
+            <Button 
+              onClick={goToAllContacts}
+              className="mr-2"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+                <path fill-rule="evenodd" d="M10.5 3.75a6.75 6.75 0 1 0 0 13.5 6.75 6.75 0 0 0 0-13.5ZM2.25 10.5a8.25 8.25 0 1 1 14.59 5.28l4.69 4.69a.75.75 0 1 1-1.06 1.06l-4.69-4.69A8.25 8.25 0 0 1 2.25 10.5Z" clip-rule="evenodd" />
+              </svg>
+
+
+            </Button>
+            
+
+            {/* Add Contact Button */}
+            <Button 
+              onClick={goToNewContact}
+              className=""
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+                <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z" clip-rule="evenodd" />
+              </svg>
+            </Button>
+  
+
+            {/* Handle Logout */}
             <Button 
               onClick={handleLogout}
               className="ml-2"
             >
-              <svg 
+               <svg 
                 xmlns="http://www.w3.org/2000/svg" 
                 viewBox="0 0 24 24" 
                 fill="currentColor" 
@@ -90,10 +123,18 @@ const Navbar = () => {
           </div>
 
           {/* Bigger screens: Mobile search + Nav links + Theme */}
-          <div className="hidden md:flex items-center space-x-6 tracking-wider">
-            <SearchForm 
-              onSearch={handleSearch}
-            />
+          <div className="hidden md:flex items-center space-x-3 tracking-wider">
+            
+            {/* Search at AllContacts */}
+            {/* <Button 
+              onClick={goToAllContacts}
+              className="mr-2"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-5">
+                  <path fillRule="evenodd" d="M10.5 3.75a6.75 6.75 0 1 0 0 13.5 6.75 6.75 0 0 0 0-13.5ZM2.25 10.5a8.25 8.25 0 1 1 14.59 5.28l4.69 4.69a.75.75 0 1 1-1.06 1.06l-4.69-4.69A8.25 8.25 0 0 1 2.25 10.5Z" clipRule="evenodd" />
+              </svg>
+            </Button> */}
+
             <div className="flex items-center text-xl space-x-5">
             {navItems.map((item) => (
               <Link 

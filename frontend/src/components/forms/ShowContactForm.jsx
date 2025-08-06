@@ -1029,6 +1029,7 @@ const ShowContactForm = ({id}) => {
                                       id="lastContactDate" 
                                       value={formData.lastContactDate}
                                       onChange={handleInputChange}
+                                      placeholder="19.03.2025 at the Berlinale ..."
                                       disabled={isLoading}
                                       className={`w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
                                       style={{
@@ -1052,7 +1053,7 @@ const ShowContactForm = ({id}) => {
                                       id="nextContactDate" 
                                       value={formData.nextContactDate}
                                       onChange={handleInputChange}
-                                      placeholder="coffe shop, berlin ..."
+                                      placeholder="on Christmas"
                                       disabled={isLoading}
                                       className={`w-full mb-5 rounded-xl border border-gray-400 dark:border-gray-400 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
                                       style={{
@@ -1446,12 +1447,12 @@ const ShowContactForm = ({id}) => {
             </div>
           )}
 
+          {/* Contact History */}
+          {(formData.lastContactDate || formData.nextContactDate) && (
           <div className="space-y-1 mb-8">
-            {/* header 2nd Part */}
-            <p className="mt-3 ml-3 -mb-1 font-text text-sm tracking-wide text-red-500 font-light">when?</p>
-            {/* Contact History */}
-            {(formData.lastContactDate || formData.nextContactDate) && (
-              <div className="space-y-1">
+            
+                {/* header 2nd Part */}
+              <p className="mt-3 ml-3 -mb-1 font-text text-sm tracking-wide text-red-500 font-light">when?</p>
 
                 {/* last contact */}
                 <div>
@@ -1482,48 +1483,37 @@ const ShowContactForm = ({id}) => {
                   </div>
               </div>
             )}
-          </div>
 
-          <div>
-          
           {/* Notes */}
           {formData.notes && (
-            
-            <div className="space-y-2">
+            <div className="">
               <h2 className="ml-3 font-text text-sm tracking-wide text-red-500 font-normal">notes</h2>
-              <h3 className="text-red-500 font-light text-sm ml-3 -mb-4">important facts to remember</h3>
-              <div className="bg-gray-50 rounded-xl p-3 ">
+              <h3 className="text-red-500 font-light text-sm ml-3">important facts to remember</h3>
+              <div className="bg-gray-50 rounded-xl p-3 -mt-2">
                 <div className="text-black text-normal font-light whitespace-pre-wrap ">
                   {formData.notes}
                 </div>
               </div>
             </div>
           )}
-          </div>
 
         </div>
-
+        {(formData.birthdate || formData.links.some(link => link.url?.trim() && link.title?.trim())) && (
         <div className="space-y-2 mb-8">
           {/* header 2nd Part */}
           <h2 className="mt-3 ml-3 font-text text-sm tracking-wide text-red-500 font-normal">additional information </h2>
 
           {/* Birthday */}
           {formData.birthdate && (
-            <div className="space-y-2">
-              <h3 className="text-red-500 font-light text-sm ml-3 -mb-4">date of birth</h3>
-              <div className="bg-gray-50 rounded-xl p-3">
+            <div>
+              <h3 className="text-red-500 font-light text-sm ml-3">date of birth</h3>
+              <div className="bg-gray-50 rounded-xl p-3 -mt-2">
                 <div className="text-black text-normal font-light">
                   {formData.birthdate}
                 </div>
               </div>
             </div>
           )}
-
-
-
-          
-          
-
 
           {/* Links */}
           {formData.links && formData.links.some(link => link.url?.trim() && link.title?.trim()) && (
@@ -1548,6 +1538,7 @@ const ShowContactForm = ({id}) => {
             </div>
           )}
         </div>
+        )}
 
         {/* Edit Button */}
         <CircleButton

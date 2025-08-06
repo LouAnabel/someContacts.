@@ -7,12 +7,11 @@ import { useNavigate } from "react-router";
 import CircleButton from "../components/ui/Buttons";
 import SearchFormAllContacts from "../components/forms/SearchFormAllContacts";
 
-
 const Button = ({ children, onClick, className = "", ...props }) => {
   return (
     <button
       onClick={onClick}
-      className={` text-black dark:text-white hover:text-red-500 dark:hover:text-red-500 transition-colors duration-200 ${className}`}
+      className={`text-black dark:text-white hover:text-red-500 dark:hover:text-red-500 transition-colors duration-200 ${className}`}
       {...props}
     >
       {children}
@@ -24,21 +23,33 @@ export default function AllContacts() {
   const navigate = useNavigate();
   const { accessToken } = useAuthContext();
 
+  // Contact states
   const [contacts, setContacts] = useState([]);
+  const [allContacts, setAllContacts] = useState([]); // Store original unfiltered contacts
+  const [filteredContacts, setFilteredContacts] = useState([]);
+  
+  // Search states
+  const [currentSearchTerm, setCurrentSearchTerm] = useState('');
+  const [currentCategory, setCurrentCategory] = useState(null);
+
+
+  // UI states
   const [errors, setErrors] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   
+  // Delete states
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [contactToDelete, setContactToDelete] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [resetSearchForm, setResetSearchForm] = useState(0);
 
+  
   // GUARDS to prevent duplicate API calls
   const contactsFetched = useRef(false);
 
   useEffect(() => {
     const fetchContacts = async () => {
-      
-      if (!accessToken ) {
+      if (!accessToken) {
         console.log("accessToken is not available")
         setIsLoading(false);
         return;
@@ -52,7 +63,11 @@ export default function AllContacts() {
 
         const contactsData = await getContacts(accessToken);
         console.log('Contacts data:', contactsData); 
+        
+        // Set both filtered and all contacts
         setContacts(contactsData);
+        setAllContacts(contactsData);
+        setFilteredContacts(contactsData);
 
       } catch (error) {
         setErrors("Failed to fetch contacts. Please try again later.");
@@ -67,6 +82,61 @@ export default function AllContacts() {
     fetchContacts();
   }, [accessToken]);
 
+  const handleSearch = (searchTerm, selectedCategory) => {
+    console.log('Search term:', searchTerm);
+    console.log('Selected category:', selectedCategory);
+    
+    setCurrentSearchTerm(searchTerm);
+    setCurrentCategory(selectedCategory);
+    
+    let filtered = [...allContacts];
+    
+    // Filter by search term
+    if (searchTerm && searchTerm.trim()) {
+      const term = searchTerm.toLowerCase().trim();
+      filtered = filtered.filter(contact => {
+        const firstName = contact.first_name?.toLowerCase() || '';
+        const lastName = contact.last_name?.toLowerCase() || '';
+        const email = contact.email?.toLowerCase() || '';
+        const phone = contact.phone?.toLowerCase() || '';
+        const city = contact.city?.toLowerCase() || '';
+        const company = contact.company?.toLowerCase() || '';
+        
+        return firstName.includes(term) ||
+               lastName.includes(term) ||
+               email.includes(term) ||
+               phone.includes(term) ||
+               city.includes(term) ||
+               company.includes(term) ||
+               `${firstName} ${lastName}`.includes(term);
+      });
+    }
+    
+    // Filter by category
+    if (selectedCategory && selectedCategory.id) {
+      filtered = filtered.filter(contact => {
+        // Adjust this based on how categories are stored in your contact objects
+        return contact.category_id === selectedCategory.id || 
+               contact.category?.id === selectedCategory.id ||
+               contact.categories?.some(cat => cat.id === selectedCategory.id);
+      });
+    }
+    
+    setFilteredContacts(filtered);
+    setContacts(filtered); // Update the contacts that are displayed
+  };
+
+  // Clear search function
+  const clearSearch = () => {
+    setCurrentSearchTerm('');
+    setCurrentCategory(null);
+    setFilteredContacts(allContacts);
+    setContacts(allContacts);
+
+    // Trigger SearchForm reset by incrementing the reset counter
+    setResetSearchForm(prev => prev + 1);
+  };
+
   const handleDeleteRequest = (contact) => {
     setContactToDelete(contact);
     setShowDeleteConfirmation(true);
@@ -77,13 +147,21 @@ export default function AllContacts() {
 
     try {
       await deleteContactById(accessToken, contactToDelete.id);
-      setContacts(contacts.filter(contact => contact.id !== contactToDelete.id));
+      
+      // Update all contact arrays
+      const updatedContacts = contacts.filter(contact => contact.id !== contactToDelete.id);
+      const updatedAllContacts = allContacts.filter(contact => contact.id !== contactToDelete.id);
+      const updatedFilteredContacts = filteredContacts.filter(contact => contact.id !== contactToDelete.id);
+      
+      setContacts(updatedContacts);
+      setAllContacts(updatedAllContacts);
+      setFilteredContacts(updatedFilteredContacts);
+      
       setShowDeleteConfirmation(false); // Close modal on success
       setContactToDelete(null); // Clear selected contact
 
     } catch (error) {
       console.error('Error deleting contact:', error);
-      // Update errors state properly
       setErrors(`Failed to delete contact: ${error.message}`);
       
     } finally {
@@ -112,7 +190,7 @@ export default function AllContacts() {
   }
 
   // error handling if no contacts found
-  if (!contacts || contacts.length === 0) {
+  if (!allContacts || allContacts.length === 0) {
     return (
       <div className="container py-20">
         <h1 className="w-full flex flex-col items-center justify-center text-3xl font-heading font-bold text-gray-900 dark:text-white mb-10">
@@ -140,55 +218,120 @@ export default function AllContacts() {
     );
   }
 
-  // Render contacts if available
   return (
     <div className="w-full 2xl:flex 2xl:flex-col 2xl:items-center">
       
       {/* Header Part */}
-      <div className="w-full justify-content text-center">
+      <div className="w-full text-center">
         <div className="relative items-center mt-14 -mb-14">
-            <Button 
-                  onClick={() => navigate('/myspace/')}
-                  className="text-black dark:text-white hover:text-red-500"
+          <Button 
+            onClick={() => navigate('/myspace/')}
+            className="text-black dark:text-white hover:text-red-500"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-5">
+              <path fillRule="evenodd" d="M17 10a.75.75 0 0 1-.75.75H5.612l4.158 3.96a.75.75 0 1 1-1.04 1.08l-5.5-5.25a.75.75 0 0 1 0-1.08l5.5-5.25a.75.75 0 1 1 1.04 1.08L5.612 9.25H16.25A.75.75 0 0 1 17 10Z" clipRule="evenodd" />
+            </svg>
+          </Button>
+        </div>
+        
+        <div className="space-y-6">
+          <h1 className="pt-10 text-3xl font-heading font-bold text-gray-900 dark:text-white mb-2 mt-6">
+            {currentSearchTerm || currentCategory ? (
+              <>
+                Found <span className="text-red-500">{contacts.length}</span> of {allContacts.length} Contacts
+              </>
+            ) : (
+              <>
+                All <span className="text-red-500">{contacts.length} </span> Contacts
+              </>
+            )}
+          </h1>
+
+          {/* Show active filters */}
+          {(currentSearchTerm || currentCategory) && (
+            <div className="flex justify-center items-center gap-2 mb-4 flex-wrap font-text">
+              <span className="text-sm font-light tracking-wide text-gray-600 dark:text-white">Filtered by:</span>
+              {currentSearchTerm && (
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-light tracking-wide dark:bg-white bg-red-300 text-black">
+                  {currentSearchTerm}
+                  <button
+                    onClick={() => handleSearch('', currentCategory)}
+                    className="ml-1 text-lg text-blue-600 font-medium hover:text-red-500"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
-                      <path fill-rule="evenodd" d="M17 10a.75.75 0 0 1-.75.75H5.612l4.158 3.96a.75.75 0 1 1-1.04 1.08l-5.5-5.25a.75.75 0 0 1 0-1.08l5.5-5.25a.75.75 0 1 1 1.04 1.08L5.612 9.25H16.25A.75.75 0 0 1 17 10Z" clip-rule="evenodd" />
-                    </svg>
-                </Button>
-          </div>
-        <h1 className="pt-10 text-3xl font-heading font-bold text-gray-900 dark:text-white mb-2 mt-6">
-          All <span className="text-red-500">{contacts.length} </span> Contacts
-        </h1>
-      </div>
+                    ×
+                  </button>
+                </span>
+              )}
+              {currentCategory && (
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-light tracking-wide bg-red-200 dark:bg-white text-black">
+                  {currentCategory.name}
+                  <button
+                    onClick={() => handleSearch(currentSearchTerm, null)}
+                    className="ml-1 text-lg font-medium text-green-600 hover:text-red-500 "
+                  >
+                    ×
+                  </button>
+                </span>
+              )}
+              <button
+                onClick={clearSearch}
+                className="text-sm tracking-wide font-light text-gray-600 dark:text-white hover:text-red-500 dark:hover:text-red-500 underline"
+              >
+                Clear all
+              </button>
+            </div>
+          )}
 
-      {/* search bar */}
-      {/* <div>
-        <SearchFormAllContacts onSearch />
-      </div> */}
-
-      <div className="p-10 gap-10 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 max-w-screen-2xl"> 
-        {contacts.map((contact, index) => {
-          // Create a more reliable key
-          const contactKey = contact.id || contact._id || `contact-${index}`;
-          
-          return (
-            <ContactCardSmall
-              key={contactKey}
-              contact={contact}
-              onDeleteRequest={() => handleDeleteRequest(contact)}
+          {/* Centered Search Bar Container */}
+          <div className="flex justify-center w-full px-4">
+            <SearchFormAllContacts 
+              onSearch={handleSearch} 
+              resetTrigger={resetSearchForm}
             />
-          );
-        })}
+          </div>
+        </div>
       </div>
 
-      {/* Delete Confirmation Modal - Now outside the grid container */}
+      {/* ERROR MESSAGES */}
+      {/* Show Contacts or No Results Message */}
+      {contacts.length === 0 && (currentSearchTerm || currentCategory) ? (
+        <div className="flex flex-col items-center justify-center py-20 font-light tracking-wide">
+          <div className="text-red-500  text-lg mb-2">No contacts found</div>
+          <div className="text-gray-700 text-sm mb-4">
+            Try adjusting your search terms or clearing the filters
+          </div>
+          <button
+            onClick={clearSearch}
+            className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors duration-200"
+          >
+            Clear Search
+          </button>
+        </div>
+      ) : (
+        <div className="p-10 gap-10 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 max-w-screen-2xl"> 
+          {contacts.map((contact, index) => {
+            // Create a more reliable key
+            const contactKey = contact.id || contact._id || `contact-${index}`;
+            
+            return (
+              <ContactCardSmall
+                key={contactKey}
+                contact={contact}
+                onDeleteRequest={() => handleDeleteRequest(contact)}
+              />
+            );
+          })}
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
       {showDeleteConfirmation && contactToDelete && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-               style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
+              style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
               <div className="bg-white rounded-3xl p-8 relative overflow-visible w-[85vw] min-w-[280px] max-w-[400px] mx-auto"
-                   style={{ 
-                     boxShadow: '0 8px 48px rgba(109, 71, 71, 0.35)'
-                   }}>
+                  style={{ 
+                    boxShadow: '0 8px 48px rgba(109, 71, 71, 0.35)'
+                  }}>
                 
                   {/* Warning Icon */}
                   <div className="flex justify-center mb-6">
