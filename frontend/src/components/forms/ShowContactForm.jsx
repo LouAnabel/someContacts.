@@ -90,7 +90,7 @@ const ShowContactForm = ({id}) => {
             newFormData.country || newFormData.postalcode)
         );
         setShowContactDetails(
-          !!(newFormData.contactDate || newFormData.meetingPlace)
+          !!(newFormData.lastContactDate || newFormData.nextContactDate)
         );
         
         const hasLinks = newFormData.links && newFormData.links.length > 0;
@@ -325,14 +325,6 @@ const ShowContactForm = ({id}) => {
         }
     }
 
-    // Validate contactDate (format only, doesn't need to be in past)
-    if (formData.contactDate && formData.contactDate.trim()) {
-        const contactDateError = validateDate(formData.contactDate, 'Contact date', false);
-        if (contactDateError) {
-            newErrors.contactDate = contactDateError;
-        }
-    }
-
     // Validate links - URL must have a title
     if (showLinks && links) {
         links.forEach((link, index) => {
@@ -418,7 +410,7 @@ const ShowContactForm = ({id}) => {
         originalFormData.country || originalFormData.postalcode)
     );
     setShowContactDetails(
-      !!(originalFormData.contactDate || originalFormData.meetingPlace)
+      !!(originalFormData.lastContactDate || originalFormData.nextContactDate)
     );
     
     const hasLinks = originalFormData.links && originalFormData.links.length > 0;
@@ -1003,20 +995,20 @@ const ShowContactForm = ({id}) => {
                               disabled={isLoading}
                           >
                               <span className="text-lg font-semibold">+</span>
-                              <span className="text-base text-black hover:text-red-500">when and where did you meet? </span>
+                              <span className="text-base text-black hover:text-red-500">when and where did/will you meet? </span>
                           </button>
                       ) : (
                           <div className="space-y-2">
                               <div className="flex items-center justify-between -mb-4">
-                                  <span className="relative left-2 text-sans text-red-500 font-light">do you remember...</span>
+                                  <span className="relative left-2 text-sans text-red-500 font-light">don't forget the...</span>
                                   <button
                                       type="button"
                                       onClick={() => {
                                           setShowContactDetails(false);
                                           setFormData(prev => ({ 
                                               ...prev, 
-                                              ContactDate: '', 
-                                              meetingPlace: '' 
+                                              lastContactDate: '', 
+                                              nextContactDate: '' 
                                           }));
                                       }}
                                       className="relative right-1 font-light text-red-500 hover:text-red-700 transition-colors duration-200 text-sm"
@@ -1028,14 +1020,14 @@ const ShowContactForm = ({id}) => {
                                   
                               {/* Last Contact Date Field */}
                               <div className="relative">
-                                  <label htmlFor="contactDate" className="relative top-3 left-4 bg-white px-1 text-sans text-base text-black font-light">
-                                      date of contact
+                                  <label htmlFor="lastContactDate" className="relative top-3 left-4 bg-white px-1 text-sans text-base text-black font-light">
+                                      last contact (date & place)
                                   </label>
                                   <input 
                                       type="text" 
-                                      name="contactDate" 
-                                      id="contactDate" 
-                                      value={formData.contactDate}
+                                      name="lastContactDate" 
+                                      id="lastContactDate" 
+                                      value={formData.lastContactDate}
                                       onChange={handleInputChange}
                                       disabled={isLoading}
                                       className={`w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
@@ -1044,21 +1036,21 @@ const ShowContactForm = ({id}) => {
                                           fontWeight: 300
                                       }}
                                   />
-                                  {hasSubmitted && errors.contactDate && (
-                                      <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.contactDate}</p>
+                                  {hasSubmitted && errors.lastContactDate && (
+                                      <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.lastContactDate}</p>
                                   )}
                               </div>
 
                               {/* Meeting Place Field */}
                               <div className="relative">
-                                  <label htmlFor="meetingPlace" className="relative top-3 left-4 bg-white px-1 text-sans text-base text-black font-light">
-                                      place of contact
+                                  <label htmlFor="nextContactDate" className="relative top-3 left-4 bg-white px-1 text-sans text-base text-black font-light">
+                                      next contact (date & place)
                                   </label>
                                   <input 
                                       type="text" 
-                                      name="meetingPlace" 
-                                      id="meetingPlace" 
-                                      value={formData.meetingPlace}
+                                      name="nextContactDate" 
+                                      id="nextContactDate" 
+                                      value={formData.nextContactDate}
                                       onChange={handleInputChange}
                                       placeholder="coffe shop, berlin ..."
                                       disabled={isLoading}
@@ -1068,8 +1060,8 @@ const ShowContactForm = ({id}) => {
                                           fontWeight: 300
                                       }}
                                   />
-                                  {hasSubmitted && errors.meetingPlace && (
-                                      <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.meetingPlace}</p>
+                                  {hasSubmitted && errors.nextContactDate && (
+                                      <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.nextContactDate}</p>
                                   )}
                               </div>
                           </div>
@@ -1362,34 +1354,158 @@ const ShowContactForm = ({id}) => {
 
         {/* Contact Information */}
         <div className="space-y-6 mb-8">
+
           {/* Contact Methods */}
-          <div className="space-y-2">
-            <h3 className="text-red-500 font-light text-sm ml-3 -mb-4">how to contact?</h3>
-            
-            {/* Email */}
-            <div className="bg-gray-50 rounded-xl p-3">
-              <div className="text-black font-light text-sm">email</div>
-              <a 
-                href={`mailto:${formData.email}`}
-                className="text-black text-normal font-light hover:text-red-500 transition-colors"
+          {(formData.email || formData.phone) && (
+            <div className="space-y-1">
+              <h3 className="text-red-500 tracking-wide font-light text-sm ml-3 -mb-3">how to contact?</h3>
+              
+              <div className="bg-gray-50 rounded-xl p-3 space-y-1">
+                {/* Email */}
+                {formData.email && (
+                  <div className="flex items-start">
+                    <span className="text-red-300 tracking-wide font-light text-sm mt-0.5">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-4">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+                      </svg>
+                    </span>
+                    <div className="ml-3">
+                      <a 
+                        href={`mailto:${formData.email}`}
+                        className="text-black text-normal font-light hover:text-red-500 transition-colors"
+                      >
+                        {formData.email}
+                      </a>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Phone */}
+                {formData.phone && (
+                  <div className="flex items-start">
+                    <span className="text-red-300 tracking-wide font-light text-sm mt-0.5">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-4">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z" />
+                      </svg>
+                    </span>
+                    <div className="ml-3">
+                      <a 
+                        href={`tel:${formData.phone}`}
+                        className="text-black text-normal font-light hover:text-red-500 transition-colors"
+                      >
+                        {formData.phone}
+                      </a>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+
+          {/* Address */}
+          {(formData.streetAndNr || formData.city || formData.country) && (
+            <div className="space-y-2">
+                <h3 className="text-red-500 tracking-wide font-light text-sm ml-3 -mb-4">where?</h3>
+
+              <a
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                  [
+                    formData.streetAndNr,
+                    formData.postalcode,
+                    formData.city,
+                    formData.country
+                  ]
+                    .filter(Boolean) // Remove empty values
+                    .join(', ')
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block bg-gray-50 hover:bg-gray-100 rounded-xl p-3 cursor-pointer"
+                title="Open in Google Maps"
               >
-                {formData.email}
+                <span className="flex items-center justify-start">
+                  {/* Small indicator */}
+                  <svg 
+                    className="w-4 h-4 text-red-200" 
+                    fill="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                  </svg>
+              </span>
+                <div className="text-black text-normal font-light -space-y-1 -mt-5 ml-6">
+                  {formData.streetAndNr && <div>{formData.streetAndNr},</div>}
+                  <div>
+                    {formData.postalcode && `${formData.postalcode} `}
+                    {formData.city},
+                  </div>
+                  {formData.country && <div>{formData.country}</div>}
+                </div>
               </a>
             </div>
-            
-            {/* Phone */}
-            {formData.phone && (
-              <div className="bg-gray-50 rounded-xl p-3">
-                <div className="text-black font-light text-sm">phone</div>
-                <a 
-                  href={`tel:${formData.phone}`}
-                  className="text-black text-normal font-light hover:text-red-500 transition-colors"
-                >
-                  {formData.phone}
-                </a>
+          )}
+
+          <div className="space-y-1 mb-8">
+            {/* header 2nd Part */}
+            <p className="mt-3 ml-3 -mb-1 font-text text-sm tracking-wide text-red-500 font-light">when?</p>
+            {/* Contact History */}
+            {(formData.lastContactDate || formData.nextContactDate) && (
+              <div className="space-y-1">
+
+                {/* last contact */}
+                <div>
+                  <h3 className="text-red-500 tracking-wide font-light text-sm ml-3 -mb-2"><span className="font-light">last contact</span></h3>
+                  <div className="bg-gray-50 rounded-xl p-3">
+                    {formData.lastContactDate && (
+                      <div>
+                        <div className="text-black text-normal font-light">
+                          {formData.lastContactDate}
+                        </div>
+                      </div>
+                    )}
+                    </div>
+                  </div>
+
+                  {/* next contact */}
+                  <div>
+                    <h3 className="text-red-500 tracking-wide font-light text-sm ml-3 -mb-2"><span className="font-light">next planned contact</span></h3>
+                    <div className="bg-gray-50 rounded-xl p-3">
+                    {formData.nextContactDate && (
+                      <div>
+                        <div className="text-black text-normal font-light">
+                          {formData.nextContactDate}
+                        </div>
+                      </div>
+                    )}
+                    </div>
+                  </div>
               </div>
             )}
           </div>
+
+          <div>
+          
+          {/* Notes */}
+          {formData.notes && (
+            
+            <div className="space-y-2">
+              <h2 className="ml-3 font-text text-sm tracking-wide text-red-500 font-normal">notes</h2>
+              <h3 className="text-red-500 font-light text-sm ml-3 -mb-4">important facts to remember</h3>
+              <div className="bg-gray-50 rounded-xl p-3 ">
+                <div className="text-black text-normal font-light whitespace-pre-wrap ">
+                  {formData.notes}
+                </div>
+              </div>
+            </div>
+          )}
+          </div>
+
+        </div>
+
+        <div className="space-y-2 mb-8">
+          {/* header 2nd Part */}
+          <h2 className="mt-3 ml-3 font-text text-sm tracking-wide text-red-500 font-normal">additional information </h2>
 
           {/* Birthday */}
           {formData.birthdate && (
@@ -1403,59 +1519,11 @@ const ShowContactForm = ({id}) => {
             </div>
           )}
 
-          {/* Address */}
-          {(formData.streetAndNr || formData.city || formData.country) && (
-            <div className="space-y-2">
-              <h3 className="text-red-500 font-light text-sm ml-3 -mb-4">address</h3>
-              <div className="bg-gray-50 rounded-xl p-3">
-                <div className="text-black text-normal font-light -space-y-1">
-                  {formData.streetAndNr && <div>{formData.streetAndNr},</div>}
-                  <div>
-                    {formData.postalcode && `${formData.postalcode} `}
-                    {formData.city},
-                  </div>
-                  {formData.country && <div>{formData.country}</div>}
-                </div>
-              </div>
-            </div>
-          )}
 
-          {/* Notes */}
-          {formData.notes && (
-            <div className="space-y-2">
-              <h3 className="text-red-500 font-light text-sm ml-3 -mb-4">notes</h3>
-              <div className="bg-gray-50 rounded-xl p-3 ">
-                <div className="text-black text-normal font-light whitespace-pre-wrap ">
-                  {formData.notes}
-                </div>
-              </div>
-            </div>
-          )}
 
-          {/* Contact History */}
-          {(formData.contactDate || formData.meetingPlace) && (
-            <div className="space-y-2">
-              <h3 className="text-red-500 font-light text-sm ml-3 -mb-4">contact history</h3>
-              <div className="bg-gray-50 rounded-xl p-3 space-y-2">
-                {formData.contactDate && (
-                  <div>
-                    <span className="text-black font-light text-sm">date:</span>
-                    <span className="text-black text-normal font-light ml-5">
-                      {formData.contactDate}
-                    </span>
-                  </div>
-                )}
-                {formData.meetingPlace && (
-                  <div>
-                    <span className="text-black font-light text-sm">place:</span>
-                    <span className="text-black text-normal font-light ml-4">
-                      {formData.meetingPlace}
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
+          
+          
+
 
           {/* Links */}
           {formData.links && formData.links.some(link => link.url?.trim() && link.title?.trim()) && (

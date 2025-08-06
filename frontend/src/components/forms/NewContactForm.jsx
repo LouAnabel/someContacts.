@@ -24,8 +24,9 @@ const NewContactForm = ({onSubmit, onCancel }) => {
         city: '',
         country: '',
         notes: '',
-        contactDate: '',
-        meetingPlace: '',
+        lastContactDate: '',
+        nextContactDate: '',
+        contacted: false,
         links: []
     });
 
@@ -33,14 +34,16 @@ const NewContactForm = ({onSubmit, onCancel }) => {
     const [errors, setErrors] = useState({});
     const [hasSubmitted, setHasSubmitted] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    
     const [showBirthdate, setShowBirthdate] = useState(false);
-
     const [showAddress, setShowAddress] = useState(false);
     const [expandedNotes, setExpandedNotes] = useState(false);
     const [showContactDetails, setShowContactDetails] = useState(false);
+    const [isContacted, setIsContacted] = useState(false);
 
     const [showLinks, setShowLinks] = useState(false);
     const [links, setLinks] = useState([{ title: '', url: '' }]);
+
 
     // Category State
     const [categories, setCategories] = useState([]);
@@ -50,7 +53,7 @@ const NewContactForm = ({onSubmit, onCancel }) => {
     const [isAddingCategory, setIsAddingCategory] = useState(false);
 
 
-    // Load Categories on component mount
+    // LOAD CATEGORIES FOR TOGGLE MENU
     useEffect(() => {
         const loadCategories = async () => {
             try {
@@ -66,7 +69,6 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                 setCategories([]); // Empty array on error
             }
         };
-
         loadCategories();
     }, [accessToken]);
 
@@ -249,16 +251,8 @@ const NewContactForm = ({onSubmit, onCancel }) => {
             }
         }
         
-        // Validate contactDate (format only, doesn't need to be in past)
-        if (formData.contactDate?.trim()) {
-            const contactDateError = validateDate(formData.contactDate, 'Contact date', false);
-            if (contactDateError) {
-                newErrors.contactDate = contactDateError;
-            }
-        }
-        
         setErrors(newErrors);
-        console.log(newErrors)
+        console.log("errors:", newErrors)
         return Object.keys(newErrors).length === 0;
     };
     
@@ -325,12 +319,16 @@ const NewContactForm = ({onSubmit, onCancel }) => {
             city: '',
             country: '',
             notes: '',
-            contactDate: '',
-            meetingPlace: ''
+            lastContactDate: '',
+            nextContactDate: '',
+            contacted: false
         });
+
+
         setShowBirthdate(false);
         setShowAddress(false);
         setShowContactDetails(false);
+        setIsContacted(false);
         setShowLinks(false);
         setExpandedNotes(false);
         setLinks([{ title: '', url: '' }]);
@@ -908,15 +906,15 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                         ) : (
                             <div className="space-y-2">
                                 <div className="flex items-center justify-between -mb-4">
-                                    <span className="relative left-2 text-sans text-red-500 font-light">do you remember...</span>
+                                    <span className="relative left-2 text-sans text-red-500 font-light">don't forget the ...</span>
                                     <button
                                         type="button"
                                         onClick={() => {
                                             setShowContactDetails(false);
                                             setFormData(prev => ({ 
                                                 ...prev, 
-                                                contactDate: '', 
-                                                meetingPlace: '' 
+                                                lastContactDate: '', 
+                                                nextContactDate: '' 
                                             }));
                                         }}
                                         className="relative right-1 font-light text-red-500 hover:text-red-700 transition-colors duration-200 text-sm"
@@ -928,16 +926,16 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                                     
                                 {/* Last Contact Date Field */}
                                 <div className="relative">
-                                    <label htmlFor="contactDate" className="relative top-3 left-4 bg-white px-1 text-sans text-base text-black font-light">
-                                        the date?
+                                    <label htmlFor="lastContactDate" className="relative top-3 left-4 bg-white px-1 text-sans text-base text-black font-light">
+                                        last contact (date & place)
                                     </label>
                                     <input 
                                         type="text" 
-                                        name="contactDate" 
-                                        id="contactDate" 
-                                        value={formData.contactDate}
+                                        name="lastContactDate" 
+                                        id="lastContactDate" 
+                                        value={formData.lastContactDate}
                                         onChange={handleInputChange}
-                                        placeholder="19.05.2025"
+                                        placeholder="am 19.05.2025 in Berlin"
                                         disabled={isLoading}
                                         className={`w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
                                         style={{
@@ -945,21 +943,21 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                                             fontWeight: 300
                                         }}
                                     />
-                                    {hasSubmitted && errors.contactDate && (
-                                        <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.contactDate}</p>
+                                    {hasSubmitted && errors.lastContactDate && (
+                                        <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.lastContactDate}</p>
                                     )}
                                 </div>
 
                                 {/* Meeting Place Field */}
                                 <div className="relative">
-                                    <label htmlFor="meetingPlace" className="relative top-3 left-4 bg-white px-1 text-sans text-base text-black font-light">
-                                        the place?
+                                    <label htmlFor="nextContactDate" className="relative top-3 left-4 bg-white px-1 text-sans text-base text-black font-light">
+                                        next planned contact (date & place)
                                     </label>
                                     <input 
                                         type="text" 
-                                        name="meetingPlace" 
-                                        id="meetingPlace" 
-                                        value={formData.meetingPlace}
+                                        name="nextContactDate" 
+                                        id="nextContactDate" 
+                                        value={formData.nextContactDate}
                                         onChange={handleInputChange}
                                         placeholder="coffe shop, berlin ..."
                                         disabled={isLoading}
@@ -969,8 +967,8 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                                             fontWeight: 300
                                         }}
                                     />
-                                    {hasSubmitted && errors.meetingPlace && (
-                                        <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.meetingPlace}</p>
+                                    {hasSubmitted && errors.nextContactDate && (
+                                        <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.nextContactDate}</p>
                                     )}
                                 </div>
                             </div>

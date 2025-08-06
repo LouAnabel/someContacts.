@@ -38,8 +38,9 @@ const ApiDataToFormData = (apiResponse) => {
         city: contact.city || '',
         country: contact.country || '',
         notes: contact.notes || '',
-        contactDate: contact.contact_date || '', // No conversion needed
-        meetingPlace: contact.contact_place || '',
+        lastContactDate: contact.last_contact_date || '', // No conversion needed, string now
+        nextContactDate: contact.next_contact_date || '',
+        contacted: contact.contacted,
         links: linksForForm
     };
 };

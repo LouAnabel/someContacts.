@@ -25,6 +25,7 @@ const FormDataToApiData = (formData, categories, links, overrides = {}) => {
             url: link.url.trim()
         })) : [];
 
+
     // Return API data - dates are already in DD.MM.YYYY format, no conversion needed
     return {
         first_name: formData.firstName?.trim(),
@@ -34,8 +35,9 @@ const FormDataToApiData = (formData, categories, links, overrides = {}) => {
         category_id: categoryId,
         is_favorite: formData.isFavorite || false,
         birth_date: formData.birthdate?.trim() || null, // Send as-is (DD.MM.YYYY)
-        contact_date: formData.contactDate?.trim() || null, // Send as-is (DD.MM.YYYY)
-        contact_place: formData.meetingPlace?.trim() || null,
+        last_contact_date: formData.lastContactDate?.trim() || null, 
+        next_contact_date: formData.nextContactDate?.trim() || null,
+        contacted : formData.contacted,
         street_and_nr: formData.streetAndNr?.trim() || null,
         postal_code: formData.postalcode?.trim() || null,
         city: formData.city?.trim() || null,
