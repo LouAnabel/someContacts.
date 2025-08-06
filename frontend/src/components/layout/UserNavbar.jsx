@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import ThemeToggle from '../theme/ThemeToggle.jsx';
-import SearchForm from '../forms/SearchForm.jsx'
+import SearchForm from '../forms/SearchFormNavbar.jsx'
 import MenuBar from './Menubar.jsx'
 import { useAuthContext } from "../../context/AuthContextProvider";
 
@@ -57,12 +57,10 @@ const Navbar = () => {
             </span>
           </Link>
 
-          {/* Small screens: Mobile search + Theme + Menu toggle */}
+          {/* search + Theme + Menu toggle */}
           <div className="flex items-center px-0 md:hidden">
             
             <SearchForm 
-              isMobile={true}
-              placeholder="search contacts..."
               onSearch={handleSearch}
             />
             
@@ -94,8 +92,6 @@ const Navbar = () => {
           {/* Bigger screens: Mobile search + Nav links + Theme */}
           <div className="hidden md:flex items-center space-x-6 tracking-wider">
             <SearchForm 
-              isMobile={true}
-              placeholder="search contacts..."
               onSearch={handleSearch}
             />
             <div className="flex items-center text-xl space-x-5">

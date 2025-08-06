@@ -5,6 +5,7 @@ import { useEffect, useState, useRef } from "react";
 import { useAuthContext } from "../context/AuthContextProvider";
 import { useNavigate } from "react-router";
 import CircleButton from "../components/ui/Buttons";
+import SearchFormAllContacts from "../components/forms/SearchFormAllContacts";
 
 
 const Button = ({ children, onClick, className = "", ...props }) => {
@@ -159,6 +160,11 @@ export default function AllContacts() {
           All <span className="text-red-500">{contacts.length} </span> Contacts
         </h1>
       </div>
+
+      {/* search bar */}
+      {/* <div>
+        <SearchFormAllContacts onSearch />
+      </div> */}
 
       <div className="p-10 gap-10 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 max-w-screen-2xl"> 
         {contacts.map((contact, index) => {

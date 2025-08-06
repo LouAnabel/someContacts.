@@ -457,7 +457,7 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                             type="button"
                             onClick={() => {
                                 console.log('Dropdown clicked. Current categories:', categories);
-                                console.log('Current selected category:', formData.category?.name || 'none selected'); // ← FIXED
+                                console.log('Current selected category:', formData.category?.name || 'none selected');
                                 setShowCategoryDropdown(!showCategoryDropdown);
                             }}
                             disabled={isLoading}
