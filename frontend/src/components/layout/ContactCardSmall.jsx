@@ -18,13 +18,13 @@ const ContactCardSmall = ({contact = {}, onContactUpdate, onDeleteRequest}) => {
     const [formData, setFormData ] = useState({});
 
     const handleFavoriteToggle = async () => {
-        if (isUpdating) return; // Prevent multiple simultaneous updates
-        
+    if (isUpdating) return; // Prevent multiple simultaneous updates
+    
         try {
             setIsUpdating(true);
             setError(null);
             
-            const newFavoriteState = !localContact.is_favorite; // Use is_favorite instead of isFavorite
+            const newFavoriteState = !localContact.is_favorite;
             
             if (!accessToken) {
                 throw new Error("Access token is not available.");
@@ -36,8 +36,10 @@ const ContactCardSmall = ({contact = {}, onContactUpdate, onDeleteRequest}) => {
             // Update local state immediately for better UX
             setLocalContact(prev => ({ ...prev, is_favorite: newFavoriteState }));
 
-            // Prepare the data for API call
-            const updatedContactData = FormDataToApiData({is_favorite: newFavoriteState});
+            // Send ONLY the favorite status - don't use FormDataToApiData helper
+            const updatedContactData = {
+                is_favorite: newFavoriteState
+            };
             
             console.log('Sending to API:', updatedContactData);
 

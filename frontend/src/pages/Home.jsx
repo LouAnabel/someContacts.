@@ -92,7 +92,7 @@ function Home() {
       <div className="">
         {/* Header */}
         <h1 className="text-2xl font-heading font-light text-gray-900 dark:text-white mb-7">
-          hello <span className="text-red-500 text-3xl font-medium">{userName}.</span>
+          hello <span className="font-text text-red-500 text-3xl font-light">{userName}</span>.
         </h1>
       
         {/* Main Part */}
@@ -102,7 +102,7 @@ function Home() {
           <p className="text-2xl font-text text-black dark:text-white">
             you already have collected{" "}
             <Link to="/myspace/contacts">
-              <span className="font-text font-semibold text-red-500 dark:text-red-500 hover:text-red-600 dark:hover:text-red-600 transition-colors">
+              <span className="font-text font-normal text-red-500 dark:text-red-500 hover:text-red-600 dark:hover:text-red-600 transition-colors">
                 {isLoading ? '0' : contactsCount}
               </span>
             </Link>
