@@ -1,5 +1,4 @@
 from app import db
-from datetime import datetime, timezone
 
 class ContactLinks(db.Model):
     __tablename__ = 'contact_links'
@@ -8,11 +7,6 @@ class ContactLinks(db.Model):
     contact_id = db.Column(db.Integer, db.ForeignKey('contacts.id', ondelete='CASCADE'), nullable=False)
     url = db.Column(db.String(500), nullable=False)
     title = db.Column(db.String(100), nullable=True)
-
-    #Timestamps
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
-    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc),
-                           onupdate=lambda: datetime.now(timezone.utc))
 
     # Constraints
     __table_args__ = (
@@ -29,8 +23,6 @@ class ContactLinks(db.Model):
             'contact_id': self.contact_id,
             'url': self.url,
             'title': self.title,
-            'created_at': self.created_at.strftime('%d-%m-%Y %H:%M:%S') if self.created_at else None,
-            'updated_at': self.updated_at.strftime('%d-%m-%Y %H:%M:%S') if self.updated_at else None,
         }
 
     def __repr__(self):

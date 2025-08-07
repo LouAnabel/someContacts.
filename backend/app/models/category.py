@@ -1,5 +1,4 @@
 from app import db
-from datetime import datetime, timezone
 
 class Category(db.Model):
     __tablename__ = 'categories'
@@ -10,19 +9,26 @@ class Category(db.Model):
 
     # Relationship with user
     creator = db.relationship('User', backref='categories')
-    contacts = db.relationship('Contact', backref='category', lazy='dynamic')
+
+    # Many-to-many relationship with contacts through ContactCategory
+    contact_categories = db.relationship('ContactCategory', back_populates='category', cascade='all, delete-orphan')
+    contacts = db.relationship('Contact', secondary='contact_categories', back_populates='categories', viewonly=True)
 
     # Unique constraint: user can't have duplicate category names
     __table_args__ = (db.UniqueConstraint('name', 'creator_id', name='unique_category_per_creator'),)
 
-
-    def to_dict(self):
-        return {
+    def to_dict(self, include_contacts=False):
+        data = {
             'id': self.id,
             'name': self.name,
             'creator_id': self.creator_id,
-            'contact_count': self.contacts.count()
+            'contact_count': len(self.contacts)
         }
-    
+
+        if include_contacts:
+            data['contacts'] = [contact.to_dict(include_categories=False) for contact in self.contacts]
+
+        return data
+
     def __repr__(self):
         return f'<Category {self.name}>'

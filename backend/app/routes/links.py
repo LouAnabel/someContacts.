@@ -56,7 +56,7 @@ def get_contact_links(contact_id):
         return jsonify({'error': str(e)}), 500
 
 
-
+# CREATE LINKS FOR CONTACT
 @contacts_bp.route('/contacts/<int:contact_id>/links', methods=['POST'])
 @jwt_required()
 def add_contact_link(contact_id):
@@ -109,10 +109,11 @@ def add_contact_link(contact_id):
         return jsonify({'error': str(e)}), 500
 
 
+# UPDATE LINK FOR A CONTACT
 @contacts_bp.route('/contacts/<int:contact_id>/links/<int:link_id>', methods=['PUT'])
 @jwt_required()
 def update_contact_link(contact_id, link_id):
-    """Update a specific link"""
+
     try:
         current_user_id = get_jwt_identity()
         data = request.get_json()
@@ -165,6 +166,7 @@ def update_contact_link(contact_id, link_id):
         return jsonify({'error': str(e)}), 500
 
 
+# DELETE LINK FOR CONTACT
 @contacts_bp.route('/contacts/<int:contact_id>/links/<int:link_id>', methods=['DELETE'])
 @jwt_required()
 def delete_contact_link(contact_id, link_id):
