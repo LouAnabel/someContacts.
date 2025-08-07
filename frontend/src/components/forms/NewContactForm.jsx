@@ -5,6 +5,7 @@ import { useAuthContext } from '../../context/AuthContextProvider';
 import { createContact, getCategories } from '../../apiCalls/contactsApi';
 import FormDataToApiData from '../helperFunctions/FormToApiData';
 import { validateDate } from '../helperFunctions/dateConversion';
+import CategorySelection from '../ui/CategorySelection';
 
 
 const NewContactForm = ({onSubmit, onCancel }) => {
@@ -14,7 +15,7 @@ const NewContactForm = ({onSubmit, onCancel }) => {
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
-        category: {name: '', id: null},
+        categories: [],
         email: '',
         phone: '',
         isFavorite: false,
@@ -45,7 +46,7 @@ const NewContactForm = ({onSubmit, onCancel }) => {
     const [links, setLinks] = useState([{ title: '', url: '' }]);
 
 
-    // Category State
+    // ies State
     const [categories, setCategories] = useState([]);
     const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
     const [showAddCategory, setShowAddCategory] = useState(false);
@@ -136,7 +137,6 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                 const categoryName = newCategoryName.charAt(0).toUpperCase() + newCategoryName.slice(1).trim();
                 console.log('Adding category:', categoryName);
                 
-                // ADD CATEGORIES TO DATABASE
                 const response = await fetch('http://127.0.0.1:5000/categories', {
                     method: 'POST',
                     headers: { 
@@ -157,48 +157,29 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                 const apiResponse = await response.json();
                 console.log('API Response for new category:', apiResponse);
                 
-                // Create a properly formatted category object
                 const newCategory = {
                     id: apiResponse.id || apiResponse.category?.id || Date.now(),
                     name: apiResponse.name || apiResponse.category?.name || categoryName,
-                    created_at: apiResponse.created_at || apiResponse.category?.created_at || new Date().toISOString(),
                     creator_id: apiResponse.creator_id || apiResponse.category?.creator_id || 1,
                     contact_count: apiResponse.contact_count || apiResponse.category?.contact_count || 0 
                 };
                 
-                console.log('Formatted new category:', newCategory);
-                console.log('Current categories before update:', categories);
+                setCategories(prevCategories => [...prevCategories, newCategory]);
                 
-                // Update categories state with the new category
-                setCategories(prevCategories => {
-                    const updatedCategories = [...prevCategories, newCategory];
-                    console.log('Updated categories:', updatedCategories);
-                    return updatedCategories;
-                });
-                
-                // Update form data to select the new category
-                setFormData(prevFormData => {
-                    const updatedFormData = { 
-                        ...prevFormData, 
-                        category: { 
-                            name: newCategory.name, 
-                            id: newCategory.id 
-                        }}
-                        console.log('Updated form data:', updatedFormData);
-                        return updatedFormData;
-                    });
+                // UPDATED: Add to categories array instead of replacing single category
+                setFormData(prevFormData => ({
+                    ...prevFormData, 
+                    categories: [...prevFormData.categories, { name: newCategory.name, id: newCategory.id }]
+                }));
 
-                
                 // Clear category errors
-                if (hasSubmitted && errors.category) {
-                    setErrors(prev => ({ ...prev, category: '' }));
+                if (hasSubmitted && errors.categories) {
+                    setErrors(prev => ({ ...prev, categories: '' }));
                 }
                 
-                // Reset add category form
                 setNewCategoryName('');
                 setShowAddCategory(false);
                 setShowCategoryDropdown(false);
-               
                 
                 console.log('Category added successfully:', newCategory.name);
                 
@@ -209,6 +190,38 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                 setIsAddingCategory(false);
             }
         }
+    };
+
+    const addCategoryToForm = (category) => {
+        // Check if category is already selected
+        const isAlreadySelected = formData.categories.some(cat => cat.id === category.id);
+        if (isAlreadySelected) {
+            return; // Don't add if already selected
+        }
+
+        // Check if we already have 3 categories
+        if (formData.categories.length >= 3) {
+            alert('Maximum 3 categories allowed');
+            return;
+        }
+
+        // Add the category
+        setFormData(prev => ({
+            ...prev,
+            categories: [...prev.categories, { name: category.name, id: category.id }]
+        }));
+
+        // Clear error immediately
+        if (hasSubmitted && errors.categories) {
+            setErrors(prev => ({ ...prev, categories: '' }));
+        }
+    };
+
+    const removeCategoryFromForm = (categoryId) => {
+        setFormData(prev => ({
+            ...prev,
+            categories: prev.categories.filter(cat => cat.id !== categoryId)
+        }));
     };
 
 
@@ -226,9 +239,9 @@ const NewContactForm = ({onSubmit, onCancel }) => {
             newErrors.lastName = 'Last name must be at least 2 characters';
         }
 
-        // category validation
-        if (!formData.category || !formData.category.name || !formData.category.id) {
-            newErrors.category = 'Category is required';
+        // UPDATED: Categories validation (at least one required)
+        if (!formData.categories || formData.categories.length === 0) {
+            newErrors.categories = 'At least one category is required';
         }
         
         // Email validation
@@ -256,7 +269,7 @@ const NewContactForm = ({onSubmit, onCancel }) => {
         return Object.keys(newErrors).length === 0;
     };
     
-
+    // HANDLE SUBMIT
     const handleSubmit = async (e) => {
         e.preventDefault();
         setHasSubmitted(true);
@@ -309,7 +322,7 @@ const NewContactForm = ({onSubmit, onCancel }) => {
         setFormData({
             firstName: '',
             lastName: '',
-            category: { name: '', id: null },
+            category: [],
             email: '',
             phone: '',
             isFavorite: false,
@@ -863,17 +876,17 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                         <div className="space-y-1">
                             
                             {/* isToContact Checkbox */}
-                            <div className="flex items-center w-full relative -mt-2 rounded-lg">
+                            <div className="flex items-center w-full relative -mt-3 rounded-lg">
                                 <button
                                     type="button"
                                     onClick={() => setFormData(prev => ({ ...prev, isToContact: !prev.isToContact }))}
-                                    className="flex items-center space-x-2 hover:text-red-500"
+                                    className="flex items-center space-x-2 text-black hover:text-red-500"
                                     disabled={isLoading}
                                 >
                                     {formData.isToContact ? (
                                         <>
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="red" class="size-6">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="red" className="size-6">
+                                            <path strokeLinecap="round" stroLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                                             </svg>
                                             <span className="text-base font-light text-black cursor-pointer">
                                                 need to contact
@@ -881,8 +894,8 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                                         </>
                                     ) : (
                                         <>
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" class="size-6">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="currentColor" className="size-6">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                                             </svg>
                                             <span className="text-base font-light text-black cursor-pointer">
                                                 don't need to contact
@@ -897,13 +910,13 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                                 <button
                                     type="button"
                                     onClick={() => setFormData(prev => ({ ...prev, isContacted: !prev.isContacted }))}
-                                    className="flex items-center space-x-2 hover:text-red-500"
+                                    className="flex items-center space-x-2 text-black hover:text-red-500"
                                     disabled={isLoading}
                                 >
                                     {formData.isContacted ? (
                                         <>
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="red" class="size-6">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="red" className="size-6">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                                             </svg>
                                             
                                             <span className="text-base font-light text-black cursor-pointer">
@@ -912,8 +925,8 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                                         </>
                                     ) : (
                                         <>
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="black" class="size-6">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="currentColor" className="size-6">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                                             </svg>
                                             <span className="text-base font-light text-black cursor-pointer">
                                                 contacted

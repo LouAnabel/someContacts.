@@ -5,16 +5,12 @@ import { formatDateForBackend } from '../helperFunctions/dateConversion'
 
 const FormDataToApiData = (formData, categories, links, overrides = {}) => {
     // Get Category ID
-    let categoryId = null;
-    if (formData.category) {
-        if (typeof formData.category === 'string') {
-            // if category is string, find the category object
-            const selectedCategory = categories.find(cat => cat.name === formData.category);
-            categoryId = selectedCategory ? selectedCategory.id : null;
-        } else if (formData.category.id) {
-            // if category is an object with id
-            categoryId = formData.category.id;
-        }
+    let categoryIds = [];
+    if (formData.categories && Array.isArray(formData.categories)) {
+         categoryIds = formData.categories
+            .filter(cat => cat && cat.id) // Only include categories with valid IDs
+            .slice(0, 3) // Limit to maximum 3 categories
+            .map(cat => cat.id);
     }
 
     // Format links properly - filter out empty ones and structure them correctly
@@ -37,7 +33,8 @@ const FormDataToApiData = (formData, categories, links, overrides = {}) => {
         birth_date: formData.birthdate?.trim() || null, // Send as-is (DD.MM.YYYY)
         last_contact_date: formData.lastContactDate?.trim() || null, 
         next_contact_date: formData.nextContactDate?.trim() || null,
-        contacted : formData.contacted,
+        is_to_contact : formData.isToContact || false,
+        is_contacted : formData.isContacted || false,
         street_and_nr: formData.streetAndNr?.trim() || null,
         postal_code: formData.postalcode?.trim() || null,
         city: formData.city?.trim() || null,

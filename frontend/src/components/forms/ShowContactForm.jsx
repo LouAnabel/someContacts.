@@ -1346,10 +1346,15 @@ const ShowContactForm = ({id}) => {
           </div>
           
           
-          {/* Category Badge */}
-          <span className="inline-block px-4 py-2 bg-red-100 text-red-600 rounded-full text-base -mt-1 mb-2 font-light">
-            {typeof formData.category === 'string' ? formData.category : formData.category?.name}
-          </span>
+          {formData.categories && formData.categories.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-4">
+                {formData.categories.map((category, index) => (
+                    <span key={category.id || index} className="inline-block px-4 py-2 bg-red-100 text-red-600 rounded-full text-base font-light">
+                        {category.name}
+                    </span>
+                ))}
+            </div>
+          )}
         </div>
 
 

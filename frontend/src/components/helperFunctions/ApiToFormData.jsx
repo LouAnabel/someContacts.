@@ -7,13 +7,13 @@ const ApiDataToFormData = (apiResponse) => {
     // extracting just the contact data from API response
     const contact = apiResponse.contact || apiResponse;
     
-    // FIXED: Handle category properly - return object format that matches your form
-    let categoryForForm = { name: '', id: null }; // Default empty category object
-    if (contact.category) {
-        categoryForForm = {
-            id: contact.category.id,
-            name: contact.category.name
-        };
+    // Handle multiple categories - return array format
+    let categoriesForForm = []; // Default empty category object
+    if (contact.categories && Array.isArray(contact.categories) && contact.categories.length > 0) {
+        categoriesForForm = contact.categories.map(category => ({
+            id: category.id,
+            name: category.name
+        }));
     }
     
     let linksForForm = [{ title: '', url: '' }]; // Default empty link
@@ -38,9 +38,11 @@ const ApiDataToFormData = (apiResponse) => {
         city: contact.city || '',
         country: contact.country || '',
         notes: contact.notes || '',
+        isToContact: contact.is_to_contact,
+        isContacted: contact.is_contacted,
         lastContactDate: contact.last_contact_date || '', // No conversion needed, string now
         nextContactDate: contact.next_contact_date || '',
-        contacted: contact.contacted,
+        
         links: linksForForm
     };
 };
