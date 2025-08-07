@@ -104,7 +104,7 @@ const SearchFormAllContacts = ({ onSearch, resetTrigger }) => {
       <form ref={searchRef} onSubmit={handleSubmit}>
         <div className="flex border-gray-200 bg-red-200 dark:bg-black rounded-xl items-center gap-0 relative" ref={dropdownRef}
         style={{ 
-                     boxShadow: '0 2px 20px rgba(0, 0, 0, 0.1)'
+                     boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)'
                  }}>
           {/* Category Dropdown Button */}
           <button 
