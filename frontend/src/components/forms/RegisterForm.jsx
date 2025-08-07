@@ -214,7 +214,7 @@ const RegisterForm = () => {
                                 onChange={handleInputChange}
                                 placeholder="meryl"
                                 disabled={showLoading}
-                                className={`w-full rounded-xl border bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
+                                className={`w-full rounded-xl border bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
                                     hasSubmitted && errors.firstName ? 'border-red-500 shadow-lg' : 'border-gray-400 dark:border-gray-400'
                                 }`}
                                 style={{
@@ -243,7 +243,7 @@ const RegisterForm = () => {
                                 onChange={handleInputChange}
                                 placeholder="streep"
                                 disabled={showLoading}
-                                className={`w-full rounded-xl border bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
+                                className={`w-full rounded-xl border bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
                                     hasSubmitted && errors.lastName ? 'border-red-500 shadow-lg' : 'border-gray-400 dark:border-gray-400'
                                 }`}
                                 style={{
@@ -277,7 +277,7 @@ const RegisterForm = () => {
                                 onChange={handleInputChange}
                                 placeholder="your@email.com"
                                 disabled={showLoading}
-                                className={`w-full rounded-xl border bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
+                                className={`w-full rounded-xl border bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
                                     hasSubmitted && errors.email ? 'border-red-500 shadow-lg' : 'border-gray-400 dark:border-gray-400'
                                 }`}
                                 style={{
@@ -306,7 +306,7 @@ const RegisterForm = () => {
                                 onChange={handleInputChange}
                                 placeholder="••••••••"
                                 disabled={showLoading}
-                                className={`w-full rounded-xl border bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
+                                className={`w-full rounded-xl border bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
                                     hasSubmitted && errors.password ? 'border-red-500 shadow-lg' : 'border-gray-400 dark:border-gray-400'
                                 }`}
                                 style={{
@@ -335,7 +335,7 @@ const RegisterForm = () => {
                                 onChange={handleInputChange}
                                 placeholder="••••••••"
                                 disabled={showLoading}
-                                className={`w-full rounded-xl border bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
+                                className={`w-full rounded-xl border bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
                                     hasSubmitted && errors.confirmPassword ? 'border-red-500 shadow-lg' : 'border-gray-400 dark:border-gray-400'
                                 }`}
                                 style={{

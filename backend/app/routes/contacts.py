@@ -122,7 +122,8 @@ def create_contact():
             birth_date=birth_date,
             last_contact_date=data.get('last_contact_date', '').strip() if data.get('last_contact_date') else None,
             next_contact_date=data.get('next_contact_date', '').strip() if data.get('next_contact_date') else None,
-            contacted=data.get('contacted', False),
+            is_contacted=data.get('is_contacted', False),
+            is_to_contact = data.get('is_to_contact', False),
             street_and_nr=data.get('street_and_nr', '').strip() if data.get('street_and_nr') else None,
             postal_code=data.get('postal_code', '').strip() if data.get('postal_code') else None,
             city=data.get('city', '').strip() if data.get('city') else None,
@@ -544,8 +545,10 @@ def update_contact(contact_id):
             contact.last_contact_date = data['last_contact_date'].strip() if data['last_contact_date'] else None
         if 'next_contact_date' in data:
             contact.next_contact_date = data['next_contact_date'].strip() if data['next_contact_date'] else None
-        if 'contacted' in data:
-            contact.contacted = bool(data['contacted'])
+        if 'is_contacted' in data:
+            contact.is_contacted = bool(data['is_contacted'])
+        if 'is_to_contact' in data:
+            contact.is_to_contact = bool(data['is_to_contact'])
         if 'street_and_nr' in data:
             contact.street_and_nr = data['street_and_nr'].strip() if data['street_and_nr'] else None
         if 'postal_code' in data:

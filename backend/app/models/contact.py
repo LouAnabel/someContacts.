@@ -19,6 +19,7 @@ class Contact(db.Model):
 
     # Additional fields that your to_dict() method expects
     birth_date = db.Column(db.Date,nullable=True)
+    is_to_contact = db.Column(db.Boolean, default=False, nullable=True)
     is_contacted = db.Column(db.Boolean, default=False, nullable=True)
     last_contact_date = db.Column(db.String(200), nullable=True)
     next_contact_date = db.Column(db.String(200), nullable=True)
@@ -63,6 +64,7 @@ class Contact(db.Model):
             'is_favorite': self.is_favorite,
             'birth_date': self.birth_date.strftime('%d.%m.%Y') if self.birth_date else None,
             'is_contacted':self.is_contacted,
+            'is_to_contact' : self.is_to_contact,
             'last_contact_date': self.last_contact_date,
             'next_contact_date': self.next_contact_date,
             'street_and_nr': self.street_and_nr,

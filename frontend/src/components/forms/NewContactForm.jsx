@@ -24,9 +24,10 @@ const NewContactForm = ({onSubmit, onCancel }) => {
         city: '',
         country: '',
         notes: '',
+        isContacted: false,
+        isToContact: false,
         lastContactDate: '',
         nextContactDate: '',
-        contacted: false,
         links: []
     });
 
@@ -39,7 +40,6 @@ const NewContactForm = ({onSubmit, onCancel }) => {
     const [showAddress, setShowAddress] = useState(false);
     const [expandedNotes, setExpandedNotes] = useState(false);
     const [showContactDetails, setShowContactDetails] = useState(false);
-    const [isContacted, setIsContacted] = useState(false);
 
     const [showLinks, setShowLinks] = useState(false);
     const [links, setLinks] = useState([{ title: '', url: '' }]);
@@ -319,16 +319,16 @@ const NewContactForm = ({onSubmit, onCancel }) => {
             city: '',
             country: '',
             notes: '',
+            isContacted: false,
+            isToContact: false,
             lastContactDate: '',
             nextContactDate: '',
-            contacted: false
         });
 
 
         setShowBirthdate(false);
         setShowAddress(false);
         setShowContactDetails(false);
-        setIsContacted(false);
         setShowLinks(false);
         setExpandedNotes(false);
         setLinks([{ title: '', url: '' }]);
@@ -357,12 +357,11 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                 style={{ 
                     boxShadow: '0 4px 32px rgba(109, 71, 71, 0.29)'
                 }}>
-                <h1 className="text-3xl font-bold text-center mb-10 text-black">
+                <h1 className="text-3xl font-bold text-center mt-6 mb-10 text-black">
                     new contact.
                 </h1>
-
                 {/* Favorite Checkbox */}
-                <div className="flex items-center w-full relative left-1 mt-3 mb-8 rounded-lg">
+                <div className="flex items-center w-full relative left-2 mt-3 mb-9 rounded-lg">
                     <button
                         type="button"
                         onClick={() => setFormData(prev => ({ ...prev, isFavorite: !prev.isFavorite }))}
@@ -385,312 +384,253 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                         </span>
                     </button>
                 </div>
+                
 
-                {/* Main Contact Information */}
-                <div className="space-y-7 mb-8">
-                    {/* First Name Field */}
-                    <div className="relative">
-                        <input 
-                            type="text" 
-                            name="firstName" 
-                            id="firstName" 
-                            value={formData.firstName}
-                            onChange={handleInputChange}
-                            placeholder="meryl"
-                            disabled={isLoading}
-                            className={`w-full rounded-xl border bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
-                                hasSubmitted && errors.firstName ? 'border-red-500 shadow-lg' : 'border-gray-400 dark:border-gray-400'
-                            }`}
-                            style={{
-                                fontSize: '18px',
-                                fontWeight: 300
-                            }}
-                        />
-                        <label 
-                            htmlFor="firstName" 
-                            className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-light"
-                        >
-                            first name
-                        </label>
-                        {hasSubmitted && errors.firstName && (
-                            <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.firstName}</p>
-                        )}
-                    </div>
+                {/* Main Contact Informations */}
+                <div className="space-y-8 mb-5">
 
-                    {/* Last Name Field */}
-                    <div className="relative">
-                        <input 
-                            type="text" 
-                            name="lastName" 
-                            id="lastName" 
-                            value={formData.lastName}
-                            onChange={handleInputChange}
-                            placeholder="streep"
-                            disabled={isLoading}
-                            className={`w-full rounded-xl border bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
-                                hasSubmitted && errors.lastName ? 'border-red-500 shadow-lg' : 'border-gray-400 dark:border-gray-400'
-                            }`}
-                            style={{
-                                fontSize: '18px',
-                                fontWeight: 300
-                            }}
-                        />
-                        <label 
-                            htmlFor="lastName" 
-                            className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-light"
-                        >
-                            last name
-                        </label>
-                        {hasSubmitted && errors.lastName && (
-                            <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.lastName}</p>
-                        )}
-                    </div>
-
-                    {/* Category Field */}
-                    <div className="relative">
-                        <label className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-light">
-                            category
-                        </label>
-                        
-                        {/* Custom Dropdown Button */}
-                        <button
-                            type="button"
-                            onClick={() => {
-                                console.log('Dropdown clicked. Current categories:', categories);
-                                console.log('Current selected category:', formData.category?.name || 'none selected');
-                                setShowCategoryDropdown(!showCategoryDropdown);
-                            }}
-                            disabled={isLoading}
-                            className={`w-full p-2.5 rounded-xl border bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black placeholder-gray-200 font-light max-w-full min-w-[200px] focus:outline-none focus:border-red-500 flex items-center justify-between ${
-                                hasSubmitted && errors.category ? 'border-red-500 shadow-lg' : 'border-gray-400 dark:border-gray-400'
-                            }`}
-                            style={{
-                                fontSize: '16px',
-                                fontWeight: 300
-                            }}
-                        >
-                            <span className={formData.category?.name ? 'text-black' : 'text-gray-300'}> {/* ← FIXED */}
-                                {formData.category?.name 
-                                    ? formData.category.name
-                                    : categories.length === 0 
-                                        ? 'create a category first'
-                                        : 'select category'
-                                }
-                            </span>
-                            <svg 
-                                className={`w-4 h-4 transition-transform duration-200 ${showCategoryDropdown ? 'rotate-180' : ''}`}
-                                fill="none" 
-                                stroke="currentColor" 
-                                viewBox="0 0 24 24"
-                            >
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </button>
-
-                        {/* Custom Dropdown Menu */}
-                        {showCategoryDropdown && (
-                            <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-30 max-h-60 overflow-y-auto"> 
-                                
-                                {/* Show category options only if categories exist */}
-                                {categories.length > 0 && (
-                                    <>
-                                        {categories.map((category) => (
-                                            <button
-                                                key={category.id}
-                                                type="button"
-                                                onClick={() => {
-                                                    console.log('Category selected:', category);
-                                                    // Update form data
-                                                    setFormData(prev => ({ ...prev, category: {name: category.name, id : category.id} }));
-                                                    
-                                                    // Clear error immediately (same as handleInputChange does)
-                                                    if (hasSubmitted && errors.category) {
-                                                        setErrors(prev => ({ ...prev, category: '' }));
-                                                    }
-                                                    
-                                                    // Close dropdown
-                                                    setShowCategoryDropdown(false);
-                                                }}
-                                                className="w-full text-left px-3 py-2 hover:bg-gray-50 hover:text-red-500 text-black font-light last:border-b-0"
-                                                style={{ fontSize: '16px', fontWeight: 300 }}
-                                            >
-                                                {category.name} 
-                                            </button>
-                                        ))}
-                                        
-                                        {/* Separator line only if there are categories */}
-                                        <div className="border-t border-gray-100"></div>
-                                    </>
-                                )}
-                                
-                                {/* Show empty state message if no categories */}
-                                {categories.length === 0 && (
-                                    <div className="px-3 py-2 text-gray-400 text-sm font-light italic">
-                                        No categories yet. Create your first one below.
-                                    </div>
-                                )}
-                                
-                                {/* Add Category Section - Always show this */}
-                                <div>
-                                    {!showAddCategory ? (
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowAddCategory(true)}
-                                            className="w-full text-left px-3 py-2 hover:bg-red-50 transition-colors duration-150 text-red-500 font-light flex items-center space-x-2"
-                                            style={{ fontSize: '16px', fontWeight: 300 }}
-                                        >
-                                            <span className="text-lg font-semibold">+</span>
-                                            <span>add new category</span>
-                                        </button>
-                                    ) : (
-                                        <div className="p-3 space-y-2">
-                                            <input
-                                                type="text"
-                                                value={newCategoryName}
-                                                onChange={(e) => setNewCategoryName(e.target.value)}
-                                                placeholder="enter category name"
-                                                className="w-full p-2 rounded-lg border border-gray-300 bg-transparent text-black font-light placeholder-gray-300 focus:outline-none focus:border-red-500"
-                                                style={{ fontSize: '15px', fontWeight: 300 }}
-                                                onKeyPress={(e) => {
-                                                    if (e.key === 'Enter') {
-                                                        addCategory();
-                                                    }
-                                                }}
-                                                autoFocus
-                                            />
-                                            <div className="flex space-x-2">
-                                                <button
-                                                    type="button"
-                                                    onClick={addCategory}
-                                                    disabled={isAddingCategory || !newCategoryName.trim()}
-                                                    className="flex-1 px-3 py-1.5 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:bg-red-300 disabled:cursor-not-allowed text-sm font-light"
-                                                >
-                                                    {isAddingCategory ? 'adding...' : 'add'}
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => {
-                                                        setShowAddCategory(false);
-                                                        setNewCategoryName('');
-                                                    }}
-                                                    disabled={isAddingCategory}
-                                                    className="flex-1 px-3 py-1.5 border border-gray-300 text-gray-600 rounded-lg hover:bg-gray-50 disabled:bg-gray-100 disabled:cursor-not-allowed transition-colors duration-150 text-sm font-light"
-                                                >
-                                                    cancel
-                                                </button>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Click outside to close dropdown */}
-                        {showCategoryDropdown && (
-                            <div 
-                                className="fixed inset-0 z-20" 
-                                onClick={() => {
-                                    setShowCategoryDropdown(false);
-                                    setShowAddCategory(false);
-                                    setNewCategoryName('');
-                                }}
-                            />
-                        )}
-
-                        {hasSubmitted && errors.category && (
-                            <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.category}</p>
-                        )}
-                    </div>
-
-                    {/* How to contact */}
-                    <div className="space-y-2 mb-8">
-                        {/* Email Field */}
+                    {/* Name & Category */}
+                    <div className="space-y-5">
+                        {/* First Name Field */}
                         <div className="relative">
-                            <p className="relative text-red-500 left-2 -mb-3 font-light">how to contact?</p>
-                            <label 
-                                htmlFor="email" 
-                                className="relative top-3 left-4 bg-white px-1 text-base text-black font-light"
-                            >
-                                email
-                            </label>
+                            
                             <input 
-                                type="email" 
-                                name="email" 
-                                id="email" 
-                                value={formData.email}
+                                type="text" 
+                                name="firstName" 
+                                id="firstName" 
+                                value={formData.firstName}
                                 onChange={handleInputChange}
-                                placeholder="your@email.com"
+                                placeholder="meryl"
                                 disabled={isLoading}
-                                className={`w-full rounded-xl border bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
-                                    hasSubmitted && errors.email ? 'border-red-500 shadow-lg' : 'border-gray-400 dark:border-gray-400'
+                                className={`w-full rounded-xl border bg-white  hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
+                                    hasSubmitted && errors.firstName ? 'border-red-500 shadow-md' : 'border-gray-400 dark:border-gray-400'
                                 }`}
                                 style={{
                                     fontSize: '18px',
                                     fontWeight: 300
                                 }}
                             />
-                            {hasSubmitted && errors.email && (
-                                <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.email}</p>
+                            <label 
+                                htmlFor="firstName" 
+                                className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-light"
+                            >
+                                first name
+                            </label>
+                            {hasSubmitted && errors.firstName && (
+                                <p className="absolute top-full right-1 font-light text-sm text-red-600 z-20">{errors.firstName}</p>
                             )}
                         </div>
 
-                        {/* Phone Field */}
+                        {/* Last Name Field */}
                         <div className="relative">
-                            <label htmlFor="phone" className="relative top-3 left-4 bg-white px-1 text-base text-black font-light">
-                                phone
-                            </label>
                             <input 
-                                type="tel" 
-                                name="phone" 
-                                id="phone" 
-                                value={formData.phone}
+                                type="text" 
+                                name="lastName" 
+                                id="lastName" 
+                                value={formData.lastName}
                                 onChange={handleInputChange}
-                                placeholder="+49 1781234567"
+                                placeholder="streep"
                                 disabled={isLoading}
-                                className={`w-full rounded-xl border bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
-                                    hasSubmitted && errors.phone ? 'border-red-500 shadow-lg' : 'border-gray-400 dark:border-gray-400'
+                                className={`w-full rounded-xl border bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
+                                    hasSubmitted && errors.lastName ? 'border-red-500 shadow-md' : 'border-gray-400 dark:border-gray-400'
+                                }`}
+                                style={{
+                                    fontSize: '18px',
+                                    fontWeight: 300
+                                }}
+                            />
+                            <label 
+                                htmlFor="lastName" 
+                                className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-light"
+                            >
+                                last name
+                            </label>
+                            {hasSubmitted && errors.lastName && (
+                                <p className="absolute top-full right-1 font-light text-sm text-red-600 z-20">{errors.lastName}</p>
+                            )}
+                        </div>
+
+                        {/* Category Field */}
+                        <div className="relative">
+                            <label className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-light">
+                                category
+                            </label>
+                            
+                            {/* Custom Dropdown Button */}
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    console.log('Dropdown clicked. Current categories:', categories);
+                                    console.log('Current selected category:', formData.category?.name || 'none selected');
+                                    setShowCategoryDropdown(!showCategoryDropdown);
+                                }}
+                                disabled={isLoading}
+                                className={`w-full p-2.5 rounded-xl border bg-white  hover:border-red-300 dark:hover:border-red-300 text-black placeholder-gray-200 font-light max-w-full min-w-[200px] focus:outline-none focus:border-red-500 flex items-center justify-between ${
+                                    hasSubmitted && errors.category ? 'border-red-500 shadow-md' : 'border-gray-400 dark:border-gray-400'
                                 }`}
                                 style={{
                                     fontSize: '16px',
                                     fontWeight: 300
                                 }}
-                            />
-                            {hasSubmitted && errors.phone && (
-                                <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.phone}</p>
+                            >
+                                <span className={formData.category?.name ? 'text-black' : 'text-gray-300'}> {/* ← FIXED */}
+                                    {formData.category?.name 
+                                        ? formData.category.name
+                                        : categories.length === 0 
+                                            ? 'create a category first'
+                                            : 'select category'
+                                    }
+                                </span>
+                                <svg 
+                                    className={`w-4 h-4 transition-transform duration-200 ${showCategoryDropdown ? 'rotate-180' : ''}`}
+                                    fill="none" 
+                                    stroke="currentColor" 
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+
+                            {/* Custom Dropdown Menu */}
+                            {showCategoryDropdown && (
+                                <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-30 max-h-60 overflow-y-auto"> 
+                                    
+                                    {/* Show category options only if categories exist */}
+                                    {categories.length > 0 && (
+                                        <>
+                                            {categories.map((category) => (
+                                                <button
+                                                    key={category.id}
+                                                    type="button"
+                                                    onClick={() => {
+                                                        console.log('Category selected:', category);
+                                                        // Update form data
+                                                        setFormData(prev => ({ ...prev, category: {name: category.name, id : category.id} }));
+                                                        
+                                                        // Clear error immediately (same as handleInputChange does)
+                                                        if (hasSubmitted && errors.category) {
+                                                            setErrors(prev => ({ ...prev, category: '' }));
+                                                        }
+                                                        
+                                                        // Close dropdown
+                                                        setShowCategoryDropdown(false);
+                                                    }}
+                                                    className="w-full text-left px-3 py-2 hover:bg-red-50 text-black font-light last:border-b-0"
+                                                    style={{ fontSize: '16px', fontWeight: 300 }}
+                                                >
+                                                    {category.name} 
+                                                </button>
+                                            ))}
+                                            
+                                            {/* Separator line only if there are categories */}
+                                            <div className="border-t border-gray-100"></div>
+                                        </>
+                                    )}
+                                    
+                                    {/* Show empty state message if no categories */}
+                                    {categories.length === 0 && (
+                                        <div className="px-3 py-2 text-gray-400 text-sm font-light italic">
+                                            No categories yet. Create your first one below.
+                                        </div>
+                                    )}
+                                    
+                                    {/* Add Category Section - Always show this */}
+                                    <div>
+                                        {!showAddCategory ? (
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowAddCategory(true)}
+                                                className="w-full text-left px-3 py-2 hover:bg-red-50 transition-colors duration-150 text-red-500 font-light flex items-center space-x-2"
+                                                style={{ fontSize: '16px', fontWeight: 300 }}
+                                            >
+                                                <span className="text-lg font-semibold">+</span>
+                                                <span>add new category</span>
+                                            </button>
+                                        ) : (
+                                            <div className="p-3 space-y-2">
+                                                <input
+                                                    type="text"
+                                                    value={newCategoryName}
+                                                    onChange={(e) => setNewCategoryName(e.target.value)}
+                                                    placeholder="enter category name"
+                                                    className="w-full p-2 rounded-lg border border-gray-300 bg-transparent text-black font-light placeholder-gray-300 focus:outline-none focus:border-red-500"
+                                                    style={{ fontSize: '15px', fontWeight: 300 }}
+                                                    onKeyPress={(e) => {
+                                                        if (e.key === 'Enter') {
+                                                            addCategory();
+                                                        }
+                                                    }}
+                                                    autoFocus
+                                                />
+                                                <div className="flex space-x-2">
+                                                    <button
+                                                        type="button"
+                                                        onClick={addCategory}
+                                                        disabled={isAddingCategory || !newCategoryName.trim()}
+                                                        className="flex-1 px-3 py-1.5 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:bg-red-300 disabled:cursor-not-allowed text-sm font-light"
+                                                    >
+                                                        {isAddingCategory ? 'adding...' : 'add'}
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            setShowAddCategory(false);
+                                                            setNewCategoryName('');
+                                                        }}
+                                                        disabled={isAddingCategory}
+                                                        className="flex-1 px-3 py-1.5 border border-gray-300 text-gray-600 rounded-lg hover:bg-gray-50 disabled:bg-gray-100 disabled:cursor-not-allowed transition-colors duration-150 text-sm font-light"
+                                                    >
+                                                        cancel
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Click outside to close dropdown */}
+                            {showCategoryDropdown && (
+                                <div 
+                                    className="fixed inset-0 z-20" 
+                                    onClick={() => {
+                                        setShowCategoryDropdown(false);
+                                        setShowAddCategory(false);
+                                        setNewCategoryName('');
+                                    }}
+                                />
+                            )}
+
+                            {hasSubmitted && errors.category && (
+                                <p className="absolute top-full right-1 font-light text-sm text-red-600 z-20">{errors.category}</p>
                             )}
                         </div>
-                    </div>
-                </div>
 
-                {/* Optional Toggle */}
-                <div className="space-y-4 mb-8">
-                    {/* Birthdate Toggle and Field */}
-                    <div className="space-y-2">
                         <div className="relative">
                             {!showBirthdate ? (
                                 <button
                                     type="button"
                                     onClick={() => setShowBirthdate(true)}
-                                    className="flex items-center space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-light"
+                                    className="ml-1.5 flex items-center -mt-2 space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-light"
                                     disabled={isLoading}
                                 >
                                     <span className="text-lg font-semibold">+</span>
-                                    <span className="text-base text-black hover:text-red-500">date of birth</span>
+                                    <span className="text-base text-black hover:text-red-500">birthdate</span>
                                 </button>
                             ) : (
                                 <div>
                                     <div className="flex items-center justify-between">
-                                        <label htmlFor="birthdate" className="block relative top-3 left-4 bg-white px-1 text-sans text-black font-light">
-                                            date of birth
-                                        </label>
-                                        <span className="relative right-1 font-light">
+                                        <p className="relative -mt-2 left-2 mb-3 text-sans font-light text-red-500 font-md">
+                                            birthdate
+                                        </p>
+                                        <span className="relative -mt-4 right-1 font-light">
                                             <button
                                                 type="button"
                                                 onClick={() => {
                                                     setShowBirthdate(false);
                                                     setFormData(prev => ({ ...prev, birthdate: '' }));
                                                 }}
-                                                className="text-red-500 hover:text-red-700 transition-colors duration-200 text-sm"
+                                                className="text-red-500 hover:text-red-700 text-sm"
                                                 disabled={isLoading}
                                             >
                                                 remove
@@ -705,7 +645,7 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                                         onChange={handleInputChange}
                                         placeholder="18.04.1995"
                                         disabled={isLoading}
-                                        className={`w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
+                                        className={`w-full -mt-3 rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
                                         style={{
                                             fontSize: '16px',
                                             fontWeight: 300
@@ -717,23 +657,83 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                                 </div>
                             )}
                         </div>
+                    </div>
+                    
 
-                        {/* Address Toggle and Fields */}
+                    {/* How to contact */}
+                    <div className="space-y-2">
+                        <p className="relative tracking-wide -mb-2 text-red-500 left-2 font-light">how to contact?</p>
+                            {/* email Field */}
+                            <div className="relative mb-4">
+                                <label htmlFor="email" className="relative left-4 bg-white px-1 text-base text-black font-light">
+                                    email
+                                </label>
+                                <input 
+                                    type="email" 
+                                    name="email" 
+                                    id="email" 
+                                    value={formData.email}
+                                    onChange={handleInputChange}
+                                    placeholder="your@email.com"
+                                    disabled={isLoading}
+                                    className={`w-full rounded-xl border -mt-3 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
+                                        hasSubmitted && errors.email ? 'border-red-500 shadow-md' : 'border-gray-400 dark:border-gray-400'
+                                    }`}
+                                    style={{
+                                        fontSize: '16px',
+                                        fontWeight: 300
+                                    }}
+                                />
+                                {hasSubmitted && errors.email && (
+                                    <p className="absolute top-full right-1 text-sm font-light text-red-600 z-20">{errors.email}</p>
+                                )}
+                            </div>
+                            
+                    
+                        <div>
+                            {/* phone Field */}
+                            <div className="relative mb-5">
+                                <label htmlFor="phone" className="relative left-4 bg-white px-1 text-base text-black font-light">
+                                    phone
+                                </label>
+                                <input 
+                                    type="tel" 
+                                    name="phone" 
+                                    id="phone" 
+                                    value={formData.phone}
+                                    onChange={handleInputChange}
+                                    placeholder="+49 1781234567"
+                                    disabled={isLoading}
+                                    className={`w-full rounded-xl border -mt-3 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
+                                        hasSubmitted && errors.phone ? 'border-red-500 shadow-md' : 'border-gray-400 dark:border-gray-400'
+                                    }`}
+                                    style={{
+                                        fontSize: '16px',
+                                        fontWeight: 300
+                                    }}
+                                />
+                                {hasSubmitted && errors.phone && (
+                                    <p className="absolute top-full right-1 font-light text-sm text-red-600 z-20">{errors.phone}</p>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Optional Address Toggle */}
                         <div className="relative">
                             {!showAddress ? (
                                 <button
                                     type="button"
                                     onClick={() => setShowAddress(true)}
-                                    className="flex items-center space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-light"
+                                    className="flex items-center ml-1.5 -mt-2 space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-light"
                                     disabled={isLoading}
                                 >
                                     <span className="text-lg font-semibold">+</span>
                                     <span className="text-base text-black hover:text-red-500">add address</span>
                                 </button>
                             ) : (
-                                <div className="space-y-1 mt-7">
+                                <div className="mt-4">
                                     <div className="flex items-center justify-between">
-                                        <span className="relative left-2 mb-2 text-sans text-base text-black font-md">
+                                        <span className="relative left-2 -mt-2 mb-4 text-sans font-light text-red-500 font-md">
                                             address information
                                         </span>
                                         <button
@@ -748,7 +748,7 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                                                     country: '' 
                                                 }));
                                             }}
-                                            className="relative right-1 text-red-500 hover:text-red-700 transition-colors duration-200 text-sm font-light"
+                                            className="relative -mb-3 right-1 text-red-500 hover:text-red-700 transition-colors duration-200 text-sm font-light"
                                             disabled={isLoading}
                                         >
                                             remove
@@ -768,7 +768,7 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                                             onChange={handleInputChange}
                                             placeholder="greifwalder Str. 8"
                                             disabled={isLoading}
-                                            className={`w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
+                                            className={`w-full rounded-xl border -mb-1 border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
                                             style={{
                                                 fontSize: '18px',
                                                 fontWeight: 300
@@ -793,7 +793,7 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                                                 onChange={handleInputChange}
                                                 placeholder="10407"
                                                 disabled={isLoading}
-                                                className={`w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
+                                                className={`w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
                                                 style={{
                                                     fontSize: '16px',
                                                     fontWeight: 300
@@ -816,7 +816,7 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                                                 onChange={handleInputChange}
                                                 placeholder="berlin"
                                                 disabled={isLoading}
-                                                className={`w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[150px] h-[48px] focus:outline-none focus:border-red-500`}
+                                                className={`w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[150px] h-[48px] focus:outline-none focus:border-red-500`}
                                                 style={{
                                                     fontSize: '16px',
                                                     fontWeight: 300
@@ -841,7 +841,7 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                                             onChange={handleInputChange}
                                             placeholder="germany"
                                             disabled={isLoading}
-                                            className={`w-full rounded-xl mb-5 border border-gray-400 dark:border-gray-400 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
+                                            className={`w-full rounded-xl mb-5 border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
                                             style={{
                                                 fontSize: '16px',
                                                 fontWeight: 300
@@ -855,16 +855,132 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                             )}
                         </div>
                     </div>
-                </div>
 
-                {/* Notes */}
-                <div className="space-y-3.5 mb-8">   
-                    {/* Notes Field */}
-                    <div className="relative">
-                        <p className="relative text-red-500 left-2 -mb-3 mt-5 font-light">notes?</p>
-                        <div className="flex items-center justify-between">
-                            <label htmlFor="notes" className="relative top-3 bg-white px-1 left-4 text-sans text-base text-black font-light">
-                                any important things to remember?
+
+                    {/* NEED TO CONTACT / CONTACTED BUTTONS */}
+                    <div className="space-y-4">
+                        <p className="font-text text-base font-light tracking-wide text-red-500 ml-1">contact history</p>
+                        <div className="space-y-1">
+                            
+                            {/* isToContact Checkbox */}
+                            <div className="flex items-center w-full relative -mt-2 rounded-lg">
+                                <button
+                                    type="button"
+                                    onClick={() => setFormData(prev => ({ ...prev, isToContact: !prev.isToContact }))}
+                                    className="flex items-center space-x-2 hover:text-red-500"
+                                    disabled={isLoading}
+                                >
+                                    {formData.isToContact ? (
+                                        <>
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="red" class="size-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                            </svg>
+                                            <span className="text-base font-light text-black cursor-pointer">
+                                                need to contact
+                                            </span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor" class="size-6">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                            </svg>
+                                            <span className="text-base font-light text-black cursor-pointer">
+                                                don't need to contact
+                                            </span>
+                                        </>
+                                    )}
+                                </button>
+                            </div>
+
+                            {/* isContacted Checkbox */}
+                            <div className="flex items-center w-full relative rounded-lg">
+                                <button
+                                    type="button"
+                                    onClick={() => setFormData(prev => ({ ...prev, isContacted: !prev.isContacted }))}
+                                    className="flex items-center space-x-2 hover:text-red-500"
+                                    disabled={isLoading}
+                                >
+                                    {formData.isContacted ? (
+                                        <>
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="red" class="size-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                            </svg>
+                                            
+                                            <span className="text-base font-light text-black cursor-pointer">
+                                                contacted
+                                            </span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="black" class="size-6">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                            </svg>
+                                            <span className="text-base font-light text-black cursor-pointer">
+                                                contacted
+                                            </span>
+                                        </>
+                                    )}
+                                </button>
+                            </div>
+                        </div>
+                        <div className="">
+                            {/* Contact History Fields */}
+                            <div className="relative -mt-3">
+                                <label htmlFor="lastContactDate" className="relative top-3 left-4 bg-white px-1 text-sans text-base text-black font-light">
+                                    last contact (date & place)
+                                </label>
+                                <input 
+                                    type="text" 
+                                    name="lastContactDate" 
+                                    id="lastContactDate" 
+                                    value={formData.lastContactDate}
+                                    onChange={handleInputChange}
+                                    placeholder="am 19.05.2025 in Berlin"
+                                    disabled={isLoading}
+                                    className={`w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
+                                    style={{
+                                        fontSize: '16px',
+                                        fontWeight: 300
+                                    }}
+                                />
+                                {hasSubmitted && errors.lastContactDate && (
+                                    <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.lastContactDate}</p>
+                                )}
+                            </div>
+
+                            {/* Next Contact Field */}
+                            <div className="relative -mt-1">
+                                <label htmlFor="nextContactDate" className="relative top-3 left-4 bg-white px-1 text-sans text-base text-black font-light">
+                                    next planned contact (date & place)
+                                </label>
+                                <input 
+                                    type="text" 
+                                    name="nextContactDate" 
+                                    id="nextContactDate" 
+                                    value={formData.nextContactDate}
+                                    onChange={handleInputChange}
+                                    placeholder="coffe shop, berlin ..."
+                                    disabled={isLoading}
+                                    className={`w-full mb-5 rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
+                                    style={{
+                                        fontSize: '16px',
+                                        fontWeight: 300
+                                    }}
+                                />
+                                {hasSubmitted && errors.nextContactDate && (
+                                    <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.nextContactDate}</p>
+                                )}
+                            </div>    
+                        </div>
+                    </div>
+                
+                    {/* Notes */}
+                    <div className="relative">   
+                        {/* Notes Field */}
+                        <p className="relative tracking-wide text-red-500 -mt-2 left-2 mb-2 font-light">additional information</p>
+                        <div className="flex items-center justify-between -mt-1">
+                            <label htmlFor="notes" className="relative bg-white px-1 left-4 text-sans text-base text-black font-light">
+                                important notes
                             </label>
                         </div>
                         <textarea 
@@ -875,7 +991,7 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                             placeholder="every thought matters.."
                             disabled={isLoading}
                             rows={expandedNotes ? 6 : 3}
-                            className={`w-full rounded-xl mb-5 pt-4 border border-gray-400 dark:border-gray-400 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
+                            className={`w-full rounded-xl -mt-3 pt-4 border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
                             style={{
                                 fontSize: '16px',
                                 fontWeight: 300,
@@ -886,180 +1002,90 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                             <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.notes}</p>
                         )}
                     </div>
-                </div>
 
 
-                {/* Optional Toggle Field */}
-                <div className="space-y-2 mb-8 -mt-5">
-                    {/* Contact Details Toggle and Fields */}
-                    <div className="relative">
-                        {!showContactDetails ? (
+                    {/* Optional Links */}
+                    <div className="relative space-y-3">
+                        {/* Links Toggle and Fields */}
+                        {!showLinks ? (
                             <button
                                 type="button"
-                                onClick={() => setShowContactDetails(true)}
-                                className="flex items-center space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-light"
+                                onClick={() => setShowLinks(true)}
+                                className="flex items-center ml-1.5 -mt-5 space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-light"
                                 disabled={isLoading}
                             >
                                 <span className="text-lg font-semibold">+</span>
-                                <span className="text-base text-black hover:text-red-500">when and where did/will you meet? </span>
+                                <span className="text-base text-black hover:text-red-500">add weblinks</span>
                             </button>
                         ) : (
                             <div className="space-y-2">
-                                <div className="flex items-center justify-between -mb-4">
-                                    <span className="relative left-2 text-sans text-red-500 font-light">don't forget the ...</span>
+                                <div className="flex items-center -mt-3 -mb-2 justify-between">
+                                    <span className="relative left-2 text-sans font-light text-red-500 font-md">
+                                        websites & links
+                                    </span>
                                     <button
                                         type="button"
                                         onClick={() => {
-                                            setShowContactDetails(false);
-                                            setFormData(prev => ({ 
-                                                ...prev, 
-                                                lastContactDate: '', 
-                                                nextContactDate: '' 
-                                            }));
-                                        }}
-                                        className="relative right-1 font-light text-red-500 hover:text-red-700 transition-colors duration-200 text-sm"
+                                        setShowLinks(false);
+                                        setLinks([{ title: '', url: '' }]);
+                                    }}
+                                        className="text-red-500 -mb-1 mr-2 font-light hover:text-red-700 text-sm"
                                         disabled={isLoading}
                                     >
                                         remove
                                     </button>
                                 </div>
-                                    
-                                {/* Last Contact Date Field */}
-                                <div className="relative">
-                                    <label htmlFor="lastContactDate" className="relative top-3 left-4 bg-white px-1 text-sans text-base text-black font-light">
-                                        last contact (date & place)
-                                    </label>
-                                    <input 
-                                        type="text" 
-                                        name="lastContactDate" 
-                                        id="lastContactDate" 
-                                        value={formData.lastContactDate}
-                                        onChange={handleInputChange}
-                                        placeholder="am 19.05.2025 in Berlin"
-                                        disabled={isLoading}
-                                        className={`w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
-                                        style={{
-                                            fontSize: '16px',
-                                            fontWeight: 300
-                                        }}
-                                    />
-                                    {hasSubmitted && errors.lastContactDate && (
-                                        <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.lastContactDate}</p>
-                                    )}
-                                </div>
-
-                                {/* Meeting Place Field */}
-                                <div className="relative">
-                                    <label htmlFor="nextContactDate" className="relative top-3 left-4 bg-white px-1 text-sans text-base text-black font-light">
-                                        next planned contact (date & place)
-                                    </label>
-                                    <input 
-                                        type="text" 
-                                        name="nextContactDate" 
-                                        id="nextContactDate" 
-                                        value={formData.nextContactDate}
-                                        onChange={handleInputChange}
-                                        placeholder="coffe shop, berlin ..."
-                                        disabled={isLoading}
-                                        className={`w-full mb-5 rounded-xl border border-gray-400 dark:border-gray-400 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
-                                        style={{
-                                            fontSize: '16px',
-                                            fontWeight: 300
-                                        }}
-                                    />
-                                    {hasSubmitted && errors.nextContactDate && (
-                                        <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.nextContactDate}</p>
-                                    )}
-                                </div>
-                            </div>
-                        )}
-                    </div>
-
-
-                    {/* Optional Links */}
-                    <div className="space-y-3">
-                        {/* Links Toggle and Fields */}
-                        <div className="relative">
-                            {!showLinks ? (
+                                
+                                {links.map((link, index) => (
+                                    <div key={index} className="relative flex items-center space-x-2">
+                                        <input 
+                                            type="text" 
+                                            value={link.title}
+                                            onChange={(e) => handleLinkChange(index, 'title', e.target.value)}
+                                            placeholder="website"
+                                            disabled={isLoading}
+                                            className="flex relative p-2.5 w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 min-w-[100px] max-w-[120px] h-[48px] focus:outline-none focus:border-red-500"
+                                            style={{
+                                                fontSize: '16px',
+                                                fontWeight: 300
+                                            }}
+                                        />
+                                        <input 
+                                            type="url" 
+                                            value={link.url}
+                                            onChange={(e) => handleLinkChange(index, 'url', e.target.value)}
+                                            placeholder="https://example.com"
+                                            disabled={isLoading}
+                                            className="flex p-2.5 w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500"
+                                            style={{
+                                                fontSize: '16px',
+                                                fontWeight: 300
+                                            }}
+                                        />
+                                        {links.length > 1 && (
+                                            <button
+                                                type="button"
+                                                onClick={() => removeLink(index)}
+                                                className="text-red-500 hover:text-red-700 transition-colors duration-200 p-1"
+                                                disabled={isLoading}
+                                            >
+                                                ×
+                                            </button>
+                                        )}
+                                    </div>
+                                ))}
+                                
                                 <button
                                     type="button"
-                                    onClick={() => setShowLinks(true)}
-                                    className="flex items-center space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-light"
+                                    onClick={addLink}
+                                    className="flex ml-1.5 items-center space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-light text-sm"
                                     disabled={isLoading}
                                 >
-                                    <span className="text-lg font-semibold">+</span>
-                                    <span className="text-base text-black hover:text-red-500">add weblinks</span>
+                                    <span className="mt-1 text-base">+</span>
+                                    <span className="mt-1 text-black hover:text-red-500">add another link</span>
                                 </button>
-                            ) : (
-                                <div className="space-y-2">
-                                    <div className="flex items-center justify-between mb-2">
-                                        <span className="relative left-2 text-sans text-base text-black font-light">
-                                            websites & links
-                                        </span>
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                            setShowLinks(false);
-                                            setLinks([{ title: '', url: '' }]);
-                                        }}
-                                            className="text-red-500 hover:text-red-700 transition-colors duration-200 text-sm"
-                                            disabled={isLoading}
-                                        >
-                                            remove
-                                        </button>
-                                    </div>
-                                    
-                                    {links.map((link, index) => (
-                                        <div key={index} className="relative flex items-center space-x-2">
-                                            <input 
-                                                type="text" 
-                                                value={link.title}
-                                                onChange={(e) => handleLinkChange(index, 'title', e.target.value)}
-                                                placeholder="website"
-                                                disabled={isLoading}
-                                                className="flex relative p-2.5 w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 min-w-[100px] max-w-[120px] h-[48px] focus:outline-none focus:border-red-500"
-                                                style={{
-                                                    fontSize: '16px',
-                                                    fontWeight: 300
-                                                }}
-                                            />
-                                            <input 
-                                                type="url" 
-                                                value={link.url}
-                                                onChange={(e) => handleLinkChange(index, 'url', e.target.value)}
-                                                placeholder="https://example.com"
-                                                disabled={isLoading}
-                                                className="flex p-2.5 w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white shadow-md hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500"
-                                                style={{
-                                                    fontSize: '16px',
-                                                    fontWeight: 300
-                                                }}
-                                            />
-                                            {links.length > 1 && (
-                                                <button
-                                                    type="button"
-                                                    onClick={() => removeLink(index)}
-                                                    className="text-red-500 hover:text-red-700 transition-colors duration-200 p-1"
-                                                    disabled={isLoading}
-                                                >
-                                                    ×
-                                                </button>
-                                            )}
-                                        </div>
-                                    ))}
-                                    
-                                    <button
-                                        type="button"
-                                        onClick={addLink}
-                                        className="flex items-center space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-light text-sm"
-                                        disabled={isLoading}
-                                    >
-                                        <span className="text-base">+</span>
-                                        <span className="text-black hover:text-red-500">add another link</span>
-                                    </button>
-                                </div>
-                            )}
-                        </div>
+                            </div>
+                        )}
                     </div> 
                 </div> 
 
@@ -1081,7 +1107,7 @@ const NewContactForm = ({onSubmit, onCancel }) => {
             </div>
 
             {/* Back Links */}
-            <div className="w-full px-8 pt-1 space-y-0.25 max-w-[480px]">
+            <div className="w-full px-8 mt-2 space-y-0.25 max-w-[480px]">
                 <div className="text-black dark:text-white font-light block relative"
                     style={{ fontSize: '16px' }}>
                 want to go {' '}
@@ -1092,7 +1118,7 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                 to contacts?
                 </button>
                 </div>
-                <div className="text-black dark:text-white font-light block -mt-2 relative"
+                <div className="text-black dark:text-white font-light block -mt-1 relative"
                     style={{ fontSize: '16px' }}>
                 or go {' '}
                 <button 

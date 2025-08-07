@@ -204,8 +204,18 @@ export default function AllContacts() {
   // error handling if no contacts found
   if (!allContacts || allContacts.length === 0) {
     return (
-      <div className="container py-20">
-        <h1 className="w-full flex flex-col items-center justify-center text-3xl font-heading font-bold text-gray-900 dark:text-white mb-10">
+      <div className=" py-20 w-full flex flex-col items-center justify-center">
+
+        <Button 
+          onClick={() => navigate('/myspace/')}
+          className="text-black dark:text-white hover:text-red-500 mb-5 -mt-7"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-5">
+            <path fillRule="evenodd" d="M17 10a.75.75 0 0 1-.75.75H5.612l4.158 3.96a.75.75 0 1 1-1.04 1.08l-5.5-5.25a.75.75 0 0 1 0-1.08l5.5-5.25a.75.75 0 1 1 1.04 1.08L5.612 9.25H16.25A.75.75 0 0 1 17 10Z" clipRule="evenodd" />
+          </svg>
+        </Button>
+
+        <h1 className=" text-3xl font-heading font-bold text-gray-900 dark:text-white mb-10">
           All Contacts
         </h1>
         <div className="font-text text-red-500 tracking-wider text-center dark:white">
