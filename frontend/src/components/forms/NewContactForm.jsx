@@ -288,7 +288,7 @@ const NewContactForm = ({onSubmit, onCancel }) => {
 
             // Prepare data for API call in HelperFunction
             const contactData = FormDataToApiData(formData, categories, links);
-                console.log('Submitting contact data:', contactData);
+                console.log('Submitted contact data:', contactData);
 
             // Call API to create contact
             const NewContactData = await createContact(accessToken, contactData);
@@ -302,10 +302,10 @@ const NewContactForm = ({onSubmit, onCancel }) => {
             resetForm();
 
             // navigate to the new contact page
-            if (NewContactData && NewContactData?.contact.id) {
-                navigate(`/myspace/contacts/${NewContactData?.contact.id}`, { replace: true });
+            if (NewContactData && NewContactData?.id) {
+                navigate(`/myspace/contacts/${NewContactData?.id}`, { replace: true });
             } else {
-                console.error('New contact data is missing ID:', NewContactData?.contact.id);
+                console.error('New contact data is missing ID:', NewContactData?.id);
                 navigate("/myspace/contacts", { replace: true });
             }
 
@@ -543,7 +543,7 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                         <p className="relative tracking-wide -mb-2 text-red-500 left-2 font-light">how to contact?</p>
                             {/* email Field */}
                             <div className="relative mb-4">
-                                <label htmlFor="email" className="relative left-4 bg-white px-1 text-base text-black font-light">
+                                <label htmlFor="email" className="relative left-4 bg-white px-1 text-normal text-black font-light">
                                     email
                                 </label>
                                 <input 
@@ -751,7 +751,7 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                                     {formData.isToContact ? (
                                         <>
                                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="red" className="size-6">
-                                            <path strokeLinecap="round" stroLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                                             </svg>
                                             <span className="text-base font-light text-black cursor-pointer">
                                                 need to contact

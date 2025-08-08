@@ -4,6 +4,7 @@ from app import db
 from app.models.contact import Contact
 from app.models.category import Category
 from app.models.contact_links import ContactLinks
+from app.models.contact_category import ContactCategory
 import re
 from datetime import datetime
 import logging
@@ -92,21 +93,19 @@ def create_contact():
             except ValueError as e:
                 return jsonify({'error': 'Invalid birth date format. Use DD.MM.YYYY (e.g., 21.05.2000)'}), 400
 
-        # Validate category if provided
-        category_id = data.get('category_id')
-        if category_id:
-            logger.debug(f"Validating category_id: {category_id}")
-            category = Category.query.filter_by(
-                id=category_id, 
-                creator_id=creator_id
-            ).first()
-            if not category:
-                logger.warning(f"Invalid category_id {category_id} for user {creator_id}")
-                return jsonify({
-                    'success': False,
-                    'message': 'Invalid category'
-                }), 400
-            logger.debug(f"Category validation successful: {category.name}")
+        categories = data.get('categories', [])
+        for category_data in categories:
+            category_id = category_data.get('id')
+            if category_id:
+                category = Category.query.filter_by(
+                    id=category_id,
+                    creator_id=creator_id
+                ).first()
+                if not category:
+                    return jsonify({
+                        'success': False,
+                        'message': f'Invalid category with ID {category_id}'
+                    }), 400
 
 
         # Create new contact with updated field names
@@ -132,6 +131,24 @@ def create_contact():
         
         db.session.add(contact)
         db.session.flush()
+
+        # Handle categories after contact is created
+        categories = data.get('categories', [])
+        for category_data in categories:
+            category_id = category_data.get('id')
+            if category_id:
+                # Verify category belongs to user
+                category = Category.query.filter_by(
+                    id=category_id,
+                    creator_id=creator_id
+                ).first()
+
+                if category:
+                    contact_category = ContactCategory(
+                        contact_id=contact.id,
+                        category_id=category_id
+                    )
+                    db.session.add(contact_category)
 
         # Handle links if provided
         links = data.get('links', [])
@@ -160,25 +177,8 @@ def create_contact():
                         title=link_title  # Make sure your ContactLinks model has this field
                     )
                     db.session.add(contact_link)
-        # Handle categories after contact is created
-        categories = data.get('categories', [])
-        for category_data in categories:
-            category_id = category_data.get('id')
-            if category_id:
-                # Verify category belongs to user
-                category = Category.query.filter_by(
-                    id=category_id,
-                    creator_id=creator_id
-                ).first()
 
-                if category:
-                    contact_category = ContactCategory(
-                        contact_id=contact.id,
-                        category_id=category_id
-                    )
-                    db.session.add(contact_category)
 
-    
         db.session.commit()
         logger.info(f"Contact created successfully: {contact.first_name} {contact.last_name or ''} (ID: {contact.id})")
 

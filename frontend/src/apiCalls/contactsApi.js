@@ -4,17 +4,18 @@ const API_BASE_URL = 'http://127.0.0.1:5000';
 
 // Helper function for API requests
 const apiRequest = async (url, options = {}) => {
+
     try {
         const response = await fetch(url, {
             headers: {
                 'Content-Type': 'application/json',
                 ...options.headers,
             },
-            ...options,
+            ...options, 
         });
 
         if (!response.ok) {
-            // Try to get JSON error first, fallback to text
+      
             let errorMessage;
             try {
                 const errorData = await response.json();
@@ -25,8 +26,8 @@ const apiRequest = async (url, options = {}) => {
             throw new Error(`API Error ${response.status}: ${errorMessage}`);
         }
         
-        const data = await response.json(); // Fixed: added 'const'
-        console.log("In API FILE: Response returned from helper function:", data); // Fixed: removed extra 'Console'
+        const data = await response.json();
+        // console.log("In API FILE: Response returned from helper function:", data);
         return data;
 
     } catch (error) {
@@ -41,33 +42,32 @@ const apiRequest = async (url, options = {}) => {
 export const createContact = async (accessToken, contactData) => {
     console.log('Creating contact with data:', contactData);
     
-    const response = await apiRequest(`${API_BASE_URL}/contacts`, {
+    const response = await fetch(`${API_BASE_URL}/contacts`, {
         method: 'POST',
         headers: {
+            'Content-Type': 'application/json',
             'Authorization': `Bearer ${accessToken}`,
         },
         body: JSON.stringify(contactData),
     });
 
-    // If contact was created successfully, add categories
-    if (response.success && response.contact && contactData.category_ids?.length > 0) {
-        const contactId = response.contact.id;
-        
+    // Handle response errors first
+    if (!response.ok) {
+        let errorMessage;
         try {
-            // Add categories to the contact
-            await addCategoriesToContact(accessToken, contactId, contactData.category_ids);
-            
-            // Fetch the updated contact with categories
-            const updatedContact = await getContactById(accessToken, contactId);
-            return updatedContact;
-        } catch (categoryError) {
-            console.error('Failed to add categories to contact:', categoryError);
-            // Return the contact even if category assignment failed
-            return response;
+            const errorData = await response.json();
+            errorMessage = errorData.message || errorData.error || `HTTP ${response.status}`;
+        } catch {
+            errorMessage = await response.text() || `HTTP ${response.status}`;
         }
+        throw new Error(`API Error ${response.status}: ${errorMessage}`);
     }
-    
-    return response;
+
+    // Parse the successful response
+    const data = await response.json();
+    console.log("In API CALL: data response:", data)
+    console.log("In API CALL only contactData:", data.contact)
+    return data.contact;
 };
 
 
@@ -79,6 +79,7 @@ export const updateContact = async (accessToken, contactId, contactData) => {
     const response = await apiRequest(`${API_BASE_URL}/contacts/${contactId}`, {
         method: 'PUT',
         headers: {
+            'Content-Type': 'application/json',
             'Authorization': `Bearer ${accessToken}`,
         },
         body: JSON.stringify(contactData),
@@ -114,7 +115,7 @@ export const addCategoriesToContact = async (accessToken, contactId, categoryIds
 
 // DELETE a category from a contact
 export const removeCategoryFromContact = async (accessToken, contactId, categoryId) => {
-    return await apiRequest(`${API_BASE_URL}/contact-categories/contacts/${contactId}/categories/${categoryId}`, {
+    return await apiRequest(`${API_BASE_URL}/contact_categories/contacts/${contactId}/categories/${categoryId}`, {
         method: 'DELETE',
         headers: {
             'Authorization': `Bearer ${accessToken}`,
@@ -125,7 +126,7 @@ export const removeCategoryFromContact = async (accessToken, contactId, category
 
 // UPDATE all categories for a contact (replace existing)
 export const updateContactCategories = async (accessToken, contactId, categoryIds) => {
-    return await apiRequest(`${API_BASE_URL}/contact-categories/contacts/${contactId}/categories`, {
+    return await apiRequest(`${API_BASE_URL}/contact_categories/contacts/${contactId}/categories`, {
         method: 'PUT',
         headers: {
             'Authorization': `Bearer ${accessToken}`,
@@ -136,7 +137,7 @@ export const updateContactCategories = async (accessToken, contactId, categoryId
 
 // READ all categories for a contact
 export const getContactCategories = async (accessToken, contactId) => {
-    return await apiRequest(`${API_BASE_URL}/contact-categories/contacts/${contactId}/categories`, {
+    return await apiRequest(`${API_BASE_URL}/contact_categories/contacts/${contactId}/categories`, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${accessToken}`,
@@ -146,7 +147,7 @@ export const getContactCategories = async (accessToken, contactId) => {
 
 // READ all contacts in a category
 export const getContactsInCategory = async (accessToken, categoryId) => {
-    return await apiRequest(`${API_BASE_URL}/contact-categories/categories/${categoryId}/contacts`, {
+    return await apiRequest(`${API_BASE_URL}/contact_categories/categories/${categoryId}/contacts`, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${accessToken}`,
@@ -157,12 +158,14 @@ export const getContactsInCategory = async (accessToken, categoryId) => {
 
 // GET contact By ID
 export const getContactById = async (accessToken, contactId) => {
-    return await apiRequest(`${API_BASE_URL}/contacts/${contactId}`, {
+    const data = await apiRequest(`${API_BASE_URL}/contacts/${contactId}`, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${accessToken}`,
         },
     });
+    const contactData = data.contact
+    return contactData
 };
 
 

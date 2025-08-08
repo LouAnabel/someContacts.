@@ -28,7 +28,7 @@ const ApiDataToFormData = (apiResponse) => {
         id: contact.id || '',
         firstName: contact.first_name || '',
         lastName: contact.last_name || '',
-        category: categoriesForForm, 
+        categories: categoriesForForm, 
         email: contact.email || '',
         phone: contact.phone || '',
         isFavorite: contact.is_favorite || false,
