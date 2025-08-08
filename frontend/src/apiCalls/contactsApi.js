@@ -156,12 +156,15 @@ export const getContactById = async (accessToken, contactId) => {
 
 // GET All Contacts
 export const getContacts = async (accessToken) => {
-    return await apiRequest(`${API_BASE_URL}/contacts`, {
+    console.log("In API FILE: fetch all contacts")
+    data = await apiRequest(`${API_BASE_URL}/contacts`, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${accessToken}`,
         },
     });
+    console.log("In API FILE: contacts data:", data)
+    return data
 };
 
 

@@ -47,8 +47,7 @@ export async function authMe(token) {
             throw new Error(`Error: ${response.status} ${response.statusText}`);
         }
         const userData = await response.json();
-        console.log("In AUTH FILE: fetched data:", userData);
-        console.log("In AUTH FILE: send only userData:", userData.user)
+        console.log("In AUTH FILE: fetching and sending userData");
         return userData.user || {};
     }   
 

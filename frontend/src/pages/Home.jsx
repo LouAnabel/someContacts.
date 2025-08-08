@@ -50,12 +50,11 @@ function Home() {
           getContacts(accessToken).catch(() => [])
         ]);
         
-        console.log("Data successfully fetched!")
-        const firstName = userData?.first_name || 'Friend';
-        setUserName(firstName);
+        console.log("Data successfully fetched!", userData, contactsData)
+        const firstName = userData?.first_name || 'friend';
+        setUserName(firstName.toLowerCase());
 
         //set Contacts
-        console.log("data:", contactsData)
         setContacts(contactsData || []);
 
       } catch (error) {
@@ -81,9 +80,10 @@ function Home() {
   };
 
   const contactsCount = contacts.length
-  const favoriteContacts = contacts.filter(contact => contact.is_favorite)
-  console.log("favorite contacts:", favoriteContacts)
-
+  const favoriteContacts = Array.isArray(contacts) 
+  ? contacts.filter(contact => contact.is_favorite) 
+  : [];
+  
 
   return (
     <div className="container mx-auto px-8 py-28 ">

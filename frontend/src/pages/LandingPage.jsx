@@ -29,7 +29,7 @@ function LandingPage() {
         <CircleButton 
             size="xl"
             variant="dark"
-            className="border border-white/30 bg-red-500 hover:bg-red-600 dark:border-red-500"
+            className="border border-white/30 font-semibold bg-red-500 hover:bg-red-600 dark:border-red-500"
             style={{ 
                         marginTop: '3rem', 
                         display: 'block' 

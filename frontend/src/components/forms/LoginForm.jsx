@@ -106,8 +106,8 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
         
         if (!formData.password) {
             newErrors.password = 'Password is required';
-        } else if (formData.password.length < 8) {
-            newErrors.password = 'Password must be at least 8 characters';
+        } else if (formData.password.length < 6) {
+            newErrors.password = 'Password must be at least 6 characters';
         } else if (!/[A-Z]/.test(formData.password)) {
             newErrors.password = 'Password must contain an uppercase letter';
         } else if (!/[a-z]/.test(formData.password)) {
@@ -142,117 +142,119 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
     const showLoading = isLoading || apiLoading;
 
     return (
-        <div className="min-h-screen bg-white dark:bg-black absolute top-[180px]" 
+        <div className="justify-items items-center bg-white dark:bg-black p-5 absolute top-[120px]" 
              style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
 
-            {/* Main Login Card */}
-            <div className="bg-white rounded-3xl p-5 pt-6 relative z-10 overflow-visible w-[88vw] min-w-[260px] max-w-[480px] h-[295px] left-1/2 transform -translate-x-1/2"
+            {/* Main Register Card */}
+            <div className="bg-white rounded-3xl p-5 relative z-10 overflow-visible w-[88vw] min-w-[260px] max-w-[480px]"
                  style={{ 
                      boxShadow: '0 4px 32px rgba(109, 71, 71, 0.29)'
                  }}>
-                
-                <h2 className="text-3xl font-bold text-center mb-8 text-black">login.</h2>
-                
-                {/* Input Fields */}
-                <div className="space-y-7">
-                    <div className="mb-4 relative">
-                        <input
-                            type="email"
-                            name="email"
-                            id="email"
-                            value={formData.email}
-                            onChange={handleInputChange}
-                            placeholder="your@email.com"
-                            className={`w-full rounded-xl border bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
-                                        hasSubmitted && errors.email ? 'border-red-500 shadow-lg' : 'border-gray-400 dark:border-gray-400'
-                            }`}
-                            style={{
-                                fontSize: '18px',
-                                fontWeight: 300
-                            }}
-                        />
-                        <label 
-                            htmlFor="email" 
-                            className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-light"
-                        >
-                            email
-                        </label>
-                        {hasSubmitted && errors.email && (
-                            <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.email}</p>
-                        )}
-                    </div>
+                <h1 className="text-3xl mt-2 font-bold text-center mb-8 text-black">
+                    login.
+                </h1>
 
-                    <div className="relative">
-                        <label 
-                            htmlFor="password" 
-                            className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-light"
-                        >
-                            password
-                        </label>
-                        <input
-                            type={showPassword ? "text" : "password"}
-                            name="password"
-                            id="password"
-                            value={formData.password}
-                            onChange={handleInputChange}
-                            placeholder="••••••••"
-                            className={`w-full rounded-xl border bg-white -mb-e hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
-                                        hasSubmitted && errors.password ? 'border-red-500 shadow-lg' : 'border-gray-400 dark:border-gray-400'
-                            }`}
-                            style={{
-                                fontSize: '18px',
-                                fontWeight: 300
-                            }}
-                        />
-                        <button 
-                            type="button"
-                            onClick={togglePasswordVisibility}
-                            className="absolute inset-y-0 end-0 mt-1 flex items-center z-20 px-3 cursor-pointer text-gray-400 hover:text-red-500 rounded-e-md focus:outline-hidden focus:text-red-500 dark:text-neutral-600 dark:focus:text-red-500">
-                        
-                            <svg className="shrink-0 size-3.5" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                {showPassword ? (
-                                    <>
-                                        <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"></path>
-                                        <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"></path>
-                                        <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"></path>
-                                        <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"></path>
-                                        <circle cx="12" cy="12" r="3"></circle>
-                                    </>
-                                ) : (
-                                    // Eye closed (password hidden)
-                                    <>
-                                        <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"></path>
-                                        <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"></path>
-                                        <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"></path>
-                                        <line x1="2" x2="22" y1="2" y2="22"></line>
-                                    </>
-                                )}
-                            </svg>
-                        </button>
-                        
-                        {hasSubmitted && errors.password && (
-                            <p className="absolute top-full mt-3 right-1 text-sm text-red-600 z-20">{errors.password}</p>
-                        )}
-                    </div>
-
-                    {/* Login Error Message */}
-                    {errors.submit && (
-                        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                            <p className="text-sm text-red-600 text-center font-light">{errors.submit}</p>
+                {/* Form Element - This is the key addition! */}
+                <form onSubmit={handleSubmit}>
+                    {/* Input Fields */}
+                    <div className="space-y-6 mb-14">
+                        <div className="relative">
+                            <input
+                                type="email"
+                                name="email"
+                                id="email"
+                                value={formData.email}
+                                onChange={handleInputChange}
+                                placeholder="your@email.com"
+                                className={`w-full rounded-xl border bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
+                                            hasSubmitted && errors.email ? 'border-red-500 shadow-md' : 'border-gray-400 dark:border-gray-400'
+                                }`}
+                                style={{
+                                    fontSize: '18px',
+                                    fontWeight: 300
+                                }}
+                            />
+                            <label 
+                                htmlFor="email" 
+                                className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-light"
+                            >
+                                email
+                            </label>
+                            {hasSubmitted && errors.email && (
+                                <p className="absolute top-full right-1 font-light text-sm text-red-600 z-20">{errors.email}</p>
+                            )}
                         </div>
-                    )}
 
-                </div>    
+                        <div className="relative">
+                            <label 
+                                htmlFor="password" 
+                                className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-light"
+                            >
+                                password
+                            </label>
+                            <input
+                                type={showPassword ? "text" : "password"}
+                                name="password"
+                                id="password"
+                                value={formData.password}
+                                onChange={handleInputChange}
+                                placeholder="••••••••"
+                                className={`w-full rounded-xl border bg-white -mb-e hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
+                                            hasSubmitted && errors.password ? 'border-red-500 shadow-md' : 'border-gray-400 dark:border-gray-400'
+                                }`}
+                                style={{
+                                    fontSize: '18px',
+                                    fontWeight: 300
+                                }}
+                            />
+                            <button 
+                                type="button"
+                                onClick={togglePasswordVisibility}
+                                className="absolute inset-y-0 end-0 mt-1 flex items-center z-20 px-3 cursor-pointer text-gray-400 hover:text-red-500 rounded-e-md focus:outline-hidden focus:text-red-500 dark:text-neutral-600 dark:focus:text-red-500">
+                            
+                                <svg className="shrink-0 size-3.5" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    {showPassword ? (
+                                        <>
+                                            <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"></path>
+                                            <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"></path>
+                                            <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"></path>
+                                            <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"></path>
+                                            <circle cx="12" cy="12" r="3"></circle>
+                                        </>
+                                    ) : (
+                                        // Eye closed (password hidden)
+                                        <>
+                                            <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"></path>
+                                            <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"></path>
+                                            <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"></path>
+                                            <line x1="2" x2="22" y1="2" y2="22"></line>
+                                        </>
+                                    )}
+                                </svg>
+                            </button>
+                            
+                            {hasSubmitted && errors.password && (
+                                <p className="absolute top-full right-1 font-light text-sm text-red-600 z-20">{errors.password}</p>
+                            )}
+                        </div>
+
+                        {/* Login Error Message */}
+                        {errors.submit && (
+                            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                                <p className="text-sm text-red-600 text-center font-light">{errors.submit}</p>
+                            </div>
+                        )}
+
+                    </div>
+
+                    {/* Hidden submit button for Enter key functionality */}
+                    <button 
+                        type="submit" 
+                        style={{ display: 'none' }}
+                        disabled={showLoading}
+                    />
+                </form>
                 
-                {/* Signup Link */}
-                <div className="text-black dark:text-white font-light block absolute bottom-[-30px] left-[30px]"
-                     style={{ fontSize: '16px' }}>
-                    no account? {' '}
-                    <a href="register" className="font-normal text-red-500 hover:underline">
-                        sign up.
-                    </a>
-                </div>
-
                 {/* Circle Button */}
                 <CircleButton
                     size="xl"
@@ -268,6 +270,16 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
                     {showLoading ? '. . .' : 'get in.'}
                 </CircleButton>
             </div>
+            {/* Signup Link */}
+            <div className="w-full px-8 mt-2 space-y-0.25 max-w-[480px]">
+                <div className="font-light text-black dark:text-white block relative"
+                    style={{ fontSize: '16px' }}>
+                    no account? {' '}
+                    <a href="register" className="font-normal text-red-500 hover:underline">
+                        sign up.
+                    </a>
+                </div>
+            </div> 
         </div>
     );
 };
