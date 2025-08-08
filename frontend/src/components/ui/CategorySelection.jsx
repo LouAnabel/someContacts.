@@ -19,13 +19,9 @@ const CategorySelection = ({
 }) => {
     return (
         <div className="relative">
-            <label className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-light">
-                categories (max 3)
-            </label>
-            
             {/* Selected Categories Display */}
             {formData.categories && formData.categories.length > 0 && (
-                <div className="mb-2 flex flex-wrap gap-2">
+                <div className="mb-4 ml-1.5 flex flex-wrap gap-2">
                     {formData.categories.map((category, index) => (
                         <div
                             key={category.id || index}
@@ -45,43 +41,48 @@ const CategorySelection = ({
                     ))}
                 </div>
             )}
+            <div>
+                <label className="absolute left-4 -mt-3 bg-white px-1 text-base text-black font-light">
+                    categories
+                </label>
             
-            {/* Dropdown Button */}
-            <button
-                type="button"
-                onClick={() => {
-                    console.log('Dropdown clicked. Current categories:', categories);
-                    console.log('Current selected categories:', formData.categories);
-                    setShowCategoryDropdown(!showCategoryDropdown);
-                }}
-                disabled={disabled || formData.categories.length >= 3}
-                className={`w-full p-2.5 rounded-xl border bg-white hover:border-red-300 dark:hover:border-red-300 text-black placeholder-gray-200 font-light max-w-full min-w-[200px] focus:outline-none focus:border-red-500 flex items-center justify-between ${
-                    hasSubmitted && errors.categories ? 'border-red-500 shadow-md' : 'border-gray-400 dark:border-gray-400'
-                } ${formData.categories.length >= 3 ? 'opacity-50 cursor-not-allowed' : ''}`}
-                style={{
-                    fontSize: '16px',
-                    fontWeight: 300
-                }}
-            >
-                <span className={formData.categories.length > 0 ? 'text-black' : 'text-gray-300'}>
-                    {formData.categories.length === 0 
-                        ? categories.length === 0 
-                            ? 'create a category first'
-                            : 'select categories'
-                        : formData.categories.length >= 3
-                            ? 'maximum categories selected'
-                            : `${formData.categories.length}/3 categories selected`
-                    }
-                </span>
-                <svg 
-                    className={`w-4 h-4 transition-transform duration-200 ${showCategoryDropdown ? 'rotate-180' : ''}`}
-                    fill="none" 
-                    stroke="currentColor" 
-                    viewBox="0 0 24 24"
+                {/* Dropdown Button */}
+                <button
+                    type="button"
+                    onClick={() => {
+                        console.log('Dropdown clicked. Current categories:', categories);
+                        console.log('Current selected categories:', formData.categories);
+                        setShowCategoryDropdown(!showCategoryDropdown);
+                    }}
+                    disabled={disabled || formData.categories.length >= 3}
+                    className={`w-full p-2.5 rounded-xl border bg-white hover:border-red-300 dark:hover:border-red-300 text-black placeholder-gray-200 font-light max-w-full min-w-[200px] focus:outline-none focus:border-red-500 flex items-center justify-between ${
+                        hasSubmitted && errors.categories ? 'border-red-400' : 'border-gray-400 dark:border-gray-400'
+                    } ${formData.categories.length >= 3 ? ' text-gray-300 border-gray-300 cursor-not-allowed' : ''}`}
+                    style={{
+                        fontSize: '16px',
+                        fontWeight: 300
+                    }}
                 >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-            </button>
+                    <span className={`font-light ${formData.categories.length < 3 ? 'text-gray-200' : 'text-gray-300'}`}>
+                        {formData.categories.length === 0 
+                            ? categories.length === 0 
+                                ? 'create a category first'
+                                : 'select up to 3 categories'
+                            : formData.categories.length >= 3
+                                ? 'maximum categories selected'
+                                : `${formData.categories.length}/3 selected`
+                        }
+                    </span>
+                    <svg 
+                        className={`w-4 h-4 transition-transform duration-200 ${showCategoryDropdown ? 'rotate-180' : ''}`}
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
+                    >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+            </div>    
 
             {/* Custom Dropdown Menu */}
             {showCategoryDropdown && (
@@ -99,15 +100,20 @@ const CategorySelection = ({
                                         key={category.id}
                                         type="button"
                                         onClick={() => {
-                                            if (canSelect) {
+                                            if (isSelected) {
+                                                // Remove category if it's selected
+                                                console.log('Category removed:', category);
+                                                removeCategoryFromForm(category.id);
+                                            } else if (canSelect) {
+                                                // Add category if it's not selected and can be selected
                                                 console.log('Category selected:', category);
                                                 addCategoryToForm(category);
                                             }
                                         }}
-                                        disabled={!canSelect}
+                                        disabled={!canSelect && !isSelected}
                                         className={`w-full text-left px-3 py-2 transition-colors duration-150 font-light ${
                                             isSelected 
-                                                ? 'bg-red-50 text-red-400 cursor-not-allowed' 
+                                                ? 'bg-red-50 text-red-500 cursor-pointer hover:bg-red-100' 
                                                 : canSelect
                                                     ? 'hover:bg-red-50 text-black cursor-pointer'
                                                     : 'text-gray-400 cursor-not-allowed'
@@ -116,16 +122,17 @@ const CategorySelection = ({
                                     >
                                         <span className="flex items-center justify-between">
                                             {category.name}
-                                            {isSelected && (
-                                                <span className="text-red-500">✓</span>
+                                            {isSelected ? (
+                                                <span className="text-red-500 text-lg font-light hover:text-red-700">×</span>
+                                            ) : canSelect ? (
+                                                <span className="text-gray-400"></span>
+                                            ) : (
+                                                <span className="text-gray-300">—</span>
                                             )}
                                         </span>
                                     </button>
                                 );
                             })}
-                            
-                            {/* Separator line only if there are categories */}
-                            <div className="border-t border-gray-100"></div>
                         </>
                     )}
                     

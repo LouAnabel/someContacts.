@@ -193,12 +193,15 @@ export const deleteContactById = async (accessToken, contactId) => {
 
 // GET all categories
 export const getCategories = async (accessToken) => {
-    return await apiRequest(`${API_BASE_URL}/categories`, {
+    const categoriesData = await apiRequest(`${API_BASE_URL}/categories`, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${accessToken}`,
         },
     });
+    const categories = categoriesData.categories
+    console.log("In API FILE categoriesData sent to frontend")
+    return categories
 };
 
 

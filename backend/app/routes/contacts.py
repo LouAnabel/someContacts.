@@ -118,7 +118,6 @@ def create_contact():
             email=data.get('email', '').strip() if data.get('email') else None,
             phone=data.get('phone', '').strip() if data.get('phone') else None,
             is_favorite=data.get('is_favorite', False),
-            category_id=category_id,
             birth_date=birth_date,
             last_contact_date=data.get('last_contact_date', '').strip() if data.get('last_contact_date') else None,
             next_contact_date=data.get('next_contact_date', '').strip() if data.get('next_contact_date') else None,
@@ -132,7 +131,7 @@ def create_contact():
         )
         
         db.session.add(contact)
-        db.session.flush() # Get the Contact ID before committing
+        db.session.flush()
 
         # Handle links if provided
         links = data.get('links', [])
@@ -161,7 +160,25 @@ def create_contact():
                         title=link_title  # Make sure your ContactLinks model has this field
                     )
                     db.session.add(contact_link)
+        # Handle categories after contact is created
+        categories = data.get('categories', [])
+        for category_data in categories:
+            category_id = category_data.get('id')
+            if category_id:
+                # Verify category belongs to user
+                category = Category.query.filter_by(
+                    id=category_id,
+                    creator_id=creator_id
+                ).first()
 
+                if category:
+                    contact_category = ContactCategory(
+                        contact_id=contact.id,
+                        category_id=category_id
+                    )
+                    db.session.add(contact_category)
+
+    
         db.session.commit()
         logger.info(f"Contact created successfully: {contact.first_name} {contact.last_name or ''} (ID: {contact.id})")
 
