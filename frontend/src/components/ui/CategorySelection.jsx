@@ -33,7 +33,7 @@ const CategorySelection = ({
                     {selectedCategories.map((category, index) => (
                         <div
                             key={category.id || index}
-                            className="inline-flex items-center bg-red-100 text-black rounded-full px-3 py-1 text-sm font-light"
+                            className="inline-flex items-center bg-red-100 text-black rounded-full px-3 py-1 text-sm font-extralight"
                         >
                             <span>{category.name}</span>
                             {!disabled && (
@@ -54,7 +54,7 @@ const CategorySelection = ({
             )}
             
             <div>
-                <label className="absolute left-4 -mt-3 bg-white px-1 text-base text-black font-light">
+                <label className="absolute left-4 -mt-3 bg-white px-1 text-base text-black font-extralight">
                     categories
                 </label>
             
@@ -67,15 +67,15 @@ const CategorySelection = ({
                         setShowCategoryDropdown(!showCategoryDropdown);
                     }}
                     disabled={disabled || selectedCategories.length >= 3}
-                    className={`w-full p-2.5 rounded-xl border bg-white hover:border-red-300 dark:hover:border-red-300 text-black placeholder-gray-200 font-light max-w-full min-w-[200px] focus:outline-none focus:border-red-500 flex items-center justify-between ${
+                    className={`w-full p-2.5 rounded-xl border bg-white hover:border-red-300 dark:hover:border-red-300 text-black placeholder-gray-200 font-extralight max-w-full min-w-[200px] focus:outline-none focus:border-red-500 flex items-center justify-between ${
                         hasSubmitted && errors.categories ? 'border-red-400' : 'border-gray-400 dark:border-gray-400'
                     } ${selectedCategories.length >= 3 ? ' text-gray-300 border-gray-300 cursor-not-allowed' : ''}`}
                     style={{
                         fontSize: '16px',
-                        fontWeight: 300
+                        fontWeight: 200
                     }}
                 >
-                    <span className={`font-light ${selectedCategories.length < 3 ? 'text-gray-200' : 'text-gray-300'}`}>
+                    <span className={`font-extralight ${selectedCategories.length < 3 ? 'text-gray-200' : 'text-gray-300'}`}>
                         {selectedCategories.length === 0 
                             ? categories.length === 0 
                                 ? 'create a category first'
@@ -131,19 +131,19 @@ const CategorySelection = ({
                                             }
                                         }}
                                         disabled={!canSelect && !isSelected}
-                                        className={`w-full text-left px-3 py-2 transition-colors duration-150 font-light ${
+                                        className={`w-full text-left px-3 py-2 transition-colors duration-150 font-extralight ${
                                             isSelected 
                                                 ? 'bg-red-50 text-red-500 cursor-pointer hover:bg-red-100' 
                                                 : canSelect
                                                     ? 'hover:bg-red-50 text-black cursor-pointer hover:text-red-500'
                                                     : 'text-gray-400 cursor-not-allowed'
                                         }`}
-                                        style={{ fontSize: '16px', fontWeight: 300 }}
+                                        style={{ fontSize: '16px', fontWeight: 200 }}
                                     >
                                         <span className="flex items-center justify-between">
                                             {category.name}
                                             {isSelected ? (
-                                                <span className="text-red-500 text-lg font-light hover:text-red-700">×</span>
+                                                <span className="text-red-500 text-lg font-extralight hover:text-red-700">×</span>
                                             ) : canSelect ? (
                                                 <span className="text-gray-400"></span>
                                             ) : (
@@ -161,7 +161,7 @@ const CategorySelection = ({
                     
                     {/* Show empty state message if no categories */}
                     {categories.length === 0 && (
-                        <div className="px-3 py-2 text-gray-400 text-sm font-light italic">
+                        <div className="px-3 py-2 text-gray-400 text-sm font-extralight italic">
                             No categories yet. Create your first one below.
                         </div>
                     )}
@@ -175,10 +175,10 @@ const CategorySelection = ({
                                     console.log('Opening add category form');
                                     setShowAddCategory(true);
                                 }}
-                                className="w-full text-left px-3 py-2 hover:bg-red-50 transition-colors duration-150 text-red-500 font-light flex items-center space-x-2"
+                                className="w-full text-left px-3 py-2 hover:bg-red-50 transition-colors duration-150 text-red-500 font-extralight flex items-center space-x-2"
                                 style={{ fontSize: '16px', fontWeight: 300 }}
                             >
-                                <span className="text-lg font-semibold">+</span>
+                                <span className="text-lg font-light">+</span>
                                 <span>add new category</span>
                             </button>
                         ) : (
@@ -191,7 +191,7 @@ const CategorySelection = ({
                                         setNewCategoryName(e.target.value);
                                     }}
                                     placeholder="enter category name"
-                                    className="w-full p-2 rounded-lg border border-gray-300 bg-transparent text-black font-light placeholder-gray-300 focus:outline-none focus:border-red-500"
+                                    className="w-full p-2 rounded-lg border border-gray-300 bg-transparent text-black font-extralight placeholder-gray-300 focus:outline-none focus:border-red-500"
                                     style={{ fontSize: '15px', fontWeight: 300 }}
                                     onKeyPress={(e) => {
                                         if (e.key === 'Enter') {
@@ -209,7 +209,7 @@ const CategorySelection = ({
                                             addCategory();
                                         }}
                                         disabled={isAddingCategory || !newCategoryName.trim()}
-                                        className="flex-1 px-3 py-1.5 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:bg-red-300 disabled:cursor-not-allowed text-sm font-light"
+                                        className="flex-1 px-3 py-1.5 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:bg-red-300 disabled:cursor-not-allowed text-sm font-extralight"
                                     >
                                         {isAddingCategory ? 'adding...' : 'add'}
                                     </button>
@@ -221,7 +221,7 @@ const CategorySelection = ({
                                             setNewCategoryName('');
                                         }}
                                         disabled={isAddingCategory}
-                                        className="flex-1 px-3 py-1.5 border border-gray-300 text-gray-600 rounded-lg hover:bg-gray-50 disabled:bg-gray-100 disabled:cursor-not-allowed transition-colors duration-150 text-sm font-light"
+                                        className="flex-1 px-3 py-1.5 border border-gray-300 text-gray-600 rounded-lg hover:bg-gray-50 disabled:bg-gray-100 disabled:cursor-not-allowed transition-colors duration-150 text-sm font-extralight"
                                     >
                                         cancel
                                     </button>

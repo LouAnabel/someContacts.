@@ -217,7 +217,7 @@ export default function AllContacts() {
             </svg>
           </Button>
 
-          <p className="text-red-500 tracking-wide font-light">{errors}</p>
+          <p className="text-red-500 tracking-wide font-extralight">{errors}</p>
 
       </div>
     );
@@ -294,9 +294,9 @@ export default function AllContacts() {
           {/* Show active filters */}
           {(currentSearchTerm || currentCategory) && (
             <div className="flex justify-center items-center gap-2 mb-4 flex-wrap font-text">
-              <span className="text-sm font-light tracking-wide text-gray-600 dark:text-white">Filtered by:</span>
+              <span className="text-sm font-extralight tracking-wide text-gray-600 dark:text-white">Filtered by:</span>
               {currentSearchTerm && (
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-light tracking-wide dark:bg-white bg-red-300 text-black">
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-extralight tracking-wide dark:bg-white bg-red-300 text-black">
                   {currentSearchTerm}
                   <button
                     onClick={clearSearchTerm}  // Changed this
@@ -307,7 +307,7 @@ export default function AllContacts() {
                 </span>
               )}
               {currentCategory && (
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-light tracking-wide bg-red-200 dark:bg-white text-black">
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-extralight tracking-wide bg-red-200 dark:bg-white text-black">
                   {currentCategory.name}
                   <button
                     onClick={clearCategory}  // Changed this
@@ -319,7 +319,7 @@ export default function AllContacts() {
               )}
               <button
                 onClick={clearSearch}  // This already triggers reset
-                className="text-sm tracking-wide font-light text-gray-600 dark:text-white hover:text-red-500 dark:hover:text-red-500 underline"
+                className="text-sm tracking-wide font-extralight text-gray-600 dark:text-white hover:text-red-500 dark:hover:text-red-500 underline"
               >
                 Clear all
               </button>
@@ -339,7 +339,7 @@ export default function AllContacts() {
       {/* ERROR MESSAGES */}
       {/* Show Contacts or No Results Message */}
       {contacts.length === 0 && (currentSearchTerm || currentCategory) ? (
-        <div className="flex flex-col items-center justify-center py-20 font-light tracking-wide">
+        <div className="flex flex-col items-center justify-center py-20 font-extralight tracking-wide">
           <div className="text-red-500  text-lg mb-2">No contacts found</div>
           <div className="text-gray-700 text-sm mb-4">
             Try adjusting your search terms or clearing the filters
@@ -402,7 +402,7 @@ export default function AllContacts() {
                   </h2>
                   
                   {/* Message */}
-                  <p className="text-center text-gray-600 font-light mb-8 leading-relaxed">
+                  <p className="text-center text-gray-600 font-extralight mb-8 leading-relaxed">
                       this action cannot be undone. all contact information, notes, and history will be permanently removed.
                   </p>
                   
@@ -416,7 +416,7 @@ export default function AllContacts() {
                             setContactToDelete(null);
                           }}
                           disabled={isDeleting}
-                          className="flex-1 py-3 px-6 rounded-xl border-2 border-gray-300 text-gray-700 font-light hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="flex-1 py-3 px-6 font-extralight rounded-xl border-2 border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                           style={{ fontSize: '16px' }}
                       >
                           cancel
@@ -427,7 +427,7 @@ export default function AllContacts() {
                           type="button"
                           onClick={handleDeleteContact}
                           disabled={isDeleting}
-                          className="flex-1 py-3 px-6 rounded-xl bg-red-500 text-white font-light hover:bg-red-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                          className="flex-1 py-3 px-6 rounded-xl bg-red-500 text-white font-extralight hover:bg-red-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                           style={{ fontSize: '16px' }}
                       >
                           {isDeleting ? (
@@ -446,7 +446,7 @@ export default function AllContacts() {
 
                   {/* Show error if deletion fails */}
                   {errors && (
-                      <p className="text-center text-red-600 text-sm mt-4 font-light">
+                      <p className="text-center text-red-600 text-sm mt-4 font-extralight">
                           {errors}
                       </p>
                   )}

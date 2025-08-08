@@ -606,7 +606,7 @@ const ShowContactForm = ({id}) => {
                             />
                             <label 
                                 htmlFor="firstName" 
-                                className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-light"
+                                className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-extralight"
                             >
                                 first name
                             </label>
@@ -635,7 +635,7 @@ const ShowContactForm = ({id}) => {
                             />
                             <label 
                                 htmlFor="lastName" 
-                                className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-light"
+                                className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-extralight"
                             >
                                 last name
                             </label>
@@ -665,62 +665,65 @@ const ShowContactForm = ({id}) => {
                             />
                         </div>
 
-                        <div className="space-y-1 ml-2"> 
-                            {/* isToContact Checkbox */}
-                            <div className="flex items-center w-full relative">
-                                <button
-                                    type="button"
-                                    onClick={() => setFormData(prev => ({ ...prev, isToContact: !prev.isToContact }))}
-                                    className="flex items-center space-x-2 mt-2 text-red-500 hover:text-red-500"
-                                    disabled={isLoading}
-                                >
-                                    {formData.isToContact ? (
-                                        <>
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-7">
-                                              <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z" />
-                                            </svg>
-                                            <span className="text-base font-light text-black cursor-pointer">
-                                                on "to do" list
-                                            </span>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokewidth="1" stroke="black" className="size-7">
-                                              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                                            </svg>
-
-                                            <span className="text-base font-light text-black cursor-pointer">
-                                                mark as "to do"
-                                            </span>
-                                        </>
-                                    )}
-                                </button>
-                            </div>
+                        {/* Checkboxes */}
+                        <div className="ml-2"> 
 
                             {/* isContacted Checkbox */}
                             <div className="flex items-center w-full relative rounded-lg">
                                 <button
                                     type="button"
                                     onClick={() => setFormData(prev => ({ ...prev, isContacted: !prev.isContacted }))}
-                                    className="flex items-center space-x-2 text-red-500 hover:text-red-500"
+                                    className="flex items-center space-x-3 text-red-500"
                                     disabled={isLoading}
                                 >
                                     {formData.isContacted ? (
                                         <>
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-7">
-                                              <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z" />
-                                            </svg>
-                                            <span className="text-base font-light text-black cursor-pointer">
+                                          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-5">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
+                                          </svg>
+
+                                            <span className="text-sm font-extralight text-black cursor-pointer">
                                                 contacted
                                             </span>
                                         </>
                                     ) : (
                                         <>
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="black" className="size-7">
-                                              <path strokeLinecap="round" strokeLinejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                                            </svg>
-                                            <span className="text-base font-light text-black cursor-pointer">
+                                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="black" className="size-5">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
+                                          </svg>
+                                            <span className="text-sm font-extralight text-black cursor-pointer">
                                                 mark as contacted
+                                            </span>
+                                        </>
+                                    )}
+                                </button>
+                            </div>
+
+                            {/* isToContact Checkbox */}
+                            <div className="flex items-center w-full relative">
+                                <button
+                                    type="button"
+                                    onClick={() => setFormData(prev => ({ ...prev, isToContact: !prev.isToContact }))}
+                                    className="flex items-center space-x-3 mt-2 text-red-500 hover:text-red-500"
+                                    disabled={isLoading}
+                                >
+                                    {formData.isToContact ? (
+                                        <>
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-5">
+                                              <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
+                                            </svg>
+
+                                            <span className="text-sm font-extralight text-black cursor-pointer">
+                                                remind me
+                                            </span>
+                                        </>
+                                    ) : (
+                                        <>
+                                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="black" className="size-5">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
+                                          </svg>
+                                            <span className="text-sm font-extralight text-black cursor-pointer">
+                                                reminder
                                             </span>
                                         </>
                                     )}
@@ -732,10 +735,10 @@ const ShowContactForm = ({id}) => {
 
                     {/* How to contact */}
                     <div className="space-y-2">
-                        <p className="relative tracking-wide -mb-2 text-red-500 left-2 font-light">how to contact?</p>
+                        <p className="relative tracking-wide -mb-2 text-red-500 left-2 font-extralight">how to contact?</p>
                             {/* email Field */}
                             <div className="relative mb-4">
-                                <label htmlFor="email" className="relative left-4 bg-white px-1 text-base text-black font-light">
+                                <label htmlFor="email" className="relative left-4 bg-white px-1 text-base text-black font-extralight">
                                     email
                                 </label>
                                 <input 
@@ -746,7 +749,7 @@ const ShowContactForm = ({id}) => {
                                     onChange={handleInputChange}
                                     placeholder="your@email.com"
                                     disabled={isLoading}
-                                    className={`w-full rounded-xl border -mt-3 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
+                                    className={`w-full rounded-xl border -mt-3 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
                                         hasSubmitted && errors.email ? 'border-red-500 shadow-md' : 'border-gray-400 dark:border-gray-400'
                                     }`}
                                     style={{
@@ -755,7 +758,7 @@ const ShowContactForm = ({id}) => {
                                     }}
                                 />
                                 {hasSubmitted && errors.email && (
-                                    <p className="absolute top-full right-1 text-sm font-light text-red-600 z-20">{errors.email}</p>
+                                    <p className="absolute top-full right-1 text-sm font-extralight text-red-600 z-20">{errors.email}</p>
                                 )}
                             </div>
                             
@@ -763,7 +766,7 @@ const ShowContactForm = ({id}) => {
                         <div>
                             {/* phone Field */}
                             <div className="relative mb-5">
-                                <label htmlFor="phone" className="relative left-4 bg-white px-1 text-base text-black font-light">
+                                <label htmlFor="phone" className="relative left-4 bg-white px-1 text-base text-black font-extralight">
                                     phone
                                 </label>
                                 <input 
@@ -774,7 +777,7 @@ const ShowContactForm = ({id}) => {
                                     onChange={handleInputChange}
                                     placeholder="+49 1781234567"
                                     disabled={isLoading}
-                                    className={`w-full rounded-xl border -mt-3 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
+                                    className={`w-full rounded-xl border -mt-3 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
                                         hasSubmitted && errors.phone ? 'border-red-500 shadow-md' : 'border-gray-400 dark:border-gray-400'
                                     }`}
                                     style={{
@@ -783,7 +786,7 @@ const ShowContactForm = ({id}) => {
                                     }}
                                 />
                                 {hasSubmitted && errors.phone && (
-                                    <p className="absolute top-full right-1 font-light text-sm text-red-600 z-20">{errors.phone}</p>
+                                    <p className="absolute top-full right-1 font-extralight text-sm text-red-600 z-20">{errors.phone}</p>
                                 )}
                             </div>
                         </div>
@@ -794,7 +797,7 @@ const ShowContactForm = ({id}) => {
                                 <button
                                     type="button"
                                     onClick={() => setShowAddress(true)}
-                                    className="flex items-center ml-1.5 -mt-1 space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-light"
+                                    className="flex items-center ml-1.5 -mt-1 space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-extralight"
                                     disabled={isLoading}
                                 >
                                     <span className="text-lg font-semibold">+</span>
@@ -803,7 +806,7 @@ const ShowContactForm = ({id}) => {
                             ) : (
                                 <div className="mt-4">
                                     <div className="flex items-center justify-between">
-                                        <span className="relative left-2 -mt-1 mb-3 tracking-wide text-sans font-light text-red-500 font-md">
+                                        <span className="relative left-2 -mt-1 mb-3 tracking-wide text-sans font-extralight text-red-500 font-md">
                                             address information
                                         </span>
                                         <button
@@ -818,7 +821,7 @@ const ShowContactForm = ({id}) => {
                                                     country: '' 
                                                 }));
                                             }}
-                                            className="relative -mb-2 right-1 text-red-500 hover:text-red-700 transition-colors duration-200 text-sm font-light"
+                                            className="relative -mb-2 right-1 text-red-500 hover:text-red-700 transition-colors duration-200 text-sm font-extralight"
                                             disabled={isLoading}
                                         >
                                             remove
@@ -827,7 +830,7 @@ const ShowContactForm = ({id}) => {
                                     
                                     {/* Address Field */}
                                     <div className="relative">
-                                        <label htmlFor="streetAndNr" className="absolute -top-3 left-4 bg-white px-1 text-sans text-base text-black font-light">
+                                        <label htmlFor="streetAndNr" className="absolute -top-3 left-4 bg-white px-1 text-sans text-base text-black font-extralight">
                                             street & nr°
                                         </label>
                                         <input 
@@ -838,7 +841,7 @@ const ShowContactForm = ({id}) => {
                                             onChange={handleInputChange}
                                             placeholder="greifwalder Str. 8"
                                             disabled={isLoading}
-                                            className={`w-full rounded-xl border -mb-1 border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
+                                            className={`w-full rounded-xl border -mb-1 border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
                                             style={{
                                                 fontSize: '17px',
                                                 fontWeight: 200
@@ -852,7 +855,7 @@ const ShowContactForm = ({id}) => {
                                     {/* Postal Code and City in a row */}
                                     <div className="flex space-x-4">
                                         <div className="relative flex-1">
-                                            <label htmlFor="postalcode" className="relative top-3 bg-white px-1 left-4 text-sans text-base text-black font-light">
+                                            <label htmlFor="postalcode" className="relative top-3 bg-white px-1 left-4 text-sans text-base text-black font-extralight">
                                                 postal code
                                             </label>
                                             <input 
@@ -863,7 +866,7 @@ const ShowContactForm = ({id}) => {
                                                 onChange={handleInputChange}
                                                 placeholder="10407"
                                                 disabled={isLoading}
-                                                className={`w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
+                                                className={`w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
                                                 style={{
                                                     fontSize: '17px',
                                                     fontWeight: 200
@@ -875,7 +878,7 @@ const ShowContactForm = ({id}) => {
                                         </div>
 
                                         <div className="relative flex-1">
-                                            <label htmlFor="city" className="relative top-3 bg-white px-1 left-4 text-sans text-base text-black font-light">
+                                            <label htmlFor="city" className="relative top-3 bg-white px-1 left-4 text-sans text-base text-black font-extralight">
                                                 city
                                             </label>
                                             <input 
@@ -886,7 +889,7 @@ const ShowContactForm = ({id}) => {
                                                 onChange={handleInputChange}
                                                 placeholder="berlin"
                                                 disabled={isLoading}
-                                                className={`w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[150px] h-[48px] focus:outline-none focus:border-red-500`}
+                                                className={`w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-200 max-w-full min-w-[150px] h-[48px] focus:outline-none focus:border-red-500`}
                                                 style={{
                                                     fontSize: '18px',
                                                     fontWeight: 200
@@ -900,7 +903,7 @@ const ShowContactForm = ({id}) => {
 
                                     {/* Country Field */}
                                     <div className="relative">
-                                        <label htmlFor="country" className="relative top-3 bg-white px-1 left-4 text-sans text-base text-black font-light">
+                                        <label htmlFor="country" className="relative top-3 bg-white px-1 left-4 text-sans text-base text-black font-extralight">
                                             country
                                         </label>
                                         <input 
@@ -911,7 +914,7 @@ const ShowContactForm = ({id}) => {
                                             onChange={handleInputChange}
                                             placeholder="germany"
                                             disabled={isLoading}
-                                            className={`w-full rounded-xl mb-5 border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
+                                            className={`w-full rounded-xl mb-5 border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
                                             style={{
                                                 fontSize: '18px',
                                                 fontWeight: 200
@@ -932,8 +935,8 @@ const ShowContactForm = ({id}) => {
                         <div className="">
                             {/* Contact History Fields */}
                             <div className="relative ">
-                              <p className="font-text text-base font-light tracking-wide text-red-500 ml-1 mt-6 ">date and place of</p>
-                                <label htmlFor="lastContactDate" className="relative left-4 bg-white px-1 text-sans text-base text-black font-light">
+                              <p className="font-text text-base font-extralight tracking-wide text-red-500 ml-1 mt-6 ">date and place of</p>
+                                <label htmlFor="lastContactDate" className="relative left-4 bg-white px-1 text-sans text-base text-black font-extralight">
                                     last contact
                                 </label>
                                 <input 
@@ -944,7 +947,7 @@ const ShowContactForm = ({id}) => {
                                     onChange={handleInputChange}
                                     placeholder="am 19.05.2025 in Berlin"
                                     disabled={isLoading}
-                                    className={`w-full rounded-xl border -mt-3 border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
+                                    className={`w-full rounded-xl border -mt-3 border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
                                     style={{
                                         fontSize: '17px',
                                         fontWeight: 200
@@ -957,7 +960,7 @@ const ShowContactForm = ({id}) => {
 
                             {/* Next Contact Field */}
                             <div className="relative -mt-1">
-                                <label htmlFor="nextContactDate" className="relative top-3 left-4 bg-white px-1 text-sans text-base text-black font-light">
+                                <label htmlFor="nextContactDate" className="relative top-3 left-4 bg-white px-1 text-sans text-base text-black font-extralight">
                                     next planned contact
                                 </label>
                                 <input 
@@ -968,7 +971,7 @@ const ShowContactForm = ({id}) => {
                                     onChange={handleInputChange}
                                     placeholder="coffe shop, berlin ..."
                                     disabled={isLoading}
-                                    className={`w-full mb-5 rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
+                                    className={`w-full mb-5 rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
                                     style={{
                                         fontSize: '17px',
                                         fontWeight: 200
@@ -984,10 +987,10 @@ const ShowContactForm = ({id}) => {
                     {/* Notes */}
                     <div className="relative">   
                         {/* Notes Field */}
-                        <p className="relative tracking-wide text-red-500 -mt-2 left-2  font-light">additional information</p>
+                        <p className="relative tracking-wide text-red-500 -mt-2 left-2  font-extralight">additional information</p>
 
                         <div className="flex items-center justify-between mt-1">
-                            <label htmlFor="notes" className="relative bg-white px-1 left-4 text-sans text-base text-black font-light">
+                            <label htmlFor="notes" className="relative bg-white px-1 left-4 text-sans text-base text-black font-extralight">
                                 important notes
                             </label>
                         </div>
@@ -999,7 +1002,7 @@ const ShowContactForm = ({id}) => {
                             placeholder="every thought matters.."
                             disabled={isLoading}
                             rows={expandedNotes ? 6 : 3}
-                            className={`w-full rounded-xl -mt-3 pt-4 border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
+                            className={`w-full rounded-xl -mt-3 pt-4 border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
                             style={{
                                 fontSize: '17px',
                                 fontWeight: 200,
@@ -1018,7 +1021,7 @@ const ShowContactForm = ({id}) => {
                             <button
                                 type="button"
                                 onClick={() => setShowLinks(true)}
-                                className="flex items-center ml-1.5 -mt-5 space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-light"
+                                className="flex items-center ml-1.5 -mt-5 space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-extralight"
                                 disabled={isLoading}
                             >
                                 <span className="text-lg font-semibold">+</span>
@@ -1027,7 +1030,7 @@ const ShowContactForm = ({id}) => {
                         ) : (
                             <div className="space-y-2">
                                 <div className="flex items-center -mt-3 -mb-2 justify-between">
-                                    <span className="relative left-2 text-sans font-light text-red-500 font-md">
+                                    <span className="relative left-2 text-sans font-extralight text-red-500 font-md">
                                         websites & links
                                     </span>
                                     <button
@@ -1036,7 +1039,7 @@ const ShowContactForm = ({id}) => {
                                         setShowLinks(false);
                                         setLinks([{ title: '', url: '' }]);
                                     }}
-                                        className="text-red-500 -mb-1 mr-2 font-light hover:text-red-700 text-sm"
+                                        className="text-red-500 -mb-1 mr-2 font-extralight hover:text-red-700 text-sm"
                                         disabled={isLoading}
                                     >
                                         remove
@@ -1051,7 +1054,7 @@ const ShowContactForm = ({id}) => {
                                             onChange={(e) => handleLinkChange(index, 'title', e.target.value)}
                                             placeholder="website"
                                             disabled={isLoading}
-                                            className="flex relative p-2.5 w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 min-w-[100px] max-w-[120px] h-[48px] focus:outline-none focus:border-red-500"
+                                            className="flex relative p-2.5 w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-200 min-w-[100px] max-w-[120px] h-[48px] focus:outline-none focus:border-red-500"
                                             style={{
                                                 fontSize: '17px',
                                                 fontWeight: 200
@@ -1063,7 +1066,7 @@ const ShowContactForm = ({id}) => {
                                             onChange={(e) => handleLinkChange(index, 'url', e.target.value)}
                                             placeholder="https://example.com"
                                             disabled={isLoading}
-                                            className="flex p-2.5 w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500"
+                                            className="flex p-2.5 w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500"
                                             style={{
                                                 fontSize: '17px',
                                                 fontWeight: 200
@@ -1085,7 +1088,7 @@ const ShowContactForm = ({id}) => {
                                 <button
                                     type="button"
                                     onClick={addLink}
-                                    className="flex ml-1.5 items-center space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-light text-normal"
+                                    className="flex ml-1.5 items-center space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-extralight text-normal"
                                     disabled={isLoading}
                                 >
                                     <span className="mt-1 font-semibold text-lg">+</span>
@@ -1099,7 +1102,7 @@ const ShowContactForm = ({id}) => {
                                 <button
                                     type="button"
                                     onClick={() => setShowBirthdate(true)}
-                                    className="ml-1.5 flex items-center space-x-2 -mt-8 text-red-500 hover:text-red-600 transition-colors duration-200 font-light"
+                                    className="ml-1.5 flex items-center space-x-2 -mt-8 text-red-500 hover:text-red-600 transition-colors duration-200 font-extralight"
                                     disabled={isLoading}
                                 >
                                     <span className="text-lg font-semibold">+</span>
@@ -1108,10 +1111,10 @@ const ShowContactForm = ({id}) => {
                             ) : (
                                 <div>
                                     <div className="flex items-center justify-between">
-                                        <p className="relative -mb-1 left-4 bg-white p-1 text-sans font-light text-black font-md">
+                                        <p className="relative -mb-1 left-4 bg-white p-1 text-sans font-extralight text-black font-md">
                                             birthdate
                                         </p>
-                                        <span className="relative -mt-4 right-1 font-light">
+                                        <span className="relative -mt-4 right-1 font-extralight">
                                             <button
                                                 type="button"
                                                 onClick={() => {
@@ -1133,7 +1136,7 @@ const ShowContactForm = ({id}) => {
                                         onChange={handleInputChange}
                                         placeholder="18.04.1995"
                                         disabled={isLoading}
-                                        className={`w-full -mt-3 rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
+                                        className={`w-full -mt-3 rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
                                         style={{
                                             fontSize: '17px',
                                             fontWeight: 200
@@ -1185,7 +1188,7 @@ const ShowContactForm = ({id}) => {
 
                   {/* Delete Confirmation Modal */}
                   {showDeleteConfirmation && (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+                    <div className="fixed font-extralight inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
                         style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
                       <div className="bg-white rounded-3xl p-8 relative overflow-visible w-[85vw] min-w-[280px] max-w-[400px] mx-auto"
                           style={{ 
@@ -1196,7 +1199,7 @@ const ShowContactForm = ({id}) => {
                         <div className="flex justify-center mb-6">
                           <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center">
                             <svg 
-                              className="w-8 h-8 text-red-500" 
+                              className="w-8 h-8 text-red-500 font-extralight" 
                               fill="none" 
                               stroke="currentColor" 
                               viewBox="0 0 24 24"
@@ -1217,7 +1220,7 @@ const ShowContactForm = ({id}) => {
                         </h2>
                         
                         {/* Message */}
-                        <p className="text-center text-black tracking-wider font-light mb-8 leading-relaxed">
+                        <p className="text-center text-black tracking-wider font-extralight mb-8 leading-relaxed">
                           this action cannot be undone. all contact information, notes, and history will be permanently removed.
                         </p>
                         
@@ -1228,7 +1231,7 @@ const ShowContactForm = ({id}) => {
                             type="button"
                             onClick={() => setShowDeleteConfirmation(false)}
                             disabled={isDeleting}
-                            className="flex-1 py-3 px-6 rounded-xl border-2 border-gray-300 text-black tracking-wide font-md hover:bg-gray-50 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex-1 py-3 px-6 rounded-xl font-extralight border-2 border-gray-300 text-black tracking-wide font-md hover:bg-gray-50 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
                             style={{ fontSize: '16px' }}
                           >
                             cancel.
@@ -1262,12 +1265,12 @@ const ShowContactForm = ({id}) => {
             </div>
 
             {/* Back Link */}
-            <div className="text-black dark:text-white font-light block mt-2 relative -ml-48 mb-36"
+            <div className="text-black dark:text-white font-extralight block mt-2 relative -ml-48 mb-36"
                 style={{ fontSize: '16px' }}>
                 want to cancel? {' '}
                 <button 
                     onClick={handleCancel}
-                    className="font-normal text-red-500 hover:underline bg-transparent border-none cursor-pointer"
+                    className="font-light text-red-500 hover:underline bg-transparent border-none cursor-pointer"
                     disabled={isSaving}
                 >
                     go back.
@@ -1422,7 +1425,7 @@ const ShowContactForm = ({id}) => {
           {/* Contact Methods */}
           {(contactData.email || contactData.phone) && (
             <div className="">
-              <h2 className="text-red-500 font-extralight text-normal ml-3 mb-1">contact details</h2>
+              <h2 className="text-red-500 font-extralight text-normal ml-3">contact details</h2>
               <p className=" text-red-500 tracking-wide font-extralight text-sm ml-3 -mb-2">how?</p>
               <div className="bg-gray-50 rounded-xl p-3">
                 {/* Email */}
@@ -1513,7 +1516,7 @@ const ShowContactForm = ({id}) => {
           {/* Contact History */}
           {(contactData.last_contact_date || contactData.next_contact_date) && (
           <div className="mb-8">
-            <h3 className="text-red-500 font-extralight text-normal ml-3 mb-2">important facts to remember</h3>
+            <h3 className="text-red-500 font-extralight text-normal ml-3 mb-1">important facts to remember</h3>
               {/* last contact */}
               {contactData.last_contact_date && (
                 <>
@@ -1544,9 +1547,9 @@ const ShowContactForm = ({id}) => {
           {contactData.notes && (
             <div className="">
               <h3 className="text-red-500 font-extralight text-sm ml-3 -mt-3">notes</h3>
-              <div className="bg-gray-50 rounded-xl p-3 -mt-2">
+              <div className="bg-gray-50 rounded-xl p-3 -mt-2 min-h-[100px]">
                 <div className="text-black text-[17px] font-extralight whitespace-pre-wrap ">
-                  {contactData.notes}
+                  "{contactData.notes}"
                 </div>
               </div>
             </div>
@@ -1556,7 +1559,7 @@ const ShowContactForm = ({id}) => {
         {(contactData.birth_date || contactData.links.some(link => link.url?.trim() && link.title?.trim())) && (
         <div className="space-y-2 mb-8">
           {/* header 2nd Part */}
-          <h2 className="mt-3 ml-3 font-text text-normal tracking-wide text-red-500 font-extralight">additional information </h2>
+          <h2 className="mt-3 ml-3 font-text text-normal tracking-wide text-red-500 font-extralight -mb-1">additional information </h2>
 
           {/* Links */}
           {contactData.links && contactData.links.some(link => link.url?.trim() && link.title?.trim()) && (
@@ -1614,22 +1617,22 @@ const ShowContactForm = ({id}) => {
 
       {/* Back Links */}
       <div className="w-full px-8 pt-1 space-y-0.25 max-w-[480px] pb-28">
-        <div className="text-black dark:text-white font-light block relative"
+        <div className="text-black dark:text-white font-extralight block relative"
             style={{ fontSize: '16px' }}>
           want to go {' '}
           <button 
             onClick={() => navigate('/myspace/contacts')}
-            className="font-normal text-red-500 hover:underline bg-transparent border-none cursor-pointer"
+            className="font-light text-red-500 hover:underline bg-transparent border-none cursor-pointer"
           >
           to contacts?
           </button>
         </div>
-        <div className="text-black dark:text-white font-light block -mt-2 relative"
+        <div className="text-black dark:text-white font-extralight block -mt-2 relative"
             style={{ fontSize: '16px' }}>
           or go {' '}
           <button 
             onClick={handleGoBack}
-            className="font-normal text-red-500 hover:underline bg-transparent border-none cursor-pointer"
+            className="font-light text-red-500 hover:underline bg-transparent border-none cursor-pointer"
           >
           back
           </button>

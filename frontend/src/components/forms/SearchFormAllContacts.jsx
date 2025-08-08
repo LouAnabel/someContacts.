@@ -110,9 +110,9 @@ const SearchFormAllContacts = ({ onSearch, resetTrigger }) => {
           <button 
             type="button"
             onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
-            className="inline-flex -mr-2 items-center py-2.5 px-4 text-sm font-light text-center text-black bg-red-200 dark:bg-red-500 dark:text-white rounded-s-lg hover:bg-red-200 hover:text-red-500 hover:dark:bg-red-200 hover:dark:text-red-500" 
+            className="inline-flex -mr-2 items-center py-2.5 px-4 text-sm font-extralight text-center text-black bg-red-100 dark:bg-red-500 dark:text-white rounded-s-lg hover:bg-red-200 hover:text-red-700 hover:dark:bg-red-200 hover:dark:text-red-500" 
           >
-            <span className="font-light tracking-wider">
+            <span className="font-extralight tracking-wider">
               {formData.category ? formData.category.name : 'Categories'}
             </span>
             <svg 
@@ -127,7 +127,7 @@ const SearchFormAllContacts = ({ onSearch, resetTrigger }) => {
 
           {/* Category Dropdown Menu */}
           {showCategoryDropdown && (
-            <div className="absolute bg-white rounded-lg shadow-lg border border-gray-200 dark:border-gray-200 w-[128px] -mt-1 top-full left-0 z-20 max-h-60 overflow-y-auto">
+            <div className="absolute bg-white rounded-lg shadow-lg border border-gray-200 dark:border-gray-200 w-[128px] top-full left-0 z-20 max-h-60 overflow-y-auto">
               
               {/* Category options */}
               {categories.length > 0 ? (
@@ -136,7 +136,7 @@ const SearchFormAllContacts = ({ onSearch, resetTrigger }) => {
                     key={category.id}
                     type="button"
                     onClick={() => handleCategorySelect(category)}
-                    className={`w-full text-left font-light text-sm px-4 py-2 hover:bg-red-200 ${
+                    className={`w-full text-left font-extralight tracking-wide text-[16px] px-4 py-2 hover:text-red-700 hover:bg-red-100 ${
                       formData.category?.id === category.id 
                         ? 'bg-red-50 text-red-600' 
                         : 'text-black'
@@ -146,7 +146,7 @@ const SearchFormAllContacts = ({ onSearch, resetTrigger }) => {
                   </button>
                 ))
               ) : (
-                <div className="px-4 py-3 text-gray-400 text-sm font-light italic">
+                <div className="px-4 py-3 text-gray-400 text-sm font-extralight italic">
                   No categories available
                 </div>
               )}
@@ -160,7 +160,7 @@ const SearchFormAllContacts = ({ onSearch, resetTrigger }) => {
               id="search-dropdown" 
               value={searchTerm}
               onChange={(e) => handleSearch(e.target.value)}
-              className="rounded-xl py-2 px-4 w-full text-normal font-light border-1 border-red-200 text-black placeholder-gray-200 placeholder-font-light placeholder-text-sm bg-white dark:bg-white dark:placeholder-gray-300 focus:outline-none focus:border-gray-300"
+              className="rounded-xl py-2 px-4 w-full text-normal font-extralight border-1 border-red-200 text-black placeholder-gray-200 placeholder-font-light placeholder-text-sm bg-white dark:bg-white dark:placeholder-gray-300 focus:outline-none focus:border-gray-300"
               placeholder="search..."
             />
 

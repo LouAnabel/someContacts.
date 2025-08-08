@@ -73,8 +73,8 @@ const ContactMenuBar = ({onDeleteRequest, isMenuOpen, setIsMenuOpen, id }) => {
                                         className={linkClasses}
                                         onClick={() => setIsMenuOpen(false)}
                                     >
-                                        <span className="font-semibold">{item.firstPart}</span>
-                                        <span className="font-light">{item.secondPart}</span>
+                                        <span className="font-base">{item.firstPart}</span>
+                                        <span className="font-extralight">{item.secondPart}</span>
                                     </Link>
                                 );
                             } else {
@@ -88,7 +88,7 @@ const ContactMenuBar = ({onDeleteRequest, isMenuOpen, setIsMenuOpen, id }) => {
                                         }}
                                     >
                                         <span className="font-semibold">{item.firstPart}</span>
-                                        <span className="font-light">{item.secondPart}</span>
+                                        <span className="font-extralight">{item.secondPart}</span>
                                     </button>
                                 );
                             }

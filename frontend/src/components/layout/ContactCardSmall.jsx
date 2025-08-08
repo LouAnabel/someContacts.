@@ -69,7 +69,7 @@ const ContactCardSmall = ({contact = {}, onContactUpdate, onDeleteRequest}) => {
         <div className="bg-white dark:bg-black relative justify-items"
              style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
 
-            <div className="relative bg-white border border-red-100 min-w-96 max-w-[480px] rounded-3xl p-3 z-10 overflow-visible h-fit left-1/2 transform -translate-x-1/2"
+            <div className="relative bg-white border border-red-100 min-w-[200px] max-w-[480px] rounded-3xl p-3 z-10 overflow-visible h-fit left-1/2 transform -translate-x-1/2"
                  style={{ 
                      boxShadow: '0 2px 15px rgba(0, 0, 0, 0.1)'
                  }}
@@ -78,7 +78,7 @@ const ContactCardSmall = ({contact = {}, onContactUpdate, onDeleteRequest}) => {
                 <div className="flex items-center justify-between w-full ml-2 mt-2">
                     {/* Name & Category */}
                     <div className="w-full relative justify-items">
-                        <h5 className="mb-1 ml-14 text-2xl text-center font-medium text-black">
+                        <h5 className="mb-1 ml-14 text-2xl text-center font-semibold text-black">
                             <Link 
                                 to={`/myspace/contacts/${contact.id}`}
                                 className="hover:text-red-500 transition-colors"
@@ -96,14 +96,22 @@ const ContactCardSmall = ({contact = {}, onContactUpdate, onDeleteRequest}) => {
                         />
                     </span>
                 </div>
-                <p className="text-lg font-light text-black text-center tracking-wide -mt-2 mb-3">{contact.category?.name}</p>
-                
+                {/* Categories Display */}
+                {contact && contact.categories && contact.categories.length > 0 && (
+                    <div className="w-full flex justify-center mx-auto flex-wrap space-x-2 mt-2 mb-4">
+                        {contact.categories.map((category, index) => (
+                            <span key={category.id || index} className="inline-block text-center px-4 py-1 min-w-[90px] border border-1 border-red-200 bg-red-100 tracking-wide text-red-800 flex-wrap rounded-xl text-base font-extralight">
+                                {category.name}
+                            </span>
+                        ))}
+                    </div>
+                )}
 
                 {/* Contact Details */}
-                <div className="w-full relative justify-items flex flex-col mt-5 mb-4 space-y-1">
+                <div className="w-full relative justify-items flex flex-col mt-4 mb-4">
                     <div className="flex items-center justify-between w-full mb-1">
                         {/* City and Country */}
-                        <span className="text-black font-text text-normal font-light ml-4">
+                        <span className="text-black font-text text-[17px] font-extralight ml-4">
                             {contact.city && contact.country 
                                 ? `${contact.city}, ${contact.country}` 
                                 : contact.city || contact.country || ""
@@ -138,12 +146,12 @@ const ContactCardSmall = ({contact = {}, onContactUpdate, onDeleteRequest}) => {
 
                     {/* Phone Number */}
                     {contact.phone && (
-                        <div className="relative left flex items-center ml-4 dark:text-black">
+                        <div className="relative left flex items-center ml-4 text-red-500">
                             <svg 
                                 xmlns="http://www.w3.org/2000/svg" 
                                 fill="none" 
                                 viewBox="0 0 24 24" 
-                                strokeWidth="1.5" 
+                                strokeWidth="1" 
                                 stroke="currentColor" 
                                 className="size-6"
                             >
@@ -156,7 +164,7 @@ const ContactCardSmall = ({contact = {}, onContactUpdate, onDeleteRequest}) => {
                             <span>
                                 <a 
                                     href={`tel:${contact.phone}`}
-                                    className="ml-4 text-blue-800 text-lg font-light hover:text-red-500 transition-colors"
+                                    className="ml-4 text-black text-lg font-extralight hover:text-red-500 transition-colors"
                                 >
                                     {contact.phone}
                                 </a>
@@ -166,12 +174,12 @@ const ContactCardSmall = ({contact = {}, onContactUpdate, onDeleteRequest}) => {
 
                     {/* Email Address */}
                     {contact.email && (
-                        <div className="relative flex items-center ml-4 dark:text-black">
+                        <div className="relative flex items-center ml-4 text-red-500">
                             <svg 
                                 xmlns="http://www.w3.org/2000/svg" 
                                 fill="none" 
                                 viewBox="0 0 24 24" 
-                                strokeWidth="1.5" 
+                                strokeWidth="1" 
                                 stroke="currentColor" 
                                 className="size-6"
                             >
@@ -184,7 +192,7 @@ const ContactCardSmall = ({contact = {}, onContactUpdate, onDeleteRequest}) => {
                             <span>
                                 <a 
                                     href={`mailto:${contact.email}`}
-                                    className="ml-4 text-blue-800 text-lg font-light hover:text-red-500 transition-colors"
+                                    className="ml-4 text-black text-lg font-extralight hover:text-red-500 transition-colors"
                                 >
                                     {contact.email}
                                 </a>
