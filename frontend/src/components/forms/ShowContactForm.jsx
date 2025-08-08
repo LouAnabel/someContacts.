@@ -539,9 +539,9 @@ const ShowContactForm = ({id}) => {
   if (isEditing) {
     console.log("Edit Mode Showing")
     return (
+      <div className="justify-items items-center bg-white dark:bg-black p-5 absolute"
+          style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
           <form onSubmit={handleSave}>
-        <div className="w-full flex flex-col items-center min-h-screen bg-white dark:bg-black" 
-            style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
             
 
             {/* Main Edit Contact Card */}
@@ -1276,8 +1276,8 @@ const ShowContactForm = ({id}) => {
                     go back.
                 </button>
             </div>
-        </div>
-      </form>
+          </form>
+      </div>
     );
   }
 

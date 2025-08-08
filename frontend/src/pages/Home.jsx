@@ -91,12 +91,12 @@ function Home() {
       {/* 1. Part: Text Section */}
       <div className="">
         {/* Header */}
-        <h1 className="text-2xl font-heading font-light text-gray-900 dark:text-white mb-7">
+        <h1 className="text-2xl font-heading font-extralight text-gray-900 dark:text-white mb-7">
           hello <span className="font-text text-red-500 text-3xl font-light">{userName}</span>.
         </h1>
       
         {/* Main Part */}
-        <div className="text-2xl font-text font-light text-black dark:text-white mb-7">
+        <div className="text-2xl font-text font-extralight text-black dark:text-white mb-7">
           <p>welcome to your very own personal space.</p>
           <p className="mb-10">keep track of all your connections that matter to you.</p>
           <p className="text-2xl font-text text-black dark:text-white">

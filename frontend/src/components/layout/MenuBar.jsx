@@ -4,6 +4,7 @@ import { buttonStyles } from '../ui/Buttons';
 import { useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from "../../context/AuthContextProvider";
+import ThemeToggle from '../theme/ThemeToggle';
 
 const MenuBar = ({ isMenuOpen, setIsMenuOpen }) => {
   const menuRef = useRef(null);
@@ -60,6 +61,7 @@ const MenuBar = ({ isMenuOpen, setIsMenuOpen }) => {
       {isMenuOpen && (
         <div className="fixed top-20 right-0 h-50 w-30 bg-black dark:bg-white z-50 md:hidden transform ease-in-out shadow-lg rounded-l-lg">
           <div className=" p-1 tracking-wider">
+            
             {menuItems.map((item) => (
               item.action ? (
                 <button 
@@ -81,10 +83,13 @@ const MenuBar = ({ isMenuOpen, setIsMenuOpen }) => {
                   onClick={() => setIsMenuOpen(false)}
                 >
                   <span className="font-semibold">{item.firstPart || ''}</span>
-                  <span className="font-light">{item.secondPart}</span>
+                  <span className="font-extralight">{item.secondPart}</span>
                 </Link>
               )
             ))}
+            <div className="px-3 pt-2 pb-2">
+              <ThemeToggle />
+            </div>    
           </div>
         </div>
       )}

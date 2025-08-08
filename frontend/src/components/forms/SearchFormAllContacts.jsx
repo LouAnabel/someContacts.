@@ -127,7 +127,7 @@ const SearchFormAllContacts = ({ onSearch, resetTrigger }) => {
 
           {/* Category Dropdown Menu */}
           {showCategoryDropdown && (
-            <div className="absolute bg-white rounded-lg shadow-lg border border-gray-200 dark:border-gray-200 w-[128px] top-full left-0 z-20 max-h-60 overflow-y-auto">
+            <div className="absolute bg-white rounded-2xl shadow-lg border border-gray-200 dark:border-gray-200 w-[150px] top-full left-0 z-20 max-h-60 overflow-y-auto">
               
               {/* Category options */}
               {categories.length > 0 ? (
@@ -136,7 +136,7 @@ const SearchFormAllContacts = ({ onSearch, resetTrigger }) => {
                     key={category.id}
                     type="button"
                     onClick={() => handleCategorySelect(category)}
-                    className={`w-full text-left font-extralight tracking-wide text-[16px] px-4 py-2 hover:text-red-700 hover:bg-red-100 ${
+                    className={`w-full text-left font-extralight tracking-wide text-gray-600 text-[16px] px-3 py-2 hover:text-red-700 hover:bg-red-100 ${
                       formData.category?.id === category.id 
                         ? 'bg-red-50 text-red-600' 
                         : 'text-black'

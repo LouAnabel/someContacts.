@@ -72,11 +72,6 @@ const Navbar = () => {
               onSearch={handleSearch}
             /> */}
 
-            {/* 
-            <MenuBar 
-              isMenuOpen={isMenuOpen} 
-              setIsMenuOpen={setIsMenuOpen} 
-            /> */}
 
             {/* Go to AllContacts/Search */}
             <Button 
@@ -99,9 +94,14 @@ const Navbar = () => {
               </svg>
             </Button>
             
-            <ThemeToggle />
+  
 
-            {/* Handle Logout */}
+            <MenuBar 
+              isMenuOpen={isMenuOpen} 
+              setIsMenuOpen={setIsMenuOpen} 
+            />
+
+            {/* Handle Logout
             <Button 
               onClick={handleLogout}
               className="ml-1"
@@ -118,7 +118,7 @@ const Navbar = () => {
                   clipRule="evenodd" 
                 />
               </svg>
-            </Button>
+            </Button> */}
           </div>
 
           {/* Bigger screens: Mobile search + Nav links + Theme */}

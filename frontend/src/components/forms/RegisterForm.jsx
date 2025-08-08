@@ -223,22 +223,22 @@ const RegisterForm = () => {
                                     onChange={handleInputChange}
                                     placeholder="meryl"
                                     disabled={showLoading}
-                                    className={`w-full rounded-xl border bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
+                                    className={`w-full rounded-xl border bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
                                         hasSubmitted && errors.firstName ? 'border-red-500 shadow-md' : 'border-gray-400 dark:border-gray-400'
                                     }`}
                                     style={{
                                         fontSize: '18px',
-                                        fontWeight: 300
+                                        fontWeight: 200
                                     }}
                                 />
                                 <label 
                                     htmlFor="firstName" 
-                                    className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-light"
+                                    className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-extralight"
                                 >
                                     first name
                                 </label>
                                 {hasSubmitted && errors.firstName && (
-                                    <p className="absolute font-light top-full right-1 text-sm text-red-600 z-20">{errors.firstName}</p>
+                                    <p className="absolute font-extralight top-full right-1 text-sm text-red-600 z-20">{errors.firstName}</p>
                                 )}
                             </div>
 
@@ -252,7 +252,7 @@ const RegisterForm = () => {
                                     onChange={handleInputChange}
                                     placeholder="streep"
                                     disabled={showLoading}
-                                    className={`w-full rounded-xl border bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
+                                    className={`w-full rounded-xl border bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
                                         hasSubmitted && errors.lastName ? 'border-red-500 shadow-md' : 'border-gray-400 dark:border-gray-400'
                                     }`}
                                     style={{
@@ -262,19 +262,19 @@ const RegisterForm = () => {
                                 />
                                 <label 
                                     htmlFor="lastName" 
-                                    className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-light"
+                                    className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-extralight"
                                 >
                                     last name
                                 </label>
                                 {hasSubmitted && errors.lastName && (
-                                    <p className="absolute top-full font-light right-1 text-sm text-red-600 z-20">{errors.lastName}</p>
+                                    <p className="absolute top-full font-extralight right-1 text-sm text-red-600 z-20">{errors.lastName}</p>
                                 )}
                             </div>
                         </div>
 
                         
                             
-                        <p className="relative text-red-500 left-2 tracking-wide font-light pt-6 ">how to login?</p>
+                        <p className="relative text-red-500 left-2 tracking-wide font-extralight pt-6 ">how to login?</p>
                         {/* Email Field */}
                         <div className="space-y-5">
                             <div className="relative">
@@ -286,7 +286,7 @@ const RegisterForm = () => {
                                     onChange={handleInputChange}
                                     placeholder="your@email.com"
                                     disabled={showLoading}
-                                    className={`w-full rounded-xl border bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
+                                    className={`w-full rounded-xl border bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
                                         hasSubmitted && errors.email ? 'border-red-500 shadow-md' : 'border-gray-400 dark:border-gray-400'
                                     }`}
                                     style={{
@@ -296,12 +296,12 @@ const RegisterForm = () => {
                                 />
                                 <label 
                                     htmlFor="email" 
-                                    className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-light"
+                                    className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-extralight"
                                 >
                                     email
                                 </label>
                                 {hasSubmitted && errors.email && (
-                                    <p className="absolute top-full font-light right-1 text-sm text-red-600 z-20">{errors.email}</p>
+                                    <p className="absolute top-full font-extralight right-1 text-sm text-red-600 z-20">{errors.email}</p>
                                 )}
                             </div>
 
@@ -309,7 +309,7 @@ const RegisterForm = () => {
                             <div className="relative">
                                 <label 
                                     htmlFor="password" 
-                                    className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-light"
+                                    className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-extralight"
                                 >
                                     password
                                 </label>
@@ -320,7 +320,7 @@ const RegisterForm = () => {
                                     value={formData.password}
                                     onChange={handleInputChange}
                                     placeholder="••••••••"
-                                    className={`w-full rounded-xl border bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
+                                    className={`w-full rounded-xl border bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
                                                 hasSubmitted && errors.password ? 'border-red-500 shadow-md' : 'border-gray-400 dark:border-gray-400'
                                     }`}
                                     style={{
@@ -355,7 +355,7 @@ const RegisterForm = () => {
                                 </button>
                                 
                                 {hasSubmitted && errors.password && (
-                                    <p className="absolute top-full font-light right-1 text-sm text-red-600 z-20">{errors.password}</p>
+                                    <p className="absolute top-full font-extralight right-1 text-sm text-red-600 z-20">{errors.password}</p>
                                 )}
                             </div>
 
@@ -364,7 +364,7 @@ const RegisterForm = () => {
                             <div className="relative">
                                 <label 
                                     htmlFor="confirmPassword" 
-                                    className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-light"
+                                    className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-extralight"
                                 >
                                     confirm password
                                 </label>
@@ -375,7 +375,7 @@ const RegisterForm = () => {
                                     value={formData.confirmPassword}
                                     onChange={handleInputChange}
                                     placeholder="••••••••"
-                                    className={`w-full rounded-xl border bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
+                                    className={`w-full rounded-xl border bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
                                                 hasSubmitted && errors.confirmPassword ? 'border-red-500 shadow-md' : 'border-gray-400 dark:border-gray-400'
                                     }`}
                                     style={{
@@ -385,7 +385,7 @@ const RegisterForm = () => {
                                 />
                                 
                                 {hasSubmitted && errors.confirmPassword && (
-                                    <p className="absolute top-full font-light right-1 text-sm text-red-600 z-20">{errors.confirmPassword}</p>
+                                    <p className="absolute top-full font-extralight right-1 text-sm text-red-600 z-20">{errors.confirmPassword}</p>
                                 )}
                             </div>
                         </div>
@@ -393,7 +393,7 @@ const RegisterForm = () => {
                         {/* Login Error Message */}
                         {errors.submit && (
                             <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                                <p className="text-sm text-red-600 text-center font-light">{errors.submit}</p>
+                                <p className="text-sm text-red-600 text-center font-extralight">{errors.submit}</p>
                             </div>
                         )}
 
@@ -411,7 +411,7 @@ const RegisterForm = () => {
                                     borderColor: acceptTerms ? 'black' : '#d1d5db'
                                 }}
                             />
-                            <label htmlFor="terms" className="text-sm font-light text-black dark:text-black mt-0.5 cursor-pointer">
+                            <label htmlFor="terms" className="text-sm font-extralight text-black dark:text-black mt-0.5 cursor-pointer">
                                 I accept the{' '}
                                 <a href="#" className="font-medium text-red-500 hover:underline">
                                     terms and conditions.
@@ -447,10 +447,10 @@ const RegisterForm = () => {
 
             {/* Signup Link */}
             <div className="w-full px-8 mt-2 space-y-0.25 max-w-[480px]">
-                <div className="text-black dark:text-white font-light block relative"
+                <div className="text-black dark:text-white font-extralight block relative"
                     style={{ fontSize: '16px' }}>
                     already registered? {' '}
-                    <a href="login" className="font-normal text-red-500 hover:underline">
+                    <a href="login" className="font-light text-red-500 hover:underline">
                         login.
                     </a>
                 </div>

@@ -171,24 +171,24 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
                                 }`}
                                 style={{
                                     fontSize: '18px',
-                                    fontWeight: 300
+                                    fontWeight: 200
                                 }}
                             />
                             <label 
                                 htmlFor="email" 
-                                className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-light"
+                                className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-extralight"
                             >
                                 email
                             </label>
                             {hasSubmitted && errors.email && (
-                                <p className="absolute top-full right-1 font-light text-sm text-red-600 z-20">{errors.email}</p>
+                                <p className="absolute top-full right-1 font-extralight text-sm text-red-600 z-20">{errors.email}</p>
                             )}
                         </div>
 
                         <div className="relative">
                             <label 
                                 htmlFor="password" 
-                                className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-light"
+                                className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-extralight"
                             >
                                 password
                             </label>
@@ -204,7 +204,7 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
                                 }`}
                                 style={{
                                     fontSize: '18px',
-                                    fontWeight: 300
+                                    fontWeight: 200
                                 }}
                             />
                             <button 
@@ -234,7 +234,7 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
                             </button>
                             
                             {hasSubmitted && errors.password && (
-                                <p className="absolute top-full right-1 font-light text-sm text-red-600 z-20">{errors.password}</p>
+                                <p className="absolute top-full right-1 font-extralight text-sm text-red-600 z-20">{errors.password}</p>
                             )}
                         </div>
 
@@ -272,10 +272,10 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
             </div>
             {/* Signup Link */}
             <div className="w-full px-8 mt-2 space-y-0.25 max-w-[480px]">
-                <div className="font-light text-black dark:text-white block relative"
+                <div className="font-extralight text-black dark:text-white block relative"
                     style={{ fontSize: '16px' }}>
                     no account? {' '}
-                    <a href="register" className="font-normal text-red-500 hover:underline">
+                    <a href="register" className="font-light text-red-500 hover:underline">
                         sign up.
                     </a>
                 </div>
