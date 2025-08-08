@@ -600,8 +600,8 @@ const ShowContactForm = ({id}) => {
                                     hasSubmitted && errors.firstName ? 'border-red-400 ' : 'border-gray-400 dark:border-gray-400'
                                 }`}
                                 style={{
-                                    fontSize: '18px',
-                                    fontWeight: 300
+                                    fontSize: '17px',
+                                    fontWeight: 200
                                 }}
                             />
                             <label 
@@ -629,8 +629,8 @@ const ShowContactForm = ({id}) => {
                                     hasSubmitted && errors.lastName ? 'border-red-500 shadow-md' : 'border-gray-400 dark:border-gray-400'
                                 }`}
                                 style={{
-                                    fontSize: '18px',
-                                    fontWeight: 300
+                                    fontSize: '17px',
+                                    fontWeight: 200
                                 }}
                             />
                             <label 
@@ -676,8 +676,8 @@ const ShowContactForm = ({id}) => {
                                 >
                                     {formData.isToContact ? (
                                         <>
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-7">
-                                              <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z" />
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-7">
+                                              <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z" />
                                             </svg>
                                             <span className="text-base font-light text-black cursor-pointer">
                                                 on "to do" list
@@ -685,8 +685,8 @@ const ShowContactForm = ({id}) => {
                                         </>
                                     ) : (
                                         <>
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="black" class="size-7">
-                                              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokewidth="1" stroke="black" className="size-7">
+                                              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                                             </svg>
 
                                             <span className="text-base font-light text-black cursor-pointer">
@@ -707,8 +707,8 @@ const ShowContactForm = ({id}) => {
                                 >
                                     {formData.isContacted ? (
                                         <>
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-7">
-                                              <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z" />
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-7">
+                                              <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z" />
                                             </svg>
                                             <span className="text-base font-light text-black cursor-pointer">
                                                 contacted
@@ -716,8 +716,8 @@ const ShowContactForm = ({id}) => {
                                         </>
                                     ) : (
                                         <>
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="black" class="size-7">
-                                              <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="black" className="size-7">
+                                              <path strokeLinecap="round" strokeLinejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                                             </svg>
                                             <span className="text-base font-light text-black cursor-pointer">
                                                 mark as contacted
@@ -750,8 +750,8 @@ const ShowContactForm = ({id}) => {
                                         hasSubmitted && errors.email ? 'border-red-500 shadow-md' : 'border-gray-400 dark:border-gray-400'
                                     }`}
                                     style={{
-                                        fontSize: '16px',
-                                        fontWeight: 300
+                                        fontSize: '17px',
+                                        fontWeight: 200
                                     }}
                                 />
                                 {hasSubmitted && errors.email && (
@@ -778,8 +778,8 @@ const ShowContactForm = ({id}) => {
                                         hasSubmitted && errors.phone ? 'border-red-500 shadow-md' : 'border-gray-400 dark:border-gray-400'
                                     }`}
                                     style={{
-                                        fontSize: '16px',
-                                        fontWeight: 300
+                                        fontSize: '17px',
+                                        fontWeight: 200
                                     }}
                                 />
                                 {hasSubmitted && errors.phone && (
@@ -840,8 +840,8 @@ const ShowContactForm = ({id}) => {
                                             disabled={isLoading}
                                             className={`w-full rounded-xl border -mb-1 border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
                                             style={{
-                                                fontSize: '18px',
-                                                fontWeight: 300
+                                                fontSize: '17px',
+                                                fontWeight: 200
                                             }}
                                         />
                                         {hasSubmitted && errors.streetAndNr && (
@@ -865,8 +865,8 @@ const ShowContactForm = ({id}) => {
                                                 disabled={isLoading}
                                                 className={`w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
                                                 style={{
-                                                    fontSize: '16px',
-                                                    fontWeight: 300
+                                                    fontSize: '17px',
+                                                    fontWeight: 200
                                                 }}
                                             />
                                             {hasSubmitted && errors.postalcode && (
@@ -888,8 +888,8 @@ const ShowContactForm = ({id}) => {
                                                 disabled={isLoading}
                                                 className={`w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[150px] h-[48px] focus:outline-none focus:border-red-500`}
                                                 style={{
-                                                    fontSize: '16px',
-                                                    fontWeight: 300
+                                                    fontSize: '18px',
+                                                    fontWeight: 200
                                                 }}
                                             />
                                             {hasSubmitted && errors.city && (
@@ -913,8 +913,8 @@ const ShowContactForm = ({id}) => {
                                             disabled={isLoading}
                                             className={`w-full rounded-xl mb-5 border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
                                             style={{
-                                                fontSize: '16px',
-                                                fontWeight: 300
+                                                fontSize: '18px',
+                                                fontWeight: 200
                                             }}
                                         />
                                         {hasSubmitted && errors.country && (
@@ -946,8 +946,8 @@ const ShowContactForm = ({id}) => {
                                     disabled={isLoading}
                                     className={`w-full rounded-xl border -mt-3 border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
                                     style={{
-                                        fontSize: '16px',
-                                        fontWeight: 300
+                                        fontSize: '17px',
+                                        fontWeight: 200
                                     }}
                                 />
                                 {hasSubmitted && errors.lastContactDate && (
@@ -970,8 +970,8 @@ const ShowContactForm = ({id}) => {
                                     disabled={isLoading}
                                     className={`w-full mb-5 rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
                                     style={{
-                                        fontSize: '16px',
-                                        fontWeight: 300
+                                        fontSize: '17px',
+                                        fontWeight: 200
                                     }}
                                 />
                                 {hasSubmitted && errors.nextContactDate && (
@@ -1001,8 +1001,8 @@ const ShowContactForm = ({id}) => {
                             rows={expandedNotes ? 6 : 3}
                             className={`w-full rounded-xl -mt-3 pt-4 border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
                             style={{
-                                fontSize: '16px',
-                                fontWeight: 300,
+                                fontSize: '17px',
+                                fontWeight: 200,
                                 height: expandedNotes ? 'auto' : 'auto'
                             }}
                         />
@@ -1053,8 +1053,8 @@ const ShowContactForm = ({id}) => {
                                             disabled={isLoading}
                                             className="flex relative p-2.5 w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 min-w-[100px] max-w-[120px] h-[48px] focus:outline-none focus:border-red-500"
                                             style={{
-                                                fontSize: '16px',
-                                                fontWeight: 300
+                                                fontSize: '17px',
+                                                fontWeight: 200
                                             }}
                                         />
                                         <input 
@@ -1065,8 +1065,8 @@ const ShowContactForm = ({id}) => {
                                             disabled={isLoading}
                                             className="flex p-2.5 w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500"
                                             style={{
-                                                fontSize: '16px',
-                                                fontWeight: 300
+                                                fontSize: '17px',
+                                                fontWeight: 200
                                             }}
                                         />
                                         {links.length > 1 && (
@@ -1085,10 +1085,10 @@ const ShowContactForm = ({id}) => {
                                 <button
                                     type="button"
                                     onClick={addLink}
-                                    className="flex ml-1.5 items-center space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-light text-sm"
+                                    className="flex ml-1.5 items-center space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-light text-normal"
                                     disabled={isLoading}
                                 >
-                                    <span className="mt-1 text-base">+</span>
+                                    <span className="mt-1 font-semibold text-lg">+</span>
                                     <span className="mt-1 text-black hover:text-red-500">add another link</span>
                                 </button>
                             </div>
@@ -1135,8 +1135,8 @@ const ShowContactForm = ({id}) => {
                                         disabled={isLoading}
                                         className={`w-full -mt-3 rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
                                         style={{
-                                            fontSize: '16px',
-                                            fontWeight: 300
+                                            fontSize: '17px',
+                                            fontWeight: 200
                                         }}
                                     />
                                     {hasSubmitted && errors.birthdate && (
@@ -1146,7 +1146,6 @@ const ShowContactForm = ({id}) => {
                             )}
                         </div>
                 </div> 
-
                 {/* Save and Cancel Buttons */}
                 
                 
@@ -1307,9 +1306,9 @@ const ShowContactForm = ({id}) => {
             }}>
         
         
-        <div className="text-center mb-10 space-y-8">
+        <div className="text-center mb-8 space-y-8">
           {/* Name and Favorite */}
-          <div className="flex items-center justify-center space-x-10 mb-3 mt-8">
+          <div className="flex items-center justify-center space-x-10 -mb-2 mt-8">
             <h1 className="text-3xl ml-14 font-bold text-black">
               {contactData.first_name} {contactData.last_name}
             </h1>
@@ -1339,9 +1338,9 @@ const ShowContactForm = ({id}) => {
           
           {/* Categories Display */}
           {contactData && contactData.categories && contactData.categories.length > 0 && (
-            <div className="w-full justify-center mx-auto flex-wrap space-x-2 mt-5 mb-4">
+            <div className="w-full justify-center mx-auto flex-wrap space-x-2 mt-3 mb-4">
                 {contactData.categories.map((category, index) => (
-                    <span key={category.id || index} className="inline-block px-4 py-2 min-w-[90px] bg-red-100 text-black rounded-full text-base font-light">
+                    <span key={category.id || index} className="inline-block px-4 py-2 min-w-[90px] bg-red-100 text-black rounded-full text-base font-extralight">
                         {category.name}
                     </span>
                 ))}
@@ -1353,16 +1352,83 @@ const ShowContactForm = ({id}) => {
         {/* Contact Information */}
         <div className="space-y-6 mb-8">
 
+          {/* Checkboxes */}
+          <div className="ml-2"> 
+
+              {/* isContacted Checkbox */}
+              <div className="flex items-center w-full relative rounded-lg">
+                  <button
+                      type="button"
+                      onClick={() => setFormData(prev => ({ ...prev, isContacted: !prev.isContacted }))}
+                      className="flex items-center space-x-3 text-red-500"
+                      disabled={isLoading}
+                  >
+                      {formData.isContacted ? (
+                          <>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-5">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
+                            </svg>
+
+                              <span className="text-sm font-extralight text-black cursor-pointer">
+                                  contacted
+                              </span>
+                          </>
+                      ) : (
+                          <>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="black" className="size-5">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
+                            </svg>
+                              <span className="text-sm font-extralight text-black cursor-pointer">
+                                  mark as contacted
+                              </span>
+                          </>
+                      )}
+                  </button>
+              </div>
+
+              {/* isToContact Checkbox */}
+              <div className="flex items-center w-full relative">
+                  <button
+                      type="button"
+                      onClick={() => setFormData(prev => ({ ...prev, isToContact: !prev.isToContact }))}
+                      className="flex items-center space-x-3 mt-2 text-red-500 hover:text-red-500"
+                      disabled={isLoading}
+                  >
+                      {formData.isToContact ? (
+                          <>
+                              <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-5">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
+                              </svg>
+
+                              <span className="text-sm font-extralight text-black cursor-pointer">
+                                  remind me
+                              </span>
+                          </>
+                      ) : (
+                          <>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="black" className="size-5">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
+                            </svg>
+                              <span className="text-sm font-extralight text-black cursor-pointer">
+                                  reminder
+                              </span>
+                          </>
+                      )}
+                  </button>
+              </div>
+
+          </div>
+
           {/* Contact Methods */}
           {(contactData.email || contactData.phone) && (
-            <div className="space-y-1">
-              <h3 className="text-red-500 tracking-wide font-light text-normal ml-3 -mb-3">how to contact?</h3>
-              
+            <div className="">
+              <h2 className="text-red-500 font-extralight text-normal ml-3 mb-1">contact details</h2>
+              <p className=" text-red-500 tracking-wide font-extralight text-sm ml-3 -mb-2">how?</p>
               <div className="bg-gray-50 rounded-xl p-3">
                 {/* Email */}
                 {contactData.email && (
                   <div className="flex items-start">
-                    <span className="text-red-300 tracking-wide font-light text- mt-1">
+                    <span className="text-red-300 tracking-wide mt-1">
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-4">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
                       </svg>
@@ -1370,7 +1436,7 @@ const ShowContactForm = ({id}) => {
                     <div className="ml-3">
                       <a 
                         href={`mailto:${contactData.email}`}
-                        className="text-black text-lg font-light hover:text-red-500 transition-colors"
+                        className="text-black text-[17px] font-extralight hover:text-red-500 transition-colors"
                       >
                         {contactData.email}
                       </a>
@@ -1381,7 +1447,7 @@ const ShowContactForm = ({id}) => {
                 {/* Phone */}
                 {contactData.phone && (
                   <div className="flex items-start">
-                    <span className="text-red-300 tracking-wide font-light text-sm mt-1">
+                    <span className="text-red-300 tracking-wide font-extralight text-sm mt-1">
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-4">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z" />
                       </svg>
@@ -1389,7 +1455,7 @@ const ShowContactForm = ({id}) => {
                     <div className="ml-3">
                       <a 
                         href={`tel:${contactData.phone}`}
-                        className="text-black text-lg font-light hover:text-red-500 transition-colors"
+                        className="text-black text-[17px] font-extralight hover:text-red-500 transition-colors"
                       >
                         {contactData.phone}
                       </a>
@@ -1404,7 +1470,7 @@ const ShowContactForm = ({id}) => {
           {/* Address */}
           {(contactData.street_and_nr || contactData.city || contactData.country) && (
             <div className="space-y-2">
-                <h3 className="text-red-500 tracking-wide font-light text-base ml-3 -mb-4">where?</h3>
+                <h3 className="text-red-500 tracking-wide font-extralight text-sm -mt-3 ml-3 -mb-4">where?</h3>
 
               <a
                 href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
@@ -1432,7 +1498,7 @@ const ShowContactForm = ({id}) => {
                     <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
                   </svg>
               </span>
-                <div className="text-black text-base font-light -space-y-1 -mt-5 ml-6">
+                <div className="text-black text-[17px] font-extralight -space-y-1 -mt-5 ml-6">
                   {contactData.street_and_nr && <div>{contactData.street_and_nr},</div>}
                   <div>
                     {contactData.postal_code && `${contactData.postal_code} `}
@@ -1446,105 +1512,40 @@ const ShowContactForm = ({id}) => {
 
           {/* Contact History */}
           {(contactData.last_contact_date || contactData.next_contact_date) && (
-          <div className="space-y-1 mb-8">
-            
-            {/* isToContact Checkbox */}
-            <div className="flex items-center w-full relative rounded-lg">
-                <button
-                    type="button"
-                    onClick={() => setFormData(prev => ({ ...prev, isToContact: !prev.isToContact }))}
-                    className="flex items-center space-x-2 text-black hover:text-red-500"
-                    disabled={isLoading}
-                >
-                    {formData.isToContact ? (
-                        <>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="red" className="size-6">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                            </svg>
-                            <span className="text-base font-light text-black cursor-pointer">
-                                on "to contact" list
-                            </span>
-                        </>
-                    ) : (
-                        <>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="currentColor" className="size-6">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                            </svg>
-                            <span className="text-base font-light text-black cursor-pointer">
-                                put on "to contact" list
-                            </span>
-                        </>
-                    )}
-                </button>
-            </div>
+          <div className="mb-8">
+            <h3 className="text-red-500 font-extralight text-normal ml-3 mb-2">important facts to remember</h3>
+              {/* last contact */}
+              {contactData.last_contact_date && (
+                <>
+                  <h3 className="text-red-500 tracking-wide font-extralight text-sm ml-3 -mb-2"><span className="font-extralight">last contact</span></h3>
+                  <div className="bg-gray-50 rounded-xl p-3">
+                      <div className="text-black text-[17px] font-extralight">
+                        {contactData.last_contact_date}
+                      </div>
+                  </div>
+                </>  
+              )}
 
-            {/* isContacted Checkbox */}
-            <div className="flex items-center w-full relative rounded-lg">
-                <button
-                    type="button"
-                    onClick={() => setFormData(prev => ({ ...prev, isContacted: !prev.isContacted }))}
-                    className="flex items-center space-x-2 text-black hover:text-red-500"
-                    disabled={isLoading}
-                >
-                    {formData.isContacted ? (
-                        <>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="red" className="size-6">
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                            </svg>
-                            
-                            <span className="text-base font-light text-black cursor-pointer">
-                                contacted
-                            </span>
-                        </>
-                    ) : (
-                        <>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="currentColor" className="size-6">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                            </svg>
-                            <span className="text-base font-light text-black cursor-pointer">
-                                mark as contacted
-                            </span>
-                        </>
-                    )}
-                </button>
-            </div>
-            
-                {/* header 2nd Part */}
-              <p className="mt-3 ml-3 -mb-1 font-text text-sm tracking-wide text-red-500 font-light">when?</p>
-
-                {/* last contact */}
-                {contactData.last_contact_date && (
-                  <>
-                    <h3 className="text-red-500 tracking-wide font-light text-sm ml-3 -mb-2"><span className="font-light">last contact</span></h3>
-                    <div className="bg-gray-50 rounded-xl p-3">
-                        <div className="text-black text-normal font-light">
-                          {contactData.last_contact_date}
-                        </div>
-                    </div>
-                  </>  
-                )}
-
-                  {/* next contact */}
-                  {contactData.next_contact_date && (
-                  <>
-                    <h3 className="text-red-500 tracking-wide font-light text-sm ml-3 -mb-2"><span className="font-light">next contact</span></h3>
-                    <div className="bg-gray-50 rounded-xl p-3">
-                        <div className="text-black text-normal font-light">
-                          {contactData.next_contact_date}
-                        </div>
-                    </div>
-                  </>  
-                )}
-            </div>
-            )}
+                {/* next contact */}
+                {contactData.next_contact_date && (
+                <>
+                  <h3 className="text-red-500 tracking-wide font-extralight text-sm mt-2 ml-3"><span className="font-extralight">next contact</span></h3>
+                  <div className="bg-gray-50 rounded-xl p-3 -mt-2">
+                      <div className="text-black text-[17px] font-extralight">
+                        {contactData.next_contact_date}
+                      </div>
+                  </div>
+                </>  
+              )}
+          </div>
+          )}
 
           {/* Notes */}
           {contactData.notes && (
             <div className="">
-              <h2 className="ml-3 font-text text-sm tracking-wide text-red-500 font-normal">notes</h2>
-              <h3 className="text-red-500 font-light text-sm ml-3">important facts to remember</h3>
+              <h3 className="text-red-500 font-extralight text-sm ml-3 -mt-3">notes</h3>
               <div className="bg-gray-50 rounded-xl p-3 -mt-2">
-                <div className="text-black text-normal font-light whitespace-pre-wrap ">
+                <div className="text-black text-[17px] font-extralight whitespace-pre-wrap ">
                   {contactData.notes}
                 </div>
               </div>
@@ -1555,24 +1556,12 @@ const ShowContactForm = ({id}) => {
         {(contactData.birth_date || contactData.links.some(link => link.url?.trim() && link.title?.trim())) && (
         <div className="space-y-2 mb-8">
           {/* header 2nd Part */}
-          <h2 className="mt-3 ml-3 font-text text-sm tracking-wide text-red-500 font-normal">additional information </h2>
-
-          {/* Birthday */}
-          {contactData.birth_date && (
-            <div>
-              <h3 className="text-red-500 font-light text-sm ml-3">birthdate</h3>
-              <div className="bg-gray-50 rounded-xl p-3 -mt-2">
-                <div className="text-black text-normal font-light">
-                  {contactData.birth_date}
-                </div>
-              </div>
-            </div>
-          )}
+          <h2 className="mt-3 ml-3 font-text text-normal tracking-wide text-red-500 font-extralight">additional information </h2>
 
           {/* Links */}
           {contactData.links && contactData.links.some(link => link.url?.trim() && link.title?.trim()) && (
             <div className="space-y-2">
-              <h3 className="text-red-500 font-light text-sm ml-3 -mb-4">links</h3>
+              <h3 className="text-red-500 font-extralight text-sm ml-3 -mb-4">links</h3>
               <div className="space-y-2">
                 {contactData.links
                   .filter(link => link.url?.trim() && link.title?.trim()) // Only show links with both URL and title
@@ -1582,13 +1571,25 @@ const ShowContactForm = ({id}) => {
                         href={link.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-black text-normal font-light hover:text-red-500 transition-colors break-all"
+                        className="text-black text-[17px] font-extralight hover:text-red-500 transition-colors break-all"
                       >
                         {link.title}
                       </a>
                     </div>
                   ))}
               </div>
+
+              {/* Birthday */}
+              {contactData.birth_date && (
+                <div>
+                  <h3 className="text-red-500 font-extralight text-sm ml-3">birthdate</h3>
+                  <div className="bg-gray-50 rounded-xl p-3 -mt-2">
+                    <div className="text-black text-[17px] font-extralight">
+                      {contactData.birth_date}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
