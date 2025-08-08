@@ -552,6 +552,8 @@ const ShowContactForm = ({id}) => {
                 <h1 className="text-3xl font-bold text-center mt-6 mb-10 text-black">
                     edit <span className="text-red-500">{formData.firstName}.</span>
                 </h1>
+
+                
                 {/* Favorite Checkbox */}
                 <div className="flex items-center w-full relative left-2 mt-3 mb-9 rounded-lg">
                     <button
@@ -663,56 +665,67 @@ const ShowContactForm = ({id}) => {
                             />
                         </div>
 
-                        <div className="relative">
-                            {!showBirthdate ? (
+                        <div className="space-y-1 ml-2"> 
+                            {/* isToContact Checkbox */}
+                            <div className="flex items-center w-full relative">
                                 <button
                                     type="button"
-                                    onClick={() => setShowBirthdate(true)}
-                                    className="ml-1.5 flex items-center -mt-2 space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-light"
+                                    onClick={() => setFormData(prev => ({ ...prev, isToContact: !prev.isToContact }))}
+                                    className="flex items-center space-x-2 mt-2 text-red-500 hover:text-red-500"
                                     disabled={isLoading}
                                 >
-                                    <span className="text-lg font-semibold">+</span>
-                                    <span className="text-base text-black hover:text-red-500">birthdate</span>
-                                </button>
-                            ) : (
-                                <div>
-                                    <div className="flex items-center justify-between">
-                                        <p className="relative -mt-2 left-2 mb-3 text-sans font-light text-red-500 font-md">
-                                            birthdate
-                                        </p>
-                                        <span className="relative -mt-4 right-1 font-light">
-                                            <button
-                                                type="button"
-                                                onClick={() => {
-                                                    setShowBirthdate(false);
-                                                    setFormData(prev => ({ ...prev, birthdate: '' }));
-                                                }}
-                                                className="text-red-500 hover:text-red-700 text-sm"
-                                                disabled={isLoading}
-                                            >
-                                                remove
-                                            </button>
-                                        </span>
-                                    </div>
-                                    <input 
-                                        type="text" 
-                                        name="birthdate" 
-                                        id="birthdate" 
-                                        value={formData.birthdate}
-                                        onChange={handleInputChange}
-                                        placeholder="18.04.1995"
-                                        disabled={isLoading}
-                                        className={`w-full -mt-3 rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
-                                        style={{
-                                            fontSize: '16px',
-                                            fontWeight: 300
-                                        }}
-                                    />
-                                    {hasSubmitted && errors.birthdate && (
-                                        <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.birthdate}</p>
+                                    {formData.isToContact ? (
+                                        <>
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-7">
+                                              <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z" />
+                                            </svg>
+                                            <span className="text-base font-light text-black cursor-pointer">
+                                                on "to do" list
+                                            </span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="black" class="size-7">
+                                              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                            </svg>
+
+                                            <span className="text-base font-light text-black cursor-pointer">
+                                                mark as "to do"
+                                            </span>
+                                        </>
                                     )}
-                                </div>
-                            )}
+                                </button>
+                            </div>
+
+                            {/* isContacted Checkbox */}
+                            <div className="flex items-center w-full relative rounded-lg">
+                                <button
+                                    type="button"
+                                    onClick={() => setFormData(prev => ({ ...prev, isContacted: !prev.isContacted }))}
+                                    className="flex items-center space-x-2 text-red-500 hover:text-red-500"
+                                    disabled={isLoading}
+                                >
+                                    {formData.isContacted ? (
+                                        <>
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-7">
+                                              <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z" />
+                                            </svg>
+                                            <span className="text-base font-light text-black cursor-pointer">
+                                                contacted
+                                            </span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="black" class="size-7">
+                                              <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                            </svg>
+                                            <span className="text-base font-light text-black cursor-pointer">
+                                                mark as contacted
+                                            </span>
+                                        </>
+                                    )}
+                                </button>
+                            </div>
                         </div>
                     </div>
                     
@@ -781,7 +794,7 @@ const ShowContactForm = ({id}) => {
                                 <button
                                     type="button"
                                     onClick={() => setShowAddress(true)}
-                                    className="flex items-center ml-1.5 -mt-2 space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-light"
+                                    className="flex items-center ml-1.5 -mt-1 space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-light"
                                     disabled={isLoading}
                                 >
                                     <span className="text-lg font-semibold">+</span>
@@ -790,7 +803,7 @@ const ShowContactForm = ({id}) => {
                             ) : (
                                 <div className="mt-4">
                                     <div className="flex items-center justify-between">
-                                        <span className="relative left-2 -mt-2 mb-4 text-sans font-light text-red-500 font-md">
+                                        <span className="relative left-2 -mt-1 mb-3 tracking-wide text-sans font-light text-red-500 font-md">
                                             address information
                                         </span>
                                         <button
@@ -805,7 +818,7 @@ const ShowContactForm = ({id}) => {
                                                     country: '' 
                                                 }));
                                             }}
-                                            className="relative -mb-3 right-1 text-red-500 hover:text-red-700 transition-colors duration-200 text-sm font-light"
+                                            className="relative -mb-2 right-1 text-red-500 hover:text-red-700 transition-colors duration-200 text-sm font-light"
                                             disabled={isLoading}
                                         >
                                             remove
@@ -914,77 +927,14 @@ const ShowContactForm = ({id}) => {
                     </div>
 
 
-                    {/* NEED TO CONTACT / CONTACTED BUTTONS */}
-                    <div className="space-y-4">
-                        <p className="font-text text-base font-light tracking-wide text-red-500 ml-1">contact history</p>
-                        <div className="space-y-1">
-                            
-                            {/* isToContact Checkbox */}
-                            <div className="flex items-center w-full relative -mt-3 rounded-lg">
-                                <button
-                                    type="button"
-                                    onClick={() => setFormData(prev => ({ ...prev, isToContact: !prev.isToContact }))}
-                                    className="flex items-center space-x-2 text-black hover:text-red-500"
-                                    disabled={isLoading}
-                                >
-                                    {formData.isToContact ? (
-                                        <>
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="red" className="size-6">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                                            </svg>
-                                            <span className="text-base font-light text-black cursor-pointer">
-                                                need to contact
-                                            </span>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="currentColor" className="size-6">
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                                            </svg>
-                                            <span className="text-base font-light text-black cursor-pointer">
-                                                don't need to contact
-                                            </span>
-                                        </>
-                                    )}
-                                </button>
-                            </div>
-
-                            {/* isContacted Checkbox */}
-                            <div className="flex items-center w-full relative rounded-lg">
-                                <button
-                                    type="button"
-                                    onClick={() => setFormData(prev => ({ ...prev, isContacted: !prev.isContacted }))}
-                                    className="flex items-center space-x-2 text-black hover:text-red-500"
-                                    disabled={isLoading}
-                                >
-                                    {formData.isContacted ? (
-                                        <>
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="red" className="size-6">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                                            </svg>
-                                            
-                                            <span className="text-base font-light text-black cursor-pointer">
-                                                contacted
-                                            </span>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="currentColor" className="size-6">
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                                            </svg>
-                                            <span className="text-base font-light text-black cursor-pointer">
-                                                contacted
-                                            </span>
-                                        </>
-                                    )}
-                                </button>
-                            </div>
-                        </div>
+                 
+                    <div className="space-y-3"> 
                         <div className="">
                             {/* Contact History Fields */}
-                            <div className="relative -mt-3">
-                                <label htmlFor="lastContactDate" className="relative top-3 left-4 bg-white px-1 text-sans text-base text-black font-light">
-                                    last contact (date & place)
+                            <div className="relative ">
+                              <p className="font-text text-base font-light tracking-wide text-red-500 ml-1 mt-6 ">date and place of</p>
+                                <label htmlFor="lastContactDate" className="relative left-4 bg-white px-1 text-sans text-base text-black font-light">
+                                    last contact
                                 </label>
                                 <input 
                                     type="text" 
@@ -994,7 +944,7 @@ const ShowContactForm = ({id}) => {
                                     onChange={handleInputChange}
                                     placeholder="am 19.05.2025 in Berlin"
                                     disabled={isLoading}
-                                    className={`w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
+                                    className={`w-full rounded-xl border -mt-3 border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
                                     style={{
                                         fontSize: '16px',
                                         fontWeight: 300
@@ -1008,7 +958,7 @@ const ShowContactForm = ({id}) => {
                             {/* Next Contact Field */}
                             <div className="relative -mt-1">
                                 <label htmlFor="nextContactDate" className="relative top-3 left-4 bg-white px-1 text-sans text-base text-black font-light">
-                                    next planned contact (date & place)
+                                    next planned contact
                                 </label>
                                 <input 
                                     type="text" 
@@ -1034,8 +984,9 @@ const ShowContactForm = ({id}) => {
                     {/* Notes */}
                     <div className="relative">   
                         {/* Notes Field */}
-                        <p className="relative tracking-wide text-red-500 -mt-2 left-2 mb-2 font-light">additional information</p>
-                        <div className="flex items-center justify-between -mt-1">
+                        <p className="relative tracking-wide text-red-500 -mt-2 left-2  font-light">additional information</p>
+
+                        <div className="flex items-center justify-between mt-1">
                             <label htmlFor="notes" className="relative bg-white px-1 left-4 text-sans text-base text-black font-light">
                                 important notes
                             </label>
@@ -1059,7 +1010,6 @@ const ShowContactForm = ({id}) => {
                             <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.notes}</p>
                         )}
                     </div>
-
 
                     {/* Optional Links */}
                     <div className="relative space-y-3">
@@ -1144,6 +1094,57 @@ const ShowContactForm = ({id}) => {
                             </div>
                         )}
                     </div> 
+                    <div className="relative">
+                            {!showBirthdate ? (
+                                <button
+                                    type="button"
+                                    onClick={() => setShowBirthdate(true)}
+                                    className="ml-1.5 flex items-center space-x-2 -mt-8 text-red-500 hover:text-red-600 transition-colors duration-200 font-light"
+                                    disabled={isLoading}
+                                >
+                                    <span className="text-lg font-semibold">+</span>
+                                    <span className="text-base text-black hover:text-red-500">birthdate</span>
+                                </button>
+                            ) : (
+                                <div>
+                                    <div className="flex items-center justify-between">
+                                        <p className="relative -mb-1 left-4 bg-white p-1 text-sans font-light text-black font-md">
+                                            birthdate
+                                        </p>
+                                        <span className="relative -mt-4 right-1 font-light">
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    setShowBirthdate(false);
+                                                    setFormData(prev => ({ ...prev, birthdate: '' }));
+                                                }}
+                                                className="text-red-500 hover:text-red-700 text-sm"
+                                                disabled={isLoading}
+                                            >
+                                                remove
+                                            </button>
+                                        </span>
+                                    </div>
+                                    <input 
+                                        type="text" 
+                                        name="birthdate" 
+                                        id="birthdate" 
+                                        value={formData.birthdate}
+                                        onChange={handleInputChange}
+                                        placeholder="18.04.1995"
+                                        disabled={isLoading}
+                                        className={`w-full -mt-3 rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
+                                        style={{
+                                            fontSize: '16px',
+                                            fontWeight: 300
+                                        }}
+                                    />
+                                    {hasSubmitted && errors.birthdate && (
+                                        <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.birthdate}</p>
+                                    )}
+                                </div>
+                            )}
+                        </div>
                 </div> 
 
                 {/* Save and Cancel Buttons */}
@@ -1286,32 +1287,35 @@ const ShowContactForm = ({id}) => {
     <div className=" flex flex-col items-center min-h-screen bg-white dark:bg-black" 
         style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
       
-                  <div className="relative mt-6 -mb-6  ">
-                <Button 
-                    onClick={() => navigate(-1)}
-                    className="text-black dark:text-white hover:text-red-500"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-5">
-                        <path fillRule="evenodd" d="M17 10a.75.75 0 0 1-.75.75H5.612l4.158 3.96a.75.75 0 1 1-1.04 1.08l-5.5-5.25a.75.75 0 0 1 0-1.08l5.5-5.25a.75.75 0 1 1 1.04 1.08L5.612 9.25H16.25A.75.75 0 0 1 17 10Z" clipRule="evenodd" />
-                        </svg>
-                    </Button>
-            </div>
+        {/* Navigation Button */}
+        <div className="relative mt-6 -mb-6  ">
+          <Button 
+              onClick={() => navigate(-1)}
+              className="text-black dark:text-white hover:text-red-500"
+              >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-5">
+              <path fillRule="evenodd" d="M17 10a.75.75 0 0 1-.75.75H5.612l4.158 3.96a.75.75 0 1 1-1.04 1.08l-5.5-5.25a.75.75 0 0 1 0-1.08l5.5-5.25a.75.75 0 1 1 1.04 1.08L5.612 9.25H16.25A.75.75 0 0 1 17 10Z" clipRule="evenodd" />
+              </svg>
+          </Button>
+        </div>
 
-      {/* Main Contact Display Card */}
-      <div className="bg-white rounded-3xl p-5 relative z-10 overflow-visible w-[88vw] min-w-[260px] max-w-[480px] h-fit mx-auto mt-10 "
-          style={{ 
-              boxShadow: '0 4px 32px rgba(109, 71, 71, 0.29)'
-          }}>
+
+        {/* Contact Display Card */}
+        <div className="bg-white rounded-3xl p-5 relative z-10 overflow-visible w-[88vw] min-w-[260px] max-w-[480px] h-fit mx-auto mt-10 "
+            style={{ 
+                boxShadow: '0 4px 32px rgba(109, 71, 71, 0.29)'
+            }}>
         
-        {/* Header with Name and Favorite */}
-        <div className="text-center mb-8">
+        
+        <div className="text-center mb-10 space-y-8">
+          {/* Name and Favorite */}
           <div className="flex items-center justify-center space-x-10 mb-3 mt-8">
             <h1 className="text-3xl ml-14 font-bold text-black">
               {contactData.first_name} {contactData.last_name}
             </h1>
           
-            {/* Favorite Checkbox */}
-            <div className="flex items-center pr-2">
+            {/* Favorite checkbox */}
+            <div className="flex items-center pr-6">
                 <button
                         type="button"
                         onClick={handleFavoriteToggle} 
@@ -1333,7 +1337,7 @@ const ShowContactForm = ({id}) => {
             </div>
           </div>
           
-          
+          {/* Categories Display */}
           {contactData && contactData.categories && contactData.categories.length > 0 && (
             <div className="w-full justify-center mx-auto flex-wrap space-x-2 mt-5 mb-4">
                 {contactData.categories.map((category, index) => (
@@ -1346,19 +1350,19 @@ const ShowContactForm = ({id}) => {
         </div>
 
 
-        {/* Contact Incontactation */}
+        {/* Contact Information */}
         <div className="space-y-6 mb-8">
 
           {/* Contact Methods */}
           {(contactData.email || contactData.phone) && (
             <div className="space-y-1">
-              <h3 className="text-red-500 tracking-wide font-light text-sm ml-3 -mb-3">how to contact?</h3>
+              <h3 className="text-red-500 tracking-wide font-light text-normal ml-3 -mb-3">how to contact?</h3>
               
-              <div className="bg-gray-50 rounded-xl p-3 space-y-1">
+              <div className="bg-gray-50 rounded-xl p-3">
                 {/* Email */}
                 {contactData.email && (
                   <div className="flex items-start">
-                    <span className="text-red-300 tracking-wide font-light text-sm mt-0.5">
+                    <span className="text-red-300 tracking-wide font-light text- mt-1">
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-4">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
                       </svg>
@@ -1366,7 +1370,7 @@ const ShowContactForm = ({id}) => {
                     <div className="ml-3">
                       <a 
                         href={`mailto:${contactData.email}`}
-                        className="text-black text-normal font-light hover:text-red-500 transition-colors"
+                        className="text-black text-lg font-light hover:text-red-500 transition-colors"
                       >
                         {contactData.email}
                       </a>
@@ -1377,7 +1381,7 @@ const ShowContactForm = ({id}) => {
                 {/* Phone */}
                 {contactData.phone && (
                   <div className="flex items-start">
-                    <span className="text-red-300 tracking-wide font-light text-sm mt-0.5">
+                    <span className="text-red-300 tracking-wide font-light text-sm mt-1">
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-4">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z" />
                       </svg>
@@ -1385,7 +1389,7 @@ const ShowContactForm = ({id}) => {
                     <div className="ml-3">
                       <a 
                         href={`tel:${contactData.phone}`}
-                        className="text-black text-normal font-light hover:text-red-500 transition-colors"
+                        className="text-black text-lg font-light hover:text-red-500 transition-colors"
                       >
                         {contactData.phone}
                       </a>
@@ -1400,7 +1404,7 @@ const ShowContactForm = ({id}) => {
           {/* Address */}
           {(contactData.street_and_nr || contactData.city || contactData.country) && (
             <div className="space-y-2">
-                <h3 className="text-red-500 tracking-wide font-light text-sm ml-3 -mb-4">where?</h3>
+                <h3 className="text-red-500 tracking-wide font-light text-base ml-3 -mb-4">where?</h3>
 
               <a
                 href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
@@ -1428,7 +1432,7 @@ const ShowContactForm = ({id}) => {
                     <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
                   </svg>
               </span>
-                <div className="text-black text-normal font-light -space-y-1 -mt-5 ml-6">
+                <div className="text-black text-base font-light -space-y-1 -mt-5 ml-6">
                   {contactData.street_and_nr && <div>{contactData.street_and_nr},</div>}
                   <div>
                     {contactData.postal_code && `${contactData.postal_code} `}
@@ -1443,6 +1447,67 @@ const ShowContactForm = ({id}) => {
           {/* Contact History */}
           {(contactData.last_contact_date || contactData.next_contact_date) && (
           <div className="space-y-1 mb-8">
+            
+            {/* isToContact Checkbox */}
+            <div className="flex items-center w-full relative rounded-lg">
+                <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, isToContact: !prev.isToContact }))}
+                    className="flex items-center space-x-2 text-black hover:text-red-500"
+                    disabled={isLoading}
+                >
+                    {formData.isToContact ? (
+                        <>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="red" className="size-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                            </svg>
+                            <span className="text-base font-light text-black cursor-pointer">
+                                on "to contact" list
+                            </span>
+                        </>
+                    ) : (
+                        <>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="currentColor" className="size-6">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                            </svg>
+                            <span className="text-base font-light text-black cursor-pointer">
+                                put on "to contact" list
+                            </span>
+                        </>
+                    )}
+                </button>
+            </div>
+
+            {/* isContacted Checkbox */}
+            <div className="flex items-center w-full relative rounded-lg">
+                <button
+                    type="button"
+                    onClick={() => setFormData(prev => ({ ...prev, isContacted: !prev.isContacted }))}
+                    className="flex items-center space-x-2 text-black hover:text-red-500"
+                    disabled={isLoading}
+                >
+                    {formData.isContacted ? (
+                        <>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="red" className="size-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                            </svg>
+                            
+                            <span className="text-base font-light text-black cursor-pointer">
+                                contacted
+                            </span>
+                        </>
+                    ) : (
+                        <>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="currentColor" className="size-6">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                            </svg>
+                            <span className="text-base font-light text-black cursor-pointer">
+                                mark as contacted
+                            </span>
+                        </>
+                    )}
+                </button>
+            </div>
             
                 {/* header 2nd Part */}
               <p className="mt-3 ml-3 -mb-1 font-text text-sm tracking-wide text-red-500 font-light">when?</p>

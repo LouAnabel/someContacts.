@@ -736,34 +736,35 @@ const NewContactForm = ({onSubmit, onCancel }) => {
 
 
                     {/* NEED TO CONTACT / CONTACTED BUTTONS */}
-                    <div className="space-y-4">
-                        <p className="font-text text-base font-light tracking-wide text-red-500 ml-1">contact history</p>
-                        <div className="space-y-1">
+                    <div className="space-y-3">
+                        <div className="p-3 pt-5 space-y-1">
                             
                             {/* isToContact Checkbox */}
-                            <div className="flex items-center w-full relative -mt-3 rounded-lg">
+                            <div className="flex items-center w-full relative -mt-8 rounded-lg">
                                 <button
                                     type="button"
                                     onClick={() => setFormData(prev => ({ ...prev, isToContact: !prev.isToContact }))}
-                                    className="flex items-center space-x-2 text-black hover:text-red-500"
+                                    className="flex items-center space-x-2 text-red-500 hover:text-red-500"
                                     disabled={isLoading}
                                 >
                                     {formData.isToContact ? (
                                         <>
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="red" className="size-6">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-7">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z" />
                                             </svg>
+
                                             <span className="text-base font-light text-black cursor-pointer">
-                                                need to contact
+                                                on "to do" list
                                             </span>
                                         </>
                                     ) : (
                                         <>
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="currentColor" className="size-6">
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="black" class="size-7">
+                                              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                                             </svg>
+
                                             <span className="text-base font-light text-black cursor-pointer">
-                                                don't need to contact
+                                                mark as "to do"
                                             </span>
                                         </>
                                     )}
@@ -775,26 +776,25 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                                 <button
                                     type="button"
                                     onClick={() => setFormData(prev => ({ ...prev, isContacted: !prev.isContacted }))}
-                                    className="flex items-center space-x-2 text-black hover:text-red-500"
+                                    className="flex items-center space-x-2 text-red-500 hover:text-red-500"
                                     disabled={isLoading}
                                 >
                                     {formData.isContacted ? (
                                         <>
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="red" className="size-6">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-7">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z" />
                                             </svg>
-                                            
                                             <span className="text-base font-light text-black cursor-pointer">
                                                 contacted
                                             </span>
                                         </>
                                     ) : (
                                         <>
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="currentColor" className="size-6">
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="black" class="size-7">
+                                              <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                                             </svg>
                                             <span className="text-base font-light text-black cursor-pointer">
-                                                contacted
+                                                mark as contacted
                                             </span>
                                         </>
                                     )}
@@ -803,9 +803,10 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                         </div>
                         <div className="">
                             {/* Contact History Fields */}
-                            <div className="relative -mt-3">
-                                <label htmlFor="lastContactDate" className="relative top-3 left-4 bg-white px-1 text-sans text-base text-black font-light">
-                                    last contact (date & place)
+                            <div className="relative -mt-4">
+                              <p className="font-text text-base font-light tracking-wide text-red-500 ml-1 mt-6 mb-1">date and place of</p>
+                                <label htmlFor="lastContactDate" className="relative left-4 bg-white px-1 text-sans text-base text-black font-light">
+                                    last contact
                                 </label>
                                 <input 
                                     type="text" 
@@ -815,7 +816,7 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                                     onChange={handleInputChange}
                                     placeholder="am 19.05.2025 in Berlin"
                                     disabled={isLoading}
-                                    className={`w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
+                                    className={`w-full rounded-xl border -mt-3 border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
                                     style={{
                                         fontSize: '16px',
                                         fontWeight: 300
@@ -829,7 +830,7 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                             {/* Next Contact Field */}
                             <div className="relative -mt-1">
                                 <label htmlFor="nextContactDate" className="relative top-3 left-4 bg-white px-1 text-sans text-base text-black font-light">
-                                    next planned contact (date & place)
+                                    next planned contact
                                 </label>
                                 <input 
                                     type="text" 

@@ -33,7 +33,7 @@ const CategorySelection = ({
                     {selectedCategories.map((category, index) => (
                         <div
                             key={category.id || index}
-                            className="inline-flex items-center bg-red-100 text-red-600 rounded-full px-3 py-1 text-sm font-light"
+                            className="inline-flex items-center bg-red-100 text-black rounded-full px-3 py-1 text-sm font-light"
                         >
                             <span>{category.name}</span>
                             {!disabled && (
