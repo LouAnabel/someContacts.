@@ -28,7 +28,7 @@ const FormDataToApiData = (formData, categories, links, overrides = {}) => {
         last_name: formData.lastName?.trim(),
         email: formData.email?.trim(),
         phone: formData.phone?.trim() || null,
-        category_id: categoryId,
+        category_id: categoryIds,
         is_favorite: formData.isFavorite || false,
         birth_date: formData.birthdate?.trim() || null, // Send as-is (DD.MM.YYYY)
         last_contact_date: formData.lastContactDate?.trim() || null, 

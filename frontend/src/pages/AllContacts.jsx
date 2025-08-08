@@ -55,24 +55,38 @@ export default function AllContacts() {
         return;
       }
 
-      contactsFetched.current = true; // Mark as fetching
+      contactsFetched.current = true; //fetching
         
       try {
+        console.log("Trying to fetch data from API")
         setIsLoading(true);
         setErrors(null);
 
         const contactsData = await getContacts(accessToken);
         console.log('Contacts data:', contactsData); 
         
+        // Add validation:
+        if (!contactsData || !Array.isArray(contactsData)) {
+          console.error('Invalid contacts data:', contactsData);
+          setContacts([]);
+          setAllContacts([]);
+          setFilteredContacts([]);
+          return;
+        }
+
         // Set both filtered and all contacts
         setContacts(contactsData);
         setAllContacts(contactsData);
         setFilteredContacts(contactsData);
 
       } catch (error) {
+        contactsFetched.current = false;
         setErrors("Failed to fetch contacts. Please try again later.");
         console.error('Error fetching contacts:', error);
-        contactsFetched.current = false;
+        
+        setContacts([]);
+        setAllContacts([]);
+        setFilteredContacts([]);
       
       } finally {
         setIsLoading(false);
@@ -142,8 +156,6 @@ export default function AllContacts() {
     setCurrentCategory(null);
     setFilteredContacts(allContacts);
     setContacts(allContacts);
-    // Trigger SearchForm reset
-    setResetSearchForm(prev => prev + 1);
 
     // Trigger SearchForm reset by incrementing the reset counter
     setResetSearchForm(prev => prev + 1);
@@ -195,8 +207,18 @@ export default function AllContacts() {
   
   if (errors) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <p className="text-red-500">{errors}</p>
+      <div className="py-20 flex flex-col justify-center items-center min-h-screen">
+          <Button 
+            onClick={() => navigate('/myspace/')}
+            className=" text-black dark:text-white hover:text-red-500 mb-5 -mt-7"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-5">
+              <path fillRule="evenodd" d="M17 10a.75.75 0 0 1-.75.75H5.612l4.158 3.96a.75.75 0 1 1-1.04 1.08l-5.5-5.25a.75.75 0 0 1 0-1.08l5.5-5.25a.75.75 0 1 1 1.04 1.08L5.612 9.25H16.25A.75.75 0 0 1 17 10Z" clipRule="evenodd" />
+            </svg>
+          </Button>
+
+          <p className="text-red-500 tracking-wide font-light">{errors}</p>
+
       </div>
     );
   }
@@ -226,7 +248,7 @@ export default function AllContacts() {
         <CircleButton
           size="small"
           variant="dark"
-          className="border border-white/30 relative bg-red-500 hover:bg-red-600 dark:bg-red-500 dark:border-red-500"
+          className="border border-white/30 relative font-semibold bg-red-500 hover:bg-red-600 dark:bg-red-500 dark:border-red-500"
           style={{
             marginTop: '2rem',
             marginLeft: 'auto',

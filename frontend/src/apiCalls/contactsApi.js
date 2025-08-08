@@ -1,3 +1,5 @@
+import { data } from "react-router";
+
 const API_BASE_URL = 'http://127.0.0.1:5000';
 
 // Helper function for API requests
@@ -12,11 +14,21 @@ const apiRequest = async (url, options = {}) => {
         });
 
         if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`API Error ${response.status}: ${errorText}`);
+            // Try to get JSON error first, fallback to text
+            let errorMessage;
+            try {
+                const errorData = await response.json();
+                errorMessage = errorData.message || errorData.error || `HTTP ${response.status}`;
+            } catch {
+                errorMessage = await response.text() || `HTTP ${response.status}`;
+            }
+            throw new Error(`API Error ${response.status}: ${errorMessage}`);
         }
+        
+        const data = await response.json(); // Fixed: added 'const'
+        console.log("In API FILE: Response returned from helper function:", data); // Fixed: removed extra 'Console'
+        return data;
 
-        return await response.json();
     } catch (error) {
         console.error('API Request failed:', error);
         throw error;
@@ -157,14 +169,14 @@ export const getContactById = async (accessToken, contactId) => {
 // GET All Contacts
 export const getContacts = async (accessToken) => {
     console.log("In API FILE: fetch all contacts")
-    data = await apiRequest(`${API_BASE_URL}/contacts`, {
+    const data = await apiRequest(`${API_BASE_URL}/contacts`, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${accessToken}`,
         },
     });
-    console.log("In API FILE: contacts data:", data)
-    return data
+    const contactsData = data.contacts;
+    return contactsData
 };
 
 
