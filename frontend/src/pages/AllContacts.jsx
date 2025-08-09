@@ -30,8 +30,9 @@ export default function AllContacts() {
   
   // Search states
   const [currentSearchTerm, setCurrentSearchTerm] = useState('');
-  const [currentCategory, setCurrentCategory] = useState(null);
-
+  const [currentCategories, setCurrentCategories] = useState([]); // Changed to array
+  const [currentContactedFilter, setCurrentContactedFilter] = useState(null);
+  const [currentToContactFilter, setCurrentToContactFilter] = useState(null);
 
   // UI states
   const [errors, setErrors] = useState(null);
@@ -96,12 +97,16 @@ export default function AllContacts() {
     fetchContacts();
   }, [accessToken]);
 
-  const handleSearch = (searchTerm, selectedCategory) => {
+  const handleSearch = (searchTerm, selectedCategories, contactedFilter, toContactFilter) => {
     console.log('Search term:', searchTerm);
-    console.log('Selected category:', selectedCategory);
+    console.log('Selected categories:', selectedCategories);
+    console.log('Contacted filter:', contactedFilter);
+    console.log('To contact filter:', toContactFilter);
     
     setCurrentSearchTerm(searchTerm);
-    setCurrentCategory(selectedCategory);
+    setCurrentCategories(selectedCategories || []);
+    setCurrentContactedFilter(contactedFilter);
+    setCurrentToContactFilter(toContactFilter);
     
     let filtered = [...allContacts];
     
@@ -126,13 +131,31 @@ export default function AllContacts() {
       });
     }
     
-    // Filter by category
-    if (selectedCategory && selectedCategory.id) {
+    // Filter by categories (multiple) - contact must have ALL selected categories
+    if (selectedCategories && selectedCategories.length > 0) {
       filtered = filtered.filter(contact => {
-        // Adjust this based on how categories are stored in your contact objects
-        return contact.category_id === selectedCategory.id || 
-               contact.category?.id === selectedCategory.id ||
-               contact.categories?.some(cat => cat.id === selectedCategory.id);
+        return selectedCategories.every(category => {
+          // Check if contact has this specific category
+          return contact.category_id === category.id || 
+                 contact.category?.id === category.id ||
+                 contact.categories?.some(cat => cat.id === category.id);
+        });
+      });
+    }
+
+    // Filter by contacted status
+    if (contactedFilter !== null) {
+      filtered = filtered.filter(contact => {
+        const isContacted = contact.contacted === true || contact.is_contacted === true;
+        return contactedFilter ? isContacted : !isContacted;
+      });
+    }
+
+    // Filter by to contact status
+    if (toContactFilter !== null) {
+      filtered = filtered.filter(contact => {
+        const isToContact = contact.to_contact === true || contact.is_to_contact === true;
+        return toContactFilter ? isToContact : !isToContact;
       });
     }
     
@@ -140,20 +163,32 @@ export default function AllContacts() {
     setContacts(filtered); // Update the contacts that are displayed
   };
 
+  const removeCategory = (categoryToRemove) => {
+    const updatedCategories = currentCategories.filter(cat => cat.id !== categoryToRemove.id);
+    handleSearch(currentSearchTerm, updatedCategories, currentContactedFilter, currentToContactFilter);
+    setResetSearchForm(prev => prev + 1);
+  };
+
   const clearSearchTerm = () => {
-    handleSearch('', currentCategory);
-    setResetSearchForm(prev => prev + 1); // Trigger SearchForm reset
+    handleSearch('', currentCategories, currentContactedFilter, currentToContactFilter);
+    setResetSearchForm(prev => prev + 1);
   };
 
-  const clearCategory = () => {
-    handleSearch(currentSearchTerm, null);
-    setResetSearchForm(prev => prev + 1); // Trigger SearchForm reset
+  const clearContactedFilter = () => {
+    handleSearch(currentSearchTerm, currentCategories, null, currentToContactFilter);
+    setResetSearchForm(prev => prev + 1);
   };
 
-  // Update the clearSearch function to also trigger reset:
+  const clearToContactFilter = () => {
+    handleSearch(currentSearchTerm, currentCategories, currentContactedFilter, null);
+    setResetSearchForm(prev => prev + 1);
+  };
+
   const clearSearch = () => {
     setCurrentSearchTerm('');
-    setCurrentCategory(null);
+    setCurrentCategories([]);
+    setCurrentContactedFilter(null);
+    setCurrentToContactFilter(null);
     setFilteredContacts(allContacts);
     setContacts(allContacts);
 
@@ -195,6 +230,17 @@ export default function AllContacts() {
 
   const handleSubmit = () => {
     navigate('/myspace/newcontact', { replace: true });
+  };
+
+  const hasActiveFilters = () => {
+    return currentSearchTerm || 
+           currentCategories.length > 0 || 
+           currentContactedFilter !== null || 
+           currentToContactFilter !== null;
+  };
+
+  const hasVisibleFilters = () => {
+    return currentSearchTerm || currentCategories.length > 0;
   };
 
   if (isLoading) {
@@ -280,7 +326,7 @@ export default function AllContacts() {
         
         <div className="space-y-6">
           <h1 className="pt-10 text-3xl font-heading font-bold text-gray-900 dark:text-white mb-2 mt-6">
-            {currentSearchTerm || currentCategory ? (
+            {hasActiveFilters() ? (
               <>
                 Found <span className="text-red-500">{contacts.length}</span> of {allContacts.length} Contacts
               </>
@@ -292,33 +338,64 @@ export default function AllContacts() {
           </h1>
 
           {/* Show active filters */}
-          {(currentSearchTerm || currentCategory) && (
+          {hasActiveFilters() && (
             <div className="flex justify-center items-center gap-2 mb-4 flex-wrap font-text">
               <span className="text-sm font-extralight tracking-wide text-gray-600 dark:text-white">Filtered by:</span>
+              
+              {/* Search term filter */}
               {currentSearchTerm && (
                 <span className="inline-flex items-center px-3 rounded-full text-sm font-extralight tracking-wide border border-red-100 dark:bg-white bg-gray-100 text-black">
                   {currentSearchTerm}
                   <button
-                    onClick={clearSearchTerm}  // Changed this
+                    onClick={clearSearchTerm}
                     className="ml-1 text-lg font-extralight text-red-500 hover:font-light"
                   >
                     ×
                   </button>
                 </span>
               )}
-              {currentCategory && (
-                <span className="inline-flex items-center px-3 rounded-full text-sm font-extralight tracking-wide border border-red-100 bg-red-50 dark:bg-white text-black">
-                  {currentCategory.name}
+
+              {/* Category filters */}
+              {currentCategories.map((category) => (
+                <span key={category.id} className="inline-flex items-center px-3 rounded-full text-sm font-extralight tracking-wide border border-red-100 bg-red-50 dark:bg-white text-black">
+                  {category.name}
                   <button
-                    onClick={clearCategory}  // Changed this
+                    onClick={() => removeCategory(category)}
+                    className="ml-1 text-lg font-extralight text-red-500 hover:font-light"
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+
+              {/* Contacted filter */}
+              {currentContactedFilter !== null && (
+                <span className="inline-flex items-center px-3 rounded-full text-sm font-extralight tracking-wide border border-blue-100 bg-blue-50 dark:bg-white text-black">
+                  {currentContactedFilter ? 'Contacted' : 'Not Contacted'}
+                  <button
+                    onClick={clearContactedFilter}
                     className="ml-1 text-lg font-extralight text-red-500 hover:font-light"
                   >
                     ×
                   </button>
                 </span>
               )}
+
+              {/* To Contact filter */}
+              {currentToContactFilter !== null && (
+                <span className="inline-flex items-center px-3 rounded-full text-sm font-extralight tracking-wide border border-green-100 bg-green-50 dark:bg-white text-black">
+                  {currentToContactFilter ? 'To Contact' : 'Not To Contact'}
+                  <button
+                    onClick={clearToContactFilter}
+                    className="ml-1 text-lg font-extralight text-red-500 hover:font-light"
+                  >
+                    ×
+                  </button>
+                </span>
+              )}
+
               <button
-                onClick={clearSearch}  // This already triggers reset
+                onClick={clearSearch}
                 className="text-sm tracking-wide font-extralight text-gray-600 dark:text-white hover:text-red-500 dark:hover:text-red-500 underline"
               >
                 Clear all
@@ -336,9 +413,8 @@ export default function AllContacts() {
         </div>
       </div>
 
-      {/* ERROR MESSAGES */}
       {/* Show Contacts or No Results Message */}
-      {contacts.length === 0 && (currentSearchTerm || currentCategory) ? (
+      {contacts.length === 0 && hasVisibleFilters() ? (
         <div className="flex flex-col items-center justify-center py-20 font-extralight tracking-wide">
           <div className="text-red-500  text-lg mb-2">No contacts found</div>
           <div className="text-gray-700 text-sm mb-4">

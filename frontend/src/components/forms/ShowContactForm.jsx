@@ -1556,48 +1556,52 @@ const ShowContactForm = ({id}) => {
           )}
 
         </div>
+     
         {(contactData.birth_date || contactData.links.some(link => link.url?.trim() && link.title?.trim())) && (
-        <div className="space-y-2 mb-8">
-          {/* header 2nd Part */}
-          <h2 className="mt-3 ml-3 font-text text-normal tracking-wide text-red-500 font-extralight -mb-1">additional information </h2>
-
-          {/* Links */}
-          {contactData.links && contactData.links.some(link => link.url?.trim() && link.title?.trim()) && (
-            <div className="space-y-2">
-              <h3 className="text-red-500 font-extralight text-sm ml-3 -mb-4">links</h3>
+          <div className="space-y-2 mb-8">
+            {/* header 2nd Part */}
+            <h2 className="mt-3 ml-3 font-text text-normal tracking-wide text-red-500 font-extralight -mb-1">additional information</h2>
+            
+            {/* Links */}
+            {contactData.links && contactData.links.some(link => link.url?.trim() && link.title?.trim()) && (
               <div className="space-y-2">
-                {contactData.links
-                  .filter(link => link.url?.trim() && link.title?.trim()) // Only show links with both URL and title
-                  .map((link, index) => (
-                    <div key={index} className="bg-gray-50 rounded-xl p-3 hover:text-red-500">
-                      <a 
-                        href={link.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-black text-[17px] font-extralight hover:text-red-500 transition-colors break-all"
-                      >
-                        {link.title}
-                      </a>
-                    </div>
-                  ))}
+                <h3 className="text-red-500 font-extralight text-sm ml-3 -mb-4">links</h3>
+                <div className="space-y-2">
+                  {contactData.links
+                    .filter(link => link.url?.trim() && link.title?.trim()) // Only show links with both URL and title
+                    .map((link, index) => (
+                      <div key={index} className="bg-gray-50 rounded-xl p-3 hover:text-red-500">
+                        <a 
+                          href={link.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-black text-[17px] font-extralight hover:text-red-500 transition-colors break-all"
+                        >
+                          {link.title}
+                        </a>
+                      </div>
+                    ))}
+                </div>
               </div>
-
-              {/* Birthday */}
-              {contactData.birth_date && (
-                <div>
-                  <h3 className="text-red-500 font-extralight text-sm ml-3">birthdate</h3>
-                  <div className="bg-gray-50 rounded-xl p-3 -mt-2">
-                    <div className="text-black text-[17px] font-extralight">
-                      {contactData.birth_date}
-                    </div>
+            )}
+            
+            {/* Birthday */}
+            {contactData.birth_date && (
+              <div>
+                <h3 className="text-red-500 font-extralight text-sm ml-3">birthdate</h3>
+                <div className="bg-gray-50 rounded-xl p-3 -mt-2">
+                  <div className="text-black text-[17px] font-extralight">
+                    {contactData.birth_date}
                   </div>
                 </div>
-              )}
-            </div>
-          )}
-        </div>
+              </div>
+            )}
+          </div>
         )}
-
+        
+      
+      
+      
         {/* Edit Button */}
         <CircleButton
             size="xl"
@@ -1616,7 +1620,7 @@ const ShowContactForm = ({id}) => {
       </div>
 
       {/* Back Links */}
-      <div className="w-full px-8 pt-1 space-y-0.25 max-w-[480px] pb-28">
+      <div className="w-full px-8 pt-2 space-y-0.25 max-w-[480px] pb-28">
         <div className="text-black dark:text-white font-extralight block relative"
             style={{ fontSize: '16px' }}>
           want to go {' '}

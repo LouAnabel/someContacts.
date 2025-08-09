@@ -59,7 +59,7 @@ const MenuBar = ({ isMenuOpen, setIsMenuOpen }) => {
 
       {/* Mobile Menu Dropdown */}
       {isMenuOpen && (
-        <div className="fixed  top-20 mt-1 bg-opacity-90 right-0 h-50 w-30 bg-white dark:bg-white z-50 md:hidden transform ease-in-out shadow-lg rounded-l-lg">
+        <div className="fixed  top-20 mt-1 bg-opacity-90 right-0 h-50 w-30 bg-white dark:bg-white z-50 transform ease-in-out shadow-lg rounded-l-lg">
           <div className=" p-1 tracking-wider">
             
             {menuItems.map((item) => (

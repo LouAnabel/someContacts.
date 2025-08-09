@@ -1,89 +1,77 @@
 import { useState, useEffect, useRef } from 'react';
-import { HiSearch, HiX } from 'react-icons/hi';
+import { HiX } from 'react-icons/hi';
 import {buttonStyles} from '../ui/Buttons';
-import { getCategories } from '../../apiCalls/contactsApi';
+import { getCategories, getContacts } from '../../apiCalls/contactsApi';
 import { useAuthContext } from '../../context/AuthContextProvider';
+import { useNavigate } from 'react-router-dom';
 
 const SearchForm = ({ onSearch }) => {
-
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [formData, setFormData] = useState ({})
+  
+  const [quickSearchTerm, setQuickSearchTerm] = useState('');
+
+  const [contacts, setContacts] = useState([]);
+  const [filteredContacts, setFilteredContacts] = useState([]);
+  const [showQuickResults, setShowQuickResults] = useState(false);
   const {accessToken} = useAuthContext();
 
   const searchRef = useRef(null);
   const dropdownRef = useRef(null);
+  const quickSearchRef = useRef(null);
 
-  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
-  const [categories, setCategories] = useState([])
+  // Load contacts for quick search
+  useEffect(() => {
+    const loadContacts = async () => {
+      try {
+        if (accessToken) {
+          const contactsData = await getContacts(accessToken);
+          setContacts(contactsData || []);
+        }
+      } catch (error) {
+        console.error('Failed to load contacts for quick search:', error);
+        setContacts([]);
+      }
+    };
+    loadContacts();
+  }, [accessToken]);
 
-  const handleSearch = (value) => {
-    console.log('Searching for:', value);
-    setSearchTerm(value);
-    if (onSearch) {
-      onSearch(value, formData.category);
+  // Handle quick search filtering
+  useEffect(() => {
+    if (quickSearchTerm.trim() && quickSearchTerm.length >= 1) {
+      const term = quickSearchTerm.toLowerCase().trim();
+      const filtered = contacts.filter(contact => {
+        const firstName = contact.first_name?.toLowerCase() || '';
+        const lastName = contact.last_name?.toLowerCase() || '';
+        const fullName = `${firstName} ${lastName}`.trim();
+        
+        return firstName.includes(term) ||
+               lastName.includes(term) ||
+               fullName.includes(term);
+      }).slice(0, 8); // Limit to 8 results
+      
+      setFilteredContacts(filtered);
+      setShowQuickResults(true);
+    } else {
+      setFilteredContacts([]);
+      setShowQuickResults(false);
     }
-  };
-  
-  // LOAD CATEGORIES FOR TOGGLE MENU
-    useEffect(() => {
-        const loadCategories = async () => {
-            try {
-                if (accessToken) {
-                    const categoriesData = await getCategories(accessToken);
-                    console.log("categoriesData:", categoriesData)
-                    setCategories(categoriesData); // Just empty array, no defaults
-                } else {
-                    setCategories([]); // Empty array when no access token
-                }
-            } catch (error) {   
-                console.error('Failed to load categories:', error);
-                setCategories([]); // Empty array on error
-            }
-        };
-        loadCategories();
-    }, [accessToken]);
+  }, [quickSearchTerm, contacts]);
 
-
-  
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (onSearch && searchTerm.trim()) {
-      onSearch(searchTerm.trim(), formData.category);
-    }
-  };
-
-  const handleCategorySelect = (category) => {
-    console.log('Selected category:', category);
-    setFormData(prev => ({ 
-      ...prev, 
-      category: { name: category.name, id: category.id } 
-    }));
-    setShowCategoryDropdown(false);
-    
-    // Trigger search with new category if there's a search term
-    if (searchTerm.trim() && onSearch) {
-      onSearch(searchTerm.trim(), { name: category.name, id: category.id });
-    }
-  };
-
-  const handleClearCategory = () => {
-    setFormData(prev => ({ ...prev, category: null }));
-    setShowCategoryDropdown(false);
-    
-    // Re-trigger search without category filter
-    if (searchTerm.trim() && onSearch) {
-      onSearch(searchTerm.trim(), null);
-    }
+  const handleContactSelect = (contact) => {
+    // Navigate to contact detail page
+    navigate(`/myspace/contacts/${contact.id}`);
+    setQuickSearchTerm('');
+    setShowQuickResults(false);
+    setIsOpen(false);
   };
 
   const handleSearchToggle = () => {
     setIsOpen(!isOpen);
     // Clear search term when closing
     if (isOpen) {
-      setSearchTerm('');
-      setFormData({});
+      setQuickSearchTerm('');
+      setShowQuickResults(false);
       if (onSearch) {
         onSearch('', null);
       }
@@ -96,16 +84,16 @@ const SearchForm = ({ onSearch }) => {
       // Close search on mobile when clicking outside
       if (isOpen && searchRef.current && !searchRef.current.contains(event.target)) {
         setIsOpen(false);
-        setSearchTerm('');
-        setFormData({});
+        setQuickSearchTerm('');
+        setShowQuickResults(false);
         if (onSearch) {
           onSearch('', null);
         }
       }
-      
-      // Close category dropdown when clicking outside
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setShowCategoryDropdown(false);
+
+      // Close quick search results when clicking outside
+      if (quickSearchRef.current && !quickSearchRef.current.contains(event.target)) {
+        setShowQuickResults(false);
       }
     };
 
@@ -115,121 +103,77 @@ const SearchForm = ({ onSearch }) => {
     };
   }, [isOpen, onSearch]);
 
-
-return (
-    <div ref={searchRef}>
+  return (
+    <div ref={searchRef} className="relative">
       {/* Search Toggle Button */}
       <button
         type="button"
         onClick={handleSearchToggle}
-        className={`p-2 rounded-lg text-sm ${buttonStyles.base} ${
+        className={`mb-1 rounded-lg text-sm ${buttonStyles.base} ${
           isOpen ? buttonStyles.active : buttonStyles.normal
         }`}
       >
         {isOpen ? (
           <HiX className="w-6 h-6" />
         ) : (
-          <HiSearch className="w-5 h-5" />
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">
+                <path fillRule="evenodd" d="M10.5 3.75a6.75 6.75 0 1 0 0 13.5 6.75 6.75 0 0 0 0-13.5ZM2.25 10.5a8.25 8.25 0 1 1 14.59 5.28l4.69 4.69a.75.75 0 1 1-1.06 1.06l-4.69-4.69A8.25 8.25 0 0 1 2.25 10.5Z" clipRule="evenodd" />
+              </svg>
         )}
         <span className="sr-only">{isOpen ? 'Close search' : 'Search'}</span>
       </button>
-        
+
       {/* Search Bar (dropdown) */}
       {isOpen && (
-        <div className="absolute top-19 mt-2 right-8 z-50">
-          <form onSubmit={handleSubmit}>
-            <div className="flex items-center gap-0 relative" ref={dropdownRef}>
-              {/* Category Dropdown Button */}
-              <button 
-                type="button"
-                onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
-                className="inline-flex -mr-2 items-center py-2.5 px-4 text-sm font-light text-center text-white bg-red-500 rounded-s-lg hover:bg-red-200 hover:text-red-500 hover:dark:bg-red-200 hover:dark:text-red-500" 
-              >
-                <span className="font-light tracking-wider">
-                  {formData.category ? formData.category.name : 'Categories'}
-                </span>
-                <svg 
-                  className={`w-4 h-4 ml-2 transition-transform duration-200 ${!showCategoryDropdown ? 'rotate-180' : ''}`}
-                  fill="none" 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-
-              {/* Category Dropdown Menu */}
-              {showCategoryDropdown && (
-                <div className="absolute bg-white rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 w-[128px] -mt-1 top-full left-0 z-20 max-h-60  overflow-y-auto">
-                  
-                  
-                  {/* Category options */}
-                  {categories.length > 0 ? (
-                    categories.map((category) => (
-                      <button
-                        key={category.id}
-                        type="button"
-                        onClick={() => handleCategorySelect(category)}
-                        className={`w-full text-left font-light text-sm px-4 py-2 hover:bg-red-200 ${
-                          formData.category?.id === category.id 
-                            ? 'bg-red-50 text-red-600' 
-                            : 'text-black'
-                        }`}
-                      >
-                        {category.name}
-                      </button>
-                    ))
-                  ) : (
-                    <div className="px-4 py-3 text-gray-400 text-sm font-light italic">
-                      No categories available
-                    </div>
-                  )}
-                </div>
-              )}         
-
-              {/* Search Input Field */}
-              <div className="relative flex-1 w-[265px]">
-                <input 
-                  type="search" 
-                  id="search-dropdown" 
-                  value={searchTerm}
-                  onChange={(e) => handleSearch(e.target.value)}
-                  className="rounded-xl py-2 px-4 w-full text-normal font-light border-gray-200 text-black placeholder-gray-200 placeholder-font-light placeholder-text-sm bg-white dark:bg-white dark:placeholder-gray-300" 
-                  placeholder="search..."
-                />
-                
-                {/* Show selected category indicator in input */}
-                {formData.category && (
-                  <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
-                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-red-100 text-red-800">
-                      {formData.category.name}
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleClearCategory();
-                        }}
-                        className="ml-1 text-red-600 hover:text-red-800"
-                      >
-                        ×
-                      </button>
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              {/* Search Submit Button
-              <button 
-                type="submit" 
-                className="py-2.5 px-3 text-sm -ml-1 font-medium bg-red-500 text-white rounded-e-lg hover:bg-red-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500"
-              >
-                <svg className="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                  <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
-                </svg>
-                <span className="sr-only">Search</span>
-              </button> */}
+        <div className="absolute top-19 mt-2 md:-right-80 -right-16 z-50">
+          {/* Quick Search Section */}
+          <div className="mb-4" ref={quickSearchRef}>
+            <div className="relative">
+              <input
+                type="text"
+                value={quickSearchTerm}
+                onChange={(e) => setQuickSearchTerm(e.target.value)}
+                placeholder="Quick find contact..."
+                className="w-[430px] px-4 py-2 text-[16px] font-extralight border border-red-200 rounded-lg bg-white text-black placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-red-100 focus:border-red-200"
+              />
             </div>
-          </form>
+
+            {/* Quick Search Results Dropdown */}
+            {showQuickResults && filteredContacts.length > 0 && (
+              <div className="absolute top-full -mt-2 w-[322px] lg:w-[322px] md:w-[280px] sm:w-[250px] bg-white border border-red-100 rounded-lg shadow-md z-60 h-15 max-h-60 overflow-y-auto">
+                {filteredContacts.map((contact) => (
+                  <button
+                    key={contact.id}
+                    onClick={() => handleContactSelect(contact)}
+                    className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-3 border-b border-white last:border-b-0"
+                  >
+                    <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center text-red-600 font-medium text-sm">
+                      {contact.first_name?.charAt(0)?.toUpperCase() || 'U'}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-[15px] font-light text-gray-900 text-sm">
+                        {contact.first_name} {contact.last_name}
+                      </div>
+                      {contact.company && (
+                        <div className="text-xs text-gray-500 truncate">
+                          {contact.company}
+                        </div>
+                      )}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* No Results Message */}
+            {showQuickResults && quickSearchTerm.trim() && filteredContacts.length === 0 && (
+              <div className="absolute top-full mt-1 w-[322px] lg:w-[322px] md:w-[280px] sm:w-[250px] bg-white border border-gray-200 rounded-lg shadow-lg z-60 px-4 py-3">
+                <div className="text-sm font-extralight text-gray-500 text-center">
+                  No contacts found for "{quickSearchTerm}"
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>
