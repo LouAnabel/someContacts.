@@ -102,7 +102,7 @@ const SearchFormAllContacts = ({ onSearch, resetTrigger }) => {
   return (
     <div className="w-[536px] lg:w-[620px] mx-auto px-8">
       <form ref={searchRef} onSubmit={handleSubmit}>
-        <div className="-pl-1 -pb-2 flex border border-red-200 bg-gray-100 hover:bg-red-50 dark:bg-black rounded-xl items-center gap-0 relative" ref={dropdownRef}
+        <div className="-pl-1 -pb-2 flex border border-red-100 bg-gray-100 hover:bg-red-50 dark:bg-black rounded-xl items-center gap-0 relative" ref={dropdownRef}
         style={{ 
                      boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)'
                  }}>
@@ -110,7 +110,7 @@ const SearchFormAllContacts = ({ onSearch, resetTrigger }) => {
           <button 
             type="button"
             onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
-            className="inline-flex w-[138px] py-3 items-center rounded-xl px-4 text-[15px] font-extralight text-center text-gray-800 hover:bg-red-50 bg-gray-100 dark:text-white  hover:text-red-500 hover:dark:bg-red-200 hover:dark:text-red-500" 
+            className="inline-flex w-[138px] py-3 items-center rounded-xl px-4 text-[15px] font-extralight text-center text-gray-800 hover:bg-red-50 bg-gray-50 dark:text-white  hover:text-red-500 hover:dark:bg-red-200 hover:dark:text-red-500" 
           >
             <span className="font-extralight tracking-wider">
               {formData.category ? formData.category.name : 'Categories'}
@@ -136,7 +136,7 @@ const SearchFormAllContacts = ({ onSearch, resetTrigger }) => {
                     key={category.id}
                     type="button"
                     onClick={() => handleCategorySelect(category)}
-                    className={`w-full text-left font-extralight tracking-wide text-gray-600 text-[16px] px-3 py-2 hover:bg-gray-100 ${
+                    className={`w-full text-left font-extralight tracking-wide text-gray-600 text-[16px] px-3 py-2 hover:bg-gray-50 ${
                       formData.category?.id === category.id 
                         ? 'bg-red-50 text-red-500' 
                         : 'text-black'

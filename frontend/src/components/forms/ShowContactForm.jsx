@@ -1343,7 +1343,7 @@ const ShowContactForm = ({id}) => {
           {contactData && contactData.categories && contactData.categories.length > 0 && (
             <div className="w-full justify-center mx-auto flex-wrap space-x-2 mt-3 mb-4">
                 {contactData.categories.map((category, index) => (
-                    <span key={category.id || index} className="inline-block px-4 py-2 min-w-[90px] bg-red-100 text-black rounded-full text-base font-extralight">
+                    <span key={category.id || index} className="inline-block px-3 py-2 min-w-[90px] border border-red-50 bg-gray-50  text-black rounded-full text-base font-extralight">
                         {category.name}
                     </span>
                 ))}

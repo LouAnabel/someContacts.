@@ -23,7 +23,7 @@ const MenuBar = ({ isMenuOpen, setIsMenuOpen }) => {
     { action: "logout", firstPart: "log", secondPart: "out." }
   ];
 
-  const linkClasses = "block px-4 py-3 font-sans font-semibold text-lg text-white dark:text-black hover:text-red-500 dark:hover:text-red-500 rounded transition-colors duration-200";
+  const linkClasses = "block px-4 py-3 font-sans text-lg dark:text-black text-black hover:text-red-500 dark:hover:text-red-500 rounded transition-colors duration-200";
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -59,7 +59,7 @@ const MenuBar = ({ isMenuOpen, setIsMenuOpen }) => {
 
       {/* Mobile Menu Dropdown */}
       {isMenuOpen && (
-        <div className="fixed top-20 mt-1 bg-opacity-80 right-0 h-50 w-30 bg-gray-100 dark:bg-white z-50 md:hidden transform ease-in-out shadow-lg rounded-l-lg">
+        <div className="fixed  top-20 mt-1 bg-opacity-90 right-0 h-50 w-30 bg-white dark:bg-white z-50 md:hidden transform ease-in-out shadow-lg rounded-l-lg">
           <div className=" p-1 tracking-wider">
             
             {menuItems.map((item) => (
@@ -72,8 +72,8 @@ const MenuBar = ({ isMenuOpen, setIsMenuOpen }) => {
                   }}
                   className={linkClasses}
                 >
-                  <span className="font-normal text-black">{item.firstPart || ''}</span>
-                  <span className="font-extralight text-black">{item.secondPart}</span>
+                  <span className="font-normal ">{item.firstPart || ''}</span>
+                  <span className="font-extralight ">{item.secondPart}</span>
                 </button>
               ) : (  
                 <Link
@@ -82,8 +82,8 @@ const MenuBar = ({ isMenuOpen, setIsMenuOpen }) => {
                   className={linkClasses}
                   onClick={() => setIsMenuOpen(false)}
                 >
-                 <span className="font-normal text-black">{item.firstPart || ''}</span>
-                  <span className="font-extralight text-black">{item.secondPart}</span>
+                 <span className="font-normal ">{item.firstPart || ''}</span>
+                  <span className="font-extralight">{item.secondPart}</span>
                 </Link>
               )
             ))}
