@@ -100,7 +100,7 @@ const ContactCardSmall = ({contact = {}, onContactUpdate, onDeleteRequest}) => {
                 {contact && contact.categories && contact.categories.length > 0 && (
                     <div className="w-full flex justify-center mx-auto flex-wrap space-x-2 mt-2 mb-4">
                         {contact.categories.map((category, index) => (
-                            <span key={category.id || index} className="inline-block text-center px-4 py-1 min-w-[90px] border border-1 border-red-200 bg-red-100 tracking-wide text-red-800 flex-wrap rounded-xl text-base font-extralight">
+                            <span key={category.id || index} className="inline-block text-center px-4 py-1 min-w-[90px] border border-1 border-red-100 bg-gray-100 tracking-wide text-gray-900 flex-wrap rounded-xl text-[16px] font-extralight">
                                 {category.name}
                             </span>
                         ))}

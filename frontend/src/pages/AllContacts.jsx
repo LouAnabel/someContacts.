@@ -296,22 +296,22 @@ export default function AllContacts() {
             <div className="flex justify-center items-center gap-2 mb-4 flex-wrap font-text">
               <span className="text-sm font-extralight tracking-wide text-gray-600 dark:text-white">Filtered by:</span>
               {currentSearchTerm && (
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-extralight tracking-wide dark:bg-white bg-red-300 text-black">
+                <span className="inline-flex items-center px-3 rounded-full text-sm font-extralight tracking-wide border border-red-100 dark:bg-white bg-gray-100 text-black">
                   {currentSearchTerm}
                   <button
                     onClick={clearSearchTerm}  // Changed this
-                    className="ml-1 text-lg text-blue-600 font-medium hover:text-red-500"
+                    className="ml-1 text-lg font-extralight text-red-500 hover:font-light"
                   >
                     ×
                   </button>
                 </span>
               )}
               {currentCategory && (
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-extralight tracking-wide bg-red-200 dark:bg-white text-black">
+                <span className="inline-flex items-center px-3 rounded-full text-sm font-extralight tracking-wide border border-red-100 bg-red-50 dark:bg-white text-black">
                   {currentCategory.name}
                   <button
                     onClick={clearCategory}  // Changed this
-                    className="ml-1 text-lg font-medium text-green-600 hover:text-red-500"
+                    className="ml-1 text-lg font-extralight text-red-500 hover:font-light"
                   >
                     ×
                   </button>

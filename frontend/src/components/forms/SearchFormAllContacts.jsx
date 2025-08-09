@@ -100,9 +100,9 @@ const SearchFormAllContacts = ({ onSearch, resetTrigger }) => {
   };
 
   return (
-    <div className="w-[536px] lg:w-[620px] mx-auto px-7">
+    <div className="w-[536px] lg:w-[620px] mx-auto px-8">
       <form ref={searchRef} onSubmit={handleSubmit}>
-        <div className="flex border-gray-200 bg-red-200 dark:bg-black rounded-xl items-center gap-0 relative" ref={dropdownRef}
+        <div className="-pl-1 -pb-2 flex border border-red-200 bg-gray-100 hover:bg-red-50 dark:bg-black rounded-xl items-center gap-0 relative" ref={dropdownRef}
         style={{ 
                      boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)'
                  }}>
@@ -110,24 +110,24 @@ const SearchFormAllContacts = ({ onSearch, resetTrigger }) => {
           <button 
             type="button"
             onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
-            className="inline-flex -mr-2 items-center py-2.5 px-4 text-sm font-extralight text-center text-black bg-red-100 dark:bg-red-500 dark:text-white rounded-s-lg hover:bg-red-200 hover:text-red-700 hover:dark:bg-red-200 hover:dark:text-red-500" 
+            className="inline-flex w-[138px] py-3 items-center rounded-xl px-4 text-[15px] font-extralight text-center text-gray-800 hover:bg-red-50 bg-gray-100 dark:text-white  hover:text-red-500 hover:dark:bg-red-200 hover:dark:text-red-500" 
           >
             <span className="font-extralight tracking-wider">
               {formData.category ? formData.category.name : 'Categories'}
             </span>
             <svg 
-              className={`w-4 h-4 ml-2 transition-transform duration-200 ${!showCategoryDropdown ? 'rotate-180' : ''}`}
+              className={`w-4 h-4 ml-2 text-black font-extralight transition-transform duration-200 ${!showCategoryDropdown ? 'rotate-180' : ''}`}
               fill="none" 
               stroke="currentColor" 
               viewBox="0 0 24 24"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 9l-7 7-7-7" />
             </svg>
           </button>
 
           {/* Category Dropdown Menu */}
           {showCategoryDropdown && (
-            <div className="absolute bg-white rounded-2xl shadow-lg border border-gray-200 dark:border-gray-200 w-[150px] top-full left-0 z-20 max-h-60 overflow-y-auto">
+            <div className="absolute bg-white rounded-2xl shadow-lg border border-gray-200 dark:border-gray-200 w-[150px] top-full mt-1 left-0 z-20 max-h-60 overflow-y-auto">
               
               {/* Category options */}
               {categories.length > 0 ? (
@@ -136,9 +136,9 @@ const SearchFormAllContacts = ({ onSearch, resetTrigger }) => {
                     key={category.id}
                     type="button"
                     onClick={() => handleCategorySelect(category)}
-                    className={`w-full text-left font-extralight tracking-wide text-gray-600 text-[16px] px-3 py-2 hover:text-red-700 hover:bg-red-100 ${
+                    className={`w-full text-left font-extralight tracking-wide text-gray-600 text-[16px] px-3 py-2 hover:bg-gray-100 ${
                       formData.category?.id === category.id 
-                        ? 'bg-red-50 text-red-600' 
+                        ? 'bg-red-50 text-red-500' 
                         : 'text-black'
                     }`}
                   >
@@ -154,13 +154,13 @@ const SearchFormAllContacts = ({ onSearch, resetTrigger }) => {
           )}         
 
           {/* Search Input Field */}
-          <div className="relative flex-1 w-[265px]">
+          <div className="relative flex-1 -ml-3">
             <input 
               type="search" 
               id="search-dropdown" 
               value={searchTerm}
               onChange={(e) => handleSearch(e.target.value)}
-              className="rounded-xl py-2 px-4 w-full text-normal font-extralight border-1 border-red-200 text-black placeholder-gray-200 placeholder-font-light placeholder-text-sm bg-white dark:bg-white dark:placeholder-gray-300 focus:outline-none focus:border-gray-300"
+              className="rounded-e-xl pt-2.5 pb-2.5 px-4 -mt-2 -mb-2 w-full text-normal font-extralight border-1 border-white text-black placeholder-gray-200 placeholder-font-light placeholder-text-sm bg-white dark:bg-white dark:placeholder-gray-300 border-l-red-100 focus:outline-none focus:border-l-red-100 focus:border-white"
               placeholder="search..."
             />
 

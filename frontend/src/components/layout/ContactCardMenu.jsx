@@ -16,13 +16,13 @@ const ContactMenuBar = ({onDeleteRequest, isMenuOpen, setIsMenuOpen, id }) => {
             type: "link",
             to: `/myspace/contacts/${id}`,
             firstPart: "open",
-            secondPart: "contact"
+            secondPart: "contact."
         },
         {
             id: "delete",
             type: "button",
             firstPart: "delete",
-            secondPart: "contact",
+            secondPart: "contact.",
             action: onDeleteRequest
         }
     ];

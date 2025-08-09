@@ -96,10 +96,10 @@ function Home() {
         </h1>
       
         {/* Main Part */}
-        <div className="text-2xl font-text font-extralight text-black dark:text-white mb-7">
+        <div className="text-2xl font-text font-extralight text-gray-900 dark:text-white mb-7">
           <p>welcome to your very own personal space.</p>
           <p className="mb-10">keep track of all your connections that matter to you.</p>
-          <p className="text-2xl font-text text-black dark:text-white">
+          <p className="text-2xl font-text text-gray-900 dark:text-white">
             you already have collected{" "}
             <Link to="/myspace/contacts">
               <span className="font-text font-normal text-red-500 dark:text-red-500 hover:text-red-600 dark:hover:text-red-600 transition-colors">

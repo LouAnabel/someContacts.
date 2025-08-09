@@ -59,7 +59,7 @@ const MenuBar = ({ isMenuOpen, setIsMenuOpen }) => {
 
       {/* Mobile Menu Dropdown */}
       {isMenuOpen && (
-        <div className="fixed top-20 right-0 h-50 w-30 bg-black dark:bg-white z-50 md:hidden transform ease-in-out shadow-lg rounded-l-lg">
+        <div className="fixed top-20 mt-1 bg-opacity-80 right-0 h-50 w-30 bg-gray-100 dark:bg-white z-50 md:hidden transform ease-in-out shadow-lg rounded-l-lg">
           <div className=" p-1 tracking-wider">
             
             {menuItems.map((item) => (
@@ -72,8 +72,8 @@ const MenuBar = ({ isMenuOpen, setIsMenuOpen }) => {
                   }}
                   className={linkClasses}
                 >
-                  <span className="font-semibold">{item.firstPart || ''}</span>
-                  <span className="font-light">{item.secondPart}</span>
+                  <span className="font-normal text-black">{item.firstPart || ''}</span>
+                  <span className="font-extralight text-black">{item.secondPart}</span>
                 </button>
               ) : (  
                 <Link
@@ -82,8 +82,8 @@ const MenuBar = ({ isMenuOpen, setIsMenuOpen }) => {
                   className={linkClasses}
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  <span className="font-semibold">{item.firstPart || ''}</span>
-                  <span className="font-extralight">{item.secondPart}</span>
+                 <span className="font-normal text-black">{item.firstPart || ''}</span>
+                  <span className="font-extralight text-black">{item.secondPart}</span>
                 </Link>
               )
             ))}
