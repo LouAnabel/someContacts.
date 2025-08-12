@@ -19,10 +19,15 @@ const Button = ({ children, onClick, className = "", ...props }) => {
 };
 
 const Navbar = () => {
-  // console.log('Navbar rendered');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
   const { logout } = useAuthContext(); 
+
+  // Debug logging
+  console.log('Navbar rendered with:', { 
+    isMenuOpen, 
+    setIsMenuOpen: typeof setIsMenuOpen 
+  });
 
   const handleLogout = () => {
     logout();
@@ -39,17 +44,21 @@ const Navbar = () => {
 
   const handleSearch = (searchTerm) => {
     console.log('Searching for:', searchTerm);
-    // Add your search logic here
     if (searchTerm.trim()) {
-      // Navigate to all contacts page (you can handle the filtering there)
       navigate('/myspace/contacts', { state: { searchTerm } });
     }
   };
 
+  // Enhanced setIsMenuOpen with logging
+  const setMenuOpenWithLogging = (value) => {
+    console.log('📱 Setting menu open to:', value);
+    setIsMenuOpen(value);
+  };
+
   // Common navigation items for desktop
   const navItems = [
-  { to: "/myspace/contacts", firstPart: "all", secondPart: "Contacts." },
-  { to: "/myspace/newcontact", firstPart: "new", secondPart: "Contact." }
+    { to: "/myspace/contacts", firstPart: "all", secondPart: "Contacts." },
+    { to: "/myspace/newcontact", firstPart: "new", secondPart: "Contact." }
   ];
 
   return (
@@ -65,72 +74,50 @@ const Navbar = () => {
             </span>
           </Link>
 
-          {/* search + Theme + Menu toggle */}
+          {/* MOBILE: search + Theme + Menu toggle */}
           <div className="flex items-center md:hidden -mr-6 space-x-1">
-
-            <SearchForm 
-              onSearch={handleSearch}
-            />
+            <SearchForm onSearch={handleSearch} />
 
             {/* Add Contact Button */}
-            <Button 
-              onClick={goToNewContact}
-              className=""
-            >
+            <Button onClick={goToNewContact} className="">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">
                 <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v2.25H9a.75.75 0 0 0 0 1.5h2.25V15a.75.75 0 0 0 1.5 0v-2.25H15a.75.75 0 0 0 0-1.5h-2.25V9Z" clipRule="evenodd" />
               </svg>
             </Button>
 
-            <MenuBar 
-              isMenuOpen={isMenuOpen} 
-              setIsMenuOpen={setIsMenuOpen} 
-            />
-
-            {/* Handle Logout
-            <Button 
-              onClick={handleLogout}
-              className="ml-1"
-            >
-               <svg 
-                xmlns="http://www.w3.org/2000/svg" 
-                viewBox="0 0 24 24" 
-                fill="currentColor" 
-                className="w-6 h-6"
-              >
-                <path 
-                  fillRule="evenodd" 
-                  d="M16.5 3.75a1.5 1.5 0 0 1 1.5 1.5v13.5a1.5 1.5 0 0 1-1.5 1.5h-6a1.5 1.5 0 0 1-1.5-1.5V15a.75.75 0 0 0-1.5 0v3.75a3 3 0 0 0 3 3h6a3 3 0 0 0 3-3V5.25a3 3 0 0 0-3-3h-6a3 3 0 0 0-3 3V9A.75.75 0 1 0 9 9V5.25a1.5 1.5 0 0 1 1.5-1.5h6ZM5.78 8.47a.75.75 0 0 0-1.06 0l-3 3a.75.75 0 0 0 0 1.06l3 3a.75.75 0 0 0 1.06-1.06l-1.72-1.72H15a.75.75 0 0 0 0-1.5H4.06l1.72-1.72a.75.75 0 0 0 0-1.06Z" 
-                  clipRule="evenodd" 
-                />
-              </svg>
-            </Button> */}
+            {/* MOBILE MenuBar */}
+            <div>
+              <MenuBar 
+                isMenuOpen={isMenuOpen} 
+                setIsMenuOpen={setMenuOpenWithLogging} 
+              />
+            </div>
           </div>
 
-          {/* Bigger screens: Mobile search + Nav links + Theme */}
+          {/* DESKTOP: search + Nav links + Theme + Menu */}
           <div className="hidden md:flex items-center space-x-3 tracking-wider">
-
-            <SearchForm 
-              onSearch={handleSearch}
-            />
+            <SearchForm onSearch={handleSearch} />
 
             <div className="flex items-center text-xl space-x-5">
-            {navItems.map((item) => (
-              <Link 
-                key={item.to}
-                to={item.to} 
-                className="nav-link hover:text-red-500 dark:hover:text-red-500"
-              >
-                <span className="font-normal">{item.firstPart}</span>
-                <span className="font-extralight">{item.secondPart}</span>
-              </Link>
-            ))}
+              {navItems.map((item) => (
+                <Link 
+                  key={item.to}
+                  to={item.to} 
+                  className="nav-link hover:text-red-500 dark:hover:text-red-500"
+                >
+                  <span className="font-normal">{item.firstPart}</span>
+                  <span className="font-extralight">{item.secondPart}</span>
+                </Link>
+              ))}
             </div>
 
-            <MenuBar 
-              isMenuOpen={isMenuOpen} 
-              setIsMenuOpen={setIsMenuOpen} 
-            />
+            {/* DESKTOP MenuBar */}
+            <div>
+              <MenuBar 
+                isMenuOpen={isMenuOpen} 
+                setIsMenuOpen={setMenuOpenWithLogging} 
+              />
+            </div>
           </div>
         </div>
       </div>

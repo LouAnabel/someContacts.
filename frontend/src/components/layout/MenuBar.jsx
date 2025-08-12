@@ -1,6 +1,4 @@
-import { Link } from 'react-router-dom';
 import { HiMenu, HiX } from 'react-icons/hi';
-import { buttonStyles } from '../ui/Buttons'; 
 import { useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from "../../context/AuthContextProvider";
@@ -11,9 +9,19 @@ const MenuBar = ({ isMenuOpen, setIsMenuOpen }) => {
   const navigate = useNavigate();
   const { logout } = useAuthContext(); 
 
-  const handleLogout = () => {
+  const handleLogout = (e) => {
+    e.stopPropagation();
+    console.log('🔴 Logout clicked');
+    setIsMenuOpen(false);
     logout();
     navigate('/login', { replace: true });
+  };
+
+  const handleLinkClick = (to, e) => {
+    e.stopPropagation();
+    console.log('🔵 Navigation clicked to:', to);
+    setIsMenuOpen(false);
+    navigate(to);
   };
 
   const menuItems = [
@@ -23,34 +31,43 @@ const MenuBar = ({ isMenuOpen, setIsMenuOpen }) => {
     { action: "logout", firstPart: "log", secondPart: "out." }
   ];
 
-  const linkClasses = "block px-4 py-3 font-sans text-lg dark:text-black text-black hover:text-red-500 dark:hover:text-red-500 rounded transition-colors duration-200";
+  const linkClasses = "w-full text-left block px-4 py-3 font-sans text-lg text-black hover:text-red-500 hover:bg-gray-50 rounded transition-all duration-200 cursor-pointer";
 
-  // Close menu when clicking outside
+  // PROPERLY FIXED: Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
+      // Check if the menu exists and if the click was outside
       if (menuRef.current && !menuRef.current.contains(event.target)) {
+        console.log('Actually clicked outside menu, closing');
         setIsMenuOpen(false);
       }
     };
 
-    // Only add event listener when menu is open
     if (isMenuOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
+      // Add a longer delay to ensure menu is fully rendered
+      const timeoutId = setTimeout(() => {
+        document.addEventListener('click', handleClickOutside);
+      }, 200);
+      
+      return () => {
+        clearTimeout(timeoutId);
+        document.removeEventListener('click', handleClickOutside);
+      };
     }
-
-    // Cleanup event listener
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
   }, [isMenuOpen, setIsMenuOpen]);
 
   return (
-    <div ref={menuRef}>
+    <div className="relative" ref={menuRef}>
       {/* Menu Toggle Button */}
       <button
-        onClick={() => setIsMenuOpen(!isMenuOpen)}
-        className={`${buttonStyles.base} ${
-          isMenuOpen ? buttonStyles.active : buttonStyles.normal
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsMenuOpen(!isMenuOpen);
+        }}
+        className={`p-2 rounded-lg transition-colors duration-200 ${
+          isMenuOpen 
+            ? 'text-red-500' 
+            : 'text-black dark:text-white hover:text-red-500 dark:hover:text-red-500'
         }`}
         aria-label={isMenuOpen ? "Close menu" : "Open menu"}
       >
@@ -59,35 +76,42 @@ const MenuBar = ({ isMenuOpen, setIsMenuOpen }) => {
 
       {/* Mobile Menu Dropdown */}
       {isMenuOpen && (
-        <div className="fixed  top-20 mt-1 bg-opacity-90 right-0 h-50 w-30 bg-white dark:bg-white z-50 transform ease-in-out shadow-lg rounded-l-lg">
-          <div className=" p-1 tracking-wider">
-            
+        <div 
+          className="absolute top-full right-0 mt-2 w-[160px] bg-white border border-gray-200 rounded-xl shadow-xl z-[9999] overflow-hidden"
+          onClick={(e) => {
+            // Prevent clicks inside the dropdown from bubbling up
+            e.stopPropagation();
+            console.log('Clicked inside dropdown');
+          }}
+        >
+          <div className="py-2">
             {menuItems.map((item) => (
               item.action ? (
                 <button 
                   key={item.action}
-                  onClick={() => {
-                    handleLogout();
-                    setIsMenuOpen(false);
-                  }}
+                  onClick={handleLogout}
                   className={linkClasses}
+                  type="button"
                 >
-                  <span className="font-normal ">{item.firstPart || ''}</span>
-                  <span className="font-extralight ">{item.secondPart}</span>
+                  <span className="font-normal">{item.firstPart || ''}</span>
+                  <span className="font-extralight">{item.secondPart}</span>
                 </button>
               ) : (  
-                <Link
+                <button
                   key={item.to}
-                  to={item.to}
+                  onClick={(e) => handleLinkClick(item.to, e)}
                   className={linkClasses}
-                  onClick={() => setIsMenuOpen(false)}
+                  type="button"
                 >
-                 <span className="font-normal ">{item.firstPart || ''}</span>
+                  <span className="font-normal">{item.firstPart || ''}</span>
                   <span className="font-extralight">{item.secondPart}</span>
-                </Link>
+                </button>
               )
             ))}
-            <div className="px-3 pt-2 pb-2">
+            
+            
+            {/* Theme Toggle */}
+            <div className="px-4 py-2">
               <ThemeToggle />
             </div>    
           </div>
