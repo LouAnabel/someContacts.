@@ -25,7 +25,7 @@ export default function AllContacts() {
 
   // Contact states
   const [contacts, setContacts] = useState([]);
-  const [allContacts, setAllContacts] = useState([]); // Store original unfiltered contacts
+  const [allContacts, setAllContacts] = useState([]); 
   const [filteredContacts, setFilteredContacts] = useState([]);
   
   // Search states

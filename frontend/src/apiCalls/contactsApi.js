@@ -107,6 +107,7 @@ export const updateContact = async (accessToken, contactId, contactData) => {
     return updatedContact;
 };
 
+
 // POST / ADD multiple categories to a contact
 export const addCategoriesToContact = async (accessToken, contactId, categoryIds) => {
     return await apiRequest(`${API_BASE_URL}/contact-categories/contacts/${contactId}/categories`, {
@@ -117,6 +118,7 @@ export const addCategoriesToContact = async (accessToken, contactId, categoryIds
         body: JSON.stringify({ category_ids: categoryIds }),
     });
 };
+
 
 // DELETE a category from a contact
 export const removeCategoryFromContact = async (accessToken, contactId, categoryId) => {
@@ -149,6 +151,7 @@ export const getContactCategories = async (accessToken, contactId) => {
     });
 };
 
+
 // READ all contacts in a category
 export const getContactsInCategory = async (accessToken, categoryId) => {
     return await apiRequest(`${API_BASE_URL}/contact_categories/categories/${categoryId}/contacts`, {
@@ -170,6 +173,7 @@ export const getContactById = async (accessToken, contactId) => {
     const contactData = data.contact
     return contactData
 };
+
 
 // GET All Contacts
 export const getContacts = async (accessToken) => {
@@ -193,6 +197,7 @@ export const deleteContactById = async (accessToken, contactId) => {
         },
     });
 };
+
 
 // GET all categories
 export const getCategories = async (accessToken) => {

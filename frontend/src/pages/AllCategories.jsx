@@ -1,16 +1,24 @@
-import ShowContactForm from "../components/forms/ShowContactForm";
-import { useParams } from "react-router";
+import { getCategories, deleteCategory} from "../apiCalls/contactsApi";
+import { useEffect, useState, useRef } from "react";
+import { useAuthContext } from "../context/AuthContextProvider";
+import { useNavigate } from "react-router";
+import CircleButton from "../components/ui/Buttons";
 
 
-export default function AllCategories() {
+export default function ShowCategories() {
 
-  const { id } = useParams();
+    const navigate = useNavigate();
+    const { accessToken } = useAuthContext();
+
+    // Contact states
+    const [contacts, setContacts] = useState([]);
+    const [allContacts, setAllContacts] = useState([]);
 
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div>
-        <ShowContactForm id={id}/>
+        Peter
       </div>                     
     </div>
   );

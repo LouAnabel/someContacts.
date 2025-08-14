@@ -13,7 +13,7 @@ import AllContacts from './pages/AllContacts';
 import NewContact from './pages/NewContact';
 import ShowContact from './pages/ShowContact';
 import UpdateContacts from './pages/UpdateContact';
-import AllCategories from './pages/AllCategories'; 
+import ShowCategories from './pages/AllCategories'; 
 import LandingPage from './pages/LandingPage';
 
 
@@ -35,7 +35,7 @@ function App() {
             <Route path="newcontact" element={<NewContact />} />
             <Route path="contacts/:id" element={<ShowContact />} /> 
             <Route path="updatecontact/:id" element={<UpdateContacts />} />
-            <Route path="categories" element={<AllCategories />} />
+            <Route path="categories" element={<ShowCategories />} />
           </Route>
         </Routes>
       </Router>
