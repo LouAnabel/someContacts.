@@ -1,6 +1,16 @@
 import { data } from "react-router";
 
-const API_BASE_URL = 'http://127.0.0.1:5000';
+// Get the appropriate backend URL based on environment
+const getBackendUrl = () => {
+    // In development, use local backend URL
+    if (import.meta.env.DEV || import.meta.env.VITE_LOCAL_BACKEND_URL) {
+        return import.meta.env.VITE_LOCAL_BACKEND_URL || 'http://127.0.0.1:5000';
+    }
+    // In production, use production backend URL
+    return import.meta.env.VITE_BACKEND_URL;
+};
+
+const API_BASE_URL = getBackendUrl();
 
 // Helper function for API requests
 const apiRequest = async (url, options = {}) => {
@@ -36,8 +46,6 @@ const apiRequest = async (url, options = {}) => {
     }
 };
 
-
-
 // CREATE contact with multiple categories
 export const createContact = async (accessToken, contactData) => {
     console.log('Creating contact with data:', contactData);
@@ -70,7 +78,6 @@ export const createContact = async (accessToken, contactData) => {
     return data.contact;
 };
 
-
 // UPDATE contact with multiple categories
 export const updateContact = async (accessToken, contactId, contactData) => {
     console.log('In API FILE: Updating contact with data:', contactData);
@@ -100,7 +107,6 @@ export const updateContact = async (accessToken, contactId, contactData) => {
     return updatedContact;
 };
 
-
 // POST / ADD multiple categories to a contact
 export const addCategoriesToContact = async (accessToken, contactId, categoryIds) => {
     return await apiRequest(`${API_BASE_URL}/contact-categories/contacts/${contactId}/categories`, {
@@ -112,7 +118,6 @@ export const addCategoriesToContact = async (accessToken, contactId, categoryIds
     });
 };
 
-
 // DELETE a category from a contact
 export const removeCategoryFromContact = async (accessToken, contactId, categoryId) => {
     return await apiRequest(`${API_BASE_URL}/contact_categories/contacts/${contactId}/categories/${categoryId}`, {
@@ -122,7 +127,6 @@ export const removeCategoryFromContact = async (accessToken, contactId, category
         },
     });
 };
-
 
 // UPDATE all categories for a contact (replace existing)
 export const updateContactCategories = async (accessToken, contactId, categoryIds) => {
@@ -155,7 +159,6 @@ export const getContactsInCategory = async (accessToken, categoryId) => {
     });
 };
 
-
 // GET contact By ID
 export const getContactById = async (accessToken, contactId) => {
     const data = await apiRequest(`${API_BASE_URL}/contacts/${contactId}`, {
@@ -167,7 +170,6 @@ export const getContactById = async (accessToken, contactId) => {
     const contactData = data.contact
     return contactData
 };
-
 
 // GET All Contacts
 export const getContacts = async (accessToken) => {
@@ -182,7 +184,6 @@ export const getContacts = async (accessToken) => {
     return contactsData
 };
 
-
 // DELETE contact by ID
 export const deleteContactById = async (accessToken, contactId) => {
     return await apiRequest(`${API_BASE_URL}/contacts/${contactId}`, {
@@ -192,7 +193,6 @@ export const deleteContactById = async (accessToken, contactId) => {
         },
     });
 };
-
 
 // GET all categories
 export const getCategories = async (accessToken) => {
@@ -206,7 +206,6 @@ export const getCategories = async (accessToken) => {
     console.log("In API FILE categoriesData sent to frontend")
     return categories
 };
-
 
 // CREATE a category
 export const createCategory = async (accessToken, categoryData) => {
