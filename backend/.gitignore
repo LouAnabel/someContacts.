@@ -1,8 +1,3 @@
-# Flask instance folder
-instance/
-*.db
-*.sqlite
-*.sqlite3
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -50,19 +45,6 @@ env.bak/
 venv.bak/
 backend/venv/
 frontend/node_modules/
-
-# Database files
-*.db
-*.sqlite
-*.sqlite3
-backend/*.db
-backend/*.sqlite
-instance/
-backend/instance/
-
-# Flask instance folder
-instance/
-backend/instance/
 
 # IDE and editor files
 .vscode/
