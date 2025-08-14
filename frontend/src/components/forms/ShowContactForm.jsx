@@ -202,69 +202,64 @@ const ShowContactForm = ({id}) => {
           }
       };
       
-  // LOADING CATEGORIES TO DATABASE 
-    const addCategory = async () => {
-      if (newCategoryName.trim() && !isAddingCategory) {
-          setIsAddingCategory(true);
-          
-          try {
-              const categoryName = newCategoryName.charAt(0).toUpperCase() + newCategoryName.slice(1).trim();
-              console.log('Adding category:', categoryName);
-              
-              const response = await fetch('http://127.0.0.1:5000/categories', {
-                  method: 'POST',
-                  headers: { 
-                      'Content-Type': 'application/json',
-                      'Authorization': `Bearer ${accessToken}`
-                  },
-                  body: JSON.stringify({ 
-                      name: categoryName
-                  })
-              });
-              
-              if (!response.ok) {
-                  const errorText = await response.text();
-                  console.error('API Error:', response.status, errorText);
-                  throw new Error(`Failed to add category: ${response.status}`);
-              }
-              
-              const apiResponse = await response.json();
-              console.log('API Response for new category:', apiResponse);
-              
-              const newCategory = {
-                  id: apiResponse.id || apiResponse.category?.id || Date.now(),
-                  name: apiResponse.name || apiResponse.category?.name || categoryName,
-                  creator_id: apiResponse.creator_id || apiResponse.category?.creator_id || 1,
-                  contact_count: apiResponse.contact_count || apiResponse.category?.contact_count || 0 
-              };
-              
-              setCategories(prevCategories => [...prevCategories, newCategory]);
-              
-              // UPDATED: Add to categories array instead of replacing single category
-              setFormData(prevFormData => ({
-                  ...prevFormData, 
-                  categories: [...prevFormData.categories, { name: newCategory.name, id: newCategory.id }]
-              }));
-
-              // Clear category errors
-              if (hasSubmitted && errors.categories) {
-                  setErrors(prev => ({ ...prev, categories: '' }));
-              }
-              
-              setNewCategoryName('');
-              setShowAddCategory(false);
-              setShowCategoryDropdown(false);
-              
-              console.log('Category added successfully:', newCategory.name);
-              
-          } catch (error) {
-              console.error('Failed to add category:', error);
-              alert(`Failed to add category: ${error.message}`);
-          } finally {
-              setIsAddingCategory(false);
-          }
-      }
+  //  HELPER FUNCTION: Get next available category ID
+  const getNextCategoryId = (categories) => {
+    if (!categories || categories.length === 0) return 1;
+  
+    // Find the highest existing ID and add 1
+    const maxId = Math.max(...categories.map(cat => parseInt(cat.id) || 0));
+    return maxId + 1;
   };
+
+  // CREATING CATEGORY FOR DISPLAY (ADDING WHEN CONTACT GETS CREATED)
+  const addCategory = async () => {
+    if (newCategoryName.trim() && !isAddingCategory) {
+      setIsAddingCategory(true);
+      
+      try {
+        const categoryName = newCategoryName.charAt(0).toUpperCase() + newCategoryName.slice(1).trim();
+        console.log('Adding category:', categoryName);
+        
+        // Get the next available ID
+        const nextId = getNextCategoryId(categories);
+        
+        // Create category with predictable ID
+        const newCategory = {
+          id: nextId,
+          name: categoryName,
+          creator_id: null, // Will be set by backend
+          contact_count: 0
+        };
+        
+        // Add to local categories list immediately
+        setCategories(prevCategories => [...prevCategories, newCategory]);
+        
+        // Add to form data immediately
+        setFormData(prevFormData => ({
+          ...prevFormData, 
+          categories: [...prevFormData.categories, { name: newCategory.name, id: newCategory.id }]
+        }));
+
+        // Clear category errors
+        if (hasSubmitted && errors.categories) {
+          setErrors(prev => ({ ...prev, categories: '' }));
+        }
+        
+        setNewCategoryName('');
+        setShowAddCategory(false);
+        setShowCategoryDropdown(false);
+        
+        console.log('Category added successfully:', newCategory);
+        
+      } catch (error) {
+        console.error('Failed to add category:', error);
+        alert(`Failed to add category: ${error.message}`);
+      } finally {
+        setIsAddingCategory(false);
+      }
+    }
+  };
+
 
   const addCategoryToForm = (category) => {
       // Check if category is already selected
@@ -339,7 +334,7 @@ const ShowContactForm = ({id}) => {
           }
 
           // Update contact data to match
-          setContactData(prev => ({ ...prev, isFavorite: newFavoriteState }));
+          setContactData(prev => ({ ...prev, is_favorite: newFavoriteState }));
           
       } catch (error) {
           console.error('Error updating favorite status:', error);
@@ -348,6 +343,68 @@ const ShowContactForm = ({id}) => {
           setError(`Failed to update favorite status: ${error.message}`);
       }
   };
+
+    const handleIsContactedToggle = async () => {
+      const newIsContactedState = !formData.isContacted;
+
+      try {
+        setFormData(prev => ({...prev, isContacted: newIsContactedState}));
+        
+        if (!accessToken) {
+          throw new Error("Access token is not available.");
+        }
+
+        const minimalUpdateData = {
+          is_contacted: newIsContactedState
+        };
+
+        console.log("Minimal data sent to API:", minimalUpdateData);
+        const apiResponse = await updateContact(accessToken, formData.id, minimalUpdateData);
+        
+        if (!apiResponse) {
+          throw new Error('Failed to update contacted status');
+        }
+
+        setContactData(prev => ({ ...prev, is_contacted: newIsContactedState }));
+        
+      } catch (error) {
+        console.error('Error updating contacted status:', error);
+        setFormData(prev => ({ ...prev, isContacted: !newIsContactedState }));
+        setError(`Failed to update contacted status: ${error.message}`);
+      }
+    };
+
+
+    const handleIsToContactToggle = async () => {
+      const newIsToContactState = !formData.isToContact;
+
+      try {
+        setFormData(prev => ({...prev, isToContact: newIsToContactState}));
+        
+        if (!accessToken) {
+          throw new Error("Access token is not available.");
+        }
+
+        const minimalUpdateData = {
+          is_to_contact: newIsToContactState
+        };
+
+        console.log("Minimal data sent to API:", minimalUpdateData);
+        const apiResponse = await updateContact(accessToken, formData.id, minimalUpdateData);
+        
+        if (!apiResponse) {
+          throw new Error('Failed to update to contact status');
+        }
+
+        setContactData(prev => ({ ...prev, is_to_contact: newIsToContactState }));
+        
+      } catch (error) {
+        console.error('Error updating to contact status:', error);
+        setFormData(prev => ({ ...prev, isToContact: !newIsToContactState }));
+        setError(`Failed to update to contact status: ${error.message}`);
+      }
+    };
+
 
   const validateForm = () => {
     const newErrors = {};       
@@ -417,12 +474,15 @@ const ShowContactForm = ({id}) => {
   };
 
 
-  const handleSave = async (e) => {
-    console.log("Data to Save:", formData, formData.categories)
+const handleSave = async (e) => {
+    console.log("📋 === STARTING SAVE PROCESS ===");
+    console.log("📋 Initial formData:", formData);
+    
     e.preventDefault();
     setHasSubmitted(true);
     
     if (!validateForm()) {
+      console.log("❌ Validation failed");
       return;
     }
     
@@ -433,35 +493,118 @@ const ShowContactForm = ({id}) => {
         throw new Error("Access token is not available.");
       }
 
+      // STEP 1: Find categories that need to be persisted
+      const existingCategoryIds = categories.map(cat => cat.id);
+      const newCategories = formData.categories.filter(cat => 
+        !existingCategoryIds.includes(cat.id)
+      );
+      
+      console.log("🔍 Existing category IDs:", existingCategoryIds);
+      console.log("🆕 New categories to persist:", newCategories);
+      
+      // STEP 2: Persist new categories
+      for (const newCat of newCategories) {
+        try {
+          console.log("💾 Persisting category:", newCat.name, "with ID:", newCat.id);
+       
+          const response = await fetch('http://127.0.0.1:5000/categories', {
+            method: 'POST',
+            headers: { 
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${accessToken}`
+            },
+            body: JSON.stringify({ 
+              name: newCat.name,
+              id: newCat.id 
+            })
+          });
+          
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.error('❌ Category API Error:', response.status, errorText);
+            throw new Error(`Failed to persist category: ${response.status}`);
+          }
+          
+          const apiResponse = await response.json();
+          console.log("✅ Category persisted successfully:", apiResponse);
+          
+          // If backend returns a different ID, update our local data
+          const actualId = apiResponse.id || apiResponse.category?.id || newCat.id;
+          
+          if (actualId !== newCat.id) {
+            console.log(`⚠️ ID mismatch: expected ${newCat.id}, got ${actualId}`);
+            setFormData(prev => ({
+              ...prev,
+              categories: prev.categories.map(cat => 
+                cat.id === newCat.id ? { ...cat, id: actualId } : cat
+              )
+            }));
+          }
+          
+        } catch (error) {
+          console.error('❌ Failed to persist category:', newCat.name, error);
+          throw new Error(`Failed to save category "${newCat.name}": ${error.message}`);
+        }
+      }
+
+      // STEP 3: Save the contact
+      console.log("📤 === PREPARING CONTACT SAVE ===");
+      console.log("📤 formData before API call:", formData);
+      console.log("📤 formData.categories before API call:", formData.categories);
+      
       const submittedContactData = FormDataToApiData(formData, categories, links);
-      console.log('Submitting transformed contact data:', submittedContactData);
+      console.log("📤 === DATA BEING SENT TO API ===");
+      console.log("📤 Complete submitted data:", submittedContactData);
+      console.log("📤 Category IDs in submitted data:", submittedContactData.category_ids);
 
       const apiContactData = await updateContact(accessToken, formData.id, submittedContactData);
       if (!apiContactData) {
         throw new Error('Failed to update contact - no response from server');
       }
+      
+      console.log("📥 === API RESPONSE RECEIVED ===");
+      console.log("📥 Complete API response:", apiContactData);
+      console.log("📥 Categories in API response:", apiContactData.categories);
+  
+      // STEP 4: Update state with API response
+      console.log("🔄 === UPDATING STATE ===");
       setContactData(apiContactData);
-      const updatedFormData = ApiDataToFormData(apiContactData);
-      setFormData(updatedFormData);
+      
+      const finalFormData = ApiDataToFormData(apiContactData);
+      console.log("🔄 Transformed final form data:", finalFormData);
+      console.log("🔄 Categories in final form data:", finalFormData.categories);
+      
+      setFormData(finalFormData);
       
       setExpandedNotes(false);
       setIsEditing(false);
       setHasSubmitted(false);
       setErrors({});
       
+      console.log("✅ === SAVE COMPLETED SUCCESSFULLY ===");
+      console.log("✅ Final contactData state:", apiContactData);
+      console.log("✅ Final formData state:", finalFormData);
+      
     } catch (error) {
-      console.error('Error updating contact:', error);
+      console.error('❌ Error updating contact:', error);
       setError(`Failed to update contact: ${error.message}`);
     } finally {
       setIsSaving(false);
     }
   };
 
+
   const handleCancel = () => {
     if (!formData) return;
 
     const originalFormData = ApiDataToFormData(contactData);
     setFormData(originalFormData);
+
+    // Remove any new categories that weren't in the original categories list
+    const originalCategoryIds = contactData.categories ? contactData.categories.map(cat => cat.id) : [];
+    setCategories(prevCategories => 
+      prevCategories.filter(cat => originalCategoryIds.includes(cat.id))
+    );
 
     setIsEditing(false);
     setHasSubmitted(false);
@@ -481,11 +624,8 @@ const ShowContactForm = ({id}) => {
     const hasLinks = originalFormData.links && originalFormData.links.length > 0;
     setShowLinks(hasLinks);
     setLinks(hasLinks ? originalFormData.links : [{ title: '', url: '' }]);
-  
   };
 
-
-  
 
   // Show loading state
   if (isLoading) {
@@ -558,7 +698,8 @@ const ShowContactForm = ({id}) => {
                 <div className="flex items-center w-full relative left-2 mt-3 mb-9 rounded-lg">
                     <button
                         type="button"
-                        onClick={() => setFormData(prev => ({ ...prev, isFavorite: !prev.isFavorite }))}
+                        onClick={handleFavoriteToggle}
+                        // onClick={() => setFormData(prev => ({ ...prev, isFavorite: !prev.isFavorite }))}
                         className="flex items-center space-x-2 hover:scale-110 transform"
                         disabled={isLoading}
                     >
@@ -672,7 +813,7 @@ const ShowContactForm = ({id}) => {
                             <div className="flex items-center w-full relative rounded-lg">
                                 <button
                                     type="button"
-                                    onClick={() => setFormData(prev => ({ ...prev, isContacted: !prev.isContacted }))}
+                                    onClick={handleIsContactedToggle}
                                     className="flex items-center space-x-3 text-red-500"
                                     disabled={isLoading}
                                 >
@@ -703,7 +844,7 @@ const ShowContactForm = ({id}) => {
                             <div className="flex items-center w-full relative">
                                 <button
                                     type="button"
-                                    onClick={() => setFormData(prev => ({ ...prev, isToContact: !prev.isToContact }))}
+                                    onClick={handleIsToContactToggle}
                                     className="flex items-center space-x-3 mt-2 text-red-500 hover:text-red-500"
                                     disabled={isLoading}
                                 >
@@ -1311,8 +1452,8 @@ const ShowContactForm = ({id}) => {
         
         <div className="text-center mb-8 space-y-8">
           {/* Name and Favorite */}
-          <div className="flex items-center justify-center space-x-10 -mb-2 mt-8">
-            <h1 className="text-3xl ml-14 font-bold text-black">
+          <div className="flex items-center justify-center space-x-5 -mb-4 mt-8">
+            <h1 className="text-3xl ml-8 font-bold text-black">
               {contactData.first_name} {contactData.last_name}
             </h1>
           
@@ -1341,9 +1482,9 @@ const ShowContactForm = ({id}) => {
           
           {/* Categories Display */}
           {contactData && contactData.categories && contactData.categories.length > 0 && (
-            <div className="w-full justify-center mx-auto flex-wrap space-x-2 mt-3 mb-4">
+            <div className="w-full justify-center mx-auto flex-wrap space-x-2 mt-1 mb-4">
                 {contactData.categories.map((category, index) => (
-                    <span key={category.id || index} className="inline-block px-3 py-2 min-w-[90px] border border-red-50 bg-gray-50  text-black rounded-full text-base font-extralight">
+                    <span key={category.id || index} className="inline-block px-3 py-2 min-w-[90px] border border-red-50 bg-red-100 tracking-wide text-red-700 rounded-full text-base font-extralight">
                         {category.name}
                     </span>
                 ))}
@@ -1362,11 +1503,11 @@ const ShowContactForm = ({id}) => {
               <div className="flex items-center w-full relative rounded-lg">
                   <button
                       type="button"
-                      onClick={() => setFormData(prev => ({ ...prev, isContacted: !prev.isContacted }))}
+                      onClick={handleIsContactedToggle} // FIXED: Use the correct handler
                       className="flex items-center space-x-3 text-red-500"
                       disabled={isLoading}
                   >
-                      {formData.isContacted ? (
+                      {contactData.is_contacted ? ( // FIXED: Use contactData instead of formData
                           <>
                             <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-5">
                               <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
@@ -1393,11 +1534,11 @@ const ShowContactForm = ({id}) => {
               <div className="flex items-center w-full relative">
                   <button
                       type="button"
-                      onClick={() => setFormData(prev => ({ ...prev, isToContact: !prev.isToContact }))}
+                      onClick={handleIsToContactToggle} // FIXED: Use the correct handler
                       className="flex items-center space-x-3 mt-2 text-red-500 hover:text-red-500"
                       disabled={isLoading}
                   >
-                      {formData.isToContact ? (
+                      {contactData.is_to_contact ? ( // FIXED: Use contactData instead of formData
                           <>
                               <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-5">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />

@@ -84,7 +84,6 @@ def create_contact():
             logger.warning(f"Contact creation failed: invalid phone format '{data.get('phone')}'")
             return jsonify({'error': 'Invalid phone number format'}), 400
 
-
         # Handle date parsing with DD-MM-YYYY format
         birth_date = None
         if data.get('birth_date'):
@@ -94,18 +93,36 @@ def create_contact():
                 return jsonify({'error': 'Invalid birth date format. Use DD.MM.YYYY (e.g., 21.05.2000)'}), 400
 
         categories = data.get('categories', [])
-        for category_data in categories:
-            category_id = category_data.get('id')
+        category_ids = []
+
+        for category_item in categories:
+            # Handle different formats:
+            if isinstance(category_item, dict):
+                # Format: [{id: 1, name: "Friend"}, {id: 2, name: "Work"}]
+                category_id = category_item.get('id')
+            elif isinstance(category_item, (int, str)):
+                # Format: [1, 2, 3] or ["1", "2", "3"]
+                category_id = int(category_item)
+            else:
+                logger.warning(f"Invalid category format: {category_item}")
+                continue
+
             if category_id:
+                # Verify category exists and belongs to user
                 category = Category.query.filter_by(
                     id=category_id,
                     creator_id=creator_id
                 ).first()
+
                 if not category:
+                    logger.warning(f"Category {category_id} not found for user {creator_id}")
                     return jsonify({
                         'success': False,
                         'message': f'Invalid category with ID {category_id}'
                     }), 400
+                else:
+                    category_ids.append(category_id)
+                    logger.info(f"Validated category: {category.name} (ID: {category_id})")
 
 
         # Create new contact with updated field names
@@ -133,22 +150,13 @@ def create_contact():
         db.session.flush()
 
         # Handle categories after contact is created
-        categories = data.get('categories', [])
-        for category_data in categories:
-            category_id = category_data.get('id')
-            if category_id:
-                # Verify category belongs to user
-                category = Category.query.filter_by(
-                    id=category_id,
-                    creator_id=creator_id
-                ).first()
-
-                if category:
-                    contact_category = ContactCategory(
-                        contact_id=contact.id,
-                        category_id=category_id
-                    )
-                    db.session.add(contact_category)
+        for category_id in category_ids:
+            logger.info(f"➕ Adding category {category_id} to contact {contact.id}")
+            contact_category = ContactCategory(
+                contact_id=contact.id,
+                category_id=category_id
+            )
+            db.session.add(contact_category)
 
         # Handle links if provided
         links = data.get('links', [])
@@ -392,88 +400,6 @@ def get_contacts():
             'message': 'Failed to retrieve contacts',
             'error': str(e)
         }), 500
-    
-    """
-    try:
-        creator_id_str = get_jwt_identity()
-        creator_id = int(creator_id_str)
-        logger.info(f"Fetching contacts for user ID: {creator_id}")
-
-        # Get query parameters for pagination and search
-        page = request.args.get('page', 1, type=int)
-        per_page = request.args.get('per_page', 10, type=int)
-        search = request.args.get('search', '', type=str).strip()
-        
-        # Optional query parameters
-        favorites_only = request.args.get('favorites', '').lower() == 'true'
-        category_id = request.args.get('category_id')
-
-        per_page = min(per_page, 100)
-        
-        # Base query
-        query = Contact.query.filter_by(creator_id=creator_id)
-
-        # Search by name, email, last contact place, city, country if provided
-        if search:
-            logger.debug(f"Applying search filter: '{search}'")
-            search_term = f"%{search}%"
-            query = query.filter(
-                db.or_(
-                    Contact.first_name.ilike(search_term),
-                    Contact.last_name.ilike(search_term),
-                    Contact.email.ilike(search_term),
-                    Contact.contact_place.ilike(search_term),
-                    Contact.city.ilike(search_term),
-                    Contact.country.ilike(search_term)
-                )
-            )
-
-        # Filter by favorites if requested
-        if favorites_only:
-            query = query.filter_by(is_favorite=True)
-
-        # Filter by category if provided
-        if category_id:
-            if category_id == 'uncategorized':
-                query = query.filter(Contact.category_id.is_(None))
-            else:
-                try:
-                    category_id = int(category_id)
-                    query = query.filter_by(category_id=category_id)
-                    logger.debug(f"Filtering for category_id: {category_id}")
-                except ValueError:
-                    logger.warning(f"Invalid category_id format: {category_id}")
-                    return jsonify({
-                        'success': False,
-                        'message': 'Invalid category ID'
-                    }), 400
-
-        # Order by favorites first, then by name
-        query = query.order_by(Contact.is_favorite.desc(), Contact.first_name.asc())
-
-        # Apply pagination (FIXED: removed duplicate query execution)
-        contacts = query.paginate(
-            page=page,
-            per_page=per_page,
-            error_out=False
-        )
-
-        return jsonify({
-            'success': True,
-            'contacts': [contact.to_dict() for contact in contacts.items],
-            'pagination': {
-                'page': page,
-                'per_page': per_page,
-                'total': contacts.total,
-                'pages': contacts.pages,
-                'has_next': contacts.has_next,
-                'has_prev': contacts.has_prev
-            }
-        }), 200
-    
-    except Exception as e:
-        logger.error(f"Error in get_contacts: {e}", exc_info=True)
-        return jsonify({'error': 'Failed to retrieve contacts'}), 500"""
 
 
 # UPDATE - Update Contact by ID
@@ -522,21 +448,6 @@ def update_contact(contact_id):
             return jsonify(
                 {'error': 'Invalid birth date format. Use DD.MM.YYYY (e.g., 15.05.1990)'}), 400
 
-        # Validate category if provided
-        if 'category_id' in data:
-            category_id = data['category_id']
-            if category_id is not None:
-                # Verify category belongs to user
-                category = Category.query.filter_by(
-                    id=category_id,
-                    creator_id=creator_id
-                ).first()
-                if not category:
-                    return jsonify({
-                        'success': False,
-                        'message': 'Invalid category'
-                    }), 400
-                logger.debug(f"Category validation successful: {category.name}")
 
         # Update basic fields
         if 'first_name' in data:
@@ -550,14 +461,9 @@ def update_contact(contact_id):
         if 'is_favorite' in data:
             contact.is_favorite = bool(data['is_favorite'])
 
-        # Update category
-        if 'category_id' in data:
-            contact.category_id = data['category_id']
-
         # Update extended fields
         if 'birth_date' in data:
-            contact.birth_date = datetime.strptime(data['birth_date'], '%d.%m.%Y').date() if data[
-                'birth_date'] else None
+            contact.birth_date = datetime.strptime(data['birth_date'], '%d.%m.%Y').date() if data['birth_date'] else None
         if 'last_contact_date' in data:
             contact.last_contact_date = data['last_contact_date'].strip() if data['last_contact_date'] else None
         if 'next_contact_date' in data:
@@ -577,7 +483,41 @@ def update_contact(contact_id):
         if 'notes' in data:
             contact.notes = data['notes'].strip() if data['notes'] else None
 
-        # Handle links update if provided (FIXED: moved outside notes block)
+        # Check for both possible field names from frontend
+        category_ids = data.get('categories') or data.get('category_ids')
+        if category_ids is not None:
+
+            # Step 1: Get all current category associations for this contact
+            current_associations = ContactCategory.query.filter_by(contact_id=contact.id).all()
+            current_category_ids = [assoc.category_id for assoc in current_associations]
+
+            # Step 2: Remove associations that are no longer needed
+            for assoc in current_associations:
+                if assoc.category_id not in category_ids:
+                    logger.info(f"🗑️ Removing category {assoc.category_id}")
+                    db.session.delete(assoc)
+
+            # Step 3: Add new associations
+            for category_id in category_ids:
+                if category_id not in current_category_ids:
+                    # Verify category exists and belongs to the user
+                    category = Category.query.filter_by(
+                        id=category_id,
+                        creator_id=creator_id
+                    ).first()
+
+                    if category:
+                        logger.info(f"Adding category {category_id} ({category.name})")
+                        new_association = ContactCategory(
+                            contact_id=contact.id,
+                            category_id=category_id
+                        )
+                        db.session.add(new_association)
+                    else:
+                        logger.warning(f"⚠Category {category_id} not found or doesn't belong to user")
+                        return jsonify({'error': f'Category {category_id} not found'}), 400
+
+
         if 'links' in data:
             # Remove existing links
             ContactLinks.query.filter_by(contact_id=contact_id).delete()
@@ -614,6 +554,9 @@ def update_contact(contact_id):
         contact.updated_at = db.func.current_timestamp()
 
         db.session.commit()
+        db.session.refresh(contact)
+        response_data = contact.to_dict(include_categories=True, include_links=True)
+        logger.info(f"Returning updated contact with categories: {response_data.get('categories')}")
 
         return jsonify({
             'success': True,
@@ -627,6 +570,7 @@ def update_contact(contact_id):
             'success': False,
             'message': 'Invalid date format. Use DD.MM.YYYY'
         }), 400
+
     except Exception as e:
         db.session.rollback()
         logger.error(f"Unexpected error in update_contact: {e}", exc_info=True)

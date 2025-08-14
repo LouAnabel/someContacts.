@@ -98,9 +98,9 @@ const ContactCardSmall = ({contact = {}, onContactUpdate, onDeleteRequest}) => {
                 </div>
                 {/* Categories Display */}
                 {contact && contact.categories && contact.categories.length > 0 && (
-                    <div className="w-full flex justify-center mx-auto flex-wrap space-x-2 mt-2 mb-4">
+                    <div className="w-full flex justify-center mx-auto flex-wrap space-x-2 mt-1 mb-4">
                         {contact.categories.map((category, index) => (
-                            <span key={category.id || index} className="inline-block text-center px-4 py-2 min-w-[90px] border border-red-50 bg-gray-50 tracking-wide text-gray-900 flex-wrap rounded-full text-[16px] font-extralight">
+                            <span key={category.id || index} className="inline-block text-center px-4 py-2 min-w-[90px] border border-red-50 bg-red-100 tracking-wide text-red-700 flex-wrap rounded-full text-[16px] font-extralight">
                                 {category.name}
                             </span>
                         ))}
