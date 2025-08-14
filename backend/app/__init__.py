@@ -39,16 +39,16 @@ def create_app():
         print("Using SQLite database")
 
     # For SQLite: Ensure database directory exists
-    db_path = db_url.replace('sqlite:///', '')
-    db_dir = os.path.dirname(db_path)
-    if db_dir and not os.path.exists(db_dir):
-        os.makedirs(db_dir, exist_ok=True)
-        print(f"Created database directory: {db_dir}")
+    # db_path = db_url.replace('sqlite:///', '')
+    # db_dir = os.path.dirname(db_path)
+    # if db_dir and not os.path.exists(db_dir):
+        # os.makedirs(db_dir, exist_ok=True)
+        # print(f"Created database directory: {db_dir}")
 
 
     # Enable CORS for all routes
     CORS(app, 
-         origins=['http://localhost:3000', 'http://localhost:5173', 'http://127.0.0.1:3000'],
+         # origins=['http://localhost:3000', 'http://localhost:5173', 'http://127.0.0.1:3000'],
          methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
          allow_headers=['Content-Type', 'Authorization'],
          supports_credentials=True)
