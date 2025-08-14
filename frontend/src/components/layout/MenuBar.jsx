@@ -11,7 +11,7 @@ const MenuBar = ({ isMenuOpen, setIsMenuOpen }) => {
 
   const handleLogout = (e) => {
     e.stopPropagation();
-    console.log('🔴 Logout clicked');
+    console.log('Logout clicked');
     setIsMenuOpen(false);
     logout();
     navigate('/login', { replace: true });
