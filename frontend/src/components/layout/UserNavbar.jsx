@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import SearchForm from '../forms/SearchFormNavbar.jsx'
-import MenuBar from "./Menubar.jsx"
+import MenuBar from "./MenuBar.jsx"
 import { useAuthContext } from "../../context/AuthContextProvider";
 
 // Button component for the logout functionality
