@@ -17,6 +17,7 @@ const Button = ({ children, onClick, className = "", ...props }) => {
   );
 };
 
+// creating Navbar Object
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
