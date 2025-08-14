@@ -679,8 +679,8 @@ const handleSave = async (e) => {
   if (isEditing) {
     console.log("Edit Mode Showing")
     return (
-      <div className="justify-items items-center bg-white dark:bg-black p-5 absolute"
-          style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
+     <div className=" flex flex-col items-center min-h-screen bg-white dark:bg-black" 
+        style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
           <form onSubmit={handleSave}>
             
 
@@ -947,7 +947,7 @@ const handleSave = async (e) => {
                             ) : (
                                 <div className="mt-4">
                                     <div className="flex items-center justify-between">
-                                        <span className="relative left-2 -mt-1 mb-3 tracking-wide text-sans font-extralight text-red-500 font-md">
+                                        <span className="relative left-2 mt-2 mb-3 tracking-wide text-sans font-extralight text-red-500 font-md">
                                             address information
                                         </span>
                                         <button
@@ -1450,7 +1450,7 @@ const handleSave = async (e) => {
             }}>
         
         
-        <div className="text-center mb-8 space-y-8">
+        <div className="text-center mb-9 space-y-8">
           {/* Name and Favorite */}
           <div className="flex items-center justify-center space-x-5 -mb-4 mt-8">
             <h1 className="text-3xl ml-8 font-bold text-black">
@@ -1482,9 +1482,9 @@ const handleSave = async (e) => {
           
           {/* Categories Display */}
           {contactData && contactData.categories && contactData.categories.length > 0 && (
-            <div className="w-full justify-center mx-auto flex-wrap space-x-2 mt-1 mb-4">
+            <div className="w-full justify-center mx-auto flex-wrap space-x-2 mt-1">
                 {contactData.categories.map((category, index) => (
-                    <span key={category.id || index} className="inline-block px-3 py-2 min-w-[90px] border border-red-50 bg-red-100 tracking-wide text-red-700 rounded-full text-base font-extralight">
+                    <span key={category.id || index} className="inline-block px-3 py-2 min-w-[90px] border border-red-50 bg-red-50 tracking-wide text-red-700 rounded-full text-base font-extralight">
                         {category.name}
                     </span>
                 ))}
@@ -1494,7 +1494,7 @@ const handleSave = async (e) => {
 
 
         {/* Contact Information */}
-        <div className="space-y-6 mb-8">
+        <div className="space-y-7 mb-7">
 
           {/* Checkboxes */}
           <div className="ml-2"> 
@@ -1504,7 +1504,7 @@ const handleSave = async (e) => {
                   <button
                       type="button"
                       onClick={handleIsContactedToggle} // FIXED: Use the correct handler
-                      className="flex items-center space-x-3 text-red-500"
+                      className="flex items-center space-x-3 text-red-700 "
                       disabled={isLoading}
                   >
                       {contactData.is_contacted ? ( // FIXED: Use contactData instead of formData
@@ -1535,7 +1535,7 @@ const handleSave = async (e) => {
                   <button
                       type="button"
                       onClick={handleIsToContactToggle} // FIXED: Use the correct handler
-                      className="flex items-center space-x-3 mt-2 text-red-500 hover:text-red-500"
+                      className="flex items-center space-x-3 mt-2 text-red-700 hover:text-red-500"
                       disabled={isLoading}
                   >
                       {contactData.is_to_contact ? ( // FIXED: Use contactData instead of formData
@@ -1562,183 +1562,188 @@ const handleSave = async (e) => {
               </div>
 
           </div>
-
-          {/* Contact Methods */}
-          {(contactData.email || contactData.phone) && (
-            <div className="">
-              <h2 className="text-red-500 font-extralight text-normal ml-3">contact details</h2>
-              <p className=" text-red-500 tracking-wide font-extralight text-sm ml-3 -mb-2">how?</p>
-              <div className="bg-gray-50 rounded-xl p-3">
-                {/* Email */}
-                {contactData.email && (
-                  <div className="flex items-start">
-                    <span className="text-red-300 tracking-wide mt-1">
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-4">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
-                      </svg>
-                    </span>
-                    <div className="ml-3">
-                      <a 
-                        href={`mailto:${contactData.email}`}
-                        className="text-black text-[17px] font-extralight hover:text-red-500 transition-colors"
-                      >
-                        {contactData.email}
-                      </a>
-                    </div>
-                  </div>
-                )}
-                
-                {/* Phone */}
-                {contactData.phone && (
-                  <div className="flex items-start">
-                    <span className="text-red-300 tracking-wide font-extralight text-sm mt-1">
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-4">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z" />
-                      </svg>
-                    </span>
-                    <div className="ml-3">
-                      <a 
-                        href={`tel:${contactData.phone}`}
-                        className="text-black text-[17px] font-extralight hover:text-red-500 transition-colors"
-                      >
-                        {contactData.phone}
-                      </a>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-
-          {/* Address */}
-          {(contactData.street_and_nr || contactData.city || contactData.country) && (
-            <div className="space-y-2">
-                <h3 className="text-red-500 tracking-wide font-extralight text-sm -mt-3 ml-3 -mb-4">where?</h3>
-
-              <a
-                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                  [
-                    contactData.street_and_nr,
-                    contactData.postal_code,
-                    contactData.city,
-                    contactData.country
-                  ]
-                    .filter(Boolean) // Remove empty values
-                    .join(', ')
-                )}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block bg-gray-50 hover:bg-gray-100 rounded-xl p-3 cursor-pointer"
-                title="Open in Google Maps"
-              >
-                <span className="flex items-center justify-start">
-                  {/* Small indicator */}
-                  <svg 
-                    className="w-4 h-4 text-red-200" 
-                    fill="currentColor" 
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-                  </svg>
-              </span>
-                <div className="text-black text-[17px] font-extralight -space-y-1 -mt-5 ml-6">
-                  {contactData.street_and_nr && <div>{contactData.street_and_nr},</div>}
-                  <div>
-                    {contactData.postal_code && `${contactData.postal_code} `}
-                    {contactData.city},
-                  </div>
-                  {contactData.country && <div>{contactData.country}</div>}
-                </div>
-              </a>
-            </div>
-          )}
-
-          {/* Contact History */}
-          {(contactData.last_contact_date || contactData.next_contact_date) && (
-          <div className="mb-8">
-            <h3 className="text-red-500 font-extralight text-normal ml-3 mb-1">important facts to remember</h3>
-              {/* last contact */}
-              {contactData.last_contact_date && (
-                <>
-                  <h3 className="text-red-500 tracking-wide font-extralight text-sm ml-3 -mb-2"><span className="font-extralight">last contact</span></h3>
-                  <div className="bg-gray-50 rounded-xl p-3">
-                      <div className="text-black text-[17px] font-extralight">
-                        {contactData.last_contact_date}
-                      </div>
-                  </div>
-                </>  
-              )}
-
-                {/* next contact */}
-                {contactData.next_contact_date && (
-                <>
-                  <h3 className="text-red-500 tracking-wide font-extralight text-sm mt-2 ml-3"><span className="font-extralight">next contact</span></h3>
-                  <div className="bg-gray-50 rounded-xl p-3 -mt-2">
-                      <div className="text-black text-[17px] font-extralight">
-                        {contactData.next_contact_date}
-                      </div>
-                  </div>
-                </>  
-              )}
-          </div>
-          )}
-
-          {/* Notes */}
-          {contactData.notes && (
-            <div className="">
-              <h3 className="text-red-500 font-extralight text-sm ml-3 -mt-3">notes</h3>
-              <div className="bg-gray-50 rounded-xl p-3 -mt-2 min-h-[100px]">
-                <div className="text-black text-[17px] font-extralight whitespace-pre-wrap ">
-                  "{contactData.notes}"
-                </div>
-              </div>
-            </div>
-          )}
-
-        </div>
-     
-        {(contactData.birth_date || contactData.links.some(link => link.url?.trim() && link.title?.trim())) && (
-          <div className="space-y-2 mb-8">
-            {/* header 2nd Part */}
-            <h2 className="mt-3 ml-3 font-text text-normal tracking-wide text-red-500 font-extralight -mb-1">additional information</h2>
-            
-            {/* Links */}
-            {contactData.links && contactData.links.some(link => link.url?.trim() && link.title?.trim()) && (
-              <div className="space-y-2">
-                <h3 className="text-red-500 font-extralight text-sm ml-3 -mb-4">links</h3>
-                <div className="space-y-2">
-                  {contactData.links
-                    .filter(link => link.url?.trim() && link.title?.trim()) // Only show links with both URL and title
-                    .map((link, index) => (
-                      <div key={index} className="bg-gray-50 rounded-xl p-3 hover:text-red-500">
+          
+          {/* <div className="">
+              <h2 className="ml-3 font-text text-normal text-red-700 font-light -mb-5">How to contact?</h2>
+          </div> */}
+    
+            {/* Contact Methods */}
+            {(contactData.email || contactData.phone) && (
+              <div className="">
+                <h2 className="text-red-700 font-extralight text-[15px] -mb-2 ml-3">mail & phone number</h2>
+                <div className="bg-gray-50 rounded-xl p-3 space-y-1">
+                  {/* Email */}
+                  {contactData.email && (
+                    <div className="flex items-start">
+                      <span className="text-gray-500 mt-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="currentColor" className="size-4">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+                        </svg>
+                      </span>
+                      <div className="ml-3">
                         <a 
-                          href={link.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-black text-[17px] font-extralight hover:text-red-500 transition-colors break-all"
+                          href={`mailto:${contactData.email}`}
+                          className="text-black text-[17px] font-extralight hover:text-red-500 transition-colors"
                         >
-                          {link.title}
+                          {contactData.email}
                         </a>
                       </div>
-                    ))}
+                    </div>
+                  )}
+                  
+                  {/* Phone */}
+                  {contactData.phone && (
+                    <div className="flex items-start">
+                      <span className="text-gray-500 font-extralight text-sm mt-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="currentColor" className="size-4">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z" />
+                        </svg>
+                      </span>
+                      <div className="ml-3">
+                        <a 
+                          href={`tel:${contactData.phone}`}
+                          className="text-black text-[17px] font-extralight hover:text-red-500 transition-colors"
+                        >
+                          {contactData.phone}
+                        </a>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
-            
+
+
+            {/* Address */}
+            {(contactData.street_and_nr || contactData.city || contactData.country) && (
+              <div className="space-y-2">
+                  <h3 className="text-red-700 font-extralight text-[15px] -mt-3 ml-3 -mb-4">address</h3>
+
+                <a
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                    [
+                      contactData.street_and_nr,
+                      contactData.postal_code,
+                      contactData.city,
+                      contactData.country
+                    ]
+                      .filter(Boolean) // Remove empty values
+                      .join(', ')
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block bg-gray-50 hover:bg-gray-100 rounded-xl p-3 cursor-pointer"
+                  title="Open in Google Maps"
+                >
+                  <span className="flex items-center justify-start">
+                    {/* Small indicator */}
+                    <svg 
+                      className="w-4 h-4 text-gray-300" 
+                      fill="currentColor" 
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                    </svg>
+                </span>
+                  <div className="text-black text-[17px]  font-extralight -space-y-1 -mt-5 ml-6">
+                    {contactData.street_and_nr && <div>{contactData.street_and_nr},</div>}
+                    <div>
+                      {contactData.postal_code && `${contactData.postal_code} `}
+                      {contactData.city},
+                    </div>
+                    {contactData.country && <div>{contactData.country}</div>}
+                  </div>
+                </a>
+              </div>
+            )}
+
             {/* Birthday */}
-            {contactData.birth_date && (
-              <div>
-                <h3 className="text-red-500 font-extralight text-sm ml-3">birthdate</h3>
-                <div className="bg-gray-50 rounded-xl p-3 -mt-2">
-                  <div className="text-black text-[17px] font-extralight">
-                    {contactData.birth_date}
+              {contactData.birth_date && (
+                <div>
+                  <h3 className="text-red-700 font-extralight text-[15px] ml-3 -mt-2">date of birth</h3>
+                  <div className="bg-gray-50 rounded-xl p-3 -mt-2">
+                    <div className="text-black text-[17px] tracking-wide font-extralight ml-6">
+                      {contactData.birth_date}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+
+
+            {/* Contact History */}
+            {(contactData.last_contact_date || contactData.next_contact_date) && (
+              
+            <div className="mb-8 bg-gray-50 rounded-xl">
+                {/* last contact */}
+                {contactData.last_contact_date && (
+                  <>
+                    <h3 className="text-red-700 text-[15px] ml-3 -mb-6"><span className="font-extralight">last date of contact:</span></h3>
+                    <div className="p-3 pt-5">
+                        <div className="text-black text-[16px] font-extralight">
+                          {contactData.last_contact_date}
+                        </div>
+                    </div>
+                  </>  
+                )}
+
+                  {/* next contact */}
+                  {contactData.next_contact_date && (
+                  <>
+                    <h3 className="text-red-700 font-extralight text-[15px] ml-3 -mb-6"><span className="font-extralight">next planned contact:</span></h3>
+                    <div className="p-3 -mt-2 pt-5">
+                        <div className="text-black text-[17px] font-extralight">
+                          {contactData.next_contact_date}
+                        </div>
+                    </div>
+                  </>  
+                )}
+            </div>
+            )}
+
+            {/* Notes */}
+            {contactData.notes && (
+              <div className="">
+                <h3 className="text-red-700 font-light text-[16px] ml-3 -mt-3">notes</h3>
+                <div className="bg-gray-50 rounded-xl p-3 -mt-2 min-h-[100px]">
+                  <div className="text-black text-[17px] font-extralight whitespace-pre-wrap ">
+                    "{contactData.notes}"
                   </div>
                 </div>
               </div>
             )}
+
           </div>
-        )}
+      
+          {(contactData.birth_date || contactData.links.some(link => link.url?.trim() && link.title?.trim())) && (
+            <div className="space-y-2 mt-5 mb-8">
+              {/* Links */}
+              {contactData.links && contactData.links.some(link => link.url?.trim() && link.title?.trim()) && (
+                <div className="space-y-2">
+                  <h3 className="text-red-700 font-light text-normal ml-3 -mb-3">links</h3>
+                  <div className="flex space-y-2">
+                    {contactData.links
+                      .filter(link => link.url?.trim() && link.title?.trim()) // Only show links with both URL and title
+                      .map((link, index) => (
+                        <div key={index} className="bg-gray-50 rounded-xl p-3 pt-2 hover:text-red-500">
+                          <a 
+                            href={link.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-red-600 text-[17px] font-extralight hover:text-red-500 transition-colors break-all"
+                          >
+                            {link.title}
+                          </a>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              )}
+              
+              
+            </div>
+          )}
+
         
       
       

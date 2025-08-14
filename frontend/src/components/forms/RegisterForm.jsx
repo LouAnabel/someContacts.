@@ -252,12 +252,12 @@ const RegisterForm = () => {
                                     onChange={handleInputChange}
                                     placeholder="streep"
                                     disabled={showLoading}
-                                    className={`w-full rounded-xl border bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
+                                    className={`w-full rounded-xl border bg-white hover:border-red-300 dark:hover:border-red-300 text-black placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
                                         hasSubmitted && errors.lastName ? 'border-red-500 shadow-md' : 'border-gray-400 dark:border-gray-400'
                                     }`}
                                     style={{
                                         fontSize: '18px',
-                                        fontWeight: 300
+                                        fontWeight: 200
                                     }}
                                 />
                                 <label 
@@ -267,7 +267,7 @@ const RegisterForm = () => {
                                     last name
                                 </label>
                                 {hasSubmitted && errors.lastName && (
-                                    <p className="absolute top-full font-extralight right-1 text-sm text-red-600 z-20">{errors.lastName}</p>
+                                    <p className="absolute top-full font-light right-1 text-sm text-red-600 z-20">{errors.lastName}</p>
                                 )}
                             </div>
                         </div>
@@ -291,7 +291,7 @@ const RegisterForm = () => {
                                     }`}
                                     style={{
                                         fontSize: '18px',
-                                        fontWeight: 300
+                                        fontWeight: 200
                                     }}
                                 />
                                 <label 
@@ -325,7 +325,7 @@ const RegisterForm = () => {
                                     }`}
                                     style={{
                                         fontSize: '18px',
-                                        fontWeight: 300
+                                        fontWeight: 200
                                     }}
                                 />
                                 <button 
@@ -380,7 +380,7 @@ const RegisterForm = () => {
                                     }`}
                                     style={{
                                         fontSize: '18px',
-                                        fontWeight: 300
+                                        fontWeight: 200
                                     }}
                                 />
                                 

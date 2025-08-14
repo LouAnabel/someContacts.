@@ -4,7 +4,7 @@ import ContactCardPhotoSmall from '../ui/ContactCardPhoto';
 import { useNavigate, Link } from 'react-router';
 import { useAuthContext } from '../../context/AuthContextProvider';
 import { updateContact } from '../../apiCalls/contactsApi';
-import FormDataToApiData from '../helperFunctions/FormToApiData'   
+
 
 const ContactCardSmall = ({contact = {}, onContactUpdate, onDeleteRequest}) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -96,11 +96,12 @@ const ContactCardSmall = ({contact = {}, onContactUpdate, onDeleteRequest}) => {
                         />
                     </span>
                 </div>
+
                 {/* Categories Display */}
                 {contact && contact.categories && contact.categories.length > 0 && (
-                    <div className="w-full flex justify-center mx-auto flex-wrap space-x-2 mt-1 mb-4">
+                    <div className="w-full flex justify-center mx-auto flex-wrap space-x-2 mt-1 mb-5">
                         {contact.categories.map((category, index) => (
-                            <span key={category.id || index} className="inline-block text-center px-4 py-2 min-w-[90px] border border-red-50 bg-red-100 tracking-wide text-red-700 flex-wrap rounded-full text-[16px] font-extralight">
+                            <span key={category.id || index} className="inline-block text-center px-4 py-2 min-w-[90px] border border-red-50 bg-red-50 tracking-wide text-red-700 flex-wrap rounded-full text-[16px] font-extralight">
                                 {category.name}
                             </span>
                         ))}
@@ -108,7 +109,7 @@ const ContactCardSmall = ({contact = {}, onContactUpdate, onDeleteRequest}) => {
                 )}
 
                 {/* Contact Details */}
-                <div className="w-full relative justify-items flex flex-col mt-4 mb-4">
+                <div className="w-full relative justify-items flex flex-col mb-4">
                     <div className="flex items-center justify-between w-full mb-1">
                         {/* City and Country */}
                         <span className="text-black font-text text-[17px] font-extralight ml-4">
@@ -146,7 +147,7 @@ const ContactCardSmall = ({contact = {}, onContactUpdate, onDeleteRequest}) => {
 
                     {/* Phone Number */}
                     {contact.phone && (
-                        <div className="relative left flex items-center ml-4 text-red-500">
+                        <div className="relative left flex items-center ml-4 text-red-300">
                             <svg 
                                 xmlns="http://www.w3.org/2000/svg" 
                                 fill="none" 
@@ -174,7 +175,7 @@ const ContactCardSmall = ({contact = {}, onContactUpdate, onDeleteRequest}) => {
 
                     {/* Email Address */}
                     {contact.email && (
-                        <div className="relative flex items-center ml-4 text-red-500">
+                        <div className="relative flex items-center ml-4 text-red-300">
                             <svg 
                                 xmlns="http://www.w3.org/2000/svg" 
                                 fill="none" 

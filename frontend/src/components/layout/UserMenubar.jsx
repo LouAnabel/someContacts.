@@ -31,7 +31,7 @@ const MenuBar = ({ isMenuOpen, setIsMenuOpen }) => {
     { action: "logout", firstPart: "log", secondPart: "out." }
   ];
 
-  const linkClasses = "w-full text-left block px-4 py-3 font-sans text-lg text-black hover:text-red-500 hover:bg-gray-50 rounded transition-all duration-200 cursor-pointer";
+  const linkClasses = "w-full text-left block px-4 py-3 font-sans text-xl text-black hover:text-red-500 hover:bg-gray-50 rounded transition-all duration-200 cursor-pointer";
 
   // PROPERLY FIXED: Close menu when clicking outside
   useEffect(() => {
