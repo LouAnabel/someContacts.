@@ -15,6 +15,7 @@ import ShowContact from './pages/ShowContact';
 import UpdateContacts from './pages/UpdateContact';
 import ShowCategories from './pages/AllCategories'; 
 import LandingPage from './pages/LandingPage';
+import UserProfile from './pages/UserProfile';
 
 
 function App() {
@@ -36,6 +37,7 @@ function App() {
             <Route path="contacts/:id" element={<ShowContact />} /> 
             <Route path="updatecontact/:id" element={<UpdateContacts />} />
             <Route path="categories" element={<ShowCategories />} />
+            <Route path="profile" element={<UserProfile />} />
           </Route>
         </Routes>
       </Router>

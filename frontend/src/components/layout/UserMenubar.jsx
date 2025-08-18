@@ -1,5 +1,5 @@
 import { HiMenu, HiX } from 'react-icons/hi';
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from "../../context/AuthContextProvider";
 import ThemeToggle from '../theme/ThemeToggle';
@@ -7,7 +7,22 @@ import ThemeToggle from '../theme/ThemeToggle';
 const MenuBar = ({ isMenuOpen, setIsMenuOpen }) => {
   const menuRef = useRef(null);
   const navigate = useNavigate();
-  const { logout } = useAuthContext(); 
+  const { logout } = useAuthContext();
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect screen size
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth < 768); // md breakpoint
+    };
+
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+
+    return () => {
+      window.removeEventListener('resize', checkScreenSize);
+    };
+  }, []);
 
   const handleLogout = (e) => {
     e.stopPropagation();
@@ -24,20 +39,31 @@ const MenuBar = ({ isMenuOpen, setIsMenuOpen }) => {
     navigate(to);
   };
 
-  const menuItems = [
-    { to: "/myspace", firstPart: "home." },
-    { to: "/myspace/newcontact", firstPart: "new", secondPart: "Contact." },
+  // Mobile menu items (all items)
+  const mobileMenuItems = [
+    { to: "/myspace", secondPart: "home." },
     { to: "/myspace/contacts", firstPart: "all", secondPart: "Contacts." },
     { to: "/myspace/categories", firstPart: "all", secondPart: "Categories." },
+    { to: "/myspace/profile", firstPart: "my", secondPart: "Profile." },
     { action: "logout", firstPart: "log", secondPart: "out." }
   ];
 
+  // Desktop menu items (excluding allContacts and newContact)
+  const desktopMenuItems = [
+    { to: "/myspace", secondPart: "home." },
+    { to: "/myspace/categories", firstPart: "all", secondPart: "Categories." },
+    { to: "/myspace/profile", firstPart: "my", secondPart: "Profile." },
+    { action: "logout", firstPart: "log", secondPart: "out." }
+  ];
+
+  // Choose menu items based on screen size
+  const menuItems = isMobile ? mobileMenuItems : desktopMenuItems;
+
   const linkClasses = "w-full text-left block px-4 py-3 font-sans text-lg text-black hover:text-red-500 hover:bg-gray-50 rounded transition-all duration-200 cursor-pointer";
 
-  // PROPERLY FIXED: Close menu when clicking outside
+  // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      // Check if the menu exists and if the click was outside
       if (menuRef.current && !menuRef.current.contains(event.target)) {
         console.log('Actually clicked outside menu, closing');
         setIsMenuOpen(false);
@@ -45,7 +71,6 @@ const MenuBar = ({ isMenuOpen, setIsMenuOpen }) => {
     };
 
     if (isMenuOpen) {
-      // Add a longer delay to ensure menu is fully rendered
       const timeoutId = setTimeout(() => {
         document.addEventListener('click', handleClickOutside);
       }, 200);
@@ -75,12 +100,13 @@ const MenuBar = ({ isMenuOpen, setIsMenuOpen }) => {
         {isMenuOpen ? <HiX className="h-6 w-6" /> : <HiMenu className="h-6 w-6" />}
       </button>
 
-      {/* Mobile Menu Dropdown */}
+      {/* Menu Dropdown */}
       {isMenuOpen && (
         <div 
-          className="absolute top-full right-0 mt-2 w-[160px] bg-white border border-gray-200 rounded-xl shadow-xl z-[9999] overflow-hidden"
+          className={`absolute top-full right-0 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl z-[9999] overflow-hidden ${
+            isMobile ? 'w-[180px]' : 'w-[160px]'
+          }`}
           onClick={(e) => {
-            // Prevent clicks inside the dropdown from bubbling up
             e.stopPropagation();
             console.log('Clicked inside dropdown');
           }}
@@ -91,7 +117,7 @@ const MenuBar = ({ isMenuOpen, setIsMenuOpen }) => {
                 <button 
                   key={item.action}
                   onClick={handleLogout}
-                  className={linkClasses}
+                  className={`${linkClasses} dark:text-white dark:hover:text-red-500 dark:hover:bg-gray-700`}
                   type="button"
                 >
                   <span className="font-normal">{item.firstPart || ''}</span>
@@ -101,7 +127,7 @@ const MenuBar = ({ isMenuOpen, setIsMenuOpen }) => {
                 <button
                   key={item.to}
                   onClick={(e) => handleLinkClick(item.to, e)}
-                  className={linkClasses}
+                  className={`${linkClasses} dark:text-white dark:hover:text-red-500 dark:hover:bg-gray-700`}
                   type="button"
                 >
                   <span className="font-normal">{item.firstPart || ''}</span>
@@ -109,7 +135,6 @@ const MenuBar = ({ isMenuOpen, setIsMenuOpen }) => {
                 </button>
               )
             ))}
-            
             
             {/* Theme Toggle */}
             <div className="px-4 py-2">
