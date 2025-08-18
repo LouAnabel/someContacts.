@@ -14,7 +14,7 @@ function AuthLayout() {
   }, [location.pathname]);
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white font-heading flex flex-col">
+    <div className="min-h-screen bg-white dark:bg-gray-900 text-black dark:text-white font-heading flex flex-col">
       <AuthNavbar />
       <main className="p-3 items-center justify-center">
         <Outlet />

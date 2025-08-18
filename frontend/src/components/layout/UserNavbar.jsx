@@ -62,7 +62,7 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className="bg-gray-50 bg-opacity-90 font-text dark:bg-black fixed w-full z-50 top-0">
+    <nav className="bg-gray-50 bg-opacity-90 font-text dark:bg-gray-900 fixed w-full z-50 top-0">
       <div className=" max-w-screen-xl mx-auto px-8 pr-9 relative">
         
         <div className="flex justify-between items-center h-20">

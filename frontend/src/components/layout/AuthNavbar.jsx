@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 const AuthNavbar = () => {
   return (
-    <nav className="bg-white dark:bg-black fixed w-full z-50 top-0">
+    <nav className="bg-white dark:bg-gray-900 fixed w-full z-50 top-0">
       <div className="max-w-screen-xl mx-auto px-5">
         <div className="flex justify-between items-center h-20">
           

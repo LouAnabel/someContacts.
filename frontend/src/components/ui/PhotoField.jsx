@@ -31,7 +31,7 @@ const PhotoField = ({ photo, name, onUpload, onTakePhoto, className = "" }) => {
     };
 
     return (
-        <div className={`relative ${className} bg-white dark:bg-black`}>
+        <div className={`relative ${className} bg-white dark:bg-gray-900`}>
             {/* Circular frame with gradient background */}
             <div 
                 className="w-[323px] h-[323px] rounded-full border border-red-400 flex-shrink-0 relative mx-auto mb-4" 

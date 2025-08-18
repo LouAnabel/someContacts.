@@ -197,7 +197,7 @@ const RegisterForm = () => {
     const showLoading = apiLoading;
 
     return (
-        <div className="justify-items items-center min-h-screen bg-white dark:bg-black p-5 absolute top-[120px]" 
+        <div className="justify-items items-center min-h-screen bg-white dark:bg-gray-900 p-5 absolute top-[120px]" 
              style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
 
             {/* Main Register Card */}

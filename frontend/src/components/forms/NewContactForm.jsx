@@ -361,7 +361,7 @@ const NewContactForm = ({onSubmit, onCancel }) => {
 
     return (
     <form onSubmit={handleSubmit}>
-        <div className="w-full flex flex-col items-center min-h-screen bg-white dark:bg-black" 
+        <div className="w-full flex flex-col items-center min-h-screen bg-white dark:bg-gray-900" 
             style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
             
 

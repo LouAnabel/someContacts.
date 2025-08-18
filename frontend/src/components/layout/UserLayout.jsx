@@ -51,7 +51,7 @@ function UserLayout() {
   
   if (isLoading || accessToken === undefined) {
     return (
-      <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">
+      <div className="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
           <p className="text-black dark:text-white">Loading...</p>
         </div>
@@ -60,7 +60,7 @@ function UserLayout() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white font-sans flex flex-col">
+    <div className="min-h-screen bg-white dark:bg-gray-900 text-black dark:text-white font-sans flex flex-col">
       <Navbar />
       
       <main className=" pt-16 flex-grow w-full">

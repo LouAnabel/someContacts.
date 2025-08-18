@@ -456,7 +456,7 @@ export default function ShowCategories() {
                           </div>
                         ) : (
                           <div className="flex items-center space-x-3">
-                            <h3 className="text-xl font-semibold text-black">
+                            <h3 className="text-xl font-semibold text-black dark:text-gray-900">
                               {category.name}
                             </h3>
                             <span className="px-3 py-1 bg-red-50 text-red-700 rounded-full text-sm font-extralight">
