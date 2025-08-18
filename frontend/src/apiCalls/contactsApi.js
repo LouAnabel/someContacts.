@@ -46,7 +46,7 @@ const apiRequest = async (url, options = {}) => {
     }
 };
 
-// CREATE contact with multiple categories
+// CREATE CONTACT with multiple categories
 export const createContact = async (accessToken, contactData) => {
     console.log('Creating contact with data:', contactData);
     
@@ -78,7 +78,8 @@ export const createContact = async (accessToken, contactData) => {
     return data.contact;
 };
 
-// UPDATE contact with multiple categories
+
+// UPDATE CONTACT with multiple categories
 export const updateContact = async (accessToken, contactId, contactData) => {
     console.log('In API FILE: Updating contact with data:', contactData);
     
@@ -119,16 +120,18 @@ export const addCategoriesToContact = async (accessToken, contactId, categoryIds
     });
 };
 
-
-// DELETE a category from a contact
-export const removeCategoryFromContact = async (accessToken, contactId, categoryId) => {
-    return await apiRequest(`${API_BASE_URL}/contact_categories/contacts/${contactId}/categories/${categoryId}`, {
+// DELETE a CATEGORY
+export const deleteCategory = async (accessToken, categoryId) => {
+    return await apiRequest(`${API_BASE_URL}/categories/${categoryId}`, {
         method: 'DELETE',
-        headers: {
+        headers: {      
             'Authorization': `Bearer ${accessToken}`,
         },
     });
 };
+
+
+
 
 // UPDATE all categories for a contact (replace existing)
 export const updateContactCategories = async (accessToken, contactId, categoryIds) => {
@@ -188,6 +191,7 @@ export const getContacts = async (accessToken) => {
     return contactsData
 };
 
+
 // DELETE contact by ID
 export const deleteContactById = async (accessToken, contactId) => {
     return await apiRequest(`${API_BASE_URL}/contacts/${contactId}`, {
@@ -212,6 +216,19 @@ export const getCategories = async (accessToken) => {
     return categories
 };
 
+
+// DELETE a category from a contact
+export const removeCategoryFromContact = async (accessToken, contactId, categoryId) => {
+    return await apiRequest(`${API_BASE_URL}/contact_categories/contacts/${contactId}/categories/${categoryId}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${accessToken}`,
+        },
+    });
+};
+
+
+
 // CREATE a category
 export const createCategory = async (accessToken, categoryData) => {
     return await apiRequest(`${API_BASE_URL}/categories`, {
@@ -221,4 +238,18 @@ export const createCategory = async (accessToken, categoryData) => {
         },
         body: JSON.stringify(categoryData),
     });
+};
+
+//UPDATE a category
+export const updateCategory = async (accessToken, categoryId, categoryData) => {
+    const data = await apiRequest(`${API_BASE_URL}/categories/${categoryId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(categoryData),
+    });
+    const updatedCategory = data.category;
+    return updatedCategory;
 };
