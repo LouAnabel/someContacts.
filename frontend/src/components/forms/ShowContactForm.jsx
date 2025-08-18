@@ -201,6 +201,10 @@ const ShowContactForm = ({id}) => {
               setLinks(newLinks);
           }
       };
+  
+  const handleCategoryClick = (categoryId) => {
+    navigate(`/myspace/categories?expand=${categoryId}`, { replace: true });
+  };
       
   //  HELPER FUNCTION: Get next available category ID
   const getNextCategoryId = (categories) => {
@@ -1484,7 +1488,10 @@ const handleSave = async (e) => {
           {contactData && contactData.categories && contactData.categories.length > 0 && (
             <div className="w-full justify-center mx-auto flex-wrap space-x-2 mt-1">
                 {contactData.categories.map((category, index) => (
-                    <span key={category.id || index} className="inline-block px-3 py-2 min-w-[90px] border border-red-50 bg-red-50 tracking-wide text-red-700 rounded-full text-base font-extralight">
+                    <span 
+                    key={category.id || index} 
+                    onClick={() => navigate(`/myspace/categories?expand=${category.id}`)}
+                    className="inline-block px-3 py-2 min-w-[90px] border border-red-50 bg-red-50 tracking-wide hover:bg-red-100 text-red-700 rounded-full text-base font-extralight">
                         {category.name}
                     </span>
                 ))}

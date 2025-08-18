@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuthContext } from '../context/AuthContextProvider';
 import { getCategories, getContacts, updateCategory, deleteCategory } from '../apiCalls/contactsApi';
 import CircleButton from '../components/ui/Buttons';
@@ -16,9 +16,10 @@ const Button = ({ children, onClick, className = "", ...props }) => {
   );
 };
 
-export default function AllCategories() {
+export default function ShowCategories() {
   const navigate = useNavigate();
   const { accessToken } = useAuthContext();
+  const [searchParams] = useSearchParams();
 
   // Data states
   const [categories, setCategories] = useState([]);
@@ -29,6 +30,7 @@ export default function AllCategories() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [expandedCategories, setExpandedCategories] = useState(new Set());
+  const categoryRef = useRef({});
 
   // Edit states
   const [editingCategory, setEditingCategory] = useState(null);
@@ -43,6 +45,8 @@ export default function AllCategories() {
   // Guards
   const categoriesFetched = useRef(false);
   const contactsFetched = useRef(false);
+
+
 
   // Fetch categories
   useEffect(() => {
@@ -76,6 +80,7 @@ export default function AllCategories() {
     fetchCategories();
   }, [accessToken]);
 
+
   // Fetch contacts
   useEffect(() => {
     const fetchContacts = async () => {
@@ -106,6 +111,8 @@ export default function AllCategories() {
     fetchContacts();
   }, [accessToken]);
 
+
+
   // Process category contacts when data changes
   useEffect(() => {
     if (categories.length > 0 && contacts.length > 0) {
@@ -133,6 +140,57 @@ export default function AllCategories() {
       contactsFetched.current = false;
     };
   }, []);
+
+
+  // Handle category expansion from URL
+  useEffect(() => {
+    const expandCategoryId = searchParams.get('expand');
+    if (!expandCategoryId || categories.length === 0) {
+      return;
+    }
+    console.log('Processing URL expansion for category:', expandCategoryId);
+    console.log('Available categories:', categories.map(c => ({ id: c.id, name: c.name })));
+    
+    const targetCategory = categories.find(cat => {
+    return String(cat.id) === String(expandCategoryId) || 
+           cat.id === parseInt(expandCategoryId) ||
+           cat.id === expandCategoryId;
+    });
+
+    if (targetCategory) {
+      console.log('Found target category:', targetCategory);
+        
+      // Expand the category
+      setExpandedCategories(prev => {
+        const newExpanded = new Set(prev);
+        newExpanded.add(targetCategory.id);
+        return newExpanded;
+      });
+
+      // Scroll to the category after a brief delay to ensure rendering
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          const categoryElement = categoryRef.current[targetCategory.id];
+          if (categoryElement) {
+            categoryElement.scrollIntoView({ 
+              behavior: 'smooth', 
+              block: 'center' 
+            });
+          } else {
+            console.log('Category element not found in ref');
+          }
+        }, 50);
+      });
+
+      const newSearchParams = new URLSearchParams(searchParams);
+      newSearchParams.delete('expand');
+      const cleanUrl = `/myspace/categories${newSearchParams.toString() ? '?' + newSearchParams.toString() : ''}`;
+      navigate(cleanUrl, { replace: true });
+    } else {
+      console.log('Category not found for ID:', expandCategoryId);
+    }
+  }, [categories, searchParams, navigate]);
+
 
   const toggleCategoryExpansion = (categoryId) => {
     const newExpanded = new Set(expandedCategories);
@@ -252,7 +310,7 @@ export default function AllCategories() {
            style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
         
         <Button 
-          onClick={() => navigate('/myspace/')}
+          onClick={() => navigate('/myspace/contacts')}
           className="text-black dark:text-white hover:text-red-500 mb-5 -mt-6"
         >
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-5">
@@ -296,7 +354,7 @@ export default function AllCategories() {
       <div className="w-full text-center">
         <div className="relative items-center mt-14 -mb-14">
           <Button 
-            onClick={() => navigate('/myspace/')}
+            onClick={() => navigate('/myspace/contacts')}
             className="text-black dark:text-white hover:text-red-500"
           >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-5">
@@ -334,11 +392,13 @@ export default function AllCategories() {
             const isEditing = editingCategory === category.id;
 
             return (
-              <div key={category.id} 
-                   className="bg-white rounded-3xl overflow-hidden"
-                   style={{ 
-                     boxShadow: '0 4px 32px rgba(109, 71, 71, 0.15)'
-                   }}>
+              <div 
+                key={category.id}
+                ref={el => categoryRef.current[category.id] = el} // ref for scrolling
+                className="bg-white rounded-3xl overflow-hidden"
+                style={{ 
+                  boxShadow: '0 4px 32px rgba(109, 71, 71, 0.15)'
+                }}>
                 
                 {/* Category Header */}
                 <div className="p-6">

@@ -232,6 +232,11 @@ export default function AllContacts() {
     navigate('/myspace/newcontact', { replace: true });
   };
 
+
+  const handleCategoryClick = (categoryId) => {
+    navigate(`/myspace/categories?expand=${categoryId}`, { replace: true });
+  };
+
   const hasActiveFilters = () => {
     return currentSearchTerm || 
            currentCategories.length > 0 || 
@@ -438,6 +443,7 @@ export default function AllContacts() {
                 key={contactKey}
                 contact={contact}
                 onDeleteRequest={() => handleDeleteRequest(contact)}
+                handleCategoryClick={handleCategoryClick}
               />
             );
           })}
