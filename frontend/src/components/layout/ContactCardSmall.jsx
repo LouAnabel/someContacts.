@@ -78,10 +78,10 @@ const ContactCardSmall = ({contact = {}, onContactUpdate, onDeleteRequest, handl
                 <div className="flex items-center justify-between w-full ml-2 mt-2">
                     {/* Name & Category */}
                     <div className="w-full relative justify-items">
-                        <h5 className="mb-1 ml-14 text-2xl text-center font-semibold text-black">
+                        <h5 className="mb-1 ml-14 text-xl md:text-2xl text-center font-semibold text-black">
                             <Link 
                                 to={`/myspace/contacts/${contact.id}`}
-                                className="hover:text-red-500 transition-colors"
+                                className="hover:text-red-500 transition-colors "
                             >
                                 {contact.first_name} {contact.last_name}
                             </Link>
