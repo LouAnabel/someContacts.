@@ -108,7 +108,7 @@ const ContactCardSmall = ({contact = {}, onContactUpdate, onDeleteRequest, handl
                                 e.stopPropagation();
                                 handleCategoryClick(category.id);
                             }}
-                            className="inline-block text-center px-4 py-2 min-w-[90px] border border-red-50 bg-red-50 tracking-wide text-red-700 hover:bg-red-200 flex-wrap rounded-full text-[16px] font-extralight">
+                            className="inline-block text-center px-4 py-1.5 min-w-[90px] border border-red-50 bg-red-50 tracking-wide text-red-700 hover:bg-red-200 flex-wrap rounded-full text-[16px] font-extralight">
                                 {category.name}
                             </span>
                         ))}
