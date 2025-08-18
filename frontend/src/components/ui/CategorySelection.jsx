@@ -20,7 +20,6 @@ const CategorySelection = ({
 
     // Safely get categories array, handling both array and single category cases
     const selectedCategories = formData.categories || [];
-    console.log("SELECTION selectedCategories:", selectedCategories);
 
     return (
         <div className="relative">
@@ -59,8 +58,6 @@ const CategorySelection = ({
                 <button
                     type="button"
                     onClick={() => {
-                        console.log('Dropdown clicked. Available categories:', categories);
-                        console.log('Currently selected categories:', selectedCategories);
                         setShowCategoryDropdown(!showCategoryDropdown);
                     }}
                     disabled={disabled || selectedCategories.length >= 3}

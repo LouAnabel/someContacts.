@@ -26,10 +26,6 @@ function UserLayout() {
   const renderCount = useRef(0);
   renderCount.current++;
   
-  console.log('USER LAYOUT rendered:', {
-    isLoading: isLoading,
-    hasToken: !!accessToken,
-  });
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -40,7 +36,6 @@ function UserLayout() {
   useEffect(() => {
     if (isLoading || authChecked.current) return;
   
-    console.log('USER LAYOUT: accessToken gets checked.');
     if (!accessToken) {
       navigate('/login', { replace: true });
     } else {

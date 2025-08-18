@@ -23,11 +23,6 @@ const Navbar = () => {
   const navigate = useNavigate();
   const { logout } = useAuthContext(); 
 
-  // Debug logging
-  console.log('Navbar rendered with:', { 
-    isMenuOpen, 
-    setIsMenuOpen: typeof setIsMenuOpen 
-  });
 
   const handleLogout = () => {
     logout();
@@ -51,7 +46,6 @@ const Navbar = () => {
 
   // Enhanced setIsMenuOpen with logging
   const setMenuOpenWithLogging = (value) => {
-    console.log('📱 Setting menu open to:', value);
     setIsMenuOpen(value);
   };
 
