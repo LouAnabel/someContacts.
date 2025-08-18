@@ -1577,7 +1577,7 @@ const handleSave = async (e) => {
             {/* Contact Methods */}
             {(contactData.email || contactData.phone) && (
               <div className="">
-                <h2 className="text-red-700 font-extralight text-[15px] -mb-2 ml-3">mail & phone number</h2>
+                <h2 className="text-red-700 font-light text-[15px] -mb-2 ml-3">mail & phone number</h2>
                 <div className="bg-gray-50 rounded-xl p-3 space-y-1">
                   {/* Email */}
                   {contactData.email && (
@@ -1624,7 +1624,7 @@ const handleSave = async (e) => {
             {/* Address */}
             {(contactData.street_and_nr || contactData.city || contactData.country) && (
               <div className="space-y-2">
-                  <h3 className="text-red-700 font-extralight text-[15px] -mt-3 ml-3 -mb-4">address</h3>
+                  <h3 className="text-red-700 font-light text-[15px] -mt-3 ml-3 -mb-4">address</h3>
 
                 <a
                   href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
@@ -1667,7 +1667,7 @@ const handleSave = async (e) => {
             {/* Birthday */}
               {contactData.birth_date && (
                 <div>
-                  <h3 className="text-red-700 font-extralight text-[15px] ml-3 -mt-2">date of birth</h3>
+                  <h3 className="text-red-700 font-light text-[15px] ml-3 -mt-2">date of birth</h3>
                   <div className="bg-gray-50 rounded-xl p-3 -mt-2">
                     <div className="text-black text-[17px] tracking-wide font-extralight ml-6">
                       {contactData.birth_date}
@@ -1680,11 +1680,11 @@ const handleSave = async (e) => {
 
             {/* Contact History */}
             {(contactData.last_contact_date || contactData.next_contact_date) && (
-              
-            <div className="mb-8 bg-gray-50 rounded-xl">
+   
+              <div className="mb-8 bg-gray-50 rounded-xl">
                 {/* last contact */}
                 {contactData.last_contact_date && (
-                  <>
+                   <>
                     <h3 className="text-red-700 text-[15px] ml-3 -mb-6"><span className="font-extralight">last date of contact:</span></h3>
                     <div className="p-3 pt-5">
                         <div className="text-black text-[16px] font-extralight">
