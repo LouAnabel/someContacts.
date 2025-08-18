@@ -12,6 +12,7 @@ const getBackendUrl = () => {
 
 const API_BASE_URL = getBackendUrl();
 
+
 // Helper function for API requests
 const apiRequest = async (url, options = {}) => {
 

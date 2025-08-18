@@ -440,9 +440,9 @@ export default function AllCategories() {
                 {isExpanded && contactsInCategory.length > 0 && (
                   <div className="border-t border-gray-100 bg-white">
                     <div className="p-6 space-y-3">
-                      <h4 className="text-sm font-light text-red-500 mb-4">
+                      {/* <h4 className="text-sm font-light text-red-500 mb-4 -mt-3">
                         Contacts in this category:
-                      </h4>
+                      </h4> */}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         {contactsInCategory.map((contact) => (
                           <button

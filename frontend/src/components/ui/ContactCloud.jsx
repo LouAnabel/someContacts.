@@ -16,9 +16,9 @@ const ContactCloud = ({ contacts }) => {
     console.log('ContactCloud - favorite contacts:', contacts);
     
     const gridPlaceholders = [
-        { left: 2, top: 1, fontSizeClass: 'text-3xl', fontWeightClass: 'font-light', rotation: 0, },
+        { left: 9, top: 1, fontSizeClass: 'text-3xl', fontWeightClass: 'font-light', rotation: 0, },
         { left: 18, top: 10, fontSizeClass: 'text-4xl', rotation: 0 },
-        { left: 0, top: 90, fontSizeClass: 'text-3xl', rotation: 270},
+        { left: 0, top: 98, fontSizeClass: 'text-3xl', rotation: 270},
         { left: 8, top: 78, fontSizeClass: 'text-2xl', fontWeightClass: 'font-light', rotation: 270 },
         { left: 12, top: 88, fontSizeClass: 'text-4xl', fontWeightClass: 'font-light', rotation: 0 },
         
@@ -26,13 +26,11 @@ const ContactCloud = ({ contacts }) => {
         { left: 50, top: 36, fontSizeClass: 'text-xl', fontWeightClass: 'font-light', rotation: 0 },
         { left: 60, top: 77, fontSizeClass: 'text-xl', fontWeightClass: 'font-light', rotation: 0 },
         { left: 45, top: 68, fontSizeClass: 'text-2xl', fontWeightClass: 'font-light', rotation: 0 },
-        { left: 25, top: 52, fontSizeClass: 'text-3xl', fontWeightClass: 'font-light', rotation: 0 }
-
-        // ab hier nicht sichtbar
-        // { left: 70, top: 18, fontSizeClass: 'text-2xl', fontWeightClass: 'font-light' , rotation: 0 },
-        // { left: -14, top: 62, fontSizeClass: 'text-2xl', rotation: 270},
-        // { right: 0, top: 0, fontSizeClass: 'text-4xl', rotation: 90 },
-        // { right: 0, top: 66, fontSizeClass: 'text-xl', fontWeightClass: 'font-light', rotation: 270 }
+        { left: 25, top: 52, fontSizeClass: 'text-3xl', fontWeightClass: 'font-light', rotation: 0 },
+        { left: 70, top: 18, fontSizeClass: 'text-2xl', fontWeightClass: 'font-light' , rotation: 0 },
+        { left: -14, top: 62, fontSizeClass: 'text-2xl', rotation: 270},
+        { right: 0, top: 0, fontSizeClass: 'text-4xl', rotation: 90 },
+        { right: 0, top: 66, fontSizeClass: 'text-xl', fontWeightClass: 'font-light', rotation: 270 }
         
     ];
 
@@ -125,9 +123,12 @@ const ContactCloud = ({ contacts }) => {
             className={`absolute font-text select-none pointer-events-auto hover:text-red-500 z-10 hover:z-50 ${item.fontSizeClass} ${item.fontWeightClass} ${Math.abs(item.rotation) === 90 ? 'px-4 py-8' : 'px-2 py-2'}`}
             style={{
               left: item.right !== undefined 
-                ? `${100 - Math.max(0, Math.min(20, item.right)) - 5}%`  // Subtract 5% buffer for right positioning
+                ? `${100 - Math.max(0, Math.min(20, item.right)) - 5}%`
                 : `${Math.max(2, Math.min(90, item.left))}%`,
-              top: `${Math.max(2, Math.min(85, item.top))}%`,
+              // Special handling for the 3rd item (index 2) - allow it to go beyond 85%
+              top: item.id === 2 || item.top > 90 
+                ? `${Math.max(2, Math.min(95, item.top))}%`  // Allow up to 95% for 3rd item
+                : `${Math.max(2, Math.min(85, item.top))}%`, // Keep 85% limit for others
               transform: `rotate(${item.rotation}deg)`,
               transformOrigin: item.right !== undefined ? 'top right' : 'top left',
               whiteSpace: 'nowrap', 
