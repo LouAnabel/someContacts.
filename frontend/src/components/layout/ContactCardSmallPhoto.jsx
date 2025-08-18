@@ -26,7 +26,7 @@ const ContactCardSmallPhoto = ({contact = {}}) => {
              style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
 
             {/* Main Login Card with Photo*/}
-            <div className="bg-gray-50 rounded-3xl p-5 relative z-10 overflow-visible w-[88vw] min-w-[260px] max-w-[380px] h-fit absolute left-1/2 transform -translate-x-1/2"
+            <div className="bg-gray-50 rounded-3xl p-5 z-10 overflow-visible w-[88vw] min-w-[260px] max-w-[380px] h-fit absolute left-1/2 transform -translate-x-1/2"
                  style={{ 
                      boxShadow: '0 4px 32px rgba(0, 0, 0, 0.3)'
                  }}>
