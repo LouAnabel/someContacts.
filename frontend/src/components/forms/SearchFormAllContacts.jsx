@@ -139,7 +139,7 @@ const SearchFormAllContacts = ({ onSearch, resetTrigger }) => {
       <form ref={searchRef} onSubmit={handleSubmit}>
         <div className="flex flex-col gap-4">
           {/* Main Search Bar */}
-          <div className="flex border border-red-100 bg-gray-100 hover:bg-red-50 dark:bg-black rounded-xl items-center gap-0 relative" ref={dropdownRef}
+          <div className="flex bg-gray-100 hover:bg-red-50 rounded-xl items-center gap-0 relative" ref={dropdownRef}
             style={{ 
               boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)'
             }}>
@@ -148,13 +148,13 @@ const SearchFormAllContacts = ({ onSearch, resetTrigger }) => {
             <button 
               type="button"
               onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
-              className="inline-flex w-[138px] py-3 items-center rounded-xl px-4 text-[15px] font-extralight text-center text-gray-800 hover:bg-red-50 bg-gray-50 dark:text-white hover:text-red-500 hover:dark:bg-red-200 hover:dark:text-red-500" 
+              className="inline-flex w-[138px] py-3 items-center rounded-xl px-4 text-[15px] font-extralight text-center text-gray-800 hover:bg-red-50 bg-gray-100 dark:text-black hover:text-red-800 hover:dark:bg-red-100 hover:dark:text-red-800" 
             >
               <span className="font-extralight tracking-wider">
                 Categories
               </span>
               <svg 
-                className={`w-4 h-4 ml-2 text-black font-extralight transition-transform duration-200 ${!showCategoryDropdown ? 'rotate-180' : ''}`}
+                className={`w-4 h-4 ml-2 text-black font-extralight ${!showCategoryDropdown ? 'rotate-180' : ''}`}
                 fill="none" 
                 stroke="currentColor" 
                 viewBox="0 0 24 24"
@@ -165,7 +165,7 @@ const SearchFormAllContacts = ({ onSearch, resetTrigger }) => {
 
             {/* Category Dropdown Menu */}
             {showCategoryDropdown && (
-              <div className="absolute bg-white rounded-2xl shadow-lg border border-gray-200 dark:border-gray-200 w-[200px] top-full mt-1 left-0 z-20 max-h-60 overflow-y-auto">
+              <div className="absolute bg-white rounded-2xl shadow-lg w-[200px] top-full mt-1 left-0 z-20 max-h-60 overflow-y-auto">
                 
                 {/* Category options */}
                 {categories.length > 0 ? (
@@ -184,7 +184,7 @@ const SearchFormAllContacts = ({ onSearch, resetTrigger }) => {
                             ? 'bg-red-50 text-red-500' 
                             : isDisabled
                             ? 'text-gray-300 cursor-not-allowed'
-                            : 'text-black hover:bg-gray-50'
+                            : 'text-black hover:bg-red-50 hover:text-red-800'
                         }`}
                       >
                         <span>{category.name}</span>
@@ -211,7 +211,7 @@ const SearchFormAllContacts = ({ onSearch, resetTrigger }) => {
                 id="search-dropdown" 
                 value={searchTerm}
                 onChange={(e) => handleSearch(e.target.value)}
-                className="rounded-e-xl pt-2.5 pb-2.5 px-4 -mt-2 -mb-2 w-full text-normal font-extralight border-1 border-white text-black placeholder-gray-200 placeholder-font-light placeholder-text-sm bg-white dark:bg-white dark:placeholder-gray-300 border-l-red-100 focus:outline-none focus:border-l-red-100 focus:border-white"
+                className="rounded-e-xl pt-2.5 pb-2.5 px-4 -mt-2 -mb-2 w-full text-normal font-extralight border-1 border-white text-black placeholder-gray-200 placeholder-font-light placeholder-text-sm bg-white dark:bg-white dark:placeholder-gray-300  focus:outline-none focus:border-white"
                 placeholder="search..."
               />
             </div>
@@ -245,7 +245,7 @@ const SearchFormAllContacts = ({ onSearch, resetTrigger }) => {
             {/* Contacted Toggle */}
             <div className="flex items-center">
               
-              <div className="flex bg-white overflow-hidden">
+              <div className="flex overflow-hidden">
                 <button
                   type="button"
                   onClick={() => handleContactedToggle(true)}

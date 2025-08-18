@@ -17,9 +17,6 @@ const CategorySelection = ({
     errors,
     disabled = false
 }) => {
-    console.log("SELECTION formData received:", formData);
-    console.log("SELECTION categories received:", categories.length);
-    console.log("SELECTION formData.categories:", formData.categories);
 
     // Safely get categories array, handling both array and single category cases
     const selectedCategories = formData.categories || [];
