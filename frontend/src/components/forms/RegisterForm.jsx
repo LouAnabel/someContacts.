@@ -81,7 +81,7 @@ const RegisterForm = () => {
                 setAcceptTerms(false);
                 setHasSubmitted(false);
                 
-                alert('Registration successful! Check console for form data.');
+                alert('Registration successful! Ready to login!');
                 navigate('/login');
 
             } else {
