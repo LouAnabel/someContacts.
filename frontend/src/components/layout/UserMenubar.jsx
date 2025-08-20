@@ -59,7 +59,7 @@ const MenuBar = ({ isMenuOpen, setIsMenuOpen }) => {
   // Choose menu items based on screen size
   const menuItems = isMobile ? mobileMenuItems : desktopMenuItems;
 
-  const linkClasses = "w-full text-left block px-4 py-3 font-sans text-lg text-black hover:text-red-500 hover:bg-gray-50 rounded transition-all duration-200 cursor-pointer";
+  const linkClasses = "w-full text-left block px-4 py-3 font-sans text-lg text-black hover:text-red-500 hover:bg-gray-50 rounded cursor-pointer";
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -103,7 +103,7 @@ const MenuBar = ({ isMenuOpen, setIsMenuOpen }) => {
       {/* Menu Dropdown */}
       {isMenuOpen && (
         <div 
-          className={`absolute top-full right-0 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl z-[9999] overflow-hidden ${
+          className={`absolute top-full right-0 mt-2 bg-white border border-gray-200 dark:border-gray-200 rounded-xl shadow-xl z-[9999] overflow-hidden ${
             isMobile ? 'w-[180px]' : 'w-[160px]'
           }`}
           onClick={(e) => {
@@ -117,7 +117,7 @@ const MenuBar = ({ isMenuOpen, setIsMenuOpen }) => {
                 <button 
                   key={item.action}
                   onClick={handleLogout}
-                  className={`${linkClasses} dark:text-white dark:hover:text-red-500 dark:hover:bg-gray-700`}
+                  className={`${linkClasses} dark:hover:text-red-500 dark:hover:bg-gray-100`}
                   type="button"
                 >
                   <span className="font-normal">{item.firstPart || ''}</span>
@@ -127,7 +127,7 @@ const MenuBar = ({ isMenuOpen, setIsMenuOpen }) => {
                 <button
                   key={item.to}
                   onClick={(e) => handleLinkClick(item.to, e)}
-                  className={`${linkClasses} dark:text-white dark:hover:text-red-500 dark:hover:bg-gray-700`}
+                  className={`${linkClasses} dark:hover:text-red-500 dark:hover:bg-gray-100`}
                   type="button"
                 >
                   <span className="font-normal">{item.firstPart || ''}</span>
