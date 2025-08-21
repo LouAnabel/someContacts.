@@ -222,8 +222,6 @@ const ShowContactForm = ({id}) => {
       
       try {
         const categoryName = newCategoryName.charAt(0).toUpperCase() + newCategoryName.slice(1).trim();
-        console.log('Adding category:', categoryName);
-        
         // Get the next available ID
         const nextId = getNextCategoryId(categories);
         
@@ -232,13 +230,14 @@ const ShowContactForm = ({id}) => {
           id: nextId,
           name: categoryName,
           creator_id: null, // Will be set by backend
-          contact_count: 0
+          contact_count: 0,
+          isPersisted: false
         };
         
-        // Add to local categories list immediately
+        // Add to local categories list
         setCategories(prevCategories => [...prevCategories, newCategory]);
         
-        // Add to form data immediately
+        // Add to form data
         setFormData(prevFormData => ({
           ...prevFormData, 
           categories: [...prevFormData.categories, { name: newCategory.name, id: newCategory.id }]
@@ -253,7 +252,7 @@ const ShowContactForm = ({id}) => {
         setShowAddCategory(false);
         setShowCategoryDropdown(false);
         
-        console.log('Category added successfully:', newCategory);
+        console.log('Category added successfully to local categories:', newCategory);
         
       } catch (error) {
         console.error('Failed to add category:', error);
@@ -486,7 +485,7 @@ const handleSave = async (e) => {
     setHasSubmitted(true);
     
     if (!validateForm()) {
-      console.log("❌ Validation failed");
+      console.log("Validation failed");
       return;
     }
     
@@ -498,14 +497,14 @@ const handleSave = async (e) => {
       }
 
       // STEP 1: Find categories that need to be persisted
-      const existingCategoryIds = categories.map(cat => cat.id);
-      const newCategories = formData.categories.filter(cat => 
-        !existingCategoryIds.includes(cat.id)
-      );
-      
-      console.log("🔍 Existing category IDs:", existingCategoryIds);
+      const newCategories = formData.categories.filter(formCat => {
+        const categoryInState = categories.find(cat => cat.id === formCat.id);
+        return categoryInState && categoryInState.isPersisted === false;
+      });
       console.log("🆕 New categories to persist:", newCategories);
       
+      const idMappings = new Map(); // oldId -> newId
+
       // STEP 2: Persist new categories
       for (const newCat of newCategories) {
         try {
@@ -525,24 +524,18 @@ const handleSave = async (e) => {
           
           if (!response.ok) {
             const errorText = await response.text();
-            console.error('❌ Category API Error:', response.status, errorText);
+            console.error('Category API Error:', response.status, errorText);
             throw new Error(`Failed to persist category: ${response.status}`);
           }
           
           const apiResponse = await response.json();
-          console.log("✅ Category persisted successfully:", apiResponse);
+          console.log("Category persisted successfully:", apiResponse);
           
           // If backend returns a different ID, update our local data
           const actualId = apiResponse.id || apiResponse.category?.id || newCat.id;
-          
           if (actualId !== newCat.id) {
-            console.log(`⚠️ ID mismatch: expected ${newCat.id}, got ${actualId}`);
-            setFormData(prev => ({
-              ...prev,
-              categories: prev.categories.map(cat => 
-                cat.id === newCat.id ? { ...cat, id: actualId } : cat
-              )
-            }));
+            console.log(`ID mismatch: expected ${newCat.id}, got ${actualId}`);
+            idMappings.set(newCat.id, actualId);
           }
           
         } catch (error) {
@@ -553,13 +546,21 @@ const handleSave = async (e) => {
 
       // STEP 3: Save the contact
       console.log("📤 === PREPARING CONTACT SAVE ===");
-      console.log("📤 formData before API call:", formData);
-      console.log("📤 formData.categories before API call:", formData.categories);
-      
-      const submittedContactData = FormDataToApiData(formData, categories, links);
+
+      // Create updated form data with correct IDs
+      const updatedFormData = {
+        ...formData,
+        categories: formData.categories.map(cat => ({
+          ...cat,
+          id: idMappings.get(cat.id) || cat.id // Use mapped ID if available, otherwise original
+        }))
+      };
+      console.log("Updated formData with correct IDs:", updatedFormData);
+
+
+      const submittedContactData = FormDataToApiData(updatedFormData, categories, links);
       console.log("📤 === DATA BEING SENT TO API ===");
       console.log("📤 Complete submitted data:", submittedContactData);
-      console.log("📤 Category IDs in submitted data:", submittedContactData.category_ids);
 
       const apiContactData = await updateContact(accessToken, formData.id, submittedContactData);
       if (!apiContactData) {
@@ -567,17 +568,25 @@ const handleSave = async (e) => {
       }
       
       console.log("📥 === API RESPONSE RECEIVED ===");
-      console.log("📥 Complete API response:", apiContactData);
       console.log("📥 Categories in API response:", apiContactData.categories);
   
       // STEP 4: Update state with API response
       console.log("🔄 === UPDATING STATE ===");
+      // Update categories state with new categories that have correct IDs
+      setCategories(prev => {
+        const updated = [...prev];
+        idMappings.forEach((newId, oldId) => {
+          const index = updated.findIndex(cat => cat.id === oldId);
+          if (index !== -1) {
+            updated[index] = { ...updated[index], id: newId, isPersisted: true };
+          }
+        });
+        return updated;
+      });
+      
       setContactData(apiContactData);
       
       const finalFormData = ApiDataToFormData(apiContactData);
-      console.log("🔄 Transformed final form data:", finalFormData);
-      console.log("🔄 Categories in final form data:", finalFormData.categories);
-      
       setFormData(finalFormData);
       
       setExpandedNotes(false);
@@ -586,8 +595,6 @@ const handleSave = async (e) => {
       setErrors({});
       
       console.log("✅ === SAVE COMPLETED SUCCESSFULLY ===");
-      console.log("✅ Final contactData state:", apiContactData);
-      console.log("✅ Final formData state:", finalFormData);
       
     } catch (error) {
       console.error('❌ Error updating contact:', error);
@@ -681,7 +688,6 @@ const handleSave = async (e) => {
 
   // Editing Mode
   if (isEditing) {
-    console.log("Edit Mode Showing")
     return (
      <div className=" flex flex-col items-center min-h-screen bg-white dark:bg-black" 
         style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
