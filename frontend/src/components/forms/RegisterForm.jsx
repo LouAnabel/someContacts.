@@ -252,7 +252,8 @@ const RegisterForm = () => {
                                     onChange={handleInputChange}
                                     placeholder="streep"
                                     disabled={showLoading}
-                                    className={`w-full rounded-xl border bg-white hover:border-red-300 dark:hover:border-red-300 text-black placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
+                                    className={`w-full rounded-xl border bg-white hover:border-red-300 dark:hover:border-red-300 text-black 
+                                        placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
                                         hasSubmitted && errors.lastName ? 'border-red-500 shadow-md' : 'border-gray-400 dark:border-gray-400'
                                     }`}
                                     style={{
