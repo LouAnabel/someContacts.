@@ -819,7 +819,7 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                             placeholder="every thought matters.."
                             disabled={isLoading}
                             rows={expandedNotes ? 6 : 3}
-                            className={`w-full rounded-xl -mt-3 pt-4 border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
+                            className={`w-full ml-2 rounded-xl -mt-3 pt-4 border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
                             style={{
                                 fontSize: '16px',
                                 fontWeight: 300,
