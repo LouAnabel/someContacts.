@@ -21,9 +21,6 @@ function Home() {
   const dataFetched = useRef(false);
   const lastAccessToken = useRef(null);
 
-  // Hover Create Contact Button
-  const [showTooltip, setShowTooltip] = useState(false)
-
   useEffect(() => {
     // This will run every time the Home component mounts
     window.scrollTo(0, 0);
@@ -115,13 +112,6 @@ function Home() {
         {/* Contact Cloud Component */}  
         <div className=" pt-9 pb-16 min-w-[400px] max-w-[650px]">
           <div className="relative z-10 -mb-12 w-fit ml-auto">
-            
-            {/* Conditional tooltip */}
-            {showTooltip && (
-              <div className="absolute font-text text-right font-normal top-10 right-10 tracking-wider -translate-x-1/2 px-3  text-red-500 text-base rounded-lg whitespace-nowrap z-10">
-                new contact.
-              </div>
-            )}
 
             <CircleButton 
               size="large"
@@ -133,8 +123,6 @@ function Home() {
                 display: 'block' 
               }}
               onClick={handleCreateButton}
-              onMouseEnter={() => setShowTooltip(true)}
-              onMouseLeave={() => setShowTooltip(false)}
             >
               create.
             </CircleButton>

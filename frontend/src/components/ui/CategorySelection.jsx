@@ -105,14 +105,11 @@ const CategorySelection = ({
                                 );
                                 const canSelect = !isSelected && selectedCategories.length < 3;
                                 
-                                console.log(`Category ${category.name}: isSelected=${isSelected}, canSelect=${canSelect}`);
-                                
                                 return (
                                     <button
                                         key={category.id}
                                         type="button"
                                         onClick={() => {
-                                            console.log('Category clicked:', category, 'isSelected:', isSelected, 'canSelect:', canSelect);
                                             
                                             if (isSelected) {
                                                 // Remove category if it's selected
@@ -189,7 +186,7 @@ const CategorySelection = ({
                                     style={{ fontSize: '15px', fontWeight: 300 }}
                                     onKeyPress={(e) => {
                                         if (e.key === 'Enter') {
-                                            console.log('Enter pressed, adding category');
+                                            
                                             addCategory();
                                         }
                                     }}
@@ -199,7 +196,7 @@ const CategorySelection = ({
                                     <button
                                         type="button"
                                         onClick={() => {
-                                            console.log('Add button clicked');
+                                    
                                             addCategory();
                                         }}
                                         disabled={isAddingCategory || !newCategoryName.trim()}
@@ -210,7 +207,6 @@ const CategorySelection = ({
                                     <button
                                         type="button"
                                         onClick={() => {
-                                            console.log('Cancel button clicked');
                                             setShowAddCategory(false);
                                             setNewCategoryName('');
                                         }}
@@ -231,7 +227,6 @@ const CategorySelection = ({
                 <div 
                     className="fixed inset-0 z-20" 
                     onClick={() => {
-                        console.log('Clicked outside, closing dropdown');
                         setShowCategoryDropdown(false);
                         setShowAddCategory(false);
                         setNewCategoryName('');
