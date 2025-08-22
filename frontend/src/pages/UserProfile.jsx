@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../context/AuthContextProvider';
+import { authMe } from '../apiCalls/authApi';
 import PhotoField from '../components/ui/PhotoField';
 import CircleButton from '../components/ui/Buttons';
 
@@ -19,6 +20,7 @@ const Button = ({ children, onClick, className = "", ...props }) => {
 export default function UserProfile() {
   const navigate = useNavigate();
   const { accessToken, user } = useAuthContext();
+  console.log(user)
 
   // Form states
   const [isEditing, setIsEditing] = useState(false);
