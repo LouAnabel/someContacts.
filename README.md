@@ -1,6 +1,7 @@
 # 📇 someContacts - Personal Contact Management 
 
-A modern contact management application built with Python & Flask (Backend) and React and styled with a beautiful, minimalist design. Store, organize, and manage your contacts with an intuitive interface and powerful features.
+A modern contact management application built with Python & Flask (backend) and for the frontend with React and styled with tailwindcss for a beautiful, minimalist design. 
+Store, organize, and manage your contacts with an intuitive interface and powerful features.
 
 ## 🚀 Features Overview
 
