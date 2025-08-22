@@ -115,7 +115,7 @@ Protected Routes - Secure access to user data
     "is_favorite": true,
     "birth_date": "15-05-1985",
     "is_contacted": false,
-    "is_to_contact": false",
+    "is_to_contact": false,
     "last_contact_date": "20-06-2025",
     "last_contact_place": "Coffee Shop Downtown",
     "street_and_nr": "123 Main Street",
