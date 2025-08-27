@@ -3,6 +3,8 @@
 A modern contact management application built with Python & Flask (backend) and for the frontend with React and styled with tailwindcss for a beautiful, minimalist design. 
 Store, organize, and manage your contacts with an intuitive interface and powerful features.
 
+<img src="frontend/src/assets/exampleDesign.png" alt="App Demo" width="full">
+
 ## 🚀 Features Overview
 
 ### 🔐 **Authentication & Security**
@@ -113,7 +115,7 @@ Protected Routes - Secure access to user data
     "is_favorite": true,
     "birth_date": "15-05-1985",
     "is_contacted": false,
-    "is_to_contact": false",
+    "is_to_contact": false,
     "last_contact_date": "20-06-2025",
     "last_contact_place": "Coffee Shop Downtown",
     "street_and_nr": "123 Main Street",
@@ -185,28 +187,3 @@ Protected Routes - Secure access to user data
 - **Buttons**: Circular design with hover effects
 - **Forms**: Floating labels with red accent colors
 
----
-
-src/
-├── components/                          # Reusable UI components
-│   ├── forms/                           # Form components
-│   ├── layout/                          # Layout components (Navbar, Cards)
-│   ├── theme/                           # Theme toggle and context
-│   └── ui/                              # Basic UI components (Buttons, Photo)
-├── context/                             # React Context providers
-│   ├── AuthContextProvider.jsx
-│   └── ThemeContext.jsx
-├── pages/                               # Page components
-│   ├── Login.jsx
-│   ├── Register.jsx
-│   ├── Home.jsx
-│   ├── AllContacts.jsx
-│   ├── NewContact.jsx
-│   ├── ShowContact.jsx
-│   ├── AllCategories.jsx
-│   └── UserProfile.jsx
-├── apiCalls/                            # API integration
-│   ├── authApi.js
-│   └── contactsApi.js
-├── styles/                              # Global styles
-└── App.jsx                              # Main application component
