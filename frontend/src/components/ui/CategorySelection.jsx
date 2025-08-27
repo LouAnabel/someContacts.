@@ -61,7 +61,7 @@ const CategorySelection = ({
                         setShowCategoryDropdown(!showCategoryDropdown);
                     }}
                     disabled={disabled || selectedCategories.length >= 3}
-                    className={`w-full p-2.5 rounded-xl border bg-white hover:border-red-300 dark:hover:border-red-300 text-black placeholder-gray-200 font-extralight max-w-full min-w-[200px] focus:outline-none focus:border-red-500 flex items-center justify-between ${
+                    className={`w-full p-2.5 rounded-xl border bg-white hover:border-red-300 dark:hover:border-red-300 text-black placeholder-gray-300 font-extralight max-w-full min-w-[200px] focus:outline-none focus:border-red-500 flex items-center justify-between ${
                         hasSubmitted && errors.categories ? 'border-red-400' : 'border-gray-400 dark:border-gray-400'
                     } ${selectedCategories.length >= 3 ? ' text-gray-300 border-gray-300 cursor-not-allowed' : ''}`}
                     style={{
@@ -69,7 +69,7 @@ const CategorySelection = ({
                         fontWeight: 200
                     }}
                 >
-                    <span className={`font-extralight ${selectedCategories.length < 3 ? 'text-gray-200' : 'text-gray-300'}`}>
+                    <span className={`font-extralight ${selectedCategories.length < 3 ? 'text-gray-300' : 'text-gray-300'}`}>
                         {selectedCategories.length === 0 
                             ? categories.length === 0 
                                 ? 'create a category first'

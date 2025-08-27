@@ -415,12 +415,12 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                                 onChange={handleInputChange}
                                 placeholder="meryl"
                                 disabled={isLoading}
-                                className={`w-full rounded-xl border bg-white  hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
+                                className={`w-full rounded-xl border bg-white  hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-300 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
                                     hasSubmitted && errors.firstName ? 'border-red-400 ' : 'border-gray-400 dark:border-gray-400'
                                 }`}
                                 style={{
-                                    fontSize: '18px',
-                                    fontWeight: 300
+                                    fontSize: '16px',
+                                    fontWeight: 200
                                 }}
                             />
                             <label 
@@ -444,12 +444,12 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                                 onChange={handleInputChange}
                                 placeholder="streep"
                                 disabled={isLoading}
-                                className={`w-full rounded-xl border bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
+                                className={`w-full rounded-xl border bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-300 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
                                     hasSubmitted && errors.lastName ? 'border-red-500 shadow-md' : 'border-gray-400 dark:border-gray-400'
                                 }`}
                                 style={{
-                                    fontSize: '18px',
-                                    fontWeight: 300
+                                    fontSize: '16px',
+                                    fontWeight: 200
                                 }}
                             />
                             <label 
@@ -483,72 +483,6 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                                 disabled={false}
                             />
                         </div>
-                        
-                        {/* Checkboxes */}
-                        <div className="ml-2"> 
-
-                            {/* isContacted Checkbox */}
-                            <div className="flex items-center w-full relative rounded-lg">
-                                <button
-                                    type="button"
-                                    onClick={() => setFormData(prev => ({ ...prev, isContacted: !prev.isContacted }))}
-                                    className="flex items-center space-x-3 text-red-500"
-                                    disabled={isLoading}
-                                >
-                                    {formData.isContacted ? (
-                                        <>
-                                          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-5">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
-                                          </svg>
-
-                                            <span className="text-sm font-extralight text-black cursor-pointer">
-                                                contacted
-                                            </span>
-                                        </>
-                                    ) : (
-                                        <>
-                                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="black" className="size-5">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
-                                          </svg>
-                                            <span className="text-sm font-extralight text-black cursor-pointer">
-                                                mark as contacted
-                                            </span>
-                                        </>
-                                    )}
-                                </button>
-                            </div>
-
-                            {/* isToContact Checkbox */}
-                            <div className="flex items-center w-full relative">
-                                <button
-                                    type="button"
-                                    onClick={() => setFormData(prev => ({ ...prev, isToContact: !prev.isToContact }))}
-                                    className="flex items-center space-x-3 mt-2 text-red-500 hover:text-red-500"
-                                    disabled={isLoading}
-                                >
-                                    {formData.isToContact ? (
-                                        <>
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-5">
-                                              <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
-                                            </svg>
-
-                                            <span className="text-sm font-extralight text-black cursor-pointer">
-                                                remind me
-                                            </span>
-                                        </>
-                                    ) : (
-                                        <>
-                                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="black" className="size-5">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
-                                          </svg>
-                                            <span className="text-sm font-extralight text-black cursor-pointer">
-                                                reminder
-                                            </span>
-                                        </>
-                                    )}
-                                </button>
-                            </div>
-                        </div>
                     </div>
                     
 
@@ -568,12 +502,12 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                                     onChange={handleInputChange}
                                     placeholder="your@email.com"
                                     disabled={isLoading}
-                                    className={`w-full rounded-xl border -mt-3 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
+                                    className={`w-full rounded-xl border -mt-3 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-300 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
                                         hasSubmitted && errors.email ? 'border-red-500 shadow-md' : 'border-gray-400 dark:border-gray-400'
                                     }`}
                                     style={{
                                         fontSize: '16px',
-                                        fontWeight: 300
+                                        fontWeight: 200
                                     }}
                                 />
                                 {hasSubmitted && errors.email && (
@@ -596,12 +530,12 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                                     onChange={handleInputChange}
                                     placeholder="+49 1781234567"
                                     disabled={isLoading}
-                                    className={`w-full rounded-xl border -mt-3 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
+                                    className={`w-full rounded-xl border -mt-3 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-300 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
                                         hasSubmitted && errors.phone ? 'border-red-500 shadow-md' : 'border-gray-400 dark:border-gray-400'
                                     }`}
                                     style={{
                                         fontSize: '16px',
-                                        fontWeight: 300
+                                        fontWeight: 200
                                     }}
                                 />
                                 {hasSubmitted && errors.phone && (
@@ -660,10 +594,10 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                                             onChange={handleInputChange}
                                             placeholder="greifwalder Str. 8"
                                             disabled={isLoading}
-                                            className={`w-full rounded-xl border -mb-1 border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
+                                            className={`w-full rounded-xl border -mb-1 border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-300 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
                                             style={{
                                                 fontSize: '18px',
-                                                fontWeight: 300
+                                                fontWeight: 200
                                             }}
                                         />
                                         {hasSubmitted && errors.streetAndNr && (
@@ -685,10 +619,10 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                                                 onChange={handleInputChange}
                                                 placeholder="10407"
                                                 disabled={isLoading}
-                                                className={`w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
+                                                className={`w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-300 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
                                                 style={{
                                                     fontSize: '16px',
-                                                    fontWeight: 300
+                                                    fontWeight: 200
                                                 }}
                                             />
                                             {hasSubmitted && errors.postalcode && (
@@ -708,10 +642,10 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                                                 onChange={handleInputChange}
                                                 placeholder="berlin"
                                                 disabled={isLoading}
-                                                className={`w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-200 max-w-full min-w-[150px] h-[48px] focus:outline-none focus:border-red-500`}
+                                                className={`w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-300 max-w-full min-w-[150px] h-[48px] focus:outline-none focus:border-red-500`}
                                                 style={{
                                                     fontSize: '16px',
-                                                    fontWeight: 300
+                                                    fontWeight: 200
                                                 }}
                                             />
                                             {hasSubmitted && errors.city && (
@@ -733,10 +667,10 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                                             onChange={handleInputChange}
                                             placeholder="germany"
                                             disabled={isLoading}
-                                            className={`w-full rounded-xl mb-5 border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
+                                            className={`w-full rounded-xl mb-5 border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-300 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
                                             style={{
                                                 fontSize: '16px',
-                                                fontWeight: 300
+                                                fontWeight: 200
                                             }}
                                         />
                                         {hasSubmitted && errors.country && (
@@ -765,10 +699,10 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                                     onChange={handleInputChange}
                                     placeholder="am 19.05.2025 in Berlin"
                                     disabled={isLoading}
-                                    className={`w-full rounded-xl border -mt-3 border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
+                                    className={`w-full rounded-xl border -mt-3 border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-300 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
                                     style={{
                                         fontSize: '16px',
-                                        fontWeight: 300
+                                        fontWeight: 200
                                     }}
                                 />
                                 {hasSubmitted && errors.lastContactDate && (
@@ -789,15 +723,81 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                                     onChange={handleInputChange}
                                     placeholder="coffe shop, berlin ..."
                                     disabled={isLoading}
-                                    className={`w-full mb-5 rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
+                                    className={`w-full mb-5 rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-300 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
                                     style={{
                                         fontSize: '16px',
-                                        fontWeight: 300
+                                        fontWeight: 200
                                     }}
                                 />
                                 {hasSubmitted && errors.nextContactDate && (
                                     <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.nextContactDate}</p>
                                 )}
+                            </div>
+
+                            {/* Checkboxes */}
+                            <div className="ml-2"> 
+
+                                {/* isContacted Checkbox */}
+                                <div className="flex items-center w-full relative rounded-lg">
+                                    <button
+                                        type="button"
+                                        onClick={() => setFormData(prev => ({ ...prev, isContacted: !prev.isContacted }))}
+                                        className="flex items-center space-x-3 text-red-500"
+                                        disabled={isLoading}
+                                    >
+                                        {formData.isContacted ? (
+                                            <>
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-5">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
+                                            </svg>
+
+                                                <span className="text-sm font-extralight text-black cursor-pointer">
+                                                    contacted
+                                                </span>
+                                            </>
+                                        ) : (
+                                            <>
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="black" className="size-5">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
+                                            </svg>
+                                                <span className="text-sm font-extralight text-black cursor-pointer">
+                                                    mark as contacted
+                                                </span>
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
+
+                                {/* isToContact Checkbox */}
+                                <div className="flex items-center w-full relative">
+                                    <button
+                                        type="button"
+                                        onClick={() => setFormData(prev => ({ ...prev, isToContact: !prev.isToContact }))}
+                                        className="flex items-center space-x-3 mt-2 text-red-500 hover:text-red-500"
+                                        disabled={isLoading}
+                                    >
+                                        {formData.isToContact ? (
+                                            <>
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-5">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
+                                                </svg>
+
+                                                <span className="text-sm font-extralight text-black cursor-pointer">
+                                                    remind me
+                                                </span>
+                                            </>
+                                        ) : (
+                                            <>
+                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="black" className="size-5">
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
+                                            </svg>
+                                                <span className="text-sm font-extralight text-black cursor-pointer">
+                                                    reminder
+                                                </span>
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
                             </div>    
                         </div>
                     </div>
@@ -805,7 +805,92 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                     {/* Notes */}
                     <div className="relative">   
                         {/* Notes Field */}
-                        <p className="relative tracking-wide text-red-500 -mt-2 left-2 mb-2 font-extralight">additional information</p>
+                        <p className="relative tracking-wide text-red-500 left-2 mb-1 font-extralight">additional information</p>
+                        
+                        {/* Optional Links */}
+                        <div className="relative space-y-3 mb-3">
+                            {/* Links Toggle and Fields */}
+                            {!showLinks ? (
+                                <button
+                                    type="button"
+                                    onClick={() => setShowLinks(true)}
+                                    className="flex items-center ml-2 space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-extralight"
+                                    disabled={isLoading}
+                                >
+                                    <span className="text-lg font-semibold">+</span>
+                                    <span className="text-normal text-black hover:text-red-500">add weblinks</span>
+                                </button>
+                            ) : (
+                                <div className="space-y-2">
+                                    <div className="flex items-center -mt-5 -mb-2 justify-between">
+                                        <span className="relative left-2 text-sans font-extralight text-red-500 font-md">
+                                            websites & links
+                                        </span>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                            setShowLinks(false);
+                                            setLinks([{ title: '', url: '' }]);
+                                        }}
+                                            className="text-red-500 -mb-1 mr-2 font-extralight hover:text-red-700 text-sm"
+                                            disabled={isLoading}
+                                        >
+                                            remove
+                                        </button>
+                                    </div>
+                                    
+                                    {links.map((link, index) => (
+                                        <div key={index} className="relative flex items-center space-x-2">
+                                            <input 
+                                                type="text" 
+                                                value={link.title}
+                                                onChange={(e) => handleLinkChange(index, 'title', e.target.value)}
+                                                placeholder="website"
+                                                disabled={isLoading}
+                                                className="flex relative p-2.5 w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-300 min-w-[100px] max-w-[120px] h-[48px] focus:outline-none focus:border-red-500"
+                                                style={{
+                                                    fontSize: '16px',
+                                                    fontWeight: 200
+                                                }}
+                                            />
+                                            <input 
+                                                type="url" 
+                                                value={link.url}
+                                                onChange={(e) => handleLinkChange(index, 'url', e.target.value)}
+                                                placeholder="https://example.com"
+                                                disabled={isLoading}
+                                                className="flex p-2.5 w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-300 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500"
+                                                style={{
+                                                    fontSize: '16px',
+                                                    fontWeight: 200
+                                                }}
+                                            />
+                                            {links.length > 1 && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeLink(index)}
+                                                    className="text-red-500 hover:text-red-700 transition-colors duration-200 p-1"
+                                                    disabled={isLoading}
+                                                >
+                                                    ×
+                                                </button>
+                                            )}
+                                        </div>
+                                    ))}
+                                    
+                                    <button
+                                        type="button"
+                                        onClick={addLink}
+                                        className="flex ml-1.5 items-center space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-extralight text-sm"
+                                        disabled={isLoading}
+                                    >
+                                        <span className="mt-1 text-base">+</span>
+                                        <span className="mt-1 text-base text-black hover:text-red-500">add another link</span>
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                        
                         <div className="flex items-center justify-between -mt-1">
                             <label htmlFor="notes" className="relative bg-white px-1 left-4 text-sans text-base text-black font-extralight">
                                 important notes
@@ -819,10 +904,10 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                             placeholder="every thought matters.."
                             disabled={isLoading}
                             rows={expandedNotes ? 6 : 3}
-                            className={`w-full ml-2 rounded-xl -mt-3 pt-4 border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
+                            className={`w-full ml-2 rounded-xl -mt-3 pt-4 border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-300 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
                             style={{
                                 fontSize: '16px',
-                                fontWeight: 300,
+                                fontWeight: 200,
                                 height: expandedNotes ? 'auto' : 'auto'
                             }}
                         />
@@ -830,91 +915,7 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                             <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.notes}</p>
                         )}
                     </div>
-
-
-                    {/* Optional Links */}
-                    <div className="relative space-y-3">
-                        {/* Links Toggle and Fields */}
-                        {!showLinks ? (
-                            <button
-                                type="button"
-                                onClick={() => setShowLinks(true)}
-                                className="flex items-center ml-1.5 -mt-6 space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-extralight"
-                                disabled={isLoading}
-                            >
-                                <span className="text-lg font-semibold">+</span>
-                                <span className="text-lg text-black hover:text-red-500">add weblinks</span>
-                            </button>
-                        ) : (
-                            <div className="space-y-2">
-                                <div className="flex items-center -mt-5 -mb-2 justify-between">
-                                    <span className="relative left-2 text-sans font-extralight text-red-500 font-md">
-                                        websites & links
-                                    </span>
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                        setShowLinks(false);
-                                        setLinks([{ title: '', url: '' }]);
-                                    }}
-                                        className="text-red-500 -mb-1 mr-2 font-extralight hover:text-red-700 text-sm"
-                                        disabled={isLoading}
-                                    >
-                                        remove
-                                    </button>
-                                </div>
-                                
-                                {links.map((link, index) => (
-                                    <div key={index} className="relative flex items-center space-x-2">
-                                        <input 
-                                            type="text" 
-                                            value={link.title}
-                                            onChange={(e) => handleLinkChange(index, 'title', e.target.value)}
-                                            placeholder="website"
-                                            disabled={isLoading}
-                                            className="flex relative p-2.5 w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-200 min-w-[100px] max-w-[120px] h-[48px] focus:outline-none focus:border-red-500"
-                                            style={{
-                                                fontSize: '16px',
-                                                fontWeight: 300
-                                            }}
-                                        />
-                                        <input 
-                                            type="url" 
-                                            value={link.url}
-                                            onChange={(e) => handleLinkChange(index, 'url', e.target.value)}
-                                            placeholder="https://example.com"
-                                            disabled={isLoading}
-                                            className="flex p-2.5 w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500"
-                                            style={{
-                                                fontSize: '16px',
-                                                fontWeight: 300
-                                            }}
-                                        />
-                                        {links.length > 1 && (
-                                            <button
-                                                type="button"
-                                                onClick={() => removeLink(index)}
-                                                className="text-red-500 hover:text-red-700 transition-colors duration-200 p-1"
-                                                disabled={isLoading}
-                                            >
-                                                ×
-                                            </button>
-                                        )}
-                                    </div>
-                                ))}
-                                
-                                <button
-                                    type="button"
-                                    onClick={addLink}
-                                    className="flex ml-1.5 items-center space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-extralight text-sm"
-                                    disabled={isLoading}
-                                >
-                                    <span className="mt-1 text-base">+</span>
-                                    <span className="mt-1 text-base text-black hover:text-red-500">add another link</span>
-                                </button>
-                            </div>
-                        )}
-                    </div> 
+ 
 
                     <div className="relative">
                         {!showBirthdate ? (
