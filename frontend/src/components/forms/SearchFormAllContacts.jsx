@@ -52,7 +52,7 @@ const SearchFormAllContacts = ({ onSearch, resetTrigger }) => {
     };
   }, []);
 
-  // Handle reset trigger from parent component
+  // Handle reset trigger from parent component DROPDOWN
   useEffect(() => {
     if (resetTrigger > 0) {
       setSearchTerm('');
@@ -65,6 +65,7 @@ const SearchFormAllContacts = ({ onSearch, resetTrigger }) => {
     }
   }, [resetTrigger]);
 
+
   const handleSearch = (value) => {
     setSearchTerm(value);
     if (onSearch) {
@@ -72,6 +73,7 @@ const SearchFormAllContacts = ({ onSearch, resetTrigger }) => {
     }
   };
 
+  
   const handleSubmit = (e) => {
     e.preventDefault();
     if (onSearch && searchTerm.trim()) {

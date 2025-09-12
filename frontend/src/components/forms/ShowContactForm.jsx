@@ -1083,32 +1083,8 @@ const handleSave = async (e) => {
 
                  
                     <div className="space-y-3"> 
-                        <div className="">
-                            {/* Contact History Fields */}
-                            <div className="relative ">
+                        <div className="relative">
                               <p className="font-text text-base font-extralight tracking-wide text-red-500 ml-1 mt-6 ">date and place of</p>
-                                <label htmlFor="lastContactDate" className="relative left-4 bg-white px-1 text-sans text-base text-black font-extralight">
-                                    last contact
-                                </label>
-                                <input 
-                                    type="text" 
-                                    name="lastContactDate" 
-                                    id="lastContactDate" 
-                                    value={formData.lastContactDate}
-                                    onChange={handleInputChange}
-                                    placeholder="am 19.05.2025 in Berlin"
-                                    disabled={isLoading}
-                                    className={`w-full rounded-xl border -mt-3 border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
-                                    style={{
-                                        fontSize: '17px',
-                                        fontWeight: 200
-                                    }}
-                                />
-                                {hasSubmitted && errors.lastContactDate && (
-                                    <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.lastContactDate}</p>
-                                )}
-                            </div>
-
                             {/* Next Contact Field */}
                             <div className="relative -mt-1">
                                 <label htmlFor="nextContactDate" className="relative top-3 left-4 bg-white px-1 text-sans text-base text-black font-extralight">
@@ -1132,6 +1108,32 @@ const handleSave = async (e) => {
                                     <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.nextContactDate}</p>
                                 )}
                             </div>    
+
+                            {/* Contact History Fields */}
+                                <div className="relative -mt-2">
+                                <label htmlFor="lastContactDate" className="relative left-4  bg-white px-1 text-sans text-base text-black font-extralight">
+                                    last contact
+                                </label>
+                                <input 
+                                    type="text" 
+                                    name="lastContactDate" 
+                                    id="lastContactDate" 
+                                    value={formData.lastContactDate}
+                                    onChange={handleInputChange}
+                                    placeholder="am 19.05.2025 in Berlin"
+                                    disabled={isLoading}
+                                    className={`w-full rounded-xl border -mt-3 border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
+                                    style={{
+                                        fontSize: '17px',
+                                        fontWeight: 200
+                                    }}
+                                />
+                                {hasSubmitted && errors.lastContactDate && (
+                                    <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.lastContactDate}</p>
+                                )}
+                            </div>
+
+                            
                         </div>
                     </div>
                 
@@ -1439,40 +1441,22 @@ const handleSave = async (e) => {
   return (
     <div className=" flex flex-col items-center min-h-screen bg-white dark:bg-black" 
         style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
-      
-        {/* Navigation Button */}
-        <div className="relative mt-6 -mb-6  ">
-          <Button 
-              onClick={() => navigate(-1)}
-              className="text-black dark:text-white hover:text-red-500"
-              >
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="size-5">
-              <path fillRule="evenodd" d="M17 10a.75.75 0 0 1-.75.75H5.612l4.158 3.96a.75.75 0 1 1-1.04 1.08l-5.5-5.25a.75.75 0 0 1 0-1.08l5.5-5.25a.75.75 0 1 1 1.04 1.08L5.612 9.25H16.25A.75.75 0 0 1 17 10Z" clipRule="evenodd" />
-              </svg>
-          </Button>
-        </div>
 
 
         {/* Contact Display Card */}
-        <div className="bg-white rounded-3xl p-5 relative z-10 overflow-visible w-[88vw] min-w-[260px] max-w-[480px] h-fit mx-auto mt-10 "
+        <div className="bg-white rounded-3xl p-4 relative z-10 overflow-visible w-[88vw] min-w-[260px] max-w-[480px] h-fit mx-auto mt-10 "
             style={{ 
                 boxShadow: '0 4px 32px rgba(109, 71, 71, 0.29)'
             }}>
         
         
-        <div className="text-center mb-9 space-y-8">
-          {/* Name and Favorite */}
-          <div className="flex items-center justify-center space-x-5 -mb-4 mt-8">
-            <h1 className="text-3xl ml-8 font-bold text-black">
-              {contactData.first_name} {contactData.last_name}
-            </h1>
-          
-            {/* Favorite checkbox */}
-            <div className="flex items-center pr-6">
+        <div className="text-center mb-4 space-y-8 pb-3">
+          {/* Favorite checkbox */}
+            <div className="flex justify-center">
                 <button
                         type="button"
                         onClick={handleFavoriteToggle} 
-                        className="flex items-center hover:scale-110 transcontact"
+                        className="flex items-center hover:scale-110 transcontact -mb-5"
                         disabled={isLoading}
                     >
                     <svg 
@@ -1488,39 +1472,47 @@ const handleSave = async (e) => {
                     </svg>
                 </button>
             </div>
+
+          {/* Names */}
+          <div className="flex items-center justify-center space-x-7">
+            <h1 className="text-3xl font-bold text-black -mb-4">
+              {contactData.first_name} {contactData.last_name}
+            </h1>
           </div>
+
           
           {/* Categories Display */}
           {contactData && contactData.categories && contactData.categories.length > 0 && (
-            <div className="w-full justify-center mx-auto flex-wrap space-x-2 mt-1">
+            <div className="w-full justify-center mx-auto flex-wrap space-x-2">
                 {contactData.categories.map((category, index) => (
                     <span 
                     key={category.id || index} 
                     onClick={() => navigate(`/myspace/categories?expand=${category.id}`)}
-                    className="inline-block px-3 py-2 min-w-[90px] border border-red-50 bg-red-50 tracking-wide hover:bg-red-100 text-red-700 rounded-full text-base font-extralight">
+                    className="inline-block px-3 py-2 min-w-[90px]  bg-red-100 tracking-wide hover:bg-red-50 hover:text-red-700 text-red-700 rounded-full text-base font-extralight">
                         {category.name}
                     </span>
                 ))}
             </div>
           )}
         </div>
-
+        
+        
 
         {/* Contact Information */}
-        <div className="space-y-7 mb-7">
+        <div className="space-y-7 mb-7 ">
 
           {/* Checkboxes */}
-          <div className="ml-2"> 
-
+          <div className="ml-2 border-b border-gray-200 pb-5"> 
+            
               {/* isContacted Checkbox */}
               <div className="flex items-center w-full relative rounded-lg">
                   <button
                       type="button"
-                      onClick={handleIsContactedToggle} // FIXED: Use the correct handler
-                      className="flex items-center space-x-3 text-red-700 "
+                      onClick={handleIsContactedToggle} 
+                      className="flex items-center space-x-3 text-red-500 hover:text-red-700"
                       disabled={isLoading}
                   >
-                      {contactData.is_contacted ? ( // FIXED: Use contactData instead of formData
+                      {contactData.is_contacted ? ( 
                           <>
                             <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-5">
                               <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
@@ -1548,7 +1540,7 @@ const handleSave = async (e) => {
                   <button
                       type="button"
                       onClick={handleIsToContactToggle} // FIXED: Use the correct handler
-                      className="flex items-center space-x-3 mt-2 text-red-700 hover:text-red-500"
+                      className="flex items-center space-x-3 mt-2 text-red-500 hover:text-red-700"
                       disabled={isLoading}
                   >
                       {contactData.is_to_contact ? ( // FIXED: Use contactData instead of formData
@@ -1573,56 +1565,60 @@ const handleSave = async (e) => {
                       )}
                   </button>
               </div>
-
           </div>
           
-          {/* <div className="">
-              <h2 className="ml-3 font-text text-normal text-red-700 font-light -mb-5">How to contact?</h2>
-          </div> */}
+          <div>
+              <h2 className="relative text-black left-2 font-extralight">Contact Information</h2>
+          </div>
     
             {/* Contact Methods */}
             {(contactData.email || contactData.phone) && (
-              <div className="">
-                <h2 className="text-red-700 font-light text-[15px] -mb-2 ml-3">mail & phone number</h2>
-                <div className="bg-gray-50 rounded-xl p-3 space-y-1">
-                  {/* Email */}
-                  {contactData.email && (
-                    <div className="flex items-start">
-                      <span className="text-gray-500 mt-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="currentColor" className="size-4">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
-                        </svg>
-                      </span>
-                      <div className="ml-3">
-                        <a 
-                          href={`mailto:${contactData.email}`}
-                          className="text-black text-[17px] font-extralight hover:text-red-500 transition-colors"
-                        >
-                          {contactData.email}
-                        </a>
+              <div className="space-y-4">
+                
+                {/* Email */}
+                {contactData.email && (
+                  <div className="-mt-4">
+                    <h2 className="text-red-500  font-extralight text-[14px] -mb-7 ml-3">private <span className="text-gray-700 font-extralight">email</span></h2>
+                      <div className=" bg-gray-50 rounded-xl pt-6 p-3 space-y-1">
+                        <div className="flex items-start ">
+                          
+                            <a 
+                              href={`mailto:${contactData.email}`}
+                              className="text-black text-[17px] font-extralight hover:text-red-500"
+                            >
+                              {/* list of emails & titles */}
+                              {contactData.email}
+                            </a>
+                         
+                        </div>
                       </div>
                     </div>
                   )}
                   
                   {/* Phone */}
                   {contactData.phone && (
-                    <div className="flex items-start">
-                      <span className="text-gray-500 font-extralight text-sm mt-1">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="currentColor" className="size-4">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z" />
-                        </svg>
-                      </span>
-                      <div className="ml-3">
-                        <a 
-                          href={`tel:${contactData.phone}`}
-                          className="text-black text-[17px] font-extralight hover:text-red-500 transition-colors"
-                        >
-                          {contactData.phone}
-                        </a>
+                    <div className="mt-2">
+                      <h2 className="text-red-500 font-extralight text-[14px] -mb-7 ml-3">office <span className="text-gray-700 font-extralight">number</span></h2>
+                      <div className=" bg-gray-50 rounded-xl pt-6 p-3 space-y-1">
+                        <div className="flex items-start">
+                          {/* <span className="text-gray-500 font-extralight text-sm ">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="currentColor" className="size-4">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z" />
+                            </svg>
+                          </span> */}
+                          
+                            <a 
+                              href={`tel:${contactData.phone}`}
+                              className="text-black text-[17px] font-extralight hover:text-red-500"
+                            >
+                              {contactData.phone}
+                            </a>
+                          
+                        </div>
                       </div>
                     </div>
                   )}
-                </div>
+                
               </div>
             )}
 
@@ -1630,7 +1626,7 @@ const handleSave = async (e) => {
             {/* Address */}
             {(contactData.street_and_nr || contactData.city || contactData.country) && (
               <div className="space-y-2">
-                  <h3 className="text-red-700 font-light text-[15px] -mt-3 ml-3 -mb-4">address</h3>
+                  <h3 className="text-red-500 font-extralight text-[14px] -mb-9 ml-3 -mt-3">office <span className="text-gray-700 font-extralight">address</span></h3>
 
                 <a
                   href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
@@ -1645,7 +1641,7 @@ const handleSave = async (e) => {
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block bg-gray-50 hover:bg-gray-100 rounded-xl p-3 cursor-pointer"
+                  className="block bg-gray-50 rounded-xl pt-7 p-3 cursor-pointer"
                   title="Open in Google Maps"
                 >
                   <span className="flex items-center justify-start">
@@ -1658,7 +1654,7 @@ const handleSave = async (e) => {
                       <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
                     </svg>
                 </span>
-                  <div className="text-black text-[17px]  font-extralight -space-y-1 -mt-5 ml-6">
+                  <div className="text-black text-[17px] hover:text-red-500 font-extralight -space-y-1 -mt-5 ml-6">
                     {contactData.street_and_nr && <div>{contactData.street_and_nr},</div>}
                     <div>
                       {contactData.postal_code && `${contactData.postal_code} `}
@@ -1670,94 +1666,107 @@ const handleSave = async (e) => {
               </div>
             )}
 
-            {/* Birthday */}
-              {contactData.birth_date && (
-                <div>
-                  <h3 className="text-red-700 font-light text-[15px] ml-3 -mt-2">date of birth</h3>
-                  <div className="bg-gray-50 rounded-xl p-3 -mt-2">
-                    <div className="text-black text-[17px] tracking-wide font-extralight ml-6">
-                      {contactData.birth_date}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-
-
-            {/* Contact History */}
-            {(contactData.last_contact_date || contactData.next_contact_date) && (
-   
-              <div className="mb-8 bg-gray-50 rounded-xl">
-                {/* last contact */}
-                {contactData.last_contact_date && (
-                   <>
-                    <h3 className="text-red-700 text-[15px] ml-3 -mb-6"><span className="font-extralight">last date of contact:</span></h3>
-                    <div className="p-3 pt-5">
-                        <div className="text-black text-[16px] font-extralight">
-                          {contactData.last_contact_date}
-                        </div>
-                    </div>
-                  </>  
-                )}
+            <div className="space-y-2 mt-4">
+              {/* Contact History */}
+              {(contactData.last_contact_date || contactData.next_contact_date) && (
+                <>
+                  <h2 className="relative text-black left-2 font-extralight">Contact History</h2>
 
                   {/* next contact */}
                   {contactData.next_contact_date && (
-                  <>
-                    <h3 className="text-red-700 font-extralight text-[15px] ml-3 -mb-6"><span className="font-extralight">next planned contact:</span></h3>
-                    <div className="p-3 -mt-2 pt-5">
-                        <div className="text-black text-[17px] font-extralight">
-                          {contactData.next_contact_date}
-                        </div>
+                    <div className=" bg-gray-50 rounded-xl space-y-1">
+                    <h3 className="text-red-500 font-extralight text-[14px] pt-2 ml-3 -mb-6">next <span className="text-gray-700 font-extralight">planned contact:</span></h3>
+                    <div className="p-3 -mt-2 pt-4">
+                      <span className="text-red-500 text-[17px] font-extralight">
+                          13.09.2025
+                      </span>
+                      <span className="text-black text-[17px] font-extralight">
+                        { } {contactData.next_contact_date}
+                      </span>
                     </div>
-                  </>  
+                  </div>  
+                )}  
+
+                {/* last contact */}
+                {contactData.last_contact_date && (
+                  <div className=" bg-gray-50 rounded-xl space-y-1">
+                  <h3 className="text-red-500 text-[14px] font-extralight pt-2 ml-3 -mb-6">last <span className="text-gray-700 font-extralight">contact:</span></h3>
+                    <div className="pt-4 p-3">
+                    <span className="text-red-500 text-[17px] font-extralight">
+                          13.09.2024
+                      </span>
+                      <span className="text-black text-[17px] font-extralight">
+                        { } {contactData.next_contact_date}
+                      </span>
+                    </div>
+                  </div>
                 )}
+              </>
+              )}
             </div>
-            )}
 
-            {/* Notes */}
-            {contactData.notes && (
-              <div className="">
-                <h3 className="text-red-700 font-light text-[16px] ml-3 -mt-3">notes</h3>
-                <div className="bg-gray-50 rounded-xl p-3 -mt-2 min-h-[100px]">
-                  <div className="text-black text-[17px] font-extralight whitespace-pre-wrap ">
-                    "{contactData.notes}"
-                  </div>
-                </div>
-              </div>
-            )}
-
-          </div>
-      
-          {(contactData.birth_date || contactData.links.some(link => link.url?.trim() && link.title?.trim())) && (
-            <div className="space-y-2 mt-5 mb-8">
-              {/* Links */}
-              {contactData.links && contactData.links.some(link => link.url?.trim() && link.title?.trim()) && (
+            <div className="">
+              {/* Additional Information */}
+              {(contactData.notes || 
+              contactData.birth_date || 
+                (contactData.links && contactData.links.some(link => link.url?.trim() && link.title?.trim()))
+                ) && (
                 <div className="space-y-2">
-                  <h3 className="text-red-700 font-light text-normal ml-3 -mb-3">links</h3>
-                  <div className="flex space-y-2">
-                    {contactData.links
-                      .filter(link => link.url?.trim() && link.title?.trim()) // Only show links with both URL and title
-                      .map((link, index) => (
-                        <div key={index} className="bg-gray-50 rounded-xl p-3 pt-2 hover:text-red-500">
-                          <a 
-                            href={link.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-red-600 text-[17px] font-extralight hover:text-red-500 transition-colors break-all"
-                          >
-                            {link.title}
-                          </a>
-                        </div>
-                      ))}
+                  <h2 className="relative text-black left-2 font-extralight mb-4">Additional Information</h2>
+
+                  {/* Notes */}
+                  {contactData.notes && (
+                  <div className="relative">
+                    <h3 className="text-gray-700 font-extralight text-[14px] ml-3 -mb-6">notes</h3>
+                    <div className="bg-gray-50 rounded-xl p-3 pt-6 -mt-2 min-h-[100px]">
+                      <div className="text-black text-[17px] font-extralight whitespace-pre-wrap ">
+                        "{contactData.notes}"
+                      </div>
+                    </div>
                   </div>
+                  )}
+              
+                  {/* birthdate */}
+                  {contactData.birth_date && (
+                      <div className="relative space-y-2">
+                        <h3 className="text-gray-700 font-extralight text-[14px] ml-3 -mb-8">date of birth</h3>
+                        <div className="bg-gray-50 rounded-xl p-3 pt-5">
+                          <div className="text-black text-[17px] tracking-wide font-extralight">
+                            {contactData.birth_date}
+
+                            {/* Link: add to calendar on the phone */}
+                            
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                  {/* Links */}
+                  {contactData.links && contactData.links.some(link => link.url?.trim() && link.title?.trim()) && (
+                    <div className="space-y-2">
+                      <h3 className="text-gray-700 font-extralight ml-2 mt-4 -mb-2">links</h3>
+                      <div className="flex-row space-y-2 max-w-[200px]">
+                        {contactData.links
+                          .filter(link => link.url?.trim() && link.title?.trim()) // Only show links with both URL and title
+                          .map((link, index) => (
+                            <div key={index} className="flex bg-gray-50 rounded-xl p-3 pt-2 hover:text-red-500 h-[45px]">
+                              <a 
+                                href={link.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-red-500 text-[17px] font-extralight hover:text-red-700 break-all"
+                              >
+                                {link.title}
+                              </a>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
-              
-              
             </div>
-          )}
-
-        
+        </div>
       
       
       
@@ -1776,6 +1785,7 @@ const handleSave = async (e) => {
         >
           edit.
         </CircleButton>
+
       </div>
 
       {/* Back Links */}
@@ -1801,7 +1811,8 @@ const handleSave = async (e) => {
           </button>
         </div>
       </div>
-    </div>
+    
+  </div>
   );
 };
 
