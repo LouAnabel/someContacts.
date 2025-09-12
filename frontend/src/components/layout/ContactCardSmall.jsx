@@ -86,10 +86,10 @@ const ContactCard = ({contact = {}, onContactUpdate, onDeleteRequest, handleCate
                                     className="w-full h-full object-cover"
                                 />
                             ) : (
-                                <div className="w-full h-full bg-gray-200 flex items-center justify-center rounded-2xl">
+                                <div className="w-full h-full flex items-center justify-center rounded-2xl">
                                     <svg 
                                         className="w-12 h-12 text-gray-400"
-                                        fill="currentColor" 
+                                        fill="linear-gradient(180deg, rgba(135, 57, 57, 0.20) 68.75%, rgba(255, 17, 17, 0.20) 100% " 
                                         viewBox="0 0 20 20"
                                     >
                                         <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
