@@ -695,7 +695,7 @@ const handleSave = async (e) => {
             
 
             {/* Main Edit Contact Card */}
-            <div className="bg-white rounded-3xl p-5 relative z-10 overflow-visible w-[88vw] min-w-[260px] max-w-[480px] mx-auto"
+            <div className="bg-white rounded-3xl p-5 mt-10 relative z-10 overflow-visible w-[88vw] min-w-[260px] max-w-[480px] mx-auto"
                 style={{ 
                     boxShadow: '0 4px 32px rgba(109, 71, 71, 0.29)'
                 }}>
