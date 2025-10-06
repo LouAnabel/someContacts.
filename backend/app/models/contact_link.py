@@ -1,6 +1,6 @@
 from app import db
 
-class ContactLinks(db.Model):
+class ContactLink(db.Model):
     __tablename__ = 'contact_links'
 
     id = db.Column(db.Integer, primary_key=True)

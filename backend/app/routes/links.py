@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask import request, jsonify
 from app.models.contact import Contact
-from app.models.contact_links import ContactLinks
+from app.models.contact_link import ContactLinks
 from app import db
 import re
 from datetime import datetime

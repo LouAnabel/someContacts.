@@ -16,14 +16,11 @@ const NewContactForm = ({onSubmit, onCancel }) => {
         firstName: '',
         lastName: '',
         categories: [],
-        email: '',
-        phone: '',
+        emails: [],
+        phones: [],
         isFavorite: false,
         birthdate: '',
-        streetAndNr: '',
-        postalcode: '',
-        city: '',
-        country: '',
+        addresses: [],
         notes: '',
         isContacted: false,
         isToContact: false,
@@ -42,11 +39,17 @@ const NewContactForm = ({onSubmit, onCancel }) => {
     const [expandedNotes, setExpandedNotes] = useState(false);
     const [showContactDetails, setShowContactDetails] = useState(false);
 
+    // Contact Details State
+    const [labelOptions, setLabelOptions] = useState(['private', 'mobile', 'work', 'office', 'custom']);
+    const [emails, setEmails] = useState([{ title: 'private', email: '' }]);
+    const [phones, setPhones] = useState([{ title: 'mobile', phone: '' }]);
+    const [addresses, setAddresses] = useState([{ title: 'private', streetAndNr: '', additionalInfo: '', postalcode: '', city: '', country: '' }]);
+
     const [showLinks, setShowLinks] = useState(false);
     const [links, setLinks] = useState([{ title: '', url: '' }]);
 
 
-    // ies State
+    // Categories State
     const [categories, setCategories] = useState([]);
     const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
     const [showAddCategory, setShowAddCategory] = useState(false);
@@ -91,9 +94,76 @@ const NewContactForm = ({onSubmit, onCancel }) => {
         }
     };
 
+    // Email Handlers
+    const handleEmailChange = (index, field, value) => {
+        const newEmails = [...emails];
 
+        newEmails[index] = {
+            ...newEmails[index],
+            [field]: value
+        };
+        setEmails(newEmails);
+        console.log("emails:", newEmails)
+    };
+
+    const addEmail = () => {
+        setEmails([...emails, { title: '', email: '' }]);
+    };
+
+    const removeEmail = (index) => {
+        if (emails.length > 1) {
+            const newEmails = emails.filter((_, i) => i !== index);
+            setEmails(newEmails);
+        }
+    };
+
+    // Phone Handlers
+    const handlePhoneChange = (index, field, value) => {
+        const newPhones = [...phones];
+        newPhones[index] = {
+            ...newPhones[index],
+            [field]: value
+        };
+        setPhones(newPhones);
+        console.log("phones:", newPhones)
+    };
+
+    const addPhone = () => {
+        setPhones([...phones, { title: '', phone: '' }]);
+    };
+
+    const removePhone = (index) => {
+        if (phones.length > 1) {
+            const newPhones = phones.filter((_, i) => i !== index);
+            setPhones(newPhones);
+        }
+    };
+
+    // Address Handlers
+    const handleAddressChange = (index, field, value) => {
+        const newAddresses = [...addresses];
+        newAddresses[index] = {
+            ...newAddresses[index],
+            [field]: value
+        };
+        setAddresses(newAddresses);
+        console.log("addresses:", newAddresses)
+    };
+
+    const addAddress = () => {
+        setAddresses([...addresses, { title: '', streetAndNr: '', additionalInfo: '', postalcode: '', city: '', country: '' }]);
+    };
+
+    const removeAddress = (index) => {
+        if (addresses.length > 1) {
+            const newAddresses = addresses.filter((_, i) => i !== index);
+            setAddresses(newAddresses);
+        }
+    };
+
+    // Link Handlers
     const handleLinkChange = (index, field, value) => {
-    const newLinks = [...links];
+        const newLinks = [...links];
     
         // If it's a URL field, auto-format it
         if (field === 'url' && value.trim()) {
@@ -323,19 +393,18 @@ const NewContactForm = ({onSubmit, onCancel }) => {
             firstName: '',
             lastName: '',
             categories: [],
-            email: '',
-            phone: '',
+            emails: [],
+            phones: [],
             isFavorite: false,
             birthdate: '',
-            streetAndNr: '',
-            postalcode: '',
-            city: '',
-            country: '',
+            addresses: [],
             notes: '',
             isContacted: false,
             isToContact: false,
             lastContactDate: '',
             nextContactDate: '',
+            nextContactPlace: '',
+            links: []
         });
 
 
@@ -489,60 +558,174 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                     {/* How to contact */}
                     <div className="space-y-2">
                         <p className="relative tracking-wide -mb-2 text-red-500 left-2 font-extralight">how to contact?</p>
+                            
                             {/* email Field */}
-                            <div className="relative mb-4">
-                                <label htmlFor="email" className="relative left-4 bg-white px-1 text-normal text-black font-extralight">
-                                    email
-                                </label>
-                                <input 
-                                    type="email" 
-                                    name="email" 
-                                    id="email" 
-                                    value={formData.email}
-                                    onChange={handleInputChange}
-                                    placeholder="your@email.com"
+                            {emails.map((email, index) => (
+                                <div key={index} className="relative mb-4">
+                                    <div className="flex items-center gap-2">)}
+
+                                        {/* Label Dropdown */ }
+                                        <select
+                                            value={email.title}
+                                            onChange={(e) => handleEmailChange(index, 'title', e.target.value)}
+                                            disabled={isLoading}
+                                            className="rounded-lg border border-gray-400 bg-white text-black font-extralight px-3 py-1 h-10 focus:outline-none focus:border-red-500"
+                                            style={{ fontSize: '14px', fontWeight: 200 }}
+                                        >
+                                            {labelOptions.map(option => (
+                                                <option key={option} value={option}>
+                                                    {option === 'custom' ? 'add label' : option}
+                                                </option>
+                                            ))}
+                                        </select>
+
+                                        {/* Email Input Field */}
+                                        {email.title === 'custom' && (
+                                            <input
+                                                type="text"
+                                                placeholder="label"
+                                                value={email.title}
+                                                onChange={(e) => handleEmailChange(index, 'title', e.target.value)}
+                                                disabled={isLoading}
+                                                className="rounded-lg border border-gray-400 bg-white text-black font-extralight px-3 py-1 h-10 focus:outline-none focus:border-red-500"
+                                                style={{ fontSize: '14px', fontWeight: 200 }}
+                                            />
+                                        )}
+
+                                        <label htmlFor="email" className="relative left-4 bg-white px-1 text-normal text-black font-extralight">
+                                            email
+                                        </label>
+
+                                        {emails.length > 1 && (
+                                            <button
+                                                type="button"
+                                                onClick={() => removeEmail(index)}
+                                                className="text-red-500 hover:text-red-700 transition-colors duration-200"
+                                                disabled={isLoading}
+                                            >
+                                                &times;
+                                            </button>
+                                        )}
+                                    </div>
+
+                                    <input 
+                                        type="email" 
+                                        name="email" 
+                                        id="email" 
+                                        value={email.email}
+                                        onChange={(e) => handleEmailChange(index, 'email', e.target.value)}
+                                        placeholder="your@email.com"
+                                        disabled={isLoading}
+                                        className={`w-full rounded-xl border -mt-3 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-300 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
+                                            hasSubmitted && errors.email ? 'border-red-500 shadow-md' : 'border-gray-400 dark:border-gray-400'
+                                        }`}
+                                        style={{
+                                            fontSize: '16px',
+                                            fontWeight: 200
+                                        }}
+                                    />
+                                    {hasSubmitted && errors.email && (
+                                        <p className="absolute top-full right-1 text-sm font-extralight text-red-600 z-20">{errors.email}</p>
+                                    )}
+                                </div>
+                            ))}
+                            <div className="mb-4">
+                                <button
+                                    type="button"
+                                    onClick={addEmail}
+                                    className="flex items-center space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-extralight"
                                     disabled={isLoading}
-                                    className={`w-full rounded-xl border -mt-3 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-300 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
-                                        hasSubmitted && errors.email ? 'border-red-500 shadow-md' : 'border-gray-400 dark:border-gray-400'
-                                    }`}
-                                    style={{
-                                        fontSize: '16px',
-                                        fontWeight: 200
-                                    }}
-                                />
-                                {hasSubmitted && errors.email && (
-                                    <p className="absolute top-full right-1 text-sm font-extralight text-red-600 z-20">{errors.email}</p>
-                                )}
-                            </div>
+                                >
+                                    <span className="text-lg font-semibold">+</span>
+                                    <span className="text-base text-black hover:text-red-500">add email</span>
+                                </button>
+                            </div>  
+                        </div>
                             
                     
                         <div>
                             {/* phone Field */}
-                            <div className="relative mb-5">
-                                <label htmlFor="phone" className="relative left-4 bg-white px-1 text-base text-black font-extralight">
-                                    phone
-                                </label>
-                                <input 
-                                    type="tel" 
-                                    name="phone" 
-                                    id="phone" 
-                                    value={formData.phone}
-                                    onChange={handleInputChange}
-                                    placeholder="+49 1781234567"
+                            {phones.map((phone, index) => (
+                                <div key={index} className="relative mb-4">
+                                    <div className="flex items-center gap-2">
+
+                                        {/* Label Dropdown */ }
+                                        <select
+                                            value={phone.title}
+                                            onChange={(e) => handlePhoneChange(index, 'title', e.target.value)}
+                                            disabled={isLoading}
+                                            className="rounded-lg border border-gray-400 bg-white text-black font-extralight px-3 py-1 h-10 focus:outline-none focus:border-red-500"
+                                            style={{ fontSize: '14px', fontWeight: 200 }}
+                                        >
+                                            {labelOptions.map(option => (
+                                                <option key={option} value={option}>
+                                                    {option === 'custom' ? 'add label' : option}
+                                                </option>
+                                            ))}
+                                        </select>
+
+                                        {/* Phone Input Field */}
+                                        {phone.title === 'custom' && (
+                                            <input
+                                                type="text"
+                                                placeholder="label"
+                                                value={phone.title}
+                                                onChange={(e) => handlePhoneChange(index, 'title', e.target.value)}
+                                                disabled={isLoading}
+                                                className="rounded-lg border border-gray-400 bg-white text-black font-extralight px-3 py-1 h-10 focus:outline-none focus:border-red-500"
+                                                style={{ fontSize: '14px', fontWeight: 200 }}
+                                            />
+                                        )}
+
+                                        <label htmlFor="phone" className="relative left-4 bg-white px-1 text-normal text-black font-extralight">
+                                            phone
+                                        </label>
+
+                                        {phones.length > 1 && (
+                                            <button
+                                                type="button"
+                                                onClick={() => removePhone(index)}
+                                                className="text-red-500 hover:text-red-700 transition-colors duration-200"
+                                                disabled={isLoading}
+                                            >
+                                                &times;
+                                            </button>
+                                        )}
+                                    </div>
+
+                                    <input 
+                                        type    ="text" 
+                                        name    ="phone" 
+                                        id      ="phone"                        
+                                        value   ={phone.phone}
+                                        onChange={(e) => handlePhoneChange(index, 'phone', e.target.value)}
+                                        placeholder="+49 170 1234567"
+                                        disabled={isLoading}
+                                        className={`w-full rounded-xl border -mt-3 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-300 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
+                                            hasSubmitted && errors.phone ? 'border-red-500 shadow-md' : 'border-gray-400 dark:border-gray-400'
+                                        }`}
+                                        style={{
+                                            fontSize: '16px',
+                                            fontWeight: 200
+                                        }}
+                                    />
+                                    {hasSubmitted && errors.phone && (
+                                        <p className="absolute top-full right-1 text-sm font-extralight text-red-600 z-20">{errors.phone}</p>
+                                    )}
+                                </div>
+                            ))}
+                            <div className="mb-4">
+                                <button
+                                    type="button"
+                                    onClick={addPhone}
+                                    className="flex items-center space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-extralight"
                                     disabled={isLoading}
-                                    className={`w-full rounded-xl border -mt-3 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-300 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
-                                        hasSubmitted && errors.phone ? 'border-red-500 shadow-md' : 'border-gray-400 dark:border-gray-400'
-                                    }`}
-                                    style={{
-                                        fontSize: '16px',
-                                        fontWeight: 200
-                                    }}
-                                />
-                                {hasSubmitted && errors.phone && (
-                                    <p className="absolute top-full right-1 font-extralight text-sm text-red-600 z-20">{errors.phone}</p>
-                                )}
-                            </div>
+                                >
+                                    <span className="text-lg font-semibold">+</span>
+                                    <span className="text-base text-black hover:text-red-500">add phone</span>
+                                </button>       
                         </div>
+  
 
                         {/* Optional Address Toggle */}
                         <div className="relative">
@@ -559,127 +742,152 @@ const NewContactForm = ({onSubmit, onCancel }) => {
                             ) : (
                                 <div className="mt-4">
                                     <div className="flex items-center justify-between">
-                                        <span className="relative left-2 -mt-2 mb-4 text-sans font-extralight text-red-500 font-md">
-                                            address information
-                                        </span>
+                                        <p className="relative tracking-wide -mb-2 text-red-500 left-2 font-extralight">address</p>
                                         <button
                                             type="button"
-                                            onClick={() => {
-                                                setShowAddress(false);
-                                                setFormData(prev => ({ 
-                                                    ...prev, 
-                                                    streetAndNr:'', 
-                                                    postalcode: '', 
-                                                    city: '', 
-                                                    country: '' 
-                                                }));
-                                            }}
-                                            className="relative -mb-3 right-1 text-red-500 hover:text-red-700 transition-colors duration-200 text-sm font-extralight"
+                                            onClick={() => setShowAddress(false)}
+                                            className="text-red-500 hover:text-red-700 transition-colors duration-200 text-2xl font-extralight"
                                             disabled={isLoading}
                                         >
-                                            remove
+                                            &times;
                                         </button>
                                     </div>
-                                    
-                                    {/* Address Field */}
-                                    <div className="relative">
-                                        <label htmlFor="streetAndNr" className="absolute -top-3 left-4 bg-white px-1 text-sans text-base text-black font-extralight">
-                                            street & nr°
-                                        </label>
-                                        <input 
-                                            type="text" 
-                                            name="streetAndNr" 
-                                            id="streetAndNr" 
-                                            value={formData.streetAndNr}
-                                            onChange={handleInputChange}
-                                            placeholder="greifwalder Str. 8"
-                                            disabled={isLoading}
-                                            className={`w-full rounded-xl border -mb-1 border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-300 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
-                                            style={{
-                                                fontSize: '18px',
-                                                fontWeight: 200
-                                            }}
-                                        />
-                                        {hasSubmitted && errors.streetAndNr && (
-                                            <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.streetAndNr}</p>
-                                        )}
-                                    </div>
 
-                                    {/* Postal Code and City in a row */}
-                                    <div className="flex space-x-4">
-                                        <div className="relative flex-1">
-                                            <label htmlFor="postalcode" className="relative top-3 bg-white px-1 left-4 text-sans text-base text-black font-extralight">
-                                                postal code
-                                            </label>
+                                    {/* Address Fields */}
+                                    {addresses.map((address, index) => (
+                                        <div key={index} className="space-y-3 mb-4 mt-2 p-4 border border-gray-300 rounded-xl relative">
+                                            <div className="flex items-center gap-2 mb-2">
+
+                                                {/* Label Dropdown */ }
+                                                <select
+                                                    value={address.title}
+                                                    onChange={(e) => handleAddressChange(index, 'title', e.target.value)}
+                                                    disabled={isLoading}
+                                                    className="rounded-lg border border-gray-400 bg-white text-black font-extralight px-3 py-1 h-   10 focus:outline-none focus:border-red-500"             
+                                                    style={{ fontSize: '14px', fontWeight: 200 }}
+                                                >
+                                                    {labelOptions.map(option => (
+                                                        <option key={option} value={option}>
+                                                            {option === 'custom' ? 'add label' : option}
+                                                        </option>
+                                                    ))}
+                                                </select>
+
+                                                {/* Address Label Input Field */}
+                                                {address.title === 'custom' && (
+                                                    <input
+                                                        type="text"
+                                                        placeholder="label"
+                                                        value={address.title}
+                                                        onChange={(e) => handleAddressChange(index, 'title', e.target.value)}
+                                                        disabled={isLoading}
+                                                        className="rounded-lg border border-gray-400 bg-white text-black font-extralight px-3 py-1 h-10 focus:outline-none focus:border-red-500"
+                                                        style={{ fontSize: '14px', fontWeight: 200 }}
+                                                    />
+                                                )}
+
+                                                {addresses.length > 1 && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => removeAddress(index)}
+                                                        className="text-red-500 hover:text-red-700 transition-colors duration-200"
+                                                        disabled={isLoading}
+                                                    >
+                                                        &times;
+                                                    </button>
+                                                )}
+                                            </div>
+
                                             <input 
                                                 type="text" 
-                                                name="postalcode" 
-                                                id="postalcode" 
-                                                value={formData.postalcode}
-                                                onChange={handleInputChange}
-                                                placeholder="10407"
+                                                name="streetAndNr" 
+                                                id="streetAndNr" 
+                                                value={address.streetAndNr}
+                                                onChange={(e) => handleAddressChange(index, 'streetAndNr', e.target.value)}
+                                                placeholder="street and number"
                                                 disabled={isLoading}
-                                                className={`w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-300 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
+                                                className="w-full rounded-xl border bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-300 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500"
                                                 style={{
                                                     fontSize: '16px',
                                                     fontWeight: 200
                                                 }}
                                             />
-                                            {hasSubmitted && errors.postalcode && (
-                                                <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.postalcode}</p>
-                                            )}
-                                        </div>
-
-                                        <div className="relative flex-1">
-                                            <label htmlFor="city" className="relative top-3 bg-white px-1 left-4 text-sans text-base text-black font-extralight">
-                                                city
-                                            </label>
                                             <input 
                                                 type="text" 
-                                                name="city" 
-                                                id="city" 
-                                                value={formData.city}
-                                                onChange={handleInputChange}
-                                                placeholder="berlin"
+                                                name="additionalInfo" 
+                                                id="additionalInfo" 
+                                                value={address.additionalInfo}     
+                                                onChange={(e) => handleAddressChange(index, 'additionalInfo', e.target.value)}
+                                                placeholder="e.g. c/o, floor, etc.)"
                                                 disabled={isLoading}
-                                                className={`w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-300 max-w-full min-w-[150px] h-[48px] focus:outline-none focus:border-red-500`}
+                                                className="w-full rounded-xl border bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-300 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500"
                                                 style={{
                                                     fontSize: '16px',
                                                     fontWeight: 200
                                                 }}
                                             />
-                                            {hasSubmitted && errors.city && (
-                                                <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.city}</p>
-                                            )}
+                                            <div className="flex space-x-2">
+                                                <input 
+                                                    type="text" 
+                                                    name="postalcode" 
+                                                    id="postalcode" 
+                                                    value={address.postalcode}  
+                                                    onChange={(e) => handleAddressChange(index, 'postalcode', e.target.value)}
+                                                    placeholder="postal code"
+                                                    disabled={isLoading}    
+                                                    className="w-1/3 rounded-xl border bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-300 min-w-[80px] h-[48px] focus:outline-none focus:border-red-500"
+                                                    style={{
+                                                        fontSize: '16px',
+                                                        fontWeight: 200
+                                                    }}
+                                                />
+                                                <input 
+                                                    type="text" 
+                                                    name="city" 
+                                                    id="city" 
+                                                    value={address.city}  
+                                                    onChange={(e) => handleAddressChange(index, 'city', e.target.value)}
+                                                    placeholder="city"
+                                                    disabled={isLoading}    
+                                                    className="w-2/3 rounded-xl border bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-300 min-w-[120px] h-[48px] focus:outline-none focus:border-red-500"
+                                                    style={{
+                                                        fontSize: '16px',
+                                                        fontWeight: 200
+                                                    }}
+                                                />
+                                            </div>
+                                            <input 
+                                                type="text" 
+                                                name="country" 
+                                                id="country"    
+                                                value={address.country}
+                                                onChange={(e) => handleAddressChange(index, 'country', e.target.value)} 
+                                                placeholder="country"
+                                                disabled={isLoading}
+                                                className="w-full rounded-xl border bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-300 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500"
+                                                style={{
+                                                    fontSize: '16px',
+                                                    fontWeight: 200 
+                                                }}
+                                            />
+                                            {hasSubmitted && errors.address && (        
+                                                <p className="absolute top-full right-1 text-sm font-extralight text-red-600 z-20">{errors.address}</p>     
+                                            )}  
                                         </div>
-                                    </div>
-
-                                    {/* Country Field */}
-                                    <div className="relative">
-                                        <label htmlFor="country" className="relative top-3 bg-white px-1 left-4 text-sans text-base text-black font-extralight">
-                                            country
-                                        </label>
-                                        <input 
-                                            type="text" 
-                                            name="country" 
-                                            id="country" 
-                                            value={formData.country}
-                                            onChange={handleInputChange}
-                                            placeholder="germany"
+                                    ))}
+                                    <div className="mb-4">
+                                        <button
+                                            type="button"
+                                            onClick={addAddress}    
+                                            className="flex items-center space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-extralight"
                                             disabled={isLoading}
-                                            className={`w-full rounded-xl mb-5 border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-300 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
-                                            style={{
-                                                fontSize: '16px',
-                                                fontWeight: 200
-                                            }}
-                                        />
-                                        {hasSubmitted && errors.country && (
-                                            <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.country}</p>
-                                        )}
+                                        >
+                                            <span className="text-lg font-semibold">+</span>    
+                                            <span className="text-base text-black hover:text-red-500">add address</span>
+                                        </button>
                                     </div>
                                 </div>
                             )}
-                        </div>
                     </div>
 
 

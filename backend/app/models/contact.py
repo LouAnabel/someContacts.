@@ -16,12 +16,12 @@ class Contact(db.Model):
     is_favorite = db.Column(db.Boolean, default=False, nullable=True)
 
     # Additional fields that your to_dict() method expects
-    birth_date = db.Column(db.Date,nullable=True)
+    birth_date = db.Column(db.Date, nullable=True)
     is_to_contact = db.Column(db.Boolean, default=False, nullable=True)
     is_contacted = db.Column(db.Boolean, default=False, nullable=True)
-    last_contact_date = db.Date(db.Date(200), nullable=True)
-    last_contact_place = db.String(db.String(200), nullable=True)
-    next_contact_date = db.Column(db.String(200), nullable=True)
+    next_contact_date = db.Date(db.Date, nullable=True)
+    next_contact_place = db.Column(db.String(200), nullable=True)
+    last_contact_date= db.String(db.String(200), nullable=True)
 
     emails = db.relationship('ContactEmail', backref='contact', lazy='dynamic', cascade='all, delete-orphan')
     phones = db.relationship('ContactPhone', backref='contact', lazy='dynamic', cascade='all, delete-orphan')
@@ -29,7 +29,7 @@ class Contact(db.Model):
 
     notes = db.Column(db.String(2000))
 
-    links = db.relationship('ContactLinks', backref='contact', lazy='dynamic', cascade='all, delete-orphan')
+    links = db.relationship('ContactLink', backref='contact', lazy='dynamic', cascade='all, delete-orphan')
     # Many-to-many Relationships
     contact_categories = db.relationship('ContactCategory', back_populates='contact', cascade='all, delete-orphan')
     categories = db.relationship('Category', secondary='contact_categories', back_populates='contacts', viewonly=True)
@@ -64,6 +64,7 @@ class Contact(db.Model):
             'is_to_contact' : self.is_to_contact,
             'last_contact_date': self.last_contact_date,
             'next_contact_date': self.next_contact_date,
+            'next_contact_place': self.next_contact_place,
             'notes': self.notes,
             'created_at': self.created_at.strftime('%d.%m.%Y %H:%M:%S') if self.created_at else None,
             'updated_at': self.updated_at.strftime('%d.%m.%Y %H:%M:%S') if self.updated_at else None,

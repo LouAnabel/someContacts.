@@ -3,7 +3,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from app import db
 from app.models.contact import Contact
 from app.models.category import Category
-from app.models.contact_links import ContactLinks
+from app.models.contact_link import ContactLink
 from app.models.contact_category import ContactCategory
 import re
 from datetime import datetime

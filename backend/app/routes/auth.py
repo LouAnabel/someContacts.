@@ -314,6 +314,23 @@ def get_current_user():
             'error': str(e)
         }), 500
 
+# update User Data
+@auth_bp.route('/user_update', methods=['PUT'])
+@jwt_required()
+def update_user_data():
+    try:
+        current_user_id=get_jwt_identity()
+        user = User.query.get(int(current_user_id))
+        logger.info(f"Updating User")
+
+        data = request.get_json()
+        if not data:
+            logger.warning("Update failed: No data provided")
+            return jsonify({
+                'success': False,
+                'message': 'No data provided'
+            }), 400
+
 
 @jwt.user_lookup_loader
 def load_user(jwt_header, jwt_payload):

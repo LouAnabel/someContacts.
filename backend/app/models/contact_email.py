@@ -14,7 +14,7 @@ class ContactEmail(db.Model):
         db.Index('idx_contact_emails', 'contact_id'),
         # Ensure URL is not empty
         db.CheckConstraint('length(email) > 0', name='check_email_not_empty'),
-        # db.CheckConstraint("url LIKE 'http%'", name='check_email_format'),
+        db.CheckConstraint("url LIKE 'http%'", name='check_email_format'),
     )
 
     def to_dict(self):
