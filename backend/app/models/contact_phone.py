@@ -13,8 +13,7 @@ class ContactPhone(db.Model):
         # Index for efficient queries
         db.Index('idx_contact_phones', 'contact_id'),
         # Ensure URL is not empty
-        db.CheckConstraint('length(phone) > 0', name='check_phone_not_empty'),
-        # db.CheckConstraint("url LIKE 'http%'", name='check_url_format'),
+        db.CheckConstraint('length(phone) > 0', name='check_phone_not_empty')
     )
 
     def to_dict(self):
@@ -26,5 +25,5 @@ class ContactPhone(db.Model):
         }
 
     def __repr__(self):
-        return f'<ContactLink {self.title}: {self.phone}>'
+        return f'<ContactPhone {self.title}: {self.phone}>'
 
