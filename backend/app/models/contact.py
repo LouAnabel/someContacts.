@@ -74,6 +74,8 @@ class Contact(db.Model):
         # Check constraints
         db.CheckConstraint('length(first_name) > 0', name='check_first_name_not_empty'),
         db.CheckConstraint('birth_date <= CURRENT_DATE', name='check_birth_date_not_future'),
+        db.CheckConstraint('next_contact_date IS NULL OR next_contact_date > CURRENT_DATE',
+                           name='check_next_contact_date_future'),
     )
 
     def to_dict(self, include_phones=True, include_emails=True, include_addresses=True, include_links=True, include_categories=True):
@@ -87,7 +89,7 @@ class Contact(db.Model):
             'is_contacted': self.is_contacted,
             'is_to_contact': self.is_to_contact,
             'last_contact_date': self.last_contact_date,
-            'next_contact_date': self.next_contact_date,
+            'next_contact_date': self.next_contact_date.strftime('%d.%m.%Y') if self.next_contact_date else None,
             'next_contact_place': self.next_contact_place,
             'notes': self.notes,
             'created_at': self.created_at.strftime('%d.%m.%Y %H:%M:%S') if self.created_at else None,
