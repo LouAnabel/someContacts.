@@ -22,18 +22,42 @@ class Contact(db.Model):
     next_contact_date = db.Date(db.Date, nullable=True)
     next_contact_place = db.Column(db.String(200), nullable=True)
     last_contact_date= db.String(db.String(200), nullable=True)
-
-    emails = db.relationship('ContactEmail', backref='contact', lazy='dynamic', cascade='all, delete-orphan')
-    phones = db.relationship('ContactPhone', backref='contact', lazy='dynamic', cascade='all, delete-orphan')
-    addresses = db.relationship('ContactAddress', backref='contact', lazy='dynamic', cascade='all, delete-orphan')
-
     notes = db.Column(db.String(2000))
 
-    links = db.relationship('ContactLink', backref='contact', lazy='dynamic', cascade='all, delete-orphan')
+
+    # Relationships - filtering by owner_type
+    emails = db.relationship(
+        'ContactEmail',
+        primaryjoin='and_(foreign(ContactEmail.contact_id)==Contact.id, ContactEmail.owner_type=="contact")',
+        lazy='dynamic',
+        cascade='all, delete-orphan',
+        viewonly=False
+    )
+    phones = db.relationship(
+        'ContactPhone',
+        primaryjoin='and_(foreign(ContactPhone.contact_id)==Contact.id, ContactPhone.owner_type=="contact")',
+        lazy='dynamic',
+        cascade='all, delete-orphan',
+        viewonly=False
+    )
+    addresses = db.relationship(
+        'ContactAddress',
+        primaryjoin='and_(foreign(ContactAddress.contact_id)==Contact.id, ContactAddress.owner_type=="contact")',
+        lazy='dynamic',
+        cascade='all, delete-orphan',
+        viewonly=False
+    )
+    links = db.relationship(
+        'ContactLink',
+        primaryjoin='and_(foreign(ContactLink.contact_id)==Contact.id, ContactLink.owner_type=="contact")',
+        lazy='dynamic',
+        cascade='all, delete-orphan',
+        viewonly=False
+    )
+
     # Many-to-many Relationships
     contact_categories = db.relationship('ContactCategory', back_populates='contact', cascade='all, delete-orphan')
     categories = db.relationship('Category', secondary='contact_categories', back_populates='contacts', viewonly=True)
-
 
     # Timestamps
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
@@ -52,16 +76,16 @@ class Contact(db.Model):
         db.CheckConstraint('birth_date <= CURRENT_DATE', name='check_birth_date_not_future'),
     )
 
-    def to_dict(self, include_phones=True, include_emails=True, include_addresses=True, include_categories=True, include_links=True):
-        data: dict[str | Any, None | dict[str, Any] | list[Any] | Any] = {
+    def to_dict(self, include_phones=True, include_emails=True, include_addresses=True, include_links=True, include_categories=True):
+        data = {
             'id': self.id,
             'creator_id': self.creator_id,
             'first_name': self.first_name,
             'last_name': self.last_name,
             'is_favorite': self.is_favorite,
             'birth_date': self.birth_date.strftime('%d.%m.%Y') if self.birth_date else None,
-            'is_contacted':self.is_contacted,
-            'is_to_contact' : self.is_to_contact,
+            'is_contacted': self.is_contacted,
+            'is_to_contact': self.is_to_contact,
             'last_contact_date': self.last_contact_date,
             'next_contact_date': self.next_contact_date,
             'next_contact_place': self.next_contact_place,
@@ -76,10 +100,8 @@ class Contact(db.Model):
             data['emails'] = [email.to_dict() for email in self.emails.all()]
         if include_addresses:
             data['addresses'] = [address.to_dict() for address in self.addresses.all()]
-
         if include_links:
             data['links'] = [link.to_dict() for link in self.links.all()]
-
         if include_categories:
             data['categories'] = [category.to_dict() for category in self.categories]
 
