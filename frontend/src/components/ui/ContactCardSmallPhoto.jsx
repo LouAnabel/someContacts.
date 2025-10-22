@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import ContactMenuBar from "./ContactCardMenu";
-import ContactCardPhotoSmall from '../ui/ContactCardPhoto';
+import ContactCardPhotoSmall from './ContactCardPhoto';
 import { useNavigate } from 'react-router';
 
 const ContactCardSmallPhoto = ({contact = {}}) => {

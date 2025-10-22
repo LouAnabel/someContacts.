@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import CircleButton from '../ui/Buttons';
 import { useNavigate } from 'react-router-dom';
+import {sendRegisterData} from '../../apiCalls/authApi';
+
 
 const RegisterForm = () => {
     const navigate = useNavigate();
@@ -13,7 +15,7 @@ const RegisterForm = () => {
     });
     const [errors, setErrors] = useState({});
     const [hasSubmitted, setHasSubmitted] = useState(false);
-    const [acceptTerms, setAcceptTerms] = useState(false);
+    // const [acceptTerms, setAcceptTerms] = useState(false);
     const [apiLoading, setApiLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
@@ -29,7 +31,7 @@ const RegisterForm = () => {
         });
         setErrors({});
         setHasSubmitted(false);
-        setAcceptTerms(false);
+        // setAcceptTerms(false);
         setApiLoading(false);
     }, []);
   
@@ -39,64 +41,61 @@ const RegisterForm = () => {
         try {
             setApiLoading(true);
             
-            
-            const response = await fetch('http://127.0.0.1:5000/auth/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    first_name: registerData.firstName,
-                    last_name: registerData.lastName,
-                    email: registerData.email,
-                    password: registerData.password
-                })
+            const data = await sendRegisterData({
+                first_name: registerData.firstName,
+                last_name: registerData.lastName,
+                email: registerData.email,
+                password: registerData.password
             });
 
-            const data = await response.json();
+            console.log('Registration successful:', data);
+
+            // Backend returns user data, not token on registration
+            if (data.user) {
+                localStorage.setItem('userData', JSON.stringify(data.user));    
+            }
+
+            setErrors({});
+            setFormData({
+                firstName: '',
+                lastName: '',
+                email: '',
+                password: '',
+                confirmPassword: ''
+            });
+
+            // setAcceptTerms(false);
+            setHasSubmitted(false);
             
-            console.log('API Response Status:', response.status);
-            console.log('API Response Data:', data);
+            // later Email send for verifivation can be added here
+            alert('Registration successful! Ready to login!');
+            navigate('/login');
 
-            if (response.ok) {
-                console.log('Registration successful:', data);
+        } catch (error) {
+            console.error('Registration error:', error);
             
-                if (data.token) {
-                    localStorage.setItem('authToken', data.token);
-                }
-
-                if (data.user) {
-                    localStorage.setItem('userData', JSON.stringify(data.user));    
-                }
-
-                setErrors({});
-                setFormData({
-                    firstName: '',
-                    lastName: '',
-                    email: '',
-                    password: '',
-                    confirmPassword: ''
-                });
-
-                setAcceptTerms(false);
-                setHasSubmitted(false);
-                
-                alert('Registration successful! Ready to login!');
-                navigate('/login');
-
-            } else {
-                console.error('Registration failed:', data);
+            // Handle different types of errors
+            if (error.status === 409) {
+                // Email already registered
                 setErrors({
-                    submit: data.message || 'Registration failed. Please try again.'
+                    submit: 'Email already registered. Please login instead.'
+                });
+            } else if (error.status === 400) {
+                // Validation error
+                setErrors({
+                    submit: error.data?.message || 'Invalid input. Please check your details.'
+                });
+            } else if (error.status >= 500) {
+                // Server errors
+                setErrors({
+                    submit: 'Server error. Please try again later.'
+                });
+            } else {
+                // Network or other errors
+                setErrors({
+                    submit: 'Unable to connect to server. Please try again later.'
                 });
             }
-        
-            
-        } catch (error) {
-            console.error('Network/API error:', error);
-            setErrors({
-                submit: 'Unable to connect to server. Please try again later.'
-            });
         } finally {
             setApiLoading(false);
         }
@@ -124,14 +123,15 @@ const RegisterForm = () => {
     }
 
 
-    const handleTermsChange = (e) => {
-        setAcceptTerms(e.target.checked);
+    // const handleTermsChange = (e) => {
+    //     setAcceptTerms(e.target.checked);
         
-        // Clear terms error immediately when checkbox is checked
-        if (e.target.checked && errors.terms) {
-            setErrors(prev => ({ ...prev, terms: '' }));
-        }
-    };
+    //     // Clear terms error immediately when checkbox is checked
+    //     if (e.target.checked && errors.terms) {
+    //         setErrors(prev => ({ ...prev, terms: '' }));
+    //     }
+    // };
+    
 
     const validateForm = () => {
         const newErrors = {};

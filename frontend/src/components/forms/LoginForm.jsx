@@ -9,6 +9,7 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
         email: '',
         password: ''
     });
+
     const [errors, setErrors] = useState({});
     const [hasSubmitted, setHasSubmitted] = useState(false);
     const [apiLoading, setApiLoading] = useState(false);
@@ -18,15 +19,20 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
     const navigate = useNavigate();
 
     // Api function call
-    const loginUser = async (loginData) => {
+    const handleLogin = async (loginData) => {
         try {
             setApiLoading(true);
 
-            // call API call
+            // call API in authApi.js
             const data = await sendLoginData(loginData);
 
             if (data && data.access_token) {
-                login(data.access_token, data.user)
+                // Store tokens (in context, localStorage, or state management)
+                localStorage.setItem('access_token', data.access_token);
+                localStorage.setItem('refresh_token', data.refresh_token);
+            
+                // Update auth context
+                login(data.access_token, data.user);
                 console.log("Login successfull!")
 
                 // clear any previous errors & clear form data
@@ -74,6 +80,7 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
         }
     };    
 
+    // Password visibility toggle
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
     }
@@ -132,7 +139,7 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
 
         // Form is valid, proceed with API call
         console.log('Submitting form with data:', formData);
-        await loginUser(formData);
+        await handleLogin(formData);
 
         if (onSubmit) {
             onSubmit(formData);
@@ -279,7 +286,13 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
                         sign up.
                     </a>
                 </div>
-            </div> 
+                <div className="font-extralight text-black dark:text-white block relative"
+                    style={{ fontSize: '16px' }}>
+                    <a href="forgot-password" className="font-light text-red-500 hover:underline">
+                        forgot password?
+                    </a>
+                </div>
+            </div>  
         </div>
     );
 };

@@ -1,1226 +1,903 @@
-import React, { useState, useEffect } from 'react';
-import CircleButton from '../ui/Buttons';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../../context/AuthContextProvider';
-import { createContact, getCategories } from '../../apiCalls/contactsApi';
-import FormDataToApiData from '../helperFunctions/FormToApiData';
+import { createContact, getCategories} from '../../apiCalls/contactsApi';
+import { FormToApiData } from '../helperFunctions/FormToApiData';
 import { validateDate } from '../helperFunctions/dateConversion';
+import CircleButton from '../ui/Buttons';
 import CategorySelection from '../ui/CategorySelection';
 
+const Button = ({ children, onClick, className = "", ...props }) => {
+  return (
+    <button
+      onClick={onClick}
+      className={`text-black dark:text-white hover:text-red-500 dark:hover:text-red-500 transition-colors duration-200 ${className}`}
+      {...props}
+    >
+      {children}
+    </button>
+  );
+};
 
-const NewContactForm = ({onSubmit, onCancel }) => {
-    const navigate = useNavigate();
-    const { accessToken } = useAuthContext();
+export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
+  const navigate = useNavigate();
+  const { accessToken } = useAuthContext();
 
-    const [formData, setFormData] = useState({
-        firstName: '',
-        lastName: '',
-        categories: [],
-        emails: [],
-        phones: [],
-        isFavorite: false,
-        birthdate: '',
-        addresses: [],
-        notes: '',
-        isContacted: false,
-        isToContact: false,
-        lastContactDate: '',
-        nextContactDate: '',
-        links: []
-    });
+  // Basic form data
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    categories: [],
+    isFavorite: false,
+    birthdate: '',
+    notes: '',
+    isContacted: false,
+    isToContact: false,
+    lastContactDate: '',
+    nextContactDate: '',
+    nextContactPlace: ''
+  });
 
-    // Original Visual State 
-    const [errors, setErrors] = useState({});
-    const [hasSubmitted, setHasSubmitted] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
-    
-    const [showBirthdate, setShowBirthdate] = useState(false);
-    const [showAddress, setShowAddress] = useState(false);
-    const [expandedNotes, setExpandedNotes] = useState(false);
-    const [showContactDetails, setShowContactDetails] = useState(false);
+  // Multi-field arrays
+  const [emails, setEmails] = useState([{ title: 'private', email: '' }]);
+  const [phones, setPhones] = useState([{ title: 'mobile', phone: '' }]);
+  const [addresses, setAddresses] = useState([{
+    title: 'private',
+    streetAndNr: '',
+    additionalInfo: '',
+    postalcode: '',
+    city: '',
+    country: ''
+  }]);
+  const [links, setLinks] = useState([{ title: '', url: '' }]);
 
-    // Contact Details State
-    const [labelOptions, setLabelOptions] = useState(['private', 'mobile', 'work', 'office', 'custom']);
-    const [emails, setEmails] = useState([{ title: 'private', email: '' }]);
-    const [phones, setPhones] = useState([{ title: 'mobile', phone: '' }]);
-    const [addresses, setAddresses] = useState([{ title: 'private', streetAndNr: '', additionalInfo: '', postalcode: '', city: '', country: '' }]);
+  // UI states
+  const [errors, setErrors] = useState({});
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-    const [showLinks, setShowLinks] = useState(false);
-    const [links, setLinks] = useState([{ title: '', url: '' }]);
+  // Optional sections visibility
+  const [showBirthdate, setShowBirthdate] = useState(false);
+  const [showAddress, setShowAddress] = useState(false);
+  const [showContactDetails, setShowContactDetails] = useState(false);
+  const [showLinks, setShowLinks] = useState(false);
+  const [expandedNotes, setExpandedNotes] = useState(false);
 
+  // Categories state
+  const [categories, setCategories] = useState([]);
+  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+  const [showAddCategory, setShowAddCategory] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const [isAddingCategory, setIsAddingCategory] = useState(false);
 
-    // Categories State
-    const [categories, setCategories] = useState([]);
-    const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
-    const [showAddCategory, setShowAddCategory] = useState(false);
-    const [newCategoryName, setNewCategoryName] = useState('');
-    const [isAddingCategory, setIsAddingCategory] = useState(false);
-
-
-    // LOAD CATEGORIES FOR TOGGLE MENU
-    useEffect(() => {
-        const loadCategories = async () => {
-            try {
-                if (accessToken) {
-                    const categoriesData = await getCategories(accessToken);
-                    console.log("categoriesData:", categoriesData)
-                    setCategories(categoriesData); // Just empty array, no defaults
-                } else {
-                    setCategories([]); // Empty array when no access token
-                }
-            } catch (error) {   
-                console.error('Failed to load categories:', error);
-                setCategories([]); // Empty array on error
-            }
-        };
-        loadCategories();
-    }, [accessToken]);
-
-
-    const handleInputChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: type === 'checkbox' ? checked : value
-        }));
-        
-        // Clear errors if user has already submitted once
-        if (hasSubmitted && errors[name]) {
-            setErrors(prev => ({ ...prev, [name]: '' }));
+  // Load categories on mount
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        if (accessToken) {
+          const categoriesData = await getCategories(accessToken);
+          console.log('Categories loaded:', categoriesData);
+          setCategories(categoriesData);
         }
+      } catch (error) {
+        console.error('Failed to load categories:', error);
+        setCategories([]);
+      }
+    };
+    loadCategories();
+  }, [accessToken]);
 
-        if (errors.submit) {
-            setErrors(prev => ({ ...prev, submit: '' }));
+  // ============================================
+  // INPUT HANDLERS
+  // ============================================
+
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+
+    // Clear errors
+    if (hasSubmitted && errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+    if (errors.submit) {
+      setErrors(prev => ({ ...prev, submit: '' }));
+    }
+  };
+
+  // Email handlers
+  const handleEmailChange = (index, field, value) => {
+    const newEmails = [...emails];
+    newEmails[index] = { ...newEmails[index], [field]: value };
+    setEmails(newEmails);
+  };
+
+  const addEmail = () => {
+    setEmails([...emails, { title: '', email: '' }]);
+  };
+
+  const removeEmail = (index) => {
+    if (emails.length > 1) {
+      setEmails(emails.filter((_, i) => i !== index));
+    }
+  };
+
+  // Phone handlers
+  const handlePhoneChange = (index, field, value) => {
+    const newPhones = [...phones];
+    newPhones[index] = { ...newPhones[index], [field]: value };
+    setPhones(newPhones);
+  };
+
+  const addPhone = () => {
+    setPhones([...phones, { title: '', phone: '' }]);
+  };
+
+  const removePhone = (index) => {
+    if (phones.length > 1) {
+      setPhones(phones.filter((_, i) => i !== index));
+    }
+  };
+
+  // Address handlers
+  const handleAddressChange = (index, field, value) => {
+    const newAddresses = [...addresses];
+    newAddresses[index] = { ...newAddresses[index], [field]: value };
+    setAddresses(newAddresses);
+  };
+
+  const addAddress = () => {
+    setAddresses([...addresses, {
+      title: '',
+      streetAndNr: '',
+      additionalInfo: '',
+      postalcode: '',
+      city: '',
+      country: ''
+    }]);
+  };
+
+  const removeAddress = (index) => {
+    if (addresses.length > 1) {
+      setAddresses(addresses.filter((_, i) => i !== index));
+    }
+  };
+
+  // Link handlers
+  const handleLinkChange = (index, field, value) => {
+    const newLinks = [...links];
+
+    // Auto-format URL
+    if (field === 'url' && value.trim()) {
+      if (!value.startsWith('http://') && !value.startsWith('https://')) {
+        if (value.includes('.')) {
+          value = 'https://' + value;
         }
-    };
-
-    // Email Handlers
-    const handleEmailChange = (index, field, value) => {
-        const newEmails = [...emails];
-
-        newEmails[index] = {
-            ...newEmails[index],
-            [field]: value
-        };
-        setEmails(newEmails);
-        console.log("emails:", newEmails)
-    };
-
-    const addEmail = () => {
-        setEmails([...emails, { title: '', email: '' }]);
-    };
-
-    const removeEmail = (index) => {
-        if (emails.length > 1) {
-            const newEmails = emails.filter((_, i) => i !== index);
-            setEmails(newEmails);
-        }
-    };
-
-    // Phone Handlers
-    const handlePhoneChange = (index, field, value) => {
-        const newPhones = [...phones];
-        newPhones[index] = {
-            ...newPhones[index],
-            [field]: value
-        };
-        setPhones(newPhones);
-        console.log("phones:", newPhones)
-    };
-
-    const addPhone = () => {
-        setPhones([...phones, { title: '', phone: '' }]);
-    };
-
-    const removePhone = (index) => {
-        if (phones.length > 1) {
-            const newPhones = phones.filter((_, i) => i !== index);
-            setPhones(newPhones);
-        }
-    };
-
-    // Address Handlers
-    const handleAddressChange = (index, field, value) => {
-        const newAddresses = [...addresses];
-        newAddresses[index] = {
-            ...newAddresses[index],
-            [field]: value
-        };
-        setAddresses(newAddresses);
-        console.log("addresses:", newAddresses)
-    };
-
-    const addAddress = () => {
-        setAddresses([...addresses, { title: '', streetAndNr: '', additionalInfo: '', postalcode: '', city: '', country: '' }]);
-    };
-
-    const removeAddress = (index) => {
-        if (addresses.length > 1) {
-            const newAddresses = addresses.filter((_, i) => i !== index);
-            setAddresses(newAddresses);
-        }
-    };
-
-    // Link Handlers
-    const handleLinkChange = (index, field, value) => {
-        const newLinks = [...links];
-    
-        // If it's a URL field, auto-format it
-        if (field === 'url' && value.trim()) {
-            // Check if URL already has protocol
-            if (!value.startsWith('http://') && !value.startsWith('https://')) {
-                // Add https:// if it looks like a URL (contains a dot)
-                if (value.includes('.')) {
-                    value = 'https://' + value;
-                }
-            }
-        }
-        
-        newLinks[index] = {
-            ...newLinks[index],
-            [field]: value
-        };
-        setLinks(newLinks);
-    };
-
-    const addLink = () => {
-        setLinks([...links, { title: '', url: '' }]);
-    };
-
-    const removeLink = (index) => {
-        if (links.length > 1) {
-            const newLinks = links.filter((_, i) => i !== index);
-            setLinks(newLinks);
-        }
-    };
-
-    const handleGoBack = () => {
-        navigate(-1);
+      }
     }
 
-    // LOADING CATEGORIES TO DATABASE 
-    const addCategory = async () => {
-        if (newCategoryName.trim() && !isAddingCategory) {
-            setIsAddingCategory(true);
-            
-            try {
-                const categoryName = newCategoryName.charAt(0).toUpperCase() + newCategoryName.slice(1).trim();
-                console.log('Adding category:', categoryName);
-                
-                const response = await fetch('http://127.0.0.1:5000/categories', {
-                    method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${accessToken}`
-                    },
-                    body: JSON.stringify({ 
-                        name: categoryName
-                    })
-                });
-                
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error('API Error:', response.status, errorText);
-                    throw new Error(`Failed to add category: ${response.status}`);
-                }
-                
-                const apiResponse = await response.json();
-                console.log('API Response for new category:', apiResponse);
-                
-                const newCategory = {
-                    id: apiResponse.id || apiResponse.category?.id || Date.now(),
-                    name: apiResponse.name || apiResponse.category?.name || categoryName,
-                    creator_id: apiResponse.creator_id || apiResponse.category?.creator_id || 1,
-                    contact_count: apiResponse.contact_count || apiResponse.category?.contact_count || 0 
-                };
-                
-                setCategories(prevCategories => [...prevCategories, newCategory]);
-                
-                // UPDATED: Add to categories array instead of replacing single category
-                setFormData(prevFormData => ({
-                    ...prevFormData, 
-                    categories: [...prevFormData.categories, { name: newCategory.name, id: newCategory.id }]
-                }));
+    newLinks[index] = { ...newLinks[index], [field]: value };
+    setLinks(newLinks);
+  };
 
-                // Clear category errors
-                if (hasSubmitted && errors.categories) {
-                    setErrors(prev => ({ ...prev, categories: '' }));
-                }
-                
-                setNewCategoryName('');
-                setShowAddCategory(false);
-                setShowCategoryDropdown(false);
-                
-                console.log('Category added successfully:', newCategory.name);
-                
-            } catch (error) {
-                console.error('Failed to add category:', error);
-                alert(`Failed to add category: ${error.message}`);
-            } finally {
-                setIsAddingCategory(false);
-            }
-        }
-    };
+  const addLink = () => {
+    setLinks([...links, { title: '', url: '' }]);
+  };
 
-    const addCategoryToForm = (category) => {
-        // Check if category is already selected
-        const isAlreadySelected = formData.categories.some(cat => cat.id === category.id);
-        if (isAlreadySelected) {
-            return; // Don't add if already selected
-        }
+  const removeLink = (index) => {
+    if (links.length > 1) {
+      setLinks(links.filter((_, i) => i !== index));
+    }
+  };
 
-        // Check if we already have 3 categories
-        if (formData.categories.length >= 3) {
-            alert('Maximum 3 categories allowed');
-            return;
-        }
+  // ============================================
+  // CATEGORY HANDLERS
+  // ============================================
 
-        // Add the category
-        setFormData(prev => ({
-            ...prev,
-            categories: [...prev.categories, { name: category.name, id: category.id }]
+  const getNextCategoryId = (categories) => {
+    if (!categories || categories.length === 0) return 1;
+    const maxId = Math.max(...categories.map(cat => parseInt(cat.id) || 0));
+    return maxId + 1;
+  };
+
+  const addCategory = async () => {
+    if (newCategoryName.trim() && !isAddingCategory) {
+      setIsAddingCategory(true);
+
+      try {
+        const categoryName = newCategoryName.charAt(0).toUpperCase() + newCategoryName.slice(1).trim();
+        const nextId = getNextCategoryId(categories);
+
+        const newCategory = {
+          id: nextId,
+          name: categoryName,
+          creator_id: null,
+          contact_count: 0,
+          isPersisted: false
+        };
+
+        setCategories(prevCategories => [...prevCategories, newCategory]);
+
+        setFormData(prevFormData => ({
+          ...prevFormData,
+          categories: [...prevFormData.categories, { name: newCategory.name, id: newCategory.id }]
         }));
 
-        // Clear error immediately
         if (hasSubmitted && errors.categories) {
-            setErrors(prev => ({ ...prev, categories: '' }));
+          setErrors(prev => ({ ...prev, categories: '' }));
         }
-    };
 
-    const removeCategoryFromForm = (categoryId) => {
-        setFormData(prev => ({
-            ...prev,
-            categories: prev.categories.filter(cat => cat.id !== categoryId)
+        setNewCategoryName('');
+        setShowAddCategory(false);
+        setShowCategoryDropdown(false);
+
+        console.log('Category added to form:', newCategory);
+      } catch (error) {
+        console.error('Failed to add category:', error);
+        alert(`Failed to add category: ${error.message}`);
+      } finally {
+        setIsAddingCategory(false);
+      }
+    }
+  };
+
+  const addCategoryToForm = (category) => {
+    const isAlreadySelected = formData.categories.some(cat => cat.id === category.id);
+    if (isAlreadySelected) return;
+
+    if (formData.categories.length >= 3) {
+      alert('Maximum 3 categories allowed');
+      return;
+    }
+
+    setFormData(prev => ({
+      ...prev,
+      categories: [...prev.categories, { name: category.name, id: category.id }]
+    }));
+
+    if (hasSubmitted && errors.categories) {
+      setErrors(prev => ({ ...prev, categories: '' }));
+    }
+  };
+
+  const removeCategoryFromForm = (categoryId) => {
+    setFormData(prev => ({
+      ...prev,
+      categories: prev.categories.filter(cat => cat.id !== categoryId)
+    }));
+  };
+
+  // ============================================
+  // VALIDATION
+  // ============================================
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    // First name validation
+    if (!formData.firstName.trim()) {
+      newErrors.firstName = 'First name is required';
+    } else if (formData.firstName.trim().length < 2) {
+      newErrors.firstName = 'First name must be at least 2 characters';
+    }
+
+    // Last name validation (optional)
+    if (formData.lastName && formData.lastName.trim() && formData.lastName.trim().length < 2) {
+      newErrors.lastName = 'Last name must be at least 2 characters';
+    }
+
+    // Category validation
+    if (!formData.categories || formData.categories.length === 0) {
+      newErrors.categories = 'At least one category is required';
+    }
+
+    // Birthdate validation
+    if (formData.birthdate && formData.birthdate.trim()) {
+      const birthdateError = validateDate(formData.birthdate, 'Birthdate', true);
+      if (birthdateError) {
+        newErrors.birthdate = birthdateError;
+      }
+    }
+
+    // Validate links
+    if (showLinks && links) {
+      links.forEach((link, index) => {
+        const hasUrl = link.url && link.url.trim();
+        const hasTitle = link.title && link.title.trim();
+
+        if (hasUrl && !hasTitle) {
+          newErrors[`link_${index}`] = 'Title for URL required';
+        }
+      });
+    }
+
+    // Validate emails
+    emails.forEach((emailItem, index) => {
+      const hasEmail = emailItem.email && emailItem.email.trim();
+      const hasTitle = emailItem.title && emailItem.title.trim();
+
+      if (hasEmail && !hasTitle) {
+        newErrors[`email_${index}`] = 'Title for email required';
+      }
+      if (hasEmail && !/\S+@\S+\.\S+/.test(emailItem.email)) {
+        newErrors[`email_${index}`] = 'Invalid email format';
+      }
+    });
+
+    // Validate phones
+    phones.forEach((phoneItem, index) => {
+      const hasPhone = phoneItem.phone && phoneItem.phone.trim();
+      const hasTitle = phoneItem.title && phoneItem.title.trim();
+
+      if (hasPhone && !hasTitle) {
+        newErrors[`phone_${index}`] = 'Title for phone required';
+      }
+    });
+
+    // Validate addresses
+    addresses.forEach((address, index) => {
+      const hasAnyAddressField = address.streetAndNr || address.city || address.country || address.postalcode;
+      const hasTitle = address.title && address.title.trim();
+
+      if (hasAnyAddressField && !hasTitle) {
+        newErrors[`address_${index}`] = 'Title for address required';
+      }
+    });
+
+    console.log('Validation errors:', newErrors);
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  // ============================================
+  // FORM SUBMISSION
+  // ============================================
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setHasSubmitted(true);
+
+    if (!validateForm()) {
+      console.log('Validation failed');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      if (!accessToken) {
+        throw new Error('Access token is not available');
+      }
+
+      // Prepare contact data with multi-fields
+      const contactData = {
+        first_name: formData.firstName.trim(),
+        last_name: formData.lastName?.trim() || null,
+        is_favorite: formData.isFavorite || false,
+        birth_date: formData.birthdate?.trim() || null,
+        next_contact_date: formData.nextContactDate?.trim() || null,
+        next_contact_place: formData.nextContactPlace?.trim() || null,
+        last_contact_date: formData.lastContactDate?.trim() || null,
+        is_contacted: formData.isContacted || false,
+        is_to_contact: formData.isToContact || false,
+        notes: formData.notes?.trim() || null,
+        categories: formData.categories.map(cat => cat.id),
+      };
+
+      // Filter and add emails
+      contactData.emails = emails
+        .filter(e => e.email?.trim() && e.title?.trim())
+        .map(e => ({
+          email: e.email.trim(),
+          title: e.title.trim()
         }));
-    };
 
+      // Filter and add phones
+      contactData.phones = phones
+        .filter(p => p.phone?.trim() && p.title?.trim())
+        .map(p => ({
+          phone: p.phone.trim(),
+          title: p.title.trim()
+        }));
 
-    const validateForm = () => {
-        const newErrors = {};
+      // Filter and add addresses
+      contactData.addresses = addresses
+        .filter(a => (a.streetAndNr || a.city || a.country || a.postalcode) && a.title?.trim())
+        .map(a => ({
+          street_and_nr: a.streetAndNr?.trim() || '',
+          additional_info: a.additionalInfo?.trim() || null,
+          postal_code: a.postalcode?.trim() || '',
+          city: a.city?.trim() || '',
+          country: a.country?.trim() || '',
+          title: a.title.trim()
+        }));
 
-        // First name validation
-        if (!formData.firstName.trim()) {
-            newErrors.firstName = 'First name is required';
-        } else if (formData.firstName.trim().length < 2) {
-            newErrors.firstName = 'First name must be at least 2 characters';
-        }
-        
-        if (formData.lastName && formData.lastName.trim() && formData.lastName.trim().length < 2) {
-            newErrors.lastName = 'Last name must be at least 2 characters';
-        }
-
-        // UPDATED: Categories validation (at least one required)
-        if (!formData.categories || formData.categories.length === 0) {
-            newErrors.categories = 'At least one category is required';
-        }
-        
-        // Email validation
-        if (!formData.email) {
-            newErrors.email = 'Email is required';
-        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-            newErrors.email = 'Email is invalid';
-        }
-        
-        // Phone validation (optional but if provided, should be valid)
-        if (formData.phone && formData.phone.trim() && !/^\+?[\d\s\-\(\)]{10,}$/.test(formData.phone.trim())) {
-            newErrors.phone = 'Please enter a valid phone number';
-        }
-
-        // Validate birthdate (must be in the past)
-        if (formData.birthdate) {
-            const birthdateError = validateDate(formData.birthdate, 'Birthdate', true);
-            if (birthdateError) {
-                newErrors.birthdate = birthdateError;
-            }
-        }
-        
-        setErrors(newErrors);
-        console.log("errors:", newErrors)
-        return Object.keys(newErrors).length === 0;
-    };
-    
-    // HANDLE SUBMIT
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setHasSubmitted(true);
-        
-        if (!validateForm()) {
-            console.error('Form validation failed:', errors);
-            return;
-        }
-        
-        setIsLoading(true);
-
-        try {
-            if (!accessToken) {
-                throw new Error("Access token is not available.");
-            }
-
-            // Prepare data for API call in HelperFunction
-            const contactData = FormDataToApiData(formData, categories, links);
-                console.log('Submitted contact data:', contactData);
-
-            // Call API to create contact
-            const NewContactData = await createContact(accessToken, contactData);
-            console.log('New contact created, newContactData:', NewContactData);
-
-            // Call the onSubmit prop if provided
-            if (onSubmit) {
-                onSubmit(NewContactData);
-            }
-            // Reset form after successful creation
-            resetForm();
-
-            // navigate to the new contact page
-            if (NewContactData && NewContactData?.id) {
-                navigate(`/myspace/contacts/${NewContactData?.id}`, { replace: true });
-            } else {
-                console.error('New contact data is missing ID:', NewContactData?.id);
-                navigate("/myspace/contacts", { replace: true });
-            }
-
-        } catch (error) {
-        setErrors(prev => ({ ...prev, submit: `Failed to create contact: ${error.message}` }));
-        console.error('Error creating contact:', error);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const resetForm = () => {
-        // Reset form after successful creation
-        setFormData({
-            firstName: '',
-            lastName: '',
-            categories: [],
-            emails: [],
-            phones: [],
-            isFavorite: false,
-            birthdate: '',
-            addresses: [],
-            notes: '',
-            isContacted: false,
-            isToContact: false,
-            lastContactDate: '',
-            nextContactDate: '',
-            nextContactPlace: '',
-            links: []
+      // Filter and add links
+      contactData.links = links
+        .filter(l => l.url?.trim() && l.title?.trim())
+        .map(l => {
+          let url = l.url.trim();
+          if (!url.startsWith('http://') && !url.startsWith('https://')) {
+            url = 'https://' + url;
+          }
+          return {
+            url: url,
+            title: l.title.trim()
+          };
         });
 
+      console.log('Creating contact with data:', contactData);
 
-        setShowBirthdate(false);
-        setShowAddress(false);
-        setShowContactDetails(false);
-        setShowLinks(false);
-        setExpandedNotes(false);
-        setLinks([{ title: '', url: '' }]);
-        setHasSubmitted(false);
-        setErrors({});
-      
-    };
-    
-    const handleCancel = () => {
-        resetForm();
-        if (onCancel) {
-            onCancel();
-        } else {
-            navigate('/myspace/');
-        }
-    };
+      // Create contact
+      const newContact = await createContact(accessToken, contactData);
 
-    return (
-    <form onSubmit={handleSubmit}>
-        <div className="w-full flex flex-col items-center min-h-screen bg-white dark:bg-gray-900" 
-            style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
-            
+      console.log('Contact created successfully:', newContact);
 
-            {/* Main Edit Contact Card */}
-            <div className="bg-white rounded-3xl p-5 relative z-10 overflow-visible w-[88vw] min-w-[260px] max-w-[480px] mx-auto"
-                style={{ 
-                    boxShadow: '0 4px 32px rgba(109, 71, 71, 0.29)'
-                }}>
-                <h1 className="text-3xl font-bold text-center mt-6 mb-10 text-black">
-                    new contact.
-                </h1>
-                {/* Favorite Checkbox */}
-                <div className="flex items-center w-full relative left-2 mt-3 mb-9 rounded-lg">
-                    <button
-                        type="button"
-                        onClick={() => setFormData(prev => ({ ...prev, isFavorite: !prev.isFavorite }))}
-                        className="flex items-center space-x-2 hover:scale-110 transform"
-                        disabled={isLoading}
-                    >
-                        <svg 
-                            className={`w-7 h-7 ${
-                                formData.isFavorite ? 'text-red-500 hover:text-yellow-300' : 'text-black hover:text-yellow-300'
-                            }`} 
-                            aria-hidden="true" 
-                            xmlns="http://www.w3.org/2000/svg" 
-                            fill="currentColor" 
-                            viewBox="0 0 22 20"
-                        >
-                            <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
-                        </svg>
-                        <span className="text-sm font-extralight text-black cursor-pointer">
-                            {formData.isFavorite ? 'favorite contact' : 'not a favorite'}
-                        </span>
-                    </button>
-                </div>
-                
+      // Call success callback
+      if (onCreateSuccess) {
+        onCreateSuccess(newContact);
+      }
+    } catch (error) {
+      console.error('Error creating contact:', error);
+      setErrors(prev => ({
+        ...prev,
+        submit: error.message || 'Failed to create contact'
+      }));
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-                {/* Main Contact Informations */}
-                <div className="space-y-8 mb-5">
+  const handleGoBack = () => {
+    navigate(-1);
+  };
 
-                    {/* Name & Category */}
-                    <div className="space-y-5">
-                        {/* First Name Field */}
-                        <div className="relative">
-                            
-                            <input 
-                                type="text" 
-                                name="firstName" 
-                                id="firstName" 
-                                value={formData.firstName}
-                                onChange={handleInputChange}
-                                placeholder="meryl"
-                                disabled={isLoading}
-                                className={`w-full rounded-xl border bg-white  hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-300 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
-                                    hasSubmitted && errors.firstName ? 'border-red-400 ' : 'border-gray-400 dark:border-gray-400'
-                                }`}
-                                style={{
-                                    fontSize: '16px',
-                                    fontWeight: 200
-                                }}
-                            />
-                            <label 
-                                htmlFor="firstName" 
-                                className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-extralight"
-                            >
-                                first name
-                            </label>
-                            {hasSubmitted && errors.firstName && (
-                                <p className="absolute top-full right-1 font-extralight text-sm text-red-600 z-20">{errors.firstName}</p>
-                            )}
-                        </div>
+  // ============================================
+  // RENDER
+  // ============================================
 
-                        {/* Last Name Field */}
-                        <div className="relative">
-                            <input 
-                                type="text" 
-                                name="lastName" 
-                                id="lastName" 
-                                value={formData.lastName}
-                                onChange={handleInputChange}
-                                placeholder="streep"
-                                disabled={isLoading}
-                                className={`w-full rounded-xl border bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-300 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
-                                    hasSubmitted && errors.lastName ? 'border-red-500 shadow-md' : 'border-gray-400 dark:border-gray-400'
-                                }`}
-                                style={{
-                                    fontSize: '16px',
-                                    fontWeight: 200
-                                }}
-                            />
-                            <label 
-                                htmlFor="lastName" 
-                                className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-extralight"
-                            >
-                                last name
-                            </label>
-                            {hasSubmitted && errors.lastName && (
-                                <p className="absolute top-full right-1 font-extralight text-sm text-red-600 z-20">{errors.lastName}</p>
-                            )}
-                        </div>
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className="w-full max-w-[480px] mx-auto"
+      style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}
+    >
+      <div
+        className="bg-white rounded-3xl p-8 shadow-lg relative pb-20"
+        style={{
+          boxShadow: '0 4px 32px rgba(109, 71, 71, 0.29)'
+        }}
+      >
+        <h1 className="text-3xl font-bold text-center mb-8 text-black">
+          new contact.
+        </h1>
 
-                        {/* Category Field */}
-                        <div className="relative">
-                            <CategorySelection 
-                                formData={formData}
-                                categories={categories}
-                                showCategoryDropdown={showCategoryDropdown}
-                                setShowCategoryDropdown={setShowCategoryDropdown}
-                                showAddCategory={showAddCategory}
-                                setShowAddCategory={setShowAddCategory}
-                                newCategoryName={newCategoryName}
-                                setNewCategoryName={setNewCategoryName}
-                                isAddingCategory={isAddingCategory}
-                                addCategory={addCategory}
-                                addCategoryToForm={addCategoryToForm}
-                                removeCategoryFromForm={removeCategoryFromForm}
-                                hasSubmitted={hasSubmitted}
-                                errors={errors}
-                                disabled={false}
-                            />
-                        </div>
-                    </div>
-                    
+        {/* Error Message */}
+        {errors.submit && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-sm text-red-600 text-center font-extralight">{errors.submit}</p>
+          </div>
+        )}
 
-                    {/* How to contact */}
-                    <div className="space-y-2">
-                        <p className="relative tracking-wide -mb-2 text-red-500 left-2 font-extralight">how to contact?</p>
-                            
-                            {/* email Field */}
-                            {emails.map((email, index) => (
-                                <div key={index} className="relative mb-4">
-                                    <div className="flex items-center gap-2">)}
+        <div className="space-y-6">
+          {/* First Name */}
+          <div className="relative">
+            <input
+              type="text"
+              name="firstName"
+              id="firstName"
+              value={formData.firstName}
+              onChange={handleInputChange}
+              placeholder="meryl"
+              disabled={isLoading}
+              className={`w-full rounded-xl border bg-white hover:border-red-300 text-black font-extralight placeholder-gray-200 h-[48px] focus:outline-none focus:border-red-500 ${
+                hasSubmitted && errors.firstName ? 'border-red-500 shadow-md' : 'border-gray-400'
+              }`}
+              style={{ fontSize: '18px', fontWeight: 200 }}
+            />
+            <label
+              htmlFor="firstName"
+              className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-extralight"
+            >
+              first name
+            </label>
+            {hasSubmitted && errors.firstName && (
+              <p className="absolute top-full right-1 text-sm text-red-600 z-20 font-extralight">
+                {errors.firstName}
+              </p>
+            )}
+          </div>
 
-                                        {/* Label Dropdown */ }
-                                        <select
-                                            value={email.title}
-                                            onChange={(e) => handleEmailChange(index, 'title', e.target.value)}
-                                            disabled={isLoading}
-                                            className="rounded-lg border border-gray-400 bg-white text-black font-extralight px-3 py-1 h-10 focus:outline-none focus:border-red-500"
-                                            style={{ fontSize: '14px', fontWeight: 200 }}
-                                        >
-                                            {labelOptions.map(option => (
-                                                <option key={option} value={option}>
-                                                    {option === 'custom' ? 'add label' : option}
-                                                </option>
-                                            ))}
-                                        </select>
+          {/* Last Name */}
+          <div className="relative">
+            <input
+              type="text"
+              name="lastName"
+              id="lastName"
+              value={formData.lastName}
+              onChange={handleInputChange}
+              placeholder="streep"
+              disabled={isLoading}
+              className={`w-full rounded-xl border bg-white hover:border-red-300 text-black font-extralight placeholder-gray-200 h-[48px] focus:outline-none focus:border-red-500 ${
+                hasSubmitted && errors.lastName ? 'border-red-500 shadow-md' : 'border-gray-400'
+              }`}
+              style={{ fontSize: '18px', fontWeight: 200 }}
+            />
+            <label
+              htmlFor="lastName"
+              className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-extralight"
+            >
+              last name
+            </label>
+            {hasSubmitted && errors.lastName && (
+              <p className="absolute top-full right-1 text-sm text-red-600 z-20 font-extralight">
+                {errors.lastName}
+              </p>
+            )}
+          </div>
 
-                                        {/* Email Input Field */}
-                                        {email.title === 'custom' && (
-                                            <input
-                                                type="text"
-                                                placeholder="label"
-                                                value={email.title}
-                                                onChange={(e) => handleEmailChange(index, 'title', e.target.value)}
-                                                disabled={isLoading}
-                                                className="rounded-lg border border-gray-400 bg-white text-black font-extralight px-3 py-1 h-10 focus:outline-none focus:border-red-500"
-                                                style={{ fontSize: '14px', fontWeight: 200 }}
-                                            />
-                                        )}
+          {/* Categories Section */}
+          <div className="relative">
+            <CategorySelection
+              formData={formData}
+              categories={categories}
+              showCategoryDropdown={showCategoryDropdown}
+              setShowCategoryDropdown={setShowCategoryDropdown}
+              showAddCategory={showAddCategory}
+              setShowAddCategory={setShowAddCategory}
+              newCategoryName={newCategoryName}
+              setNewCategoryName={setNewCategoryName}
+              isAddingCategory={isAddingCategory}
+              addCategory={addCategory}
+              addCategoryToForm={addCategoryToForm}
+              removeCategoryFromForm={removeCategoryFromForm}
+              hasSubmitted={hasSubmitted}
+              errors={errors}
+              isLoading={isLoading}
+            />
+          </div>
 
-                                        <label htmlFor="email" className="relative left-4 bg-white px-1 text-normal text-black font-extralight">
-                                            email
-                                        </label>
+          {/* Emails Section */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <p className="relative text-red-500 left-2 tracking-wide font-extralight">emails</p>
+              <Button type="button" onClick={addEmail} className="text-sm font-light text-red-500 hover:underline">
+                + add
+              </Button>
+            </div>
+            {emails.map((email, index) => (
+              <div key={index} className="flex gap-2 items-start">
+                <input
+                  type="text"
+                  value={email.title}
+                  onChange={(e) => handleEmailChange(index, 'title', e.target.value)}
+                  placeholder="private"
+                  className="w-[120px] rounded-xl border border-gray-400 bg-white p-2 text-black font-extralight text-sm focus:outline-none focus:border-red-500"
+                />
+                <input
+                  type="email"
+                  value={email.email}
+                  onChange={(e) => handleEmailChange(index, 'email', e.target.value)}
+                  placeholder="email@example.com"
+                  className="flex-1 rounded-xl border border-gray-400 bg-white p-2 text-black font-extralight text-sm focus:outline-none focus:border-red-500"
+                />
+                {emails.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removeEmail(index)}
+                    className="text-red-500 hover:text-red-700 transition-colors p-1"
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
 
-                                        {emails.length > 1 && (
-                                            <button
-                                                type="button"
-                                                onClick={() => removeEmail(index)}
-                                                className="text-red-500 hover:text-red-700 transition-colors duration-200"
-                                                disabled={isLoading}
-                                            >
-                                                &times;
-                                            </button>
-                                        )}
-                                    </div>
+          {/* Phones Section */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <p className="relative text-red-500 left-2 tracking-wide font-extralight">phone numbers</p>
+              <Button type="button" onClick={addPhone} className="text-sm font-light text-red-500 hover:underline">
+                + add
+              </Button>
+            </div>
+            {phones.map((phone, index) => (
+              <div key={index} className="flex gap-2 items-start">
+                <input
+                  type="text"
+                  value={phone.title}
+                  onChange={(e) => handlePhoneChange(index, 'title', e.target.value)}
+                  placeholder="mobile"
+                  className="w-[120px] rounded-xl border border-gray-400 bg-white p-2 text-black font-extralight text-sm focus:outline-none focus:border-red-500"
+                />
+                <input
+                  type="tel"
+                  value={phone.phone}
+                  onChange={(e) => handlePhoneChange(index, 'phone', e.target.value)}
+                  placeholder="+1 234 567 8900"
+                  className="flex-1 rounded-xl border border-gray-400 bg-white p-2 text-black font-extralight text-sm focus:outline-none focus:border-red-500"
+                />
+                {phones.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removePhone(index)}
+                    className="text-red-500 hover:text-red-700 transition-colors p-1"
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
 
-                                    <input 
-                                        type="email" 
-                                        name="email" 
-                                        id="email" 
-                                        value={email.email}
-                                        onChange={(e) => handleEmailChange(index, 'email', e.target.value)}
-                                        placeholder="your@email.com"
-                                        disabled={isLoading}
-                                        className={`w-full rounded-xl border -mt-3 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-300 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
-                                            hasSubmitted && errors.email ? 'border-red-500 shadow-md' : 'border-gray-400 dark:border-gray-400'
-                                        }`}
-                                        style={{
-                                            fontSize: '16px',
-                                            fontWeight: 200
-                                        }}
-                                    />
-                                    {hasSubmitted && errors.email && (
-                                        <p className="absolute top-full right-1 text-sm font-extralight text-red-600 z-20">{errors.email}</p>
-                                    )}
-                                </div>
-                            ))}
-                            <div className="mb-4">
-                                <button
-                                    type="button"
-                                    onClick={addEmail}
-                                    className="flex items-center space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-extralight"
-                                    disabled={isLoading}
-                                >
-                                    <span className="text-lg font-semibold">+</span>
-                                    <span className="text-base text-black hover:text-red-500">add email</span>
-                                </button>
-                            </div>  
-                        </div>
-                            
-                    
-                        <div>
-                            {/* phone Field */}
-                            {phones.map((phone, index) => (
-                                <div key={index} className="relative mb-4">
-                                    <div className="flex items-center gap-2">
-
-                                        {/* Label Dropdown */ }
-                                        <select
-                                            value={phone.title}
-                                            onChange={(e) => handlePhoneChange(index, 'title', e.target.value)}
-                                            disabled={isLoading}
-                                            className="rounded-lg border border-gray-400 bg-white text-black font-extralight px-3 py-1 h-10 focus:outline-none focus:border-red-500"
-                                            style={{ fontSize: '14px', fontWeight: 200 }}
-                                        >
-                                            {labelOptions.map(option => (
-                                                <option key={option} value={option}>
-                                                    {option === 'custom' ? 'add label' : option}
-                                                </option>
-                                            ))}
-                                        </select>
-
-                                        {/* Phone Input Field */}
-                                        {phone.title === 'custom' && (
-                                            <input
-                                                type="text"
-                                                placeholder="label"
-                                                value={phone.title}
-                                                onChange={(e) => handlePhoneChange(index, 'title', e.target.value)}
-                                                disabled={isLoading}
-                                                className="rounded-lg border border-gray-400 bg-white text-black font-extralight px-3 py-1 h-10 focus:outline-none focus:border-red-500"
-                                                style={{ fontSize: '14px', fontWeight: 200 }}
-                                            />
-                                        )}
-
-                                        <label htmlFor="phone" className="relative left-4 bg-white px-1 text-normal text-black font-extralight">
-                                            phone
-                                        </label>
-
-                                        {phones.length > 1 && (
-                                            <button
-                                                type="button"
-                                                onClick={() => removePhone(index)}
-                                                className="text-red-500 hover:text-red-700 transition-colors duration-200"
-                                                disabled={isLoading}
-                                            >
-                                                &times;
-                                            </button>
-                                        )}
-                                    </div>
-
-                                    <input 
-                                        type    ="text" 
-                                        name    ="phone" 
-                                        id      ="phone"                        
-                                        value   ={phone.phone}
-                                        onChange={(e) => handlePhoneChange(index, 'phone', e.target.value)}
-                                        placeholder="+49 170 1234567"
-                                        disabled={isLoading}
-                                        className={`w-full rounded-xl border -mt-3 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-300 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
-                                            hasSubmitted && errors.phone ? 'border-red-500 shadow-md' : 'border-gray-400 dark:border-gray-400'
-                                        }`}
-                                        style={{
-                                            fontSize: '16px',
-                                            fontWeight: 200
-                                        }}
-                                    />
-                                    {hasSubmitted && errors.phone && (
-                                        <p className="absolute top-full right-1 text-sm font-extralight text-red-600 z-20">{errors.phone}</p>
-                                    )}
-                                </div>
-                            ))}
-                            <div className="mb-4">
-                                <button
-                                    type="button"
-                                    onClick={addPhone}
-                                    className="flex items-center space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-extralight"
-                                    disabled={isLoading}
-                                >
-                                    <span className="text-lg font-semibold">+</span>
-                                    <span className="text-base text-black hover:text-red-500">add phone</span>
-                                </button>       
-                        </div>
-  
-
-                        {/* Optional Address Toggle */}
-                        <div className="relative">
-                            {!showAddress ? (
-                                <button
-                                    type="button"
-                                    onClick={() => setShowAddress(true)}
-                                    className="flex items-center ml-1.5 -mt-2 space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-extralight"
-                                    disabled={isLoading}
-                                >
-                                    <span className="text-lg font-semibold">+</span>
-                                    <span className="text-base text-black hover:text-red-500">add address</span>
-                                </button>
-                            ) : (
-                                <div className="mt-4">
-                                    <div className="flex items-center justify-between">
-                                        <p className="relative tracking-wide -mb-2 text-red-500 left-2 font-extralight">address</p>
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowAddress(false)}
-                                            className="text-red-500 hover:text-red-700 transition-colors duration-200 text-2xl font-extralight"
-                                            disabled={isLoading}
-                                        >
-                                            &times;
-                                        </button>
-                                    </div>
-
-                                    {/* Address Fields */}
-                                    {addresses.map((address, index) => (
-                                        <div key={index} className="space-y-3 mb-4 mt-2 p-4 border border-gray-300 rounded-xl relative">
-                                            <div className="flex items-center gap-2 mb-2">
-
-                                                {/* Label Dropdown */ }
-                                                <select
-                                                    value={address.title}
-                                                    onChange={(e) => handleAddressChange(index, 'title', e.target.value)}
-                                                    disabled={isLoading}
-                                                    className="rounded-lg border border-gray-400 bg-white text-black font-extralight px-3 py-1 h-   10 focus:outline-none focus:border-red-500"             
-                                                    style={{ fontSize: '14px', fontWeight: 200 }}
-                                                >
-                                                    {labelOptions.map(option => (
-                                                        <option key={option} value={option}>
-                                                            {option === 'custom' ? 'add label' : option}
-                                                        </option>
-                                                    ))}
-                                                </select>
-
-                                                {/* Address Label Input Field */}
-                                                {address.title === 'custom' && (
-                                                    <input
-                                                        type="text"
-                                                        placeholder="label"
-                                                        value={address.title}
-                                                        onChange={(e) => handleAddressChange(index, 'title', e.target.value)}
-                                                        disabled={isLoading}
-                                                        className="rounded-lg border border-gray-400 bg-white text-black font-extralight px-3 py-1 h-10 focus:outline-none focus:border-red-500"
-                                                        style={{ fontSize: '14px', fontWeight: 200 }}
-                                                    />
-                                                )}
-
-                                                {addresses.length > 1 && (
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => removeAddress(index)}
-                                                        className="text-red-500 hover:text-red-700 transition-colors duration-200"
-                                                        disabled={isLoading}
-                                                    >
-                                                        &times;
-                                                    </button>
-                                                )}
-                                            </div>
-
-                                            <input 
-                                                type="text" 
-                                                name="streetAndNr" 
-                                                id="streetAndNr" 
-                                                value={address.streetAndNr}
-                                                onChange={(e) => handleAddressChange(index, 'streetAndNr', e.target.value)}
-                                                placeholder="street and number"
-                                                disabled={isLoading}
-                                                className="w-full rounded-xl border bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-300 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500"
-                                                style={{
-                                                    fontSize: '16px',
-                                                    fontWeight: 200
-                                                }}
-                                            />
-                                            <input 
-                                                type="text" 
-                                                name="additionalInfo" 
-                                                id="additionalInfo" 
-                                                value={address.additionalInfo}     
-                                                onChange={(e) => handleAddressChange(index, 'additionalInfo', e.target.value)}
-                                                placeholder="e.g. c/o, floor, etc.)"
-                                                disabled={isLoading}
-                                                className="w-full rounded-xl border bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-300 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500"
-                                                style={{
-                                                    fontSize: '16px',
-                                                    fontWeight: 200
-                                                }}
-                                            />
-                                            <div className="flex space-x-2">
-                                                <input 
-                                                    type="text" 
-                                                    name="postalcode" 
-                                                    id="postalcode" 
-                                                    value={address.postalcode}  
-                                                    onChange={(e) => handleAddressChange(index, 'postalcode', e.target.value)}
-                                                    placeholder="postal code"
-                                                    disabled={isLoading}    
-                                                    className="w-1/3 rounded-xl border bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-300 min-w-[80px] h-[48px] focus:outline-none focus:border-red-500"
-                                                    style={{
-                                                        fontSize: '16px',
-                                                        fontWeight: 200
-                                                    }}
-                                                />
-                                                <input 
-                                                    type="text" 
-                                                    name="city" 
-                                                    id="city" 
-                                                    value={address.city}  
-                                                    onChange={(e) => handleAddressChange(index, 'city', e.target.value)}
-                                                    placeholder="city"
-                                                    disabled={isLoading}    
-                                                    className="w-2/3 rounded-xl border bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-300 min-w-[120px] h-[48px] focus:outline-none focus:border-red-500"
-                                                    style={{
-                                                        fontSize: '16px',
-                                                        fontWeight: 200
-                                                    }}
-                                                />
-                                            </div>
-                                            <input 
-                                                type="text" 
-                                                name="country" 
-                                                id="country"    
-                                                value={address.country}
-                                                onChange={(e) => handleAddressChange(index, 'country', e.target.value)} 
-                                                placeholder="country"
-                                                disabled={isLoading}
-                                                className="w-full rounded-xl border bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-300 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500"
-                                                style={{
-                                                    fontSize: '16px',
-                                                    fontWeight: 200 
-                                                }}
-                                            />
-                                            {hasSubmitted && errors.address && (        
-                                                <p className="absolute top-full right-1 text-sm font-extralight text-red-600 z-20">{errors.address}</p>     
-                                            )}  
-                                        </div>
-                                    ))}
-                                    <div className="mb-4">
-                                        <button
-                                            type="button"
-                                            onClick={addAddress}    
-                                            className="flex items-center space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-extralight"
-                                            disabled={isLoading}
-                                        >
-                                            <span className="text-lg font-semibold">+</span>    
-                                            <span className="text-base text-black hover:text-red-500">add address</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
-                    </div>
-
-
-                    <div className="space-y-3">
-                        <div className="">
-                            {/* Contact History Fields */}
-                            <div className="relative -mt-1">
-                              <p className="font-text text-base font-extralight tracking-wide text-red-500 ml-1 mt-6 mb-1">date and place of</p>
-                                <label htmlFor="lastContactDate" className="relative left-4 bg-white px-1 text-sans text-base text-black font-extralight">
-                                    last contact
-                                </label>
-                                <input 
-                                    type="text" 
-                                    name="lastContactDate" 
-                                    id="lastContactDate" 
-                                    value={formData.lastContactDate}
-                                    onChange={handleInputChange}
-                                    placeholder="am 19.05.2025 in Berlin"
-                                    disabled={isLoading}
-                                    className={`w-full rounded-xl border -mt-3 border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-300 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
-                                    style={{
-                                        fontSize: '16px',
-                                        fontWeight: 200
-                                    }}
-                                />
-                                {hasSubmitted && errors.lastContactDate && (
-                                    <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.lastContactDate}</p>
-                                )}
-                            </div>
-
-                            {/* Next Contact Field */}
-                            <div className="relative -mt-1">
-                                <label htmlFor="nextContactDate" className="relative top-3 left-4 bg-white px-1 text-sans text-base text-black font-extralight">
-                                    next planned contact
-                                </label>
-                                <input 
-                                    type="text" 
-                                    name="nextContactDate" 
-                                    id="nextContactDate" 
-                                    value={formData.nextContactDate}
-                                    onChange={handleInputChange}
-                                    placeholder="coffe shop, berlin ..."
-                                    disabled={isLoading}
-                                    className={`w-full mb-5 rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-300 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
-                                    style={{
-                                        fontSize: '16px',
-                                        fontWeight: 200
-                                    }}
-                                />
-                                {hasSubmitted && errors.nextContactDate && (
-                                    <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.nextContactDate}</p>
-                                )}
-                            </div>
-
-                            {/* Checkboxes */}
-                            <div className="ml-2"> 
-
-                                {/* isContacted Checkbox */}
-                                <div className="flex items-center w-full relative rounded-lg">
-                                    <button
-                                        type="button"
-                                        onClick={() => setFormData(prev => ({ ...prev, isContacted: !prev.isContacted }))}
-                                        className="flex items-center space-x-3 text-red-500"
-                                        disabled={isLoading}
-                                    >
-                                        {formData.isContacted ? (
-                                            <>
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-5">
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
-                                            </svg>
-
-                                                <span className="text-sm font-extralight text-black cursor-pointer">
-                                                    contacted
-                                                </span>
-                                            </>
-                                        ) : (
-                                            <>
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="black" className="size-5">
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
-                                            </svg>
-                                                <span className="text-sm font-extralight text-black cursor-pointer">
-                                                    mark as contacted
-                                                </span>
-                                            </>
-                                        )}
-                                    </button>
-                                </div>
-
-                                {/* isToContact Checkbox */}
-                                <div className="flex items-center w-full relative">
-                                    <button
-                                        type="button"
-                                        onClick={() => setFormData(prev => ({ ...prev, isToContact: !prev.isToContact }))}
-                                        className="flex items-center space-x-3 mt-2 text-red-500 hover:text-red-500"
-                                        disabled={isLoading}
-                                    >
-                                        {formData.isToContact ? (
-                                            <>
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-5">
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
-                                                </svg>
-
-                                                <span className="text-sm font-extralight text-black cursor-pointer">
-                                                    remind me
-                                                </span>
-                                            </>
-                                        ) : (
-                                            <>
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="black" className="size-5">
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
-                                            </svg>
-                                                <span className="text-sm font-extralight text-black cursor-pointer">
-                                                    reminder
-                                                </span>
-                                            </>
-                                        )}
-                                    </button>
-                                </div>
-                            </div>    
-                        </div>
-                    </div>
-                
-                    {/* Notes */}
-                    <div className="relative">   
-                        {/* Notes Field */}
-                        <p className="relative tracking-wide text-red-500 left-2 mb-1 font-extralight">additional information</p>
-                        
-                        {/* Optional Links */}
-                        <div className="relative space-y-3 mb-3">
-                            {/* Links Toggle and Fields */}
-                            {!showLinks ? (
-                                <button
-                                    type="button"
-                                    onClick={() => setShowLinks(true)}
-                                    className="flex items-center ml-2 space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-extralight"
-                                    disabled={isLoading}
-                                >
-                                    <span className="text-lg font-semibold">+</span>
-                                    <span className="text-normal text-black hover:text-red-500">add weblinks</span>
-                                </button>
-                            ) : (
-                                <div className="space-y-2">
-                                    <div className="flex items-center -mt-5 -mb-2 justify-between">
-                                        <span className="relative left-2 text-sans font-extralight text-red-500 font-md">
-                                            websites & links
-                                        </span>
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                            setShowLinks(false);
-                                            setLinks([{ title: '', url: '' }]);
-                                        }}
-                                            className="text-red-500 -mb-1 mr-2 font-extralight hover:text-red-700 text-sm"
-                                            disabled={isLoading}
-                                        >
-                                            remove
-                                        </button>
-                                    </div>
-                                    
-                                    {links.map((link, index) => (
-                                        <div key={index} className="relative flex items-center space-x-2">
-                                            <input 
-                                                type="text" 
-                                                value={link.title}
-                                                onChange={(e) => handleLinkChange(index, 'title', e.target.value)}
-                                                placeholder="website"
-                                                disabled={isLoading}
-                                                className="flex relative p-2.5 w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-300 min-w-[100px] max-w-[120px] h-[48px] focus:outline-none focus:border-red-500"
-                                                style={{
-                                                    fontSize: '16px',
-                                                    fontWeight: 200
-                                                }}
-                                            />
-                                            <input 
-                                                type="url" 
-                                                value={link.url}
-                                                onChange={(e) => handleLinkChange(index, 'url', e.target.value)}
-                                                placeholder="https://example.com"
-                                                disabled={isLoading}
-                                                className="flex p-2.5 w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-300 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500"
-                                                style={{
-                                                    fontSize: '16px',
-                                                    fontWeight: 200
-                                                }}
-                                            />
-                                            {links.length > 1 && (
-                                                <button
-                                                    type="button"
-                                                    onClick={() => removeLink(index)}
-                                                    className="text-red-500 hover:text-red-700 transition-colors duration-200 p-1"
-                                                    disabled={isLoading}
-                                                >
-                                                    ×
-                                                </button>
-                                            )}
-                                        </div>
-                                    ))}
-                                    
-                                    <button
-                                        type="button"
-                                        onClick={addLink}
-                                        className="flex ml-1.5 items-center space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-extralight text-sm"
-                                        disabled={isLoading}
-                                    >
-                                        <span className="mt-1 text-base">+</span>
-                                        <span className="mt-1 text-base text-black hover:text-red-500">add another link</span>
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-                        
-                        <div className="flex items-center justify-between -mt-1">
-                            <label htmlFor="notes" className="relative bg-white px-1 left-4 text-sans text-base text-black font-extralight">
-                                important notes
-                            </label>
-                        </div>
-                        <textarea 
-                            name="notes" 
-                            id="notes" 
-                            value={formData.notes}
-                            onChange={handleInputChange}
-                            placeholder="every thought matters.."
-                            disabled={isLoading}
-                            rows={expandedNotes ? 6 : 3}
-                            className={`w-full ml-2 rounded-xl -mt-3 pt-4 border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-300 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
-                            style={{
-                                fontSize: '16px',
-                                fontWeight: 200,
-                                height: expandedNotes ? 'auto' : 'auto'
-                            }}
-                        />
-                        {hasSubmitted && errors.notes && (
-                            <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.notes}</p>
-                        )}
-                    </div>
- 
-
-                    <div className="relative">
-                        {!showBirthdate ? (
-                            <button
-                                type="button"
-                                onClick={() => setShowBirthdate(true)}
-                                className="ml-1.5 flex items-center -mt-7 space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-extralight"
-                                disabled={isLoading}
-                            >
-                                <span className="text-lg font-semibold">+</span>
-                                <span className="text-base text-black hover:text-red-500">birthdate</span>
-                            </button>
-                        ) : (
-                            <div>
-                                <div className="flex items-center justify-between">
-                                    <p className="relative -mt-2 left-2 mb-3 text-sans font-extralight text-red-500 font-md">
-                                        birthdate
-                                    </p>
-                                    <span className="relative -mt-4 right-1 font-extralight">
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                setShowBirthdate(false);
-                                                setFormData(prev => ({ ...prev, birthdate: '' }));
-                                            }}
-                                            className="text-red-500 hover:text-red-700 text-sm"
-                                            disabled={isLoading}
-                                        >
-                                            remove
-                                        </button>
-                                    </span>
-                                </div>
-                                <input 
-                                    type="text" 
-                                    name="birthdate" 
-                                    id="birthdate" 
-                                    value={formData.birthdate}
-                                    onChange={handleInputChange}
-                                    placeholder="18.04.1995"
-                                    disabled={isLoading}
-                                    className={`w-full -mt-3 rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
-                                    style={{
-                                        fontSize: '16px',
-                                        fontWeight: 300
-                                    }}
-                                />
-                                {hasSubmitted && errors.birthdate && (
-                                    <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.birthdate}</p>
-                                )}
-                            </div>
-                        )}
-                    </div>
-                </div> 
-
-                {/* Circle Button - Outside the space-y-6 div but inside the card */}
-                <CircleButton
-                    type="submit"
-                    size="xl"
-                    variant="dark"
-                    className=" font-semibold absolute -bottom-[85px] -right-[10px]"
-                    style={{ 
-                        marginTop: '2rem', 
-                        marginLeft: 'auto', 
-                        display: 'block' 
+          {/* Optional: Addresses */}
+          {!showAddress ? (
+            <button
+              type="button"
+              onClick={() => setShowAddress(true)}
+              className="flex items-center ml-1.5 space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-extralight"
+            >
+              <span className="text-lg font-semibold">+</span>
+              <span className="text-base text-black hover:text-red-500">address</span>
+            </button>
+          ) : (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <p className="relative text-red-500 left-2 tracking-wide font-extralight">addresses</p>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    onClick={addAddress}
+                    className="text-sm font-light text-red-500 hover:underline"
+                  >
+                    + add
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      setShowAddress(false);
+                      setAddresses([{ title: 'private', streetAndNr: '', additionalInfo: '', postalcode: '', city: '', country: '' }]);
                     }}
-                    disabled={isLoading}
-                >
-                    {isLoading ? '. . .' : 'save.'}
-                </CircleButton>
+                    className="text-sm font-light text-gray-400 hover:text-red-500"
+                  >
+                    remove
+                  </Button>
+                </div>
+              </div>
+              {addresses.map((address, index) => (
+                <div key={index} className="space-y-2 p-3 bg-gray-50 rounded-xl">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-light text-gray-600">Address {index + 1}</span>
+                    {addresses.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeAddress(index)}
+                        className="text-sm font-light text-gray-400 hover:text-red-500"
+                      >
+                        remove
+                      </button>
+                    )}
+                  </div>
+                  <input
+                    type="text"
+                    value={address.title}
+                    onChange={(e) => handleAddressChange(index, 'title', e.target.value)}
+                    placeholder="Title (Home, Work, etc.)"
+                    className="w-full rounded-xl border border-gray-300 bg-white p-2 text-black font-extralight text-sm focus:outline-none focus:border-red-500"
+                  />
+                  <input
+                    type="text"
+                    value={address.streetAndNr}
+                    onChange={(e) => handleAddressChange(index, 'streetAndNr', e.target.value)}
+                    placeholder="Street & Number"
+                    className="w-full rounded-xl border border-gray-300 bg-white p-2 text-black font-extralight text-sm focus:outline-none focus:border-red-500"
+                  />
+                  <input
+                    type="text"
+                    value={address.additionalInfo}
+                    onChange={(e) => handleAddressChange(index, 'additionalInfo', e.target.value)}
+                    placeholder="Additional Info (optional)"
+                    className="w-full rounded-xl border border-gray-300 bg-white p-2 text-black font-extralight text-sm focus:outline-none focus:border-red-500"
+                  />
+                  <div className="grid grid-cols-2 gap-2">
+                    <input
+                      type="text"
+                      value={address.postalcode}
+                      onChange={(e) => handleAddressChange(index, 'postalcode', e.target.value)}
+                      placeholder="Postal Code"
+                      className="w-full rounded-xl border border-gray-300 bg-white p-2 text-black font-extralight text-sm focus:outline-none focus:border-red-500"
+                    />
+                    <input
+                      type="text"
+                      value={address.city}
+                      onChange={(e) => handleAddressChange(index, 'city', e.target.value)}
+                      placeholder="City"
+                      className="w-full rounded-xl border border-gray-300 bg-white p-2 text-black font-extralight text-sm focus:outline-none focus:border-red-500"
+                    />
+                  </div>
+                  <input
+                    type="text"
+                    value={address.country}
+                    onChange={(e) => handleAddressChange(index, 'country', e.target.value)}
+                    placeholder="Country"
+                    className="w-full rounded-xl border border-gray-300 bg-white p-2 text-black font-extralight text-sm focus:outline-none focus:border-red-500"
+                  />
+                </div>
+              ))}
             </div>
+          )}
 
-            {/* Back Links */}
-            <div className="w-full px-8 mt-2 space-y-0.25 max-w-[480px]">
-                <div className="text-black dark:text-white font-extralight block relative"
-                    style={{ fontSize: '16px' }}>
-                want to go {' '}
-                <button 
-                    onClick={() => navigate('/myspace/contacts')}
-                    className="font-light text-red-500 hover:underline bg-transparent border-none cursor-pointer"
-                >
-                to contacts?
-                </button>
+          {/* Optional: Links */}
+          {!showLinks ? (
+            <button
+              type="button"
+              onClick={() => setShowLinks(true)}
+              className="flex items-center ml-1.5 space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-extralight"
+            >
+              <span className="text-lg font-semibold">+</span>
+              <span className="text-base text-black hover:text-red-500">links</span>
+            </button>
+          ) : (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <p className="relative text-red-500 left-2 tracking-wide font-extralight">links</p>
+                <div className="flex gap-2">
+                  <Button type="button" onClick={addLink} className="text-sm font-light text-red-500 hover:underline">
+                    + add
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      setShowLinks(false);
+                      setLinks([{ title: '', url: '' }]);
+                    }}
+                    className="text-sm font-light text-gray-400 hover:text-red-500"
+                  >
+                    remove
+                  </Button>
                 </div>
-                <div className="text-black font-extralight dark:text-white block -mt-1 relative"
-                    style={{ fontSize: '16px' }}>
-                or go {' '}
-                <button 
-                    onClick={handleGoBack}
-                    className="font-light text-red-500 hover:underline bg-transparent border-none cursor-pointer"
-                >
-                back
-                </button>
+              </div>
+              {links.map((link, index) => (
+                <div key={index} className="flex gap-2 items-start">
+                  <input
+                    type="text"
+                    value={link.title}
+                    onChange={(e) => handleLinkChange(index, 'title', e.target.value)}
+                    placeholder="website"
+                    className="w-[120px] rounded-xl border border-gray-400 bg-white p-2 text-black font-extralight text-sm focus:outline-none focus:border-red-500"
+                  />
+                  <input
+                    type="url"
+                    value={link.url}
+                    onChange={(e) => handleLinkChange(index, 'url', e.target.value)}
+                    placeholder="https://example.com"
+                    className="flex-1 rounded-xl border border-gray-400 bg-white p-2 text-black font-extralight text-sm focus:outline-none focus:border-red-500"
+                  />
+                  {links.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeLink(index)}
+                      className="text-red-500 hover:text-red-700 transition-colors p-1"
+                    >
+                      ×
+                    </button>
+                  )}
                 </div>
+              ))}
             </div>
+          )}
+
+          {/* Notes */}
+          <div className="relative">
+            <label
+              htmlFor="notes"
+              className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-extralight"
+            >
+              important notes
+            </label>
+            <textarea
+              name="notes"
+              id="notes"
+              value={formData.notes}
+              onChange={handleInputChange}
+              placeholder="every thought matters.."
+              disabled={isLoading}
+              rows={expandedNotes ? 6 : 3}
+              className="w-full rounded-xl border border-gray-400 bg-white hover:border-red-300 text-black font-extralight placeholder-gray-300 p-3 focus:outline-none focus:border-red-500"
+              style={{ fontSize: '16px', fontWeight: 200 }}
+            />
+          </div>
+
+          {/* Optional: Birthdate */}
+          {!showBirthdate ? (
+            <button
+              type="button"
+              onClick={() => setShowBirthdate(true)}
+              className="flex items-center ml-1.5 space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-extralight"
+            >
+              <span className="text-lg font-semibold">+</span>
+              <span className="text-base text-black hover:text-red-500">birthdate</span>
+            </button>
+          ) : (
+            <div className="relative">
+              <div className="flex items-center justify-between mb-2">
+                <p className="relative text-red-500 left-2 font-extralight">birthdate</p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowBirthdate(false);
+                    setFormData(prev => ({ ...prev, birthdate: '' }));
+                  }}
+                  className="text-red-500 hover:text-red-700 text-sm font-extralight"
+                >
+                  remove
+                </button>
+              </div>
+              <input
+                type="text"
+                name="birthdate"
+                id="birthdate"
+                value={formData.birthdate}
+                onChange={handleInputChange}
+                placeholder="DD.MM.YYYY"
+                disabled={isLoading}
+                className={`w-full rounded-xl border bg-white hover:border-red-300 text-black font-extralight placeholder-gray-200 h-[48px] focus:outline-none focus:border-red-500 ${
+                  hasSubmitted && errors.birthdate ? 'border-red-500 shadow-md' : 'border-gray-400'
+                }`}
+                style={{ fontSize: '16px', fontWeight: 200 }}
+              />
+              {hasSubmitted && errors.birthdate && (
+                <p className="absolute top-full right-1 text-sm text-red-600 z-20 font-extralight">
+                  {errors.birthdate}
+                </p>
+              )}
+            </div>
+          )}
         </div>
-    </form>
-    )
-}
 
-export default NewContactForm;
+        {/* Submit Button */}
+        <CircleButton
+          type="submit"
+          size="xl"
+          variant="dark"
+          className="font-semibold absolute -bottom-[85px] -right-[10px]"
+          style={{
+            marginTop: '2rem',
+            marginLeft: 'auto',
+            display: 'block'
+          }}
+          disabled={isLoading}
+        >
+          {isLoading ? '. . .' : 'save.'}
+        </CircleButton>
+      </div>
+
+      {/* Bottom Navigation */}
+      <div className="w-full px-8 mt-2 space-y-0.25 max-w-[480px]">
+        <div className="text-black dark:text-white font-extralight block relative" style={{ fontSize: '16px' }}>
+          want to go{' '}
+          <button
+            type="button"
+            onClick={() => navigate('/myspace/contacts')}
+            className="font-light text-red-500 hover:underline bg-transparent border-none cursor-pointer"
+          >
+            to contacts?
+          </button>
+        </div>
+        <div className="text-black font-extralight dark:text-white block -mt-1 relative" style={{ fontSize: '16px' }}>
+          or go{' '}
+          <button
+            type="button"
+            onClick={handleGoBack}
+            className="font-light text-red-500 hover:underline bg-transparent border-none cursor-pointer"
+          >
+            back
+          </button>
+        </div>
+      </div>
+    </form>
+  );
+}
