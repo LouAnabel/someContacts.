@@ -14,10 +14,8 @@ class ContactLink(db.Model):
 
     # Constraints
     __table_args__ = (
-        # Index for efficient queries
         db.Index('idx_contact_links', 'contact_id'),
-        db.Index('idx_user_phones', 'user_id'),
-        # Ensure URL is not empty
+        db.Index('idx_user_links', 'user_id'),
         db.CheckConstraint('length(url) > 0', name='check_url_not_empty'),
         db.CheckConstraint("url LIKE 'http%'", name='check_url_format'),
         db.CheckConstraint(

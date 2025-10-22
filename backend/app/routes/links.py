@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask import request, jsonify
 from app.models.contact import Contact
-from app.models.contact_link import ContactLinks
+from app.models.contact_link import ContactLink
 from app import db
 import re
 from datetime import datetime
@@ -44,7 +44,7 @@ def get_contact_links(contact_id):
             return jsonify({'error': 'Contact not found'}), 404
 
         # Get all links for this contact
-        links = ContactLinks.query.filter_by(contact_id=contact_id).all()
+        links = ContactLink.query.filter_by(contact_id=contact_id).all()
 
         return jsonify({
             'links': [link.to_dict() for link in links],
@@ -89,7 +89,7 @@ def add_contact_link(contact_id):
             return jsonify({'error': 'Invalid URL format'}), 400
 
         # Create new link
-        new_link = ContactLinks(
+        new_link = ContactLink(
             contact_id=contact_id,
             url=url,
             title=data.get('title', '').strip() or None
@@ -128,7 +128,7 @@ def update_contact_link(contact_id, link_id):
             return jsonify({'error': 'Contact not found'}), 404
 
         # Find the link
-        link = ContactLinks.query.filter_by(
+        link = ContactLink.query.filter_by(
             id=link_id,
             contact_id=contact_id
         ).first()
@@ -184,7 +184,7 @@ def delete_contact_link(contact_id, link_id):
             return jsonify({'error': 'Contact not found'}), 404
 
         # Find and delete the link
-        link = ContactLinks.query.filter_by(
+        link = ContactLink.query.filter_by(
             id=link_id,
             contact_id=contact_id
         ).first()

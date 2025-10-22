@@ -19,9 +19,9 @@ class Contact(db.Model):
     birth_date = db.Column(db.Date, nullable=True)
     is_to_contact = db.Column(db.Boolean, default=False, nullable=True)
     is_contacted = db.Column(db.Boolean, default=False, nullable=True)
-    next_contact_date = db.Date(db.Date, nullable=True)
+    next_contact_date = db.Column(db.Date, nullable=True)
     next_contact_place = db.Column(db.String(200), nullable=True)
-    last_contact_date= db.String(db.String(200), nullable=True)
+    last_contact_date= db.Column(db.String(200), nullable=True)
     notes = db.Column(db.String(2000))
 
 
@@ -67,9 +67,6 @@ class Contact(db.Model):
 
     # Constraints for data integrity
     __table_args__ = (
-        # Index for creator_id and email queries (allows duplicates)
-        db.Index('idx_creator_email', 'creator_id', 'email', unique=False,
-                 postgresql_where=db.text('email IS NOT NULL')),
         db.Index('idx_creator_favorite', 'creator_id', 'is_favorite'),
         # Check constraints
         db.CheckConstraint('length(first_name) > 0', name='check_first_name_not_empty'),

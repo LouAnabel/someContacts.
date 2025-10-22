@@ -323,7 +323,7 @@ def get_current_user():
         }), 500
 
 
-@auth_bp.route('/user_update', methods=['PUT'])
+@auth_bp.route('/update', methods=['PUT'])
 @jwt_required()
 def update_user_data():
     try:
