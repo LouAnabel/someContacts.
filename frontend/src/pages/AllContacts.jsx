@@ -1,5 +1,5 @@
-import ContactCardSmall from "../components/layout/ContactCardSmall"
-import ContactCardSmallPhoto from "../components/layout/ContactCardSmallPhoto";
+import ContactCardSmall from "../components/ui/ContactCardSmall";
+import ContactCardSmallPhoto from "../components/ui/ContactCardSmallPhoto";
 import { getContacts, deleteContactById } from "../apiCalls/contactsApi";
 import { useEffect, useState, useRef } from "react";
 import { useAuthContext } from "../context/AuthContextProvider";

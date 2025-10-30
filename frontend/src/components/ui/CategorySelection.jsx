@@ -25,7 +25,7 @@ const CategorySelection = ({
         <div className="relative">
             {/* Selected Categories Display */}
             {selectedCategories && selectedCategories.length > 0 && (
-                <div className="mb-4 ml-1.5 flex flex-wrap gap-2">
+                <div className="mb-4 flex flex-wrap gap-2">
                     {selectedCategories.map((category, index) => (
                         <div
                             key={category.id || index}
@@ -50,7 +50,7 @@ const CategorySelection = ({
             )}
             
             <div>
-                <label className="absolute left-4 -mt-3 bg-white px-1 text-base text-black font-extralight">
+                <label className="absolute left-2 -mt-3 bg-white px-1 text-base text-black font-extralight">
                     categories
                 </label>
             
@@ -80,7 +80,7 @@ const CategorySelection = ({
                         }
                     </span>
                     <svg 
-                        className={`w-4 h-4 transition-transform duration-200 ${showCategoryDropdown ? 'rotate-180' : ''}`}
+                        className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${showCategoryDropdown ? 'rotate-180' : ''}`}
                         fill="none" 
                         stroke="currentColor" 
                         viewBox="0 0 24 24"
@@ -235,7 +235,7 @@ const CategorySelection = ({
             )}
 
             {hasSubmitted && errors.categories && (
-                <p className="absolute top-full right-1 font-light text-sm text-red-600 z-20">{errors.categories}</p>
+                <p className="absolute top-full right-1 font-extralight text-xs text-red-500 z-20">{errors.categories}</p>
             )}
         </div>
     );

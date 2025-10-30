@@ -1,5 +1,5 @@
 import CircleButton from '../ui/Buttons';
-import PhotoField from '../ui/profilePhoto';
+import PhotoField from '../ui/PhotoShowContact.jsx';
 
 
 export default function ShowUserProfile({ userData, onEdit, onNavigate }) {

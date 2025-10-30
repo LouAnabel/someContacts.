@@ -96,15 +96,21 @@ def create_contact():
 
         # Validate categories
         category_ids = []
+        print("category data:", data.get('categories'))
         if data.get('categories'):
             categories = data['categories'] if isinstance(data['categories'], list) else [data['categories']]
             for category_item in categories:
                 category_id = category_item.get('id') if isinstance(category_item, dict) else int(category_item)
-
-                category = Category.query.filter_by(id=category_id, creator_id=creator_id).first()
+                if category_item.get('new_category'):
+                    category = Category(name=category_item.get('name'), creator_id=creator_id)
+                    db.session.add(category)
+                    db.session.flush()
+                else:
+                    category = Category.query.filter_by(id=category_id, creator_id=creator_id).first()
                 if not category:
                     return jsonify({'success': False, 'message': f'Category {category_id} not found'}), 400
-                category_ids.append(category_id)
+                category_ids.append(category.id)
+        print(category_ids, "Category IDs")
 
         # Create contact with basic fields only
         contact = Contact(

@@ -83,9 +83,10 @@ const PhotoField = ({
         <div className={`relative ${className}`}>
             {/* Circular frame with gradient background */}
             <div 
-                className="w-[323px] h-[323px] rounded-full border border-red-400 flex-shrink-0 relative mx-auto mb-4 overflow-hidden" 
+                className="w-[333px] h-[333px] rounded-full flex-shrink-0 relative mx-auto mb-4 overflow-hidden border border-1 border-red-500"
                 style={{ 
-                    background: 'linear-gradient(180deg, rgba(135, 57, 57, 0.20) 68.75%, rgba(255, 17, 17, 0.20) 100%)' 
+                    background: 'linear-gradient(180deg, rgba(135, 67, 67, 0.1) 68.75%, rgba(280, 22, 22, 0.20) 100%)' ,
+                    boxShadow: '8px 8px 30px #d9d9d9, -10px -10px 30px #ffffff'
                 }}
             >
                 {/* Display photo if available */}
@@ -100,13 +101,13 @@ const PhotoField = ({
                     <div 
                         className="w-full h-full flex items-center justify-center"
                         style={{
-                            background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.6) 0%, rgba(220, 38, 38, 0.8) 100%)'
-                        }}
+                            background: 'linear-gradient(180deg, rgba(135, 67, 67, 0.10) 68.75%, rgba(380, 22, 22, 0.20) 100%)' 
+                }}
                     >
                         <span 
-                            className="text-white font-light select-none"
+                            className="text-red-500 font-light select-none mb-1"
                             style={{ 
-                                fontSize: '120px',
+                                fontSize: '140px',
                                 textShadow: '0 4px 12px rgba(0, 0, 0, 0.2)'
                             }}
                         >
@@ -117,23 +118,23 @@ const PhotoField = ({
                 
                 {/* Upload/Photo buttons - only show if not disabled */}
                 {!disabled && (
-                    <div className="absolute inset-0 flex flex-col justify-center items-center gap-2">
+                    <div className="absolute inset-0 flex flex-row items-end gap-1 mb-11 justify-center">
                         {/* Upload link */}
                         <button 
                             onClick={handleUploadClick}
                             type="button"
-                            className="flex w-[200px] h-[35px] justify-center items-center flex-shrink-0 bg-white/50 text-black font-light dark:bg-white/10 dark:border-0 rounded-lg dark:font-light hover:bg-white/70 dark:hover:bg-white/20 hover:text-red-500 transition-all duration-200"
+                            className="flex w-[110px] h-[35px] justify-center items-center flex-shrink-0 text-sm text-red-500 font-extralight hover:text-red-500 hover:font-light border border-red-300 bg-white/50 dark:bg-white/10 dark:border-0 rounded-lg dark:font-light hover:bg-white/70 dark:hover:bg-white/20"
                         >
-                            <span className="text-sm font-md">upload photo.</span>
+                            <span className="">upload photo.</span>
                         </button>
                         
                         {/* Take photo link */}
                         <button 
                             onClick={handleTakePhotoClick}
                             type="button"
-                            className="flex w-[200px] h-[35px] justify-center items-center flex-shrink-0 text-black font-light bg-white/50 dark:bg-white/10 dark:border-0 rounded-lg hover:bg-white/70 dark:hover:bg-white/20 hover:text-red-500 transition-all duration-200"
+                            className="flex w-[100px] h-[35px] justify-center items-center flex-shrink-0 text-sm text-red-500 font-extralight hover:text-red-500 hover:font-light border border-red-300 bg-white/50 dark:bg-white/10 dark:border-0 rounded-lg dark:font-light hover:bg-white/70 dark:hover:bg-white/20"
                         >
-                            <span className="text-sm font-md">take photo.</span>
+                            <span className="">take photo.</span>
                         </button>
                     </div>
                 )}

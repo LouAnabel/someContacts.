@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { updateUserData } from '../../apiCalls/authApi';
 import CircleButton from '../ui/Buttons';
-import PhotoField from '../ui/profilePhoto';
+import PhotoField from '../ui/PhotoShowContact.jsx';
 
 const Button = ({ children, onClick, className = "", ...props }) => {
   return (

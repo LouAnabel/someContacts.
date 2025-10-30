@@ -2,9 +2,9 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../context/AuthContextProvider';
 import { getContactById } from '../apiCalls/contactsApi';
-import PhotoField from '../components/ui/PhotoField';
-import ViewContact from '../components/contacts/ViewContact';
-import EditContact from '../components/contacts/EditContact';
+import PhotoField from '../components/ui/PhotoShowContact.jsx';
+import ViewContact from '../components/forms/ShowContactForm';
+import EditContact from '../components/forms/EditContactForm.jsx';
 
 const Button = ({ children, onClick, className = "", ...props }) => {
   return (
@@ -141,7 +141,7 @@ export default function ShowContact() {
       </div>
 
       {/* Photo Field */}
-      <div className={isEditing ? "w-full pb-6" : "-mb-4"}>
+      <div className={isEditing ? "w-full pb-6" : "mb-6"}>
         <PhotoField
           photo={contactPhoto}
           name={`${contactData.first_name || ''} ${contactData.last_name || ''}`.trim()}

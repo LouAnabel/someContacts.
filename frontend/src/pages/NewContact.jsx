@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import PhotoField from '../components/ui/PhotoField';
-import CreateContactForm from '../components/contacts/CreateContactForm';
+import PhotoField from '../components/ui/PhotoNewContact.jsx';
+import NewContactForm from '../components/forms/newContact/NewContactForm.jsx';
 
 const Button = ({ children, onClick, className = "", ...props }) => {
   return (
@@ -69,7 +69,7 @@ export default function NewContact() {
 
       {/* Contact Form */}
       <div className="w-full pb-40">
-        <CreateContactForm
+        <NewContactForm
           contactPhoto={contactPhoto}
           onCreateSuccess={handleCreateSuccess}
         />
