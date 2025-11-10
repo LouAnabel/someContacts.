@@ -58,7 +58,7 @@ export default function NewContact() {
       </div>
 
       {/* Photo Field - Full width at top */}
-      <div className="w-full pb-6">
+      <div className="w-full mb-4">
         <PhotoField
           photo={contactPhoto}
           name="New Contact"

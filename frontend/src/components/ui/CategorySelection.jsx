@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 
 const CategorySelection = ({
     formData,
@@ -20,6 +20,20 @@ const CategorySelection = ({
 
     // Safely get categories array, handling both array and single category cases
     const selectedCategories = formData.categories || [];
+    
+    // Ref for the dropdown container
+    const dropdownRef = useRef(null);
+    const addCategoryFormRef = useRef(null);
+
+    // Scroll to bottom when add category form opens
+    useEffect(() => {
+        if (showAddCategory && addCategoryFormRef.current) {
+            addCategoryFormRef.current.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'nearest' 
+            });
+        }
+    }, [showAddCategory]);
 
     return (
         <div className="relative">
@@ -51,7 +65,7 @@ const CategorySelection = ({
             
             <div>
                 <label className="absolute left-2 -mt-3 bg-white px-1 text-base text-black font-extralight">
-                    categories
+                    categories*
                 </label>
             
                 {/* Dropdown Button */}
@@ -92,7 +106,10 @@ const CategorySelection = ({
 
             {/* Custom Dropdown Menu */}
             {showCategoryDropdown && (
-                <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-30 max-h-60 overflow-y-auto"> 
+                <div 
+                    ref={dropdownRef}
+                    className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-30 max-h-60 overflow-y-auto"
+                > 
                     
                     {/* Show category options only if categories exist */}
                     {categories.length > 0 && (
@@ -158,7 +175,7 @@ const CategorySelection = ({
                     )}
                     
                     {/* Add Category Section - Always show this */}
-                    <div>
+                    <div ref={addCategoryFormRef}>
                         {!showAddCategory ? (
                             <button
                                 type="button"
@@ -186,7 +203,6 @@ const CategorySelection = ({
                                     style={{ fontSize: '15px', fontWeight: 300 }}
                                     onKeyPress={(e) => {
                                         if (e.key === 'Enter') {
-                                            
                                             addCategory();
                                         }
                                     }}
@@ -196,7 +212,6 @@ const CategorySelection = ({
                                     <button
                                         type="button"
                                         onClick={() => {
-                                    
                                             addCategory();
                                         }}
                                         disabled={isAddingCategory || !newCategoryName.trim()}

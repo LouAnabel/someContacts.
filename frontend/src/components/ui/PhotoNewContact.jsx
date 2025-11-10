@@ -83,10 +83,10 @@ const PhotoField = ({
 
        <div className={`relative ${className}`}>
             <div 
-                className="w-[333px] h-[333px] rounded-full flex-shrink-0 relative mx-auto mb-4 overflow-hidden border border-1 border-red-500"
+                className="w-[333px] h-[333px] rounded-full flex-shrink-0 relative mx-auto mb-4 overflow-hidden border border-1  border-red-300"
                 style={{ 
-                    background: 'linear-gradient(180deg, rgba(135, 67, 67, 0.1) 68.75%, rgba(280, 22, 22, 0.20) 100%)' ,
-                    boxShadow: '8px 8px 30px #d9d9d9, -10px -10px 30px #ffffff'
+                    background: 'linear-gradient(180deg, rgba(180, 67, 67, 0.1) 68.75%' 
+                    // boxShadow: '8px 8px 30px #d9d9d9, -10px -10px 30px #ffffff'
                 }}
             >
                 {/* Inner circle */}
@@ -114,7 +114,7 @@ const PhotoField = ({
                 </div>
                 
                 {!disabled && (
-                    <div className="absolute inset-0 flex flex-col justify-center items-center gap-4">
+                    <div className="absolute inset-0 flex flex-col justify-center items-center gap-3">
                         <button 
                             onClick={handleUploadClick}
                             type="button"
@@ -126,7 +126,7 @@ const PhotoField = ({
                         <button 
                             onClick={handleTakePhotoClick}
                             type="button"
-                            className="w-[150px] h-[40px] text-sm rounded-2xl bg-white text-gray-600 font-light shadow-md hover:shadow-lg hover:scale-105 transition-all duration-100 hover:bg-red-500 hover:text-white"
+                            className="w-[180px] h-[40px] text-sm rounded-2xl bg-white text-gray-600 font-light shadow-md hover:shadow-lg hover:scale-105 transition-all duration-100 hover:bg-red-500 hover:text-white"
                         >
                             take photo.
                         </button>

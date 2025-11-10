@@ -2,6 +2,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@source "../node_modules/flowbite-datepicker";
+
+@plugin "tailwindcss-animate";
+@plugin "tailwindcss-react-aria-components";
 
 @layer base {
   html {

@@ -4,6 +4,7 @@ import { useAuthContext } from '../../../context/AuthContextProvider';
 import { createContact, getCategories } from '../../../apiCalls/contactsApi';
 import { FormToApiData } from '../../helperFunctions/FormToApiData';
 import { validateDate } from '../../helperFunctions/dateConversion';
+import { formatDateForBackend } from '../../helperFunctions/dateConversion';
 
 import CircleButton, {NavigationButtons} from '../../ui/Buttons';
 import ProgressIndicator from './ProgressIndicator';
@@ -67,7 +68,6 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
 
   // Optional sections visibility
   const [showBirthdate, setShowBirthdate] = useState(false);
-  const [showContactDetails, setShowContactDetails] = useState(false);
   const [showLinks, setShowLinks] = useState(false);
   const [expandedNotes, setExpandedNotes] = useState(false);
   const [showAddress, setShowAddress] = useState(false);
@@ -84,8 +84,11 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
   const [phoneDropdownStates, setPhoneDropdownStates] = useState({});
   const [addressDropdownStates, setAddressDropdownStates] = useState({});
 
-  // ============================================
-  // Load categories on mount
+  // ========================================
+  // LOAD & HANDLE CATEGORIES
+  // ========================================
+
+  // Categories loading with guard
   useEffect(() => {
     const loadCategories = async () => {
       try {
@@ -102,146 +105,6 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
     loadCategories();
   }, [accessToken]);
 
-  // ============================================
-  // NAVIGATION HANDLERS
-  // ============================================
-
-  const nextStep = () => {
-    if (currentStep < totalSteps) {
-      setCurrentStep(prev => prev + 1);
-    }
-  };
-
-  const prevStep = () => {
-    if (currentStep > 1) {
-      setCurrentStep(prev => prev - 1);
-    }
-  };
-
-  const goToStep = (step) => {
-    setCurrentStep(step);
-  };
-
-  // ============================================
-  // INPUT HANDLERS
-  // ============================================
-
-  const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
-
-    // Clear errors
-    if (hasSubmitted && errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
-    }
-    if (errors.submit) {
-      setErrors(prev => ({ ...prev, submit: '' }));
-    }
-  };
-
-  // Email handlers
-  const handleEmailChange = (index, field, value) => {
-    const newEmails = [...emails];
-    newEmails[index] = { ...newEmails[index], [field]: value };
-    setEmails(newEmails);
-  };
-
-  const addEmail = () => {
-    setEmails([...emails, { title: '', email: '' }]);
-  };
-
-  const removeEmail = (index) => {
-    if (emails.length > 1) {
-      setEmails(emails.filter((_, i) => i !== index));
-    }
-  };
-
-  // Phone handlers
-  const handlePhoneChange = (index, field, value) => {
-    const newPhones = [...phones];
-    newPhones[index] = { ...newPhones[index], [field]: value };
-    setPhones(newPhones);
-  };
-
-  const addPhone = () => {
-    setPhones([...phones, { title: '', phone: '' }]);
-  };
-
-  const removePhone = (index) => {
-    if (phones.length > 1) {
-      setPhones(phones.filter((_, i) => i !== index));
-    }
-  };
-
-  // Address handlers
-  const handleAddressChange = (index, field, value) => {
-    const newAddresses = [...addresses];
-    newAddresses[index] = { ...newAddresses[index], [field]: value };
-    setAddresses(newAddresses);
-  };
-
-  const addAddress = () => {
-    setAddresses([...addresses, {
-      title: '',
-      streetAndNr: '',
-      additionalInfo: '',
-      postalcode: '',
-      city: '',
-      country: ''
-    }]);
-  };
-
-  const removeAddress = (index) => {
-    if (addresses.length > 1) {
-      setAddresses(addresses.filter((_, i) => i !== index));
-      // Clean up dropdown state
-      setAddressDropdownStates(prev => {
-        const newState = { ...prev };
-        delete newState[index];
-        return newState;
-      });
-    }
-  };
-
-  // Link handlers
-  const handleLinkChange = (index, field, value) => {
-    const newLinks = [...links];
-
-    // Auto-format URL
-    if (field === 'url' && value.trim()) {
-      if (!value.startsWith('http://') && !value.startsWith('https://')) {
-        if (value.includes('.')) {
-          value = 'https://' + value;
-        }
-      }
-    }
-
-    newLinks[index] = { ...newLinks[index], [field]: value };
-    setLinks(newLinks);
-  };
-
-  const addLink = () => {
-    setLinks([...links, { title: '', url: '' }]);
-  };
-
-  const removeLink = (index) => {
-    if (links.length > 1) {
-      setLinks(links.filter((_, i) => i !== index));
-    }
-  };
-
-  // ============================================
-  // CATEGORY HANDLERS
-  // ============================================
-
-  // const getNextCategoryId = (categories) => {
-  //   if (!categories || categories.length === 0) return 1;
-  //   const maxId = Math.max(...categories.map(cat => parseInt(cat.id) || 0));
-  //   return maxId + 1;
-  // };
 
   const addCategory = async () => {
     if (newCategoryName.trim() && !isAddingCategory) {
@@ -249,7 +112,6 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
 
       try {
         const categoryName = newCategoryName.charAt(0).toUpperCase() + newCategoryName.slice(1).trim();
-        // const nextId = getNextCategoryId(categories);
 
         const newCategory = {
           // id: nextId,
@@ -310,6 +172,140 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
       categories: prev.categories.filter(cat => cat.id !== categoryId)
     }));
   };
+
+  // ============================================
+  // NAVIGATION HANDLERS
+  // ============================================
+
+  const nextStep = () => {
+    if (currentStep < totalSteps) {
+      setCurrentStep(prev => prev + 1);
+    }
+  };
+
+  const prevStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep(prev => prev - 1);
+    }
+  };
+
+  const goToStep = (step) => {
+    setCurrentStep(step);
+  };
+
+  // ============================================
+  // INPUT HANDLERS
+  // ============================================
+
+  // Handle basic input changes
+  const handleInputChange = (e) => {
+    console.log('e.target:', e.target.value);
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+
+    // Clear errors
+    if (hasSubmitted && errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+    if (errors.submit) {
+      setErrors(prev => ({ ...prev, submit: '' }));
+    }
+  };
+
+  // handle EMAILS
+  const handleEmailChange = (index, field, value) => {
+    const newEmails = [...emails];
+    newEmails[index] = { ...newEmails[index], [field]: value };
+    setEmails(newEmails);
+  };
+
+  const addEmail = () => {
+    setEmails([...emails, { title: '', email: '' }]);
+  };
+
+  const removeEmail = (index) => {
+    if (emails.length > 1) {
+      setEmails(emails.filter((_, i) => i !== index));
+    }
+  };
+
+  // handle PHONES
+  const handlePhoneChange = (index, field, value) => {
+    const newPhones = [...phones];
+    newPhones[index] = { ...newPhones[index], [field]: value };
+    setPhones(newPhones);
+  };
+
+  const addPhone = () => {
+    setPhones([...phones, { title: '', phone: '' }]);
+  };
+
+  const removePhone = (index) => {
+    if (phones.length > 1) {
+      setPhones(phones.filter((_, i) => i !== index));
+    }
+  };
+
+  // handle ADDRESSES
+  const handleAddressChange = (index, field, value) => {
+    const newAddresses = [...addresses];
+    newAddresses[index] = { ...newAddresses[index], [field]: value };
+    setAddresses(newAddresses);
+  };
+
+  const addAddress = () => {
+    setAddresses([...addresses, {
+      title: '',
+      streetAndNr: '',
+      additionalInfo: '',
+      postalcode: '',
+      city: '',
+      country: ''
+    }]);
+  };
+
+  const removeAddress = (index) => {
+    if (addresses.length > 1) {
+      setAddresses(addresses.filter((_, i) => i !== index));
+      // Clean up dropdown state
+      setAddressDropdownStates(prev => {
+        const newState = { ...prev };
+        delete newState[index];
+        return newState;
+      });
+    }
+  };
+
+  // Handle Links
+  const handleLinkChange = (index, field, value) => {
+    const newLinks = [...links];
+
+    // Auto-format URL
+    if (field === 'url' && value.trim()) {
+      if (!value.startsWith('http://') && !value.startsWith('https://')) {
+        if (value.includes('.')) {
+          value = 'https://' + value;
+        }
+      }
+    }
+
+    newLinks[index] = { ...newLinks[index], [field]: value };
+    setLinks(newLinks);
+  };
+
+  const addLink = () => {
+    setLinks([...links, { title: '', url: '' }]);
+  };
+
+  const removeLink = (index) => {
+    if (links.length > 1) {
+      setLinks(links.filter((_, i) => i !== index));
+    }
+  };
+
 
   // ============================================
   // TITLE HANDLERS
@@ -500,8 +496,8 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
         first_name: formData.firstName.trim(),
         last_name: formData.lastName?.trim() || null,
         is_favorite: formData.isFavorite || false,
-        birth_date: formData.birthdate?.trim() || null,
-        next_contact_date: formData.nextContactDate?.trim() || null,
+        birth_date: formatDateForBackend(formData.birthdate?.trim()) || null,
+        next_contact_date: formatDateForBackend(formData.nextContactDate?.trim()) || null,
         next_contact_place: formData.nextContactPlace?.trim() || null,
         last_contact_date: formData.lastContactDate?.trim() || null,
         is_contacted: formData.isContacted || false,
@@ -638,6 +634,8 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
             formData={formData}
             handleInputChange={handleInputChange}
             setFormData={setFormData}
+            expandedNotes={expandedNotes}
+            setExpandedNotes={setExpandedNotes}
             errors={errors}
             hasSubmitted={hasSubmitted}
             isLoading={isLoading}
@@ -687,7 +685,7 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
       {/* Form */}
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-[480px] mx-auto"
+        className="w-[88vw] min-w-[260px] max-w-[480px] mx-auto -mt-4"
         style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}
         >
         <div
@@ -696,9 +694,6 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
           boxShadow: '0 4px 32px rgba(109, 71, 71, 0.29)'
           }}
           >
-          <h1 className="text-3xl font-bold text-center mt-2 mb-10 text-black">
-          new contact.
-          </h1>
           
           {renderStepContent()}
          
@@ -711,6 +706,7 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
           prevStep={prevStep}
           nextStep={nextStep}
           handleSubmit={handleSubmit}
+          nextStepWithValidation={nextStepWithValidation}
           isLoading={isLoading}
         />
 
@@ -721,19 +717,19 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
             want to go {' '}
             <button 
               onClick={() => navigate('/myspace/contacts')}
-              className="font-light text-red-500 hover:underline bg-transparent border-none cursor-pointer"
+              className="font-extralight text-red-500 hover:underline bg-transparent border-none cursor-pointer"
             >
             to contacts?
             </button>
           </div>
           <div className="text-black dark:text-white font-extralight block -mt-2 relative"
               style={{ fontSize: '16px' }}>
-            or go {' '}
+            or  {' '}
             <button 
               onClick={handleGoBack}
-              className="font-light text-red-500 hover:underline bg-transparent border-none cursor-pointer"
+              className="font-extralight text-red-500 hover:underline bg-transparent border-none cursor-pointer"
             >
-            back
+            go back.
             </button>
           </div>
         </div>

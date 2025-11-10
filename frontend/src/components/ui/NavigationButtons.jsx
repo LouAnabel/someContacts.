@@ -10,7 +10,7 @@ const Button = ({ children, onClick, className = "", ...props }) => {
   );
 };
 
-const NavigationButtons = ({ currentStep, totalSteps, prevStep, nextStep, handleSubmit, isLoading }) => {
+const NavigationButtons = ({ currentStep, totalSteps, prevStep, nextStep, handleSubmit, isLoading, nextStepWithValidation }) => {
   return (
     <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-200">
       
@@ -44,7 +44,7 @@ const NavigationButtons = ({ currentStep, totalSteps, prevStep, nextStep, handle
         {currentStep < totalSteps && (
           <button
             type="button"
-            onClick={nextStep}
+            onClick={nextStepWithValidation}
             className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 font-extralight transition-colors"
           >
             Next →

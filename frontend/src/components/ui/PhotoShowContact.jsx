@@ -85,8 +85,8 @@ const PhotoField = ({
             <div 
                 className="w-[333px] h-[333px] rounded-full flex-shrink-0 relative mx-auto mb-4 overflow-hidden border border-1 border-red-500"
                 style={{ 
-                    background: 'linear-gradient(180deg, rgba(135, 67, 67, 0.1) 68.75%, rgba(280, 22, 22, 0.20) 100%)' ,
-                    boxShadow: '8px 8px 30px #d9d9d9, -10px -10px 30px #ffffff'
+                    background: 'linear-gradient(180deg, rgba(180, 67, 67, 0.1) 68.75%', 
+                    // boxShadow: '8px 8px 30px #d9d9d9, -10px -10px 30px #ffffff'
                 }}
             >
                 {/* Display photo if available */}
@@ -132,7 +132,7 @@ const PhotoField = ({
                         <button 
                             onClick={handleTakePhotoClick}
                             type="button"
-                            className="flex w-[100px] h-[35px] justify-center items-center flex-shrink-0 text-sm text-red-500 font-extralight hover:text-red-500 hover:font-light border border-red-300 bg-white/50 dark:bg-white/10 dark:border-0 rounded-lg dark:font-light hover:bg-white/70 dark:hover:bg-white/20"
+                            className="flex w-[110px] h-[35px] justify-center items-center flex-shrink-0 text-sm text-red-500 font-extralight hover:text-red-500 hover:font-light border border-red-300 bg-white/50 dark:bg-white/10 dark:border-0 rounded-lg dark:font-light hover:bg-white/70 dark:hover:bg-white/20"
                         >
                             <span className="">take photo.</span>
                         </button>

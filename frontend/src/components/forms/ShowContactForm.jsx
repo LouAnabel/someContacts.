@@ -13,48 +13,150 @@ const Button = ({ children, onClick, className = "", ...props }) => {
 };
 
 
-export default function ShowContact({ contactData, onEdit, onDelete, onNavigate }) {
-  const handleCategoryClick = (categoryId) => {
-    onNavigate(`/myspace/categories?expand=${categoryId}`);
-  };
+export default function ShowContact({ 
+  contactData, 
+  navigate,
+  handleFavoriteToggle, 
+  handleIsContactedToggle, 
+  handleIsToContactToggle, 
+  onEdit,  
+  onNavigate,
+  isLoading
+
+}) {
+
 
   const handleGoBack = () => {
     onNavigate(-1);
   };
-  
 
   return (
-    <div className="w-full max-w-[480px] mx-auto pb-40">
-      <div
-        className="bg-white rounded-3xl p-8 shadow-lg relative pb-20"
-        style={{
-          boxShadow: '0 4px 32px rgba(109, 71, 71, 0.29)'
-        }}
-      >
-        {/* Name */}
-        <h1 className="text-3xl font-bold text-center mb-6 text-black">
-          {contactData.first_name} {contactData.last_name}
-        </h1>
+    <div className="min-h-screen w-full">
 
-        <div className="space-y-6">
-          {/* Categories */}
-          {contactData.categories && contactData.categories.length > 0 && (
-            <div>
-              <h3 className="text-red-700 font-light text-[15px] ml-3 mb-2">categories</h3>
-              <div className="flex flex-wrap gap-2">
-                {contactData.categories.map((category) => (
-                  <button
-                    key={category.id}
-                    onClick={() => handleCategoryClick(category.id)}
-                    className="px-4 py-2 bg-gray-50 hover:bg-gray-100 rounded-full text-black font-extralight text-sm transition-colors"
+      {/* Contact Display Card */}
+      <div className="bg-white rounded-3xl p-4 relative z-10 overflow-visible w-[88vw] min-w-[260px] max-w-[480px] h-fit mx-auto"
+          style={{ 
+              boxShadow: '0 4px 32px rgba(109, 71, 71, 0.29)'
+          }}>
+        
+        {/* Favorite Button, Name, Categories */}
+        <div className="text-center mb-4 space-y-7 pb-3">
+          
+          {/* Favorite checkbox */}
+          <div className="flex justify-center">
+              <button
+                      type="button"
+                      onClick={handleFavoriteToggle} 
+                      className="flex items-center hover:scale-110 transcontact -mb-4"
+                      disabled={isLoading}
                   >
-                    {category.name}
-                  </button>
+                  <svg 
+                      className={`w-7 h-7 ${
+                          contactData.is_favorite ? 'text-red-500 hover:text-yellow-300' : 'text-black hover:text-yellow-300'
+                      }`} 
+                      aria-hidden="true" 
+                      xmlns="http://www.w3.org/2000/svg" 
+                      fill="currentColor" 
+                      viewBox="0 0 22 20"
+                      >
+                      <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
+                  </svg>
+              </button>
+          </div>
+          
+          {/* Name */}
+          <h1 className="text-3xl font-bold text-center text-black">
+              {contactData.first_name} {contactData.last_name}
+          </h1>
+    
+          
+          {/* Categories Display */}
+          {contactData && contactData.categories && contactData.categories.length > 0 && (
+            <div className="w-full justify-center mx-auto flex-wrap ">
+              <div className="-mt-4">
+                {contactData.categories.map((category, index) => (
+                    <span 
+                    key={category.id || index} 
+                    onClick={() => navigate(`/myspace/categories?expand=${category.id}`)}
+                    className="inline-block px-3 py-2 min-w-[90px] mx-1 bg-red-100 tracking-wide hover:bg-red-50 hover:text-red-700 text-red-700 rounded-full text-base font-extralight">
+                        {category.name}
+                    </span>
                 ))}
-              </div>
+               </div> 
             </div>
           )}
 
+          {/* Checkboxes */}
+          <div className="ml-2 border-b border-gray-200 pb-5"> 
+            
+              {/* isContacted Checkbox */}
+              <div className="flex items-center w-full relative rounded-lg">
+                  <button
+                      type="button"
+                      onClick={handleIsContactedToggle} 
+                      className="flex items-center space-x-3 text-red-500 hover:text-red-700"
+                      disabled={isLoading}
+                  >
+                      {contactData.is_contacted ? ( 
+                          <>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-5">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
+                            </svg>
+
+                              <span className="text-sm font-extralight text-black cursor-pointer">
+                                  contacted
+                              </span>
+                          </>
+                      ) : (
+                          <>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="black" className="size-5">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
+                            </svg>
+                              <span className="text-sm font-extralight text-black cursor-pointer">
+                                  mark as contacted
+                              </span>
+                          </>
+                      )}
+                  </button>
+                </div>
+
+              {/* isToContact Checkbox */}
+              <div className="flex items-center w-full relative">
+                  <button
+                      type="button"
+                      onClick={handleIsToContactToggle} // FIXED: Use the correct handler
+                      className="flex items-center space-x-3 mt-2 text-red-500 hover:text-red-700"
+                      disabled={isLoading}
+                  >
+                      {contactData.is_to_contact ? ( // FIXED: Use contactData instead of contactData
+                          <>
+                              <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-5">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
+                              </svg>
+
+                              <span className="text-sm font-extralight text-black cursor-pointer">
+                                  remind me
+                              </span>
+                          </>
+                      ) : (
+                          <>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="black" className="size-5">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
+                            </svg>
+                              <span className="text-sm font-extralight text-black cursor-pointer">
+                                  reminder
+                              </span>
+                          </>
+                      )}
+                  </button>
+              </div>
+          </div>
+        </div>
+
+
+         {/* Contact Information */}
+        <div className="space-y-7 mb-7 ">
+          
           {/* Emails */}
           {contactData.emails && contactData.emails.length > 0 && (
             <div>

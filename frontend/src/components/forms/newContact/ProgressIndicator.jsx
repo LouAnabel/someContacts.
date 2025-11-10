@@ -24,14 +24,14 @@ const ProgressIndicator = ({ currentStep, totalSteps, goToStep }) => {
                     ? 'bg-red-500 text-white scale-110'
                     : step.number < currentStep
                     ? 'bg-red-100 text-red-500 cursor-pointer hover:bg-red-200'
-                    : 'bg-gray-200 text-white cursor-not-allowed'
+                    : 'bg-red-200 text-white cursor-not-allowed'
                 }`}
                 disabled={step.number > currentStep}
                 >
                 {step.number < currentStep ? '✓' : step.number}
                 </button>
                 <span className={`mt-2 text-xs font-extralight text-center ${
-                step.number === currentStep ? 'text-red-500' : 'text-gray-500'
+                step.number === currentStep ? 'text-red-500' : 'text-gray-400'
                 }`}>
                 {step.label}
                 </span>

@@ -1,5 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './components/theme/ThemeContext';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 // Layout components
 import UserLayout from './components/layout/UserLayout';
@@ -20,28 +22,30 @@ import UserProfile from './pages/UserProfile';
 
 function App() {
   return (
-    <ThemeProvider>
-      <Router>
-        <Routes>
-          {/* All routes now use UserLayout - no authentication needed */}
-          <Route path="/*" element={<AuthLayout />}>
-            <Route index element={<LandingPage />} />
-            <Route path="login" element={<Login />} />
-            <Route path="register" element={<Register />} />
-          </Route>
-          <Route path="/myspace/*" element={<UserLayout />}>  
-            <Route index element={<Home />} />
-            {/* Nested routes for contacts */}
-            <Route path="contacts" element={<AllContacts />} />
-            <Route path="newcontact" element={<NewContact />} />
-            <Route path="contacts/:id" element={<ShowContact />} /> 
-            <Route path="updatecontact/:id" element={<UpdateContacts />} />
-            <Route path="categories" element={<ShowCategories />} />
-            <Route path="profile" element={<UserProfile />} />
-          </Route>
-        </Routes>
-      </Router>
-    </ThemeProvider>
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <ThemeProvider>
+        <Router>
+          <Routes>
+            {/* All routes now use UserLayout - no authentication needed */}
+            <Route path="/*" element={<AuthLayout />}>
+              <Route index element={<LandingPage />} />
+              <Route path="login" element={<Login />} />
+              <Route path="register" element={<Register />} />
+            </Route>
+            <Route path="/myspace/*" element={<UserLayout />}>  
+              <Route index element={<Home />} />
+              {/* Nested routes for contacts */}
+              <Route path="contacts" element={<AllContacts />} />
+              <Route path="newcontact" element={<NewContact />} />
+              <Route path="contacts/:id" element={<ShowContact />} /> 
+              <Route path="updatecontact/:id" element={<UpdateContacts />} />
+              <Route path="categories" element={<ShowCategories />} />
+              <Route path="profile" element={<UserProfile />} />
+            </Route>
+          </Routes>
+        </Router>
+      </ThemeProvider>
+    </LocalizationProvider>
   );
 }
 
