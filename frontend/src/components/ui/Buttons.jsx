@@ -89,7 +89,7 @@ export const NavigationButtons = ({ currentStep, totalSteps, prevStep, nextStep,
             size="xl"
             variant="dark"
             onClick={nextStep}
-            className="absolute -bottom-[10px] -right-[10px] tracking-wide bg-red-500 hover:bg-red-700 text-2xl font-semibold"
+            className="absolute -bottom-[10px] -right-[10px] tracking-wide bg-red-500 hover:bg-red-700 text-2xl font-semibold flex items-center justify-center px-2 py-3"
           >
             next.
           </CircleButton>
@@ -102,7 +102,7 @@ export const NavigationButtons = ({ currentStep, totalSteps, prevStep, nextStep,
             size="xl"
             variant="dark"
             onClick={handleSubmit}
-            className="absolute -bottom-[10px] -right-[10px] tracking-wide bg-red-500 hover:bg-red-700 text-2xl font-semibold"
+            className="absolute -bottom-[10px] -right-[10px] tracking-wide bg-red-500 hover:bg-red-700 text-2xl font-semibold flex items-center justify-center px-2 py-3"
             disabled={isLoading}
           >
             {isLoading ? 'saving...' : 'save.'}

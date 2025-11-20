@@ -64,7 +64,7 @@ const Step1BasicInfo = ({
     return (
         <div className="space-y-8">
             {/* Header with subtle animation */}
-            <div className="text-center mb-10">
+            <div className="text-center mb-8">
                 <h1 className="text-3xl font-bold text-black tracking-tight">
                     create contact.
                 </h1>
@@ -335,9 +335,9 @@ const Step1BasicInfo = ({
                             <button
                                 type="button"
                                 onClick={() => setShowAddress(true)}
-                                className="flex items-center ml-2 mt-3 space-x-2 font-extralight hover:font-light hover:text-red-500"
+                                className="flex tracking-wide items-center -ml-1 mt-5 space-x-2 font-light "
                             >
-                                <span className="text-base text-black"> <span className="font-semibold text-red-500">+</span> add <span className="text-red-500 font-light hover:font-normal">address</span></span>
+                                <span className="text-lg text-red-400 hover:text-red-500"> <span className="text-xl font-semibold text-red-400">+</span> address information.</span>
                             </button>
                         ) : (
                             <div className="mt-5">

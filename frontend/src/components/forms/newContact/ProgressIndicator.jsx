@@ -4,14 +4,13 @@ import React from 'react';
 
 const ProgressIndicator = ({ currentStep, totalSteps, goToStep }) => {
   const steps = [
-    { number: 1, label: 'basic informations' },
-    { number: 2, label: 'contact history' },
-    { number: 3, label: 'additional info' },
+    { number: 1, label: 'basic informations.' },
+    { number: 2, label: 'additional info.' },
   ];
 
     return (
-    <div className="mb-9">
-        <div className="w-full min-w-[480px] px-10 mx-auto flex items-center justify-between max-w-[530px]">
+    <div className="mb-8 -mt-3">
+        <div className="w-full min-w-[280px] px-10 mx-auto flex items-center justify-between max-w-[400px]">
         {steps.map((step, index) => (
             <React.Fragment key={step.number}>
             {/* Step Circle */}
@@ -39,8 +38,8 @@ const ProgressIndicator = ({ currentStep, totalSteps, goToStep }) => {
 
             {/* Connector Line */}
             {index < steps.length - 1 && (
-                <div className={`flex-1 h-0.5 -mx-3 -ml-5 rounded transition-all ${
-                step.number < currentStep ? 'bg-red-500' : 'bg-gray-200'
+                <div className={`flex-1 h-0.5 -mt-5 -mx-3 -ml-7 rounded transition-all ${
+                step.number < currentStep ? 'bg-red-300' : 'bg-gray-200'
                 }`} />
             )}
             </React.Fragment>

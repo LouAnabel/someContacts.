@@ -2,7 +2,7 @@ import { useState } from 'react';
 import dayjs from 'dayjs';
 import DatePicker from '../../ui/DatePicker';
 
-const Step3AdditionalInfo = ({
+const Step2AdditionalInfo = ({
   formData,
   handleInputChange,
   setFormData,
@@ -43,16 +43,71 @@ const Step3AdditionalInfo = ({
   };
 
   return (
-    <div className="space-y-6 max-w-2xl mx-auto">
+    <div className="space-y-6 max-w-2xl mx-auto mb-2">
       {/* Header with subtle animation */}
-      <div className="text-center mb-10">
+      <div className="text-center mb-8">
         <h1 className="text-3xl font-bold text-black tracking-tight">
           additional information.
         </h1>
       </div>
 
+      {/* Optional: Birthdate */}
+      {!showBirthdate ? (
+        <button
+          type="button"
+          onClick={() => setShowBirthdate(true)}
+          className="flex items-center ml-1 space-x-2 font-extralight hover:font-light hover:text-red-500"
+        >
+          <span className="text-base text-black"> <span className="font-semibold text-red-500">+</span> add <span className="text-red-500 font-light hover:font-normal">birthdate</span></span>
+        </button>
+      ) : (
+        <div className="relative">
+          <div className="flex items-center justify-between">
+              <span>
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-1 h-6 bg-red-400 rounded-full"></div>
+                  <h2 className="text-lg font-light text-red-500 tracking-wide">
+                    birthdate.
+                  </h2>
+                </div>
+              </span>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setShowBirthdate(false);
+                  setFormData(prev => ({ ...prev, birthdate: '' }));
+                }}
+                className="relative mr-3 text-red-500 tracking-wide hover:underline text-sm font-extralight -mt-2"
+                disabled={isLoading}
+              >
+                remove
+              </button>
+            </div>
+
+          {/* Date Picker */}
+          <div className="relative">
+                
+                <DatePicker
+                    value={formData.birthdate}
+                    onChange={handleDateChange}
+                    label="select date"
+                    disabled={isLoading}
+                />
+            
+            </div>
+  
+
+          {hasSubmitted && errors.birthdate && (
+            <p className="absolute top-full right-1 text-sm text-red-600 z-20 font-extralight">
+              {errors.birthdate}
+            </p>
+          )}
+        </div>
+      )}
+
       {/* Notes Section - Enhanced Card */}
-      <div>
+      <div className="pt-1">
         <div className="flex items-center gap-2 mb-2">
           <div className="w-1 h-6 bg-red-400 rounded-full"></div>
           <h2 className="text-lg font-light text-red-500 tracking-wide">
@@ -105,7 +160,7 @@ const Step3AdditionalInfo = ({
                 <div className="flex items-center gap-2 mb-4">
                   <div className="w-1 h-6 bg-red-400 rounded-full"></div>
                   <h2 className="text-lg font-light text-red-500 tracking-wide">
-                    links & websites.
+                    websites & links.
                   </h2>
                 </div>
               </span>
@@ -129,7 +184,7 @@ const Step3AdditionalInfo = ({
                   {/* website input field */}
                   <div className="relative mb-4">
                     <label htmlFor={`link-title-${index}`} className="absolute left-2 -top-3 bg-white px-1 font-extralight text-gray-800 z-10">
-                      website
+                      title/name
                     </label>
 
                     <input
@@ -158,7 +213,7 @@ const Step3AdditionalInfo = ({
                   {/* URL input field */}
                   <div className="relative mb-4 ml-1">
                     <label htmlFor={`link-url-${index}`} className="absolute left-2 -top-3 bg-white px-1 font-extralight text-gray-800 z-10">
-                      link
+                      weblink
                     </label>
 
                     <input
@@ -208,61 +263,10 @@ const Step3AdditionalInfo = ({
         )}
       </div>
 
-      {/* Optional: Birthdate */}
-      {!showBirthdate ? (
-        <button
-          type="button"
-          onClick={() => setShowBirthdate(true)}
-          className="flex items-center ml-1 space-x-2 font-extralight hover:font-light hover:text-red-500"
-        >
-          <span className="text-base text-black"> <span className="font-semibold text-red-500">+</span> add <span className="text-red-500 font-light hover:font-normal">birthdate</span></span>
-        </button>
-      ) : (
-        <div className="relative">
-          <div className="flex items-center justify-between">
-              <span>
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="w-1 h-6 bg-red-400 rounded-full"></div>
-                  <h2 className="text-lg font-light text-red-500 tracking-wide">
-                    birthdate.
-                  </h2>
-                </div>
-              </span>
 
-              <button
-                type="button"
-                onClick={() => {
-                  setShowBirthdate(false);
-                  setFormData(prev => ({ ...prev, birthdate: '' }));
-                }}
-                className="relative mr-3 text-red-500 tracking-wide hover:underline text-sm font-extralight -mt-2"
-                disabled={isLoading}
-              >
-                remove
-              </button>
-            </div>
 
-          {/* Date Picker */}
-          <div className="relative">
-
-                <DatePicker
-                    value={formData.birthdate}
-                    onChange={handleDateChange}
-                    label="select date"
-                    disabled={isLoading}
-                />
-            </div>
-  
-
-          {hasSubmitted && errors.birthdate && (
-            <p className="absolute top-full right-1 text-sm text-red-600 z-20 font-extralight">
-              {errors.birthdate}
-            </p>
-          )}
-        </div>
-      )}
     </div>
   );
 };
 
-export default Step3AdditionalInfo;
+export default Step2AdditionalInfo;

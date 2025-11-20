@@ -3,7 +3,7 @@ import { useState } from 'react';
 import dayjs from 'dayjs';
 import DatePicker from '../../ui/DatePicker';
 
-const Step2ContactHistory = ({
+const ContactPlanner = ({
     formData,
     handleInputChange,
     setFormData,
@@ -230,4 +230,4 @@ const Step2ContactHistory = ({
     );
 };
 
-export default Step2ContactHistory;
+export default ContactPlanner;

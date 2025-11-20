@@ -33,13 +33,13 @@ export default function NewContact() {
 
   return (
     <div
-      className=" flex flex-col items-center justify-center mx-auto lg:py-0 mt-10"
+      className="flex flex-col items-center justify-center mx-auto lg:py-0 mt-10 bg-white dark:bg-black"
       style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}
     >
       {/* Back Button */}
       <div className="relative mt-4 mb-4">
         <Button
-          onClick={() => navigate('/myspace/')}
+          onClick={() => navigate(-1)}
           className="text-black dark:text-white hover:text-red-500"
         >
           <svg

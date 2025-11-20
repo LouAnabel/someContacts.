@@ -6,24 +6,12 @@ import { FormToApiData } from '../../helperFunctions/FormToApiData';
 import { validateDate } from '../../helperFunctions/dateConversion';
 import { formatDateForBackend } from '../../helperFunctions/dateConversion';
 
-import CircleButton, { NavigationButtons } from '../../ui/Buttons';
+import { NavigationButtons } from '../../ui/Buttons';
 import ProgressIndicator from './ProgressIndicator';
 import Step1BasicInfo from './Step1BasicInfo';
-import Step2ContactHistory from './Step2ContactHistory';
-import Step3AdditionalInfo from './Step3AdditionalInfo';
+import Step2AdditionalInfo from './Step2AdditionalInfo';
+// import ContactPlanner from './ContactPlanner';
 
-
-const Button = ({ children, onClick, className = "", ...props }) => {
-  return (
-    <button
-      onClick={onClick}
-      className={`text-black dark:text-white hover:text-red-500 dark:hover:text-red-500 transition-colors duration-200 ${className}`}
-      {...props}
-    >
-      {children}
-    </button>
-  );
-};
 
 export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
   const navigate = useNavigate();
@@ -31,7 +19,7 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
 
   // multi-step form or optional sections
   const [currentStep, setCurrentStep] = useState(1);
-  const totalSteps = 3;
+  const totalSteps = 2;
 
   // Basic form data
   const [formData, setFormData] = useState({
@@ -604,22 +592,7 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
 
       case 2:
         return (
-          <Step2ContactHistory
-            formData={formData}
-            handleInputChange={handleInputChange}
-            setFormData={setFormData}
-            expandedNotes={expandedNotes}
-            setExpandedNotes={setExpandedNotes}
-            errors={errors}
-            hasSubmitted={hasSubmitted}
-            isLoading={isLoading}
-
-          />
-        );
-
-      case 3:
-        return (
-          <Step3AdditionalInfo
+          <Step2AdditionalInfo
             formData={formData}
             handleInputChange={handleInputChange}
             setFormData={setFormData}
@@ -638,6 +611,24 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
             isLoading={isLoading}
           />
         );
+        
+      // NOT USED ANYMORE
+      // case 3:
+      //   return (
+      //     <ContactPlanner
+      //       formData={formData}
+      //       handleInputChange={handleInputChange}
+      //       setFormData={setFormData}
+      //       expandedNotes={expandedNotes}
+      //       setExpandedNotes={setExpandedNotes}
+      //       errors={errors}
+      //       hasSubmitted={hasSubmitted}
+      //       isLoading={isLoading}
+
+      //     />
+      //   );
+
+        
 
       default:
         return null;
@@ -659,7 +650,7 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
       {/* Form */}
       <form
         onSubmit={handleSubmit}
-        className="w-[88vw] min-w-[260px] max-w-[480px] mx-auto -mt-4"
+        className="w-[90vw] min-w-[260px] max-w-[480px] mx-auto -mt-4"
         style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}
       >
         <div
@@ -684,25 +675,15 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
         />
 
         {/* Back Links */}
-        <div className="w-full px-8 space-y-0.25 max-w-[480px] -mt-24 pt-2">
+        <div className="w-full px-6 max-w-[480px] -mt-24">
           <div className="text-black dark:text-white font-extralight block relative"
             style={{ fontSize: '16px' }}>
-            want to go {' '}
+             want to {' '}
             <button
               onClick={() => navigate('/myspace/contacts')}
               className="font-extralight text-red-500 hover:underline bg-transparent border-none cursor-pointer"
             >
-              to contacts?
-            </button>
-          </div>
-          <div className="text-black dark:text-white font-extralight block -mt-2 relative"
-            style={{ fontSize: '16px' }}>
-            or  {' '}
-            <button
-              onClick={handleGoBack}
-              className="font-extralight text-red-500 hover:underline bg-transparent border-none cursor-pointer"
-            >
-              go back.
+              cancel?
             </button>
           </div>
         </div>
