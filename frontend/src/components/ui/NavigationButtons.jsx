@@ -2,7 +2,7 @@ const Button = ({ children, onClick, className = "", ...props }) => {
   return (
     <button
       onClick={onClick}
-      className={`text-black dark:text-white hover:text-red-500 dark:hover:text-red-500 transition-colors duration-200 ${className}`}
+      className={`text-black dark:text-white hover:text-red-500 dark:hover:text-red-500 ${className}`}
       {...props}
     >
       {children}

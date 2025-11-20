@@ -19,9 +19,10 @@ class Contact(db.Model):
     birth_date = db.Column(db.Date, nullable=True)
     is_to_contact = db.Column(db.Boolean, default=False, nullable=True)
     is_contacted = db.Column(db.Boolean, default=False, nullable=True)
+    last_contact_date = db.Column(db.Date, nullable=True)
+    last_contact_place = db.Column(db.String(200), nullable=True)
     next_contact_date = db.Column(db.Date, nullable=True)
     next_contact_place = db.Column(db.String(200), nullable=True)
-    last_contact_date= db.Column(db.String(200), nullable=True)
     notes = db.Column(db.String(2000))
 
 
@@ -73,6 +74,8 @@ class Contact(db.Model):
         db.CheckConstraint('birth_date <= CURRENT_DATE', name='check_birth_date_not_future'),
         db.CheckConstraint('next_contact_date IS NULL OR next_contact_date > CURRENT_DATE',
                            name='check_next_contact_date_future'),
+        db.CheckConstraint('last_contact_date IS NULL OR last_contact_date <= CURRENT_DATE',
+                           name='check_last_contact_date_past'),
     )
 
     def to_dict(self, include_phones=True, include_emails=True, include_addresses=True, include_links=True, include_categories=True):
@@ -85,7 +88,8 @@ class Contact(db.Model):
             'birth_date': self.birth_date.strftime('%d.%m.%Y') if self.birth_date else None,
             'is_contacted': self.is_contacted,
             'is_to_contact': self.is_to_contact,
-            'last_contact_date': self.last_contact_date,
+            'last_contact_date': self.last_contact_date.strftime('%d.%m.%Y') if self.last_contact_date else None,
+            'last_contact_place': self.last_contact_place,
             'next_contact_date': self.next_contact_date.strftime('%d.%m.%Y') if self.next_contact_date else None,
             'next_contact_place': self.next_contact_place,
             'notes': self.notes,

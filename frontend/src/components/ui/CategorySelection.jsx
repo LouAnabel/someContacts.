@@ -36,7 +36,7 @@ const CategorySelection = ({
     }, [showAddCategory]);
 
     return (
-        <div className="relative">
+        <div className="relative mb-6"> {/* Added mb-6 for spacing for error message */}
             {/* Selected Categories Display */}
             {selectedCategories && selectedCategories.length > 0 && (
                 <div className="mb-4 flex flex-wrap gap-2">
@@ -64,8 +64,8 @@ const CategorySelection = ({
             )}
             
             <div>
-                <label className="absolute left-2 -mt-3 bg-white px-1 text-base text-black font-extralight">
-                    categories*
+                <label className="absolute left-2 -mt-3 bg-white px-1 text-base text-black font-extralight z-10">
+                    categories<span className="text-red-500">*</span>
                 </label>
             
                 {/* Dropdown Button */}
@@ -76,7 +76,7 @@ const CategorySelection = ({
                     }}
                     disabled={disabled || selectedCategories.length >= 3}
                     className={`w-full p-2.5 rounded-xl border bg-white hover:border-red-300 dark:hover:border-red-300 text-black placeholder-gray-300 font-extralight max-w-full min-w-[200px] focus:outline-none focus:border-red-500 flex items-center justify-between ${
-                        hasSubmitted && errors.categories ? 'border-red-400' : 'border-gray-400 dark:border-gray-400'
+                        errors.categories ? 'border-red-400' : 'border-gray-400 dark:border-gray-400'
                     } ${selectedCategories.length >= 3 ? ' text-gray-300 border-gray-300 cursor-not-allowed' : ''}`}
                     style={{
                         fontSize: '16px',
@@ -104,11 +104,18 @@ const CategorySelection = ({
                 </button>
             </div>    
 
+            {/* Error Message - Moved above dropdown for better visibility */}
+            {errors.lastName && (
+                            <p className="absolute top-full right-1 text-xs text-red-600 z-20 font-extralight">
+                                {errors.categories}
+                            </p>
+                        )}
+
             {/* Custom Dropdown Menu */}
             {showCategoryDropdown && (
                 <div 
                     ref={dropdownRef}
-                    className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-30 max-h-60 overflow-y-auto"
+                    className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-xl shadow-lg z-30 max-h-60 overflow-y-auto"
                 > 
                     
                     {/* Show category options only if categories exist */}
@@ -247,10 +254,6 @@ const CategorySelection = ({
                         setNewCategoryName('');
                     }}
                 />
-            )}
-
-            {hasSubmitted && errors.categories && (
-                <p className="absolute top-full right-1 font-extralight text-xs text-red-500 z-20">{errors.categories}</p>
             )}
         </div>
     );

@@ -73,7 +73,7 @@ export const NavigationButtons = ({ currentStep, totalSteps, prevStep, nextStep,
             size="medium"
             variant="dark"
             onClick={prevStep}
-            className="absolute -bottom-[0px] right-[100px] text-lg font-semibold disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-black transition-colors"
+            className="absolute -bottom-[0px] right-[100px] text-lg font-semibold tracking-wider disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-black transition-colors"
             disabled={currentStep === 1}
           >
             back.
@@ -89,7 +89,7 @@ export const NavigationButtons = ({ currentStep, totalSteps, prevStep, nextStep,
             size="xl"
             variant="dark"
             onClick={nextStep}
-            className="absolute -bottom-[10px] -right-[10px] bg-red-500 hover:bg-red-700 text-2xl font-semibold"
+            className="absolute -bottom-[10px] -right-[10px] tracking-wide bg-red-500 hover:bg-red-700 text-2xl font-semibold"
           >
             next.
           </CircleButton>
@@ -102,7 +102,7 @@ export const NavigationButtons = ({ currentStep, totalSteps, prevStep, nextStep,
             size="xl"
             variant="dark"
             onClick={handleSubmit}
-            className="absolute -bottom-[10px] -right-[10px] bg-red-500 hover:bg-red-700 text-2xl font-semibold"
+            className="absolute -bottom-[10px] -right-[10px] tracking-wide bg-red-500 hover:bg-red-700 text-2xl font-semibold"
             disabled={isLoading}
           >
             {isLoading ? 'saving...' : 'save.'}

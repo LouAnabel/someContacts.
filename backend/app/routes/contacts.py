@@ -40,7 +40,7 @@ def validate_date(date_string, allow_future=False):
         date_obj = datetime.strptime(date_string, '%d.%m.%Y').date()
         today = datetime.today().date()
 
-        if not allow_future and date_obj > today:
+        if not allow_future and date_obj >= today:
             return False, f"Date cannot be in the future"
         if allow_future and date_obj <= today:
             return False, f"Date must be in the future"
@@ -87,6 +87,13 @@ def create_contact():
                 return jsonify({'success': False, 'message': date_obj}), 400
             birth_date = date_obj
 
+        last_contact_date = None
+        if data.get('last_contact_date'):
+            is_valid, date_obj = validate_date(data['last_contact_date'], allow_future=False)
+            if not is_valid:
+                return jsonify({'success': False, 'message': date_obj}), 400
+            last_contact_date = date_obj
+
         next_contact_date = None
         if data.get('next_contact_date'):
             is_valid, date_obj = validate_date(data['next_contact_date'], allow_future=True)
@@ -119,9 +126,11 @@ def create_contact():
             last_name=data.get('last_name', '').strip() if data.get('last_name') else None,
             is_favorite=data.get('is_favorite', False),
             birth_date=birth_date,
+            last_contact_date=last_contact_date,
+            last_contact_place=data.get('last_contact_place', '').strip() if data.get('last_contact_place') else None,
             next_contact_date=next_contact_date,
             next_contact_place=data.get('next_contact_place', '').strip() if data.get('next_contact_place') else None,
-            last_contact_date=data.get('last_contact_date', '').strip() if data.get('last_contact_date') else None,
+
             is_contacted=data.get('is_contacted', False),
             is_to_contact=data.get('is_to_contact', False),
             notes=data.get('notes', '').strip() if data.get('notes') else None
@@ -373,10 +382,10 @@ def update_contact(contact_id):
             contact.is_contacted = bool(data['is_contacted'])
         if 'is_to_contact' in data:
             contact.is_to_contact = bool(data['is_to_contact'])
+        if 'last_contact_place' in data:
+            contact.last_contact_place = data['last_contact_place'].strip() if data['last_contact_place'] else None
         if 'next_contact_place' in data:
             contact.next_contact_place = data['next_contact_place'].strip() if data['next_contact_place'] else None
-        if 'last_contact_date' in data:
-            contact.last_contact_date = data['last_contact_date'].strip() if data['last_contact_date'] else None
         if 'notes' in data:
             contact.notes = data['notes'].strip() if data['notes'] else None
 
@@ -399,6 +408,16 @@ def update_contact(contact_id):
                 contact.next_contact_date = date_obj
             else:
                 contact.next_contact_date = None
+
+        # Update last_contact_date
+        if 'last_contact_date' in data:
+            if data['last_contact_date']:
+                is_valid, date_obj = validate_date(data['last_contact_date'], allow_future=False)
+                if not is_valid:
+                    return jsonify({'success': False, 'message': date_obj}), 400
+                contact.last_contact_date = date_obj
+            else:
+                contact.last_contact_date = None
 
         # Update emails
         if 'emails' in data and isinstance(data['emails'], list):

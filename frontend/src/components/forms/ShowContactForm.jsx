@@ -31,7 +31,7 @@ export default function ShowContact({
   };
 
   return (
-    <div className="min-h-screen w-full">
+    <div className=" min-h-screen w-full">
 
       {/* Contact Display Card */}
       <div className="bg-white rounded-3xl p-4 relative z-10 overflow-visible w-[88vw] min-w-[260px] max-w-[480px] h-fit mx-auto"

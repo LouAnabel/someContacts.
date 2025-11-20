@@ -182,6 +182,7 @@ const RegisterForm = () => {
     };
 
     const handleSubmit = async (e) => {
+        console.log("formdata on submit:", formData);
         e.preventDefault();
         setHasSubmitted(true);
         
@@ -201,7 +202,7 @@ const RegisterForm = () => {
              style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
 
             {/* Main Register Card */}
-            <div className="bg-white rounded-3xl p-5 relative z-10 overflow-visible w-[88vw] min-w-[260px] max-w-[480px] "
+            <div className="bg-white rounded-3xl p-4 relative z-10 overflow-visible w-[90vw] min-w-[260px] max-w-[480px] "
                  style={{ 
                      boxShadow: '0 4px 32px rgba(109, 71, 71, 0.29)'
                  }}>
@@ -212,6 +213,12 @@ const RegisterForm = () => {
                 {/* Form Element - This is the key addition! */}
                 <form onSubmit={handleSubmit}>
                     <div className="space-y-3 mb-14">
+                        
+                        <div className="flex items-center gap-2 left-2">
+                            <div className="w-1 h-6 bg-red-400 rounded-full mb-2"></div>
+                            <p className="relative text-lg font-light text-red-500 tracking-wide -mt-1">what's your name?</p>
+                        </div>
+
                         <div className="space-y-5">
                             {/* First Name Field */}
                             <div className="relative">
@@ -233,9 +240,9 @@ const RegisterForm = () => {
                                 />
                                 <label 
                                     htmlFor="firstName" 
-                                    className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-extralight"
+                                    className="absolute -top-3 left-2 bg-white px-1 text-base text-black font-extralight"
                                 >
-                                    first name
+                                    first name<span className="text-red-500">*</span>
                                 </label>
                                 {hasSubmitted && errors.firstName && (
                                     <p className="absolute font-extralight top-full right-1 text-sm text-red-600 z-20">{errors.firstName}</p>
@@ -263,9 +270,9 @@ const RegisterForm = () => {
                                 />
                                 <label 
                                     htmlFor="lastName" 
-                                    className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-extralight"
+                                    className="absolute -top-3 left-2 bg-white px-1 text-base text-black font-extralight"
                                 >
-                                    last name
+                                    last name<span className="text-red-500">*</span>
                                 </label>
                                 {hasSubmitted && errors.lastName && (
                                     <p className="absolute top-full font-light right-1 text-sm text-red-600 z-20">{errors.lastName}</p>
@@ -274,8 +281,11 @@ const RegisterForm = () => {
                         </div>
 
                         
-                            
-                        <p className="relative text-red-500 left-2 tracking-wide font-extralight pt-6 ">how to login?</p>
+                        <div className="flex items-center gap-2 pt-6 left-2">
+                            <div className="w-1 h-6 bg-red-400 rounded-full mb-2"></div>
+                            <p className="relative text-lg font-light text-red-500 tracking-wide -mt-1">how to login?</p>
+                        </div>
+
                         {/* Email Field */}
                         <div className="space-y-5">
                             <div className="relative">
@@ -297,9 +307,9 @@ const RegisterForm = () => {
                                 />
                                 <label 
                                     htmlFor="email" 
-                                    className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-extralight"
+                                    className="absolute -top-3 left-2 bg-white px-1 text-base text-black font-extralight"
                                 >
-                                    email
+                                    email<span className="text-red-500">*</span>
                                 </label>
                                 {hasSubmitted && errors.email && (
                                     <p className="absolute top-full font-extralight right-1 text-sm text-red-600 z-20">{errors.email}</p>
@@ -310,9 +320,9 @@ const RegisterForm = () => {
                             <div className="relative">
                                 <label 
                                     htmlFor="password" 
-                                    className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-extralight"
+                                    className="absolute -top-3 left-2 bg-white px-1 text-base text-black font-extralight"
                                 >
-                                    password
+                                    password<span className="text-red-500">*</span>
                                 </label>
                                 <input
                                     type={showPassword ? "text" : "password"}
@@ -365,9 +375,9 @@ const RegisterForm = () => {
                             <div className="relative">
                                 <label 
                                     htmlFor="confirmPassword" 
-                                    className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-extralight"
+                                    className="absolute -top-3 left-2 bg-white px-1 text-base text-black font-extralight"
                                 >
-                                    confirm password
+                                    confirm password<span className="text-red-500">*</span>
                                 </label>
                                 <input
                                     type="password"

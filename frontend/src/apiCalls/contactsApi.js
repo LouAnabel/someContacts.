@@ -60,6 +60,7 @@ const apiRequest = async (url, options = {}) => {
  *   next_contact_date: string (DD.MM.YYYY),
  *   next_contact_place: string,
  *   last_contact_date: string (DD.MM.YYYY),
+ *   last_contact_place: string,
  *   is_contacted: boolean,
  *   is_to_contact: boolean,
  *   notes: string,

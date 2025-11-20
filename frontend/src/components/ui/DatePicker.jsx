@@ -18,15 +18,18 @@ const DatePicker = ({
         onChange(newValue);
     };
 
+    // Convert DD.MM.YYYY to a dayjs object
+    const parsedValue = value ? dayjs(value, 'DD.MM.YYYY') : null;
+
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <div className="relative  w-[190px]">
+            <div className="relative w-[190px] ">
                 <label className="absolute left-2 -top-2.5 bg-white px-1 text-base text-gray-800 font-extralight z-10">
                     {label}
                 </label>
                 
                 <MobileDatePicker
-                    value={value ? dayjs(value) : null}
+                    value={parsedValue}  // Changed from value ? dayjs(value) : null
                     onChange={handleDateChange}
                     disabled={disabled}
                     format={format}
@@ -38,8 +41,8 @@ const DatePicker = ({
                                 style: {
                                     fontSize: '16px',
                                     fontWeight: 100,
-                                    height: '48px',
-                                    borderRadius: '0.75rem',
+                                    height: '49px',
+                                    borderRadius: '0.80rem',
                                 }
                             },
                             sx: {
@@ -51,7 +54,7 @@ const DatePicker = ({
                                         borderColor: '#9ca3af',
                                     },
                                     '&:hover fieldset': {
-                                        borderColor: '#fca5a5',
+                                        borderColor: 'red',
                                     },
                                     '&.Mui-focused fieldset': {
                                         borderColor: '#ef4444',

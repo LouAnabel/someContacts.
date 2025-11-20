@@ -53,6 +53,7 @@ export function validatePassword(password) {
 
 //Register User API Call
 export async function sendRegisterData(registerData) {
+    console.log("In AUTH FILE: Register Data to send:", registerData);
     try {
         const response = await fetch(`${BACKEND_URL}/auth/register`, {
             method: 'POST',
@@ -60,8 +61,8 @@ export async function sendRegisterData(registerData) {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                    first_name: registerData.firstName,
-                    last_name: registerData.lastName,
+                    first_name: registerData.first_name,
+                    last_name: registerData.last_name,
                     email: registerData.email,
                     password: registerData.password
             })

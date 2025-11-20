@@ -38,6 +38,8 @@ def register():
     try:
         # pull data that was entered
         data = request.get_json()
+        print("data received:", data)
+
         if not data:
             return jsonify({
                 'success': False,
@@ -48,20 +50,20 @@ def register():
         if not data.get('email') or not data.get('password'):
             return jsonify({
                 'success': False,
-                'message': 'Email and password required'
+                'message': 'email and password required.'
             }), 400
 
         if not data.get('first_name') or not data.get('last_name'):
             return jsonify({
                 'success': False,
-                'message': 'First name and last name required'
+                'message': 'first name and last name required.'
             }), 400
 
         # Email format validation
         if not validate_email(data['email']):
             return jsonify({
                 'success': False,
-                'message': 'Invalid email format'
+                'message': 'invalid email format.'
             }), 400
 
         # Password strength validation
@@ -76,7 +78,7 @@ def register():
         if User.query.filter_by(email=data['email']).first():
             return jsonify({
                 'success': False,
-                'message': 'Email already registered'
+                'message': 'email already registered.'
             }), 409
 
         # After successful validation, create user
@@ -126,21 +128,21 @@ def login():
         if not email or not password:
             return jsonify({
                 'success': False,
-                'message': 'Email and password required'
+                'message': 'email and password required.'
             }), 400
 
         # Email format validation
         if not validate_email(email):
             return jsonify({
                 'success': False,
-                'message': 'Invalid email format'
+                'message': 'invalid email format.'
             }), 400
 
         user = User.query.filter_by(email=email).first()
         if not user or not user.check_password(password):  # uses bcrypt
             return jsonify({
                 'success': False,
-                'message': 'Invalid credentials'
+                'message': 'invalid credentials.'
             }), 401
 
         # Create tokens
@@ -154,7 +156,7 @@ def login():
                 'message': 'Failed to create session'
             }), 500
 
-        logger.info(f"User logged in: {user.email}")
+        logger.info(f"welcome. user logged in: {user.email}.")
 
         return jsonify({
             'success': True,
@@ -190,7 +192,7 @@ def refresh():
             logger.error(f"Failed to revoke old tokens: {revoke_error}")
             return jsonify({
                 'success': False,
-                'message': 'Failed to revoke old tokens'
+                'message': 'failed to revoke old tokens.'
             }), 500
 
         # Generate BOTH new access and refresh tokens
@@ -201,12 +203,12 @@ def refresh():
         if not store_token_pair(new_access_token, new_refresh_token, int(current_user_id)):
             return jsonify({
                 'success': False,
-                'message': 'Failed to store new tokens'
+                'message': 'failed to store new tokens.'
             }), 500
 
         return jsonify({
             'success': True,
-            'message': 'Token refreshed successfully',
+            'message': 'token refreshed successfully.',
             'access_token': new_access_token,
             'refresh_token': new_refresh_token
         }), 200
@@ -215,7 +217,7 @@ def refresh():
         logger.error(f"Token refresh failed: {e}")
         return jsonify({
             'success': False,
-            'message': 'Token refresh failed',
+            'message': 'token refresh failed.',
             'error': str(e)
         }), 500
 
@@ -236,19 +238,19 @@ def logout():
 
             return jsonify({
                 'success': True,
-                'message': 'Successfully logged out'
+                'message': 'goodbye. successfully logged out.'
             }), 200
         else:
             return jsonify({
                 'success': False,
-                'message': 'Failed to logout'
+                'message': 'sorry. failed to logout.'
             }), 500
 
     except Exception as e:
         logger.error(f"Logout failed: {e}")
         return jsonify({
             'success': False,
-            'message': 'Logout failed',
+            'message': 'sorry. logout failed.',
             'error': str(e)
         }), 500
 
@@ -265,15 +267,15 @@ def logout_all():
         if revoked_count >= 0:  # 0 or more tokens revoked (0 is valid if no active tokens)
             user = User.query.get(int(current_user_id))
             if user:
-                logger.info(f"User logged out from all devices: {user.email} ({revoked_count} tokens revoked)")
+                logger.info(f"user logged out from all devices: {user.email} ({revoked_count} tokens revoked.)")
 
             # Provide different messages based on revoked count
             if revoked_count == 0:
-                message = "No active sessions found to revoke"
+                message = "no active sessions found to revoke."
             elif revoked_count == 1:
-                message = "Successfully logged out from 1 session"
+                message = "successfully logged out from 1 session."
             else:
-                message = f"Successfully logged out from all devices ({revoked_count} sessions ended)"
+                message = f"successfully logged out from all devices ({revoked_count} sessions ended.)"
 
             return jsonify({
                 'success': True,
@@ -283,14 +285,14 @@ def logout_all():
         else:
             return jsonify({
                 'success': False,
-                'message': 'Failed to logout from all devices'
+                'message': 'sorry. failed to logout from all devices.'
             }), 500
 
     except Exception as e:
-        logger.error(f"Logout all failed: {e}")
+        logger.error(f"sorry. logout all failed: {e}.")
         return jsonify({
             'success': False,
-            'message': 'Logout all failed',
+            'message': 'sorry. logout all failed.',
             'error': str(e)
         }), 500
 
@@ -306,7 +308,7 @@ def get_current_user():
         if not user:
             return jsonify({
                 'success': False,
-                'message': 'User not found'
+                'message': 'sorry. user not found.'
             }), 404
 
         return jsonify({
@@ -315,10 +317,10 @@ def get_current_user():
         }), 200
 
     except Exception as e:
-        logger.error(f"Failed to get user info: {e}")
+        logger.error(f"sorry. failed to get user info: {e}.")
         return jsonify({
             'success': False,
-            'message': 'Failed to get user info',
+            'message': 'sorry. failed to get user info.',
             'error': str(e)
         }), 500
 

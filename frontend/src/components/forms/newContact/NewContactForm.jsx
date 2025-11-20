@@ -6,7 +6,7 @@ import { FormToApiData } from '../../helperFunctions/FormToApiData';
 import { validateDate } from '../../helperFunctions/dateConversion';
 import { formatDateForBackend } from '../../helperFunctions/dateConversion';
 
-import CircleButton, {NavigationButtons} from '../../ui/Buttons';
+import CircleButton, { NavigationButtons } from '../../ui/Buttons';
 import ProgressIndicator from './ProgressIndicator';
 import Step1BasicInfo from './Step1BasicInfo';
 import Step2ContactHistory from './Step2ContactHistory';
@@ -29,7 +29,7 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
   const navigate = useNavigate();
   const { accessToken } = useAuthContext();
 
-   // multi-step form or optional sections
+  // multi-step form or optional sections
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 3;
 
@@ -44,6 +44,7 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
     isContacted: false,
     isToContact: false,
     lastContactDate: '',
+    lastContactPlace: '',
     nextContactDate: '',
     nextContactPlace: ''
   });
@@ -68,7 +69,7 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
 
   // Optional sections visibility
   const [showBirthdate, setShowBirthdate] = useState(false);
-  const [showLinks, setShowLinks] = useState(false);
+  const [showLinks, setShowLinks] = useState(true);
   const [expandedNotes, setExpandedNotes] = useState(false);
   const [showAddress, setShowAddress] = useState(false);
 
@@ -177,7 +178,16 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
   // NAVIGATION HANDLERS
   // ============================================
 
-  const nextStep = () => {
+  const nextStep = async () => {
+    // Validate the current step
+    const isValid = validateForm();
+
+    // If validation fails, don't proceed
+    if (!isValid) {
+      return;
+    }
+
+    // If validation passes, move to next step
     if (currentStep < totalSteps) {
       setCurrentStep(prev => prev + 1);
     }
@@ -207,7 +217,7 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
     }));
 
     // Clear errors
-    if (hasSubmitted && errors[name]) {
+    if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
     if (errors.submit) {
@@ -318,14 +328,14 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
   };
 
   const updateEmailDropdownState = (index, updates) => {
-  setEmailDropdownStates(prev => ({
-    ...prev,
-    [index]: { 
-      ...(prev[index] || { showDropdown: false, showAddTitle: false, newTitleName: '' }), 
-      ...updates 
-    }
-  }));
-};
+    setEmailDropdownStates(prev => ({
+      ...prev,
+      [index]: {
+        ...(prev[index] || { showDropdown: false, showAddTitle: false, newTitleName: '' }),
+        ...updates
+      }
+    }));
+  };
 
   const updateEmailTitle = (index, newTitle) => {
     const updatedEmails = [...emails];
@@ -341,14 +351,14 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
   };
 
   const updatePhoneDropdownState = (index, updates) => {
-  setPhoneDropdownStates(prev => ({
-    ...prev,
-    [index]: { 
-      ...(prev[index] || { showDropdown: false, showAddTitle: false, newTitleName: '' }), 
-      ...updates 
-    }
-  }));
-};
+    setPhoneDropdownStates(prev => ({
+      ...prev,
+      [index]: {
+        ...(prev[index] || { showDropdown: false, showAddTitle: false, newTitleName: '' }),
+        ...updates
+      }
+    }));
+  };
 
   const updatePhoneTitle = (index, newTitle) => {
     const updatedPhones = [...phones];
@@ -366,9 +376,9 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
   const updateAddressDropdownState = (index, updates) => {
     setAddressDropdownStates(prev => ({
       ...prev,
-      [index]: { 
+      [index]: {
         ...(prev[index] || { showDropdown: false, showAddTitle: false, newTitleName: '' }),
-        ...updates 
+        ...updates
       }
     }));
   };
@@ -383,37 +393,31 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
   // VALIDATION
   // ============================================
 
-  const nextStepWithValidation = () => {
-    setHasSubmitted(true);
-    if (validateForm()) {
-      nextStep();
-      setHasSubmitted(false);
-    }
-  };
-
   const validateForm = () => {
     const newErrors = {};
 
     // First name validation
     if (!formData.firstName.trim()) {
-      newErrors.firstName = 'First name is required';
+      newErrors.firstName = 'first name is required.';
     } else if (formData.firstName.trim().length < 2) {
-      newErrors.firstName = 'First name must be at least 2 characters';
+      newErrors.firstName = 'first name must be at least 2 characters.';
     }
 
     // Last name validation (optional)
-    if (formData.lastName && formData.lastName.trim() && formData.lastName.trim().length < 2) {
-      newErrors.lastName = 'Last name must be at least 2 characters';
+    if (!formData.lastName.trim()) {
+      newErrors.lastName = 'last name is required.';
+    } else if (formData.lastName.trim().length < 2) {
+      newErrors.lastName = 'last name must be at least 2 characters.';
     }
 
     // Category validation
     if (!formData.categories || formData.categories.length === 0) {
-      newErrors.categories = 'At least one category is required';
+      newErrors.categories = 'at least one category is required.';
     }
 
     // Birthdate validation
     if (formData.birthdate && formData.birthdate.trim()) {
-      const birthdateError = validateDate(formData.birthdate, 'Birthdate', true);
+      const birthdateError = validateDate(formData.birthdate, 'birthdate', true);
       if (birthdateError) {
         newErrors.birthdate = birthdateError;
       }
@@ -426,43 +430,10 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
         const hasTitle = link.title && link.title.trim();
 
         if (hasUrl && !hasTitle) {
-          newErrors[`link_${index}`] = 'Title for URL required';
+          newErrors[`link_${index}`] = 'title for URL required.';
         }
       });
     }
-
-    // Validate emails
-    emails.forEach((emailItem, index) => {
-      const hasEmail = emailItem.email && emailItem.email.trim();
-      const hasTitle = emailItem.title && emailItem.title.trim();
-
-      if (hasEmail && !hasTitle) {
-        newErrors[`email_${index}`] = 'Title for email required';
-      }
-      if (hasEmail && !/\S+@\S+\.\S+/.test(emailItem.email)) {
-        newErrors[`email_${index}`] = 'Invalid email format';
-      }
-    });
-
-    // Validate phones
-    phones.forEach((phoneItem, index) => {
-      const hasPhone = phoneItem.phone && phoneItem.phone.trim();
-      const hasTitle = phoneItem.title && phoneItem.title.trim();
-
-      if (hasPhone && !hasTitle) {
-        newErrors[`phone_${index}`] = 'Title for phone required';
-      }
-    });
-
-    // Validate addresses
-    addresses.forEach((address, index) => {
-      const hasAnyAddressField = address.streetAndNr || address.city || address.country || address.postalcode;
-      const hasTitle = address.title && address.title.trim();
-
-      if (hasAnyAddressField && !hasTitle) {
-        newErrors[`address_${index}`] = 'Title for address required';
-      }
-    });
 
     console.log('Validation errors:', newErrors);
     setErrors(newErrors);
@@ -497,9 +468,10 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
         last_name: formData.lastName?.trim() || null,
         is_favorite: formData.isFavorite || false,
         birth_date: formatDateForBackend(formData.birthdate?.trim()) || null,
+        last_contact_date: formatDateForBackend(formData.lastContactDate?.trim()) || null,
+        last_contact_place: formData.lastContactPlace?.trim() || null,
         next_contact_date: formatDateForBackend(formData.nextContactDate?.trim()) || null,
         next_contact_place: formData.nextContactPlace?.trim() || null,
-        last_contact_date: formData.lastContactDate?.trim() || null,
         is_contacted: formData.isContacted || false,
         is_to_contact: formData.isToContact || false,
         notes: formData.notes?.trim() || null,
@@ -578,15 +550,17 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
   // ============================================
   // RENDER STEP CONTENT
   // ============================================
-  
+
   const renderStepContent = () => {
-    switch(currentStep) {
+    switch (currentStep) {
       case 1:
         return (
           <Step1BasicInfo
             formData={formData}
             setFormData={setFormData}
             handleInputChange={handleInputChange}
+            showBirthdate={showBirthdate}
+            setShowBirthdate={setShowBirthdate}
             emails={emails}
             phones={phones}
             addresses={addresses}
@@ -625,9 +599,9 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
             errors={errors}
             hasSubmitted={hasSubmitted}
             isLoading={isLoading}
-        />
+          />
         );
-      
+
       case 2:
         return (
           <Step2ContactHistory
@@ -642,7 +616,7 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
 
           />
         );
-      
+
       case 3:
         return (
           <Step3AdditionalInfo
@@ -650,21 +624,21 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
             handleInputChange={handleInputChange}
             setFormData={setFormData}
             links={links}
+            showBirthdate={showBirthdate}
+            setShowBirthdate={setShowBirthdate}
             handleLinkChange={handleLinkChange}
             addLink={addLink}
             removeLink={removeLink}
             showLinks={showLinks}
             setShowLinks={setShowLinks}
-            showBirthdate={showBirthdate}
-            setShowBirthdate={setShowBirthdate}
             expandedNotes={expandedNotes}
             setExpandedNotes={setExpandedNotes}
             errors={errors}
             hasSubmitted={hasSubmitted}
             isLoading={isLoading}
-        />
-                );
-      
+          />
+        );
+
       default:
         return null;
     }
@@ -676,10 +650,10 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
   return (
     <div>
       {/* Progress Indicator */}
-      <ProgressIndicator 
-        currentStep={currentStep} 
-        totalSteps={totalSteps} 
-        goToStep={goToStep} 
+      <ProgressIndicator
+        currentStep={currentStep}
+        totalSteps={totalSteps}
+        goToStep={goToStep}
       />
 
       {/* Form */}
@@ -687,16 +661,16 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
         onSubmit={handleSubmit}
         className="w-[88vw] min-w-[260px] max-w-[480px] mx-auto -mt-4"
         style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}
-        >
+      >
         <div
-          className="bg-white rounded-3xl p-5 pt-8 shadow-lg relative pb-20"
+          className="bg-white rounded-3xl p-4 pt-8 shadow-lg relative pb-20"
           style={{
-          boxShadow: '0 4px 32px rgba(109, 71, 71, 0.29)'
+            boxShadow: '0 4px 32px rgba(109, 71, 71, 0.29)'
           }}
-          >
-          
+        >
+
           {renderStepContent()}
-         
+
         </div>
 
         {/* Navigation Buttons */}
@@ -706,30 +680,29 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
           prevStep={prevStep}
           nextStep={nextStep}
           handleSubmit={handleSubmit}
-          nextStepWithValidation={nextStepWithValidation}
           isLoading={isLoading}
         />
 
         {/* Back Links */}
         <div className="w-full px-8 space-y-0.25 max-w-[480px] -mt-24 pt-2">
           <div className="text-black dark:text-white font-extralight block relative"
-              style={{ fontSize: '16px' }}>
+            style={{ fontSize: '16px' }}>
             want to go {' '}
-            <button 
+            <button
               onClick={() => navigate('/myspace/contacts')}
               className="font-extralight text-red-500 hover:underline bg-transparent border-none cursor-pointer"
             >
-            to contacts?
+              to contacts?
             </button>
           </div>
           <div className="text-black dark:text-white font-extralight block -mt-2 relative"
-              style={{ fontSize: '16px' }}>
+            style={{ fontSize: '16px' }}>
             or  {' '}
-            <button 
+            <button
               onClick={handleGoBack}
               className="font-extralight text-red-500 hover:underline bg-transparent border-none cursor-pointer"
             >
-            go back.
+              go back.
             </button>
           </div>
         </div>

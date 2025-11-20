@@ -33,7 +33,7 @@ export default function NewContact() {
 
   return (
     <div
-      className="flex flex-col items-center justify-center mx-auto lg:py-0 mt-10"
+      className=" flex flex-col items-center justify-center mx-auto lg:py-0 mt-10"
       style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}
     >
       {/* Back Button */}

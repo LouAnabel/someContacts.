@@ -10,7 +10,7 @@ const ProgressIndicator = ({ currentStep, totalSteps, goToStep }) => {
   ];
 
     return (
-    <div className="mb-8">
+    <div className="mb-9">
         <div className="w-full min-w-[480px] px-10 mx-auto flex items-center justify-between max-w-[530px]">
         {steps.map((step, index) => (
             <React.Fragment key={step.number}>

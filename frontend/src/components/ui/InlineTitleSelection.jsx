@@ -23,7 +23,7 @@ const InlineTitleSelection = ({
                     setShowDropdown(!showDropdown);
                 }}
                 disabled={disabled}
-                className="text-red-500 bg-white font-extralight hover:underline flex items-center gap-1 transition-colors px-1"
+                className="text-red-500 bg-white hover:bg-red-50 rounded-2xl pl-2 p-0.5 flex items-center gap-1"
                 style={{
                     fontSize: '16px',
                     fontWeight: 200
