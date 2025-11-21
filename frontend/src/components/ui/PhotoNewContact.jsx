@@ -85,8 +85,8 @@ const PhotoField = ({
             <div 
                 className="w-[300px] h-[300px] rounded-full flex-shrink-0 relative mx-auto mb-4 overflow-hidden border border-1  border-red-300"
                 style={{ 
-                    background: 'linear-gradient(180deg, rgba(180, 67, 67, 0.1) 68.75%' 
-                    // boxShadow: '8px 8px 30px #d9d9d9, -10px -10px 30px #ffffff'
+                    background: 'linear-gradient(180deg, rgba(180, 67, 67, 0.1) 68.75%', 
+                    boxShadow: '8px 8px 30px #d9d9d9, -20px -20px 30px #ffffff'
                 }}
             >
                 {/* Inner circle */}

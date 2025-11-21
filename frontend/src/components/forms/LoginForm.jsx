@@ -192,7 +192,7 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
                                     htmlFor="email"
                                     className="absolute -top-3 left-3 bg-white px-1 text-base text-black font-extralight"
                                 >
-                                    email<span className="text-red-500">*</span>
+                                    email
                                 </label>
                             </div>
 
@@ -201,7 +201,7 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
                                     htmlFor="password"
                                     className="absolute -top-3 left-3 bg-white px-1 text-base text-black font-extralight"
                                 >
-                                    password<span className="text-red-500">*</span>
+                                    password
                                 </label>
                                 <input
                                     type={showPassword ? "text" : "password"}
@@ -247,7 +247,7 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
 
                         <div className="relative text-end right-2"
                             style={{ fontSize: '14px' }}>
-                            <a href="forgot-password" className="font-extralight text-black hover:text-red-500">
+                            <a href="forgot-password" className="font-extralight text-red-400 hover:text-red-500">
                                 forgot password?
                             </a>
                         </div>

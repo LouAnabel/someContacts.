@@ -675,7 +675,7 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
         />
 
         {/* Back Links */}
-        <div className="w-full px-6 max-w-[480px] -mt-24">
+        <div className="w-full px-6 max-w-[480px] -mt-24 pt-1">
           <div className="text-black dark:text-white font-extralight block relative"
             style={{ fontSize: '16px' }}>
              want to {' '}

@@ -335,7 +335,7 @@ const Step1BasicInfo = ({
                             <button
                                 type="button"
                                 onClick={() => setShowAddress(true)}
-                                className="flex tracking-wide items-center -ml-1 mt-5 space-x-2 font-light "
+                                className="flex tracking-wide items-center mt-5 space-x-2 font-light "
                             >
                                 <span className="text-lg text-red-400 hover:text-red-500"> <span className="text-xl font-semibold text-red-400">+</span> address information.</span>
                             </button>

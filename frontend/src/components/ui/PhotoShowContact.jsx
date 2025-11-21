@@ -83,12 +83,13 @@ const PhotoField = ({
         <div className={`relative ${className}`}>
             {/* Circular frame with gradient background */}
             <div 
-                className="w-[333px] h-[333px] rounded-full flex-shrink-0 relative mx-auto mb-4 overflow-hidden border border-1 border-red-500"
+                className="w-[300px] h-[300px] rounded-full flex-shrink-0 relative mx-auto mb-4 overflow-hidden border border-1 border-red-500"
                 style={{ 
-                    background: 'linear-gradient(180deg, rgba(180, 67, 67, 0.1) 68.75%', 
-                    // boxShadow: '8px 8px 30px #d9d9d9, -10px -10px 30px #ffffff'
+                    background: 'white', // 'linear-gradient(180deg, rgba(180, 67, 67, 0.1) 68.75%'
+                    boxShadow: '8px 8px 20px #d9d9d9, -10px -10px 30px #ffffff'
                 }}
             >
+                
                 {/* Display photo if available */}
                 {photo ? (
                     <img 

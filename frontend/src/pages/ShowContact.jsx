@@ -5,7 +5,7 @@ import { getContactById, getCategories, updateContact, deleteContactById } from 
 import { ApiToFormData } from '../components/helperFunctions/ApiToFormData.jsx';
 import { FormToApiData } from '../components/helperFunctions/FormToApiData.jsx';
 import PhotoField from '../components/ui/PhotoShowContact.jsx';
-import ViewContact from '../components/forms/ShowContactForm';
+import ShowContactForm from '../components/forms/ShowContactForm.jsx';
 import EditContact from '../components/forms/EditContactForm.jsx';
 
 const Button = ({ children, onClick, className = "", ...props }) => {
@@ -420,7 +420,7 @@ export default function ShowContact() {
       {/* Contact View or Edit */}
       <div className="w-full">
         {!isEditing ? (
-          <ViewContact
+          <ShowContactForm
             contactData={contactData}
             formData={formData}
             navigate={navigate}
