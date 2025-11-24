@@ -149,15 +149,15 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
     const showLoading = isLoading || apiLoading;
 
     return (
-        <div className="justify-items items-center bg-white dark:bg-gray-900 p-4 absolute top-[230px]"
+        <div className="justify-items items-center bg-white dark:bg-gray-900 absolute top-[180px]"
             style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
 
             {/* Main Register Card */}
-            <div className="bg-white rounded-3xl p-4 relative z-10 overflow-visible w-[90vw] min-w-[240px] max-w-[480px]"
+            <div className="bg-white p-4 rounded-3xl relative z-10 overflow-visible w-[90vw] min-w-[240px] max-w-[480px]"
                 style={{
                     boxShadow: '0 4px 32px rgba(109, 71, 71, 0.29)'
                 }}>
-                <h1 className="text-3xl mt-2 font-bold text-center mb-6 text-black">
+                <h1 className="text-3xl mt-2 font-bold text-center mb-4 text-black">
                     login.
                 </h1>
 

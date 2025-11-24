@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 
-const InlineTitleSelection = ({
+const WebTitleSelection = ({
     title,
     setTitle,
     showDropdown,
@@ -11,8 +11,19 @@ const InlineTitleSelection = ({
     setNewTitleName,
     disabled = false
 }) => {
-    const predefinedTitles = ['private', 'work', 'mobile', 'other'];
-    const currentTitle = title || 'private';
+    const predefinedTitles = ['website', 'instagram', 'facebook', 'linkedIn', 'filmmakers', 'other'];
+    const currentTitle = title || 'website';
+
+    // Ref for dropdown menu
+    const dropdownRef = useRef(null);
+    const addTitleFormRef = useRef(null); // Ref for the custom label form
+
+    // Scroll to custom label form when it opens
+    useEffect(() => {
+        if (showAddTitle && addTitleFormRef.current) {
+            addTitleFormRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    }, [showAddTitle]);
 
     return (
         <div className="relative">
@@ -23,34 +34,33 @@ const InlineTitleSelection = ({
                     setShowDropdown(!showDropdown);
                 }}
                 disabled={disabled}
-                className="text-red-500 bg-white hover:bg-red-50 rounded-2xl pl-2 p-0.5 flex items-center gap-1"
+                className="text-red-500 bg-white hover:bg-red-50 rounded-2xl pl-2 p-0.5 flex items-center gap-1 relative z-50"
                 style={{
                     fontSize: '16px',
                     fontWeight: 200
                 }}
             >
                 <span>{currentTitle}</span>
-                <svg 
-                    className={`w-3 h-3 transition-transform duration-200 ${showDropdown ? 'rotate-180' : ''}`}
-                    fill="none" 
-                    stroke="currentColor" 
+                <svg
+                    className={`w-3 h-3 mr-1 ${showDropdown ? 'rotate-180' : ''}`}
+                    fill="none"
+                    stroke="currentColor"
                     viewBox="0 0 24 24"
                 >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
             </button>
 
-            {/* Dropdown Menu */}
             {showDropdown && (
                 <>
-                    <div 
-                        className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-30 max-h-60 overflow-y-auto min-w-[150px]"
+                    <div
+                        ref={dropdownRef}
+                        className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-[100] max-h-60 overflow-y-auto min-w-[150px] max-w-[200px]"
                         onClick={(e) => e.stopPropagation()}
                     >
-                        {/* Predefined Titles */}
                         {predefinedTitles.map((titleOption) => {
                             const isSelected = currentTitle.toLowerCase() === titleOption.toLowerCase();
-                            
+
                             return (
                                 <button
                                     key={titleOption}
@@ -63,8 +73,8 @@ const InlineTitleSelection = ({
                                         setNewTitleName('');
                                     }}
                                     className={`w-full text-left px-3 py-2 transition-colors duration-150 font-extralight ${
-                                        isSelected 
-                                            ? 'bg-red-50 text-red-500' 
+                                        isSelected
+                                            ? 'bg-red-50 text-red-500'
                                             : 'hover:bg-red-50 text-black hover:text-red-500'
                                     }`}
                                     style={{ fontSize: '14px', fontWeight: 200 }}
@@ -96,7 +106,7 @@ const InlineTitleSelection = ({
                                 <span>own label</span>
                             </button>
                         ) : (
-                            <div className="p-2 space-y-2">
+                            <div ref={addTitleFormRef} className="p-2 space-y-2">
                                 <input
                                     type="text"
                                     value={newTitleName}
@@ -148,8 +158,8 @@ const InlineTitleSelection = ({
                     </div>
 
                     {/* Click outside overlay */}
-                    <div 
-                        className="fixed inset-0 z-20" 
+                    <div
+                        className="fixed inset-0 z-[90]"
                         onClick={() => {
                             setShowDropdown(false);
                             setShowAddTitle(false);
@@ -162,4 +172,4 @@ const InlineTitleSelection = ({
     );
 };
 
-export default InlineTitleSelection;
+export default WebTitleSelection;

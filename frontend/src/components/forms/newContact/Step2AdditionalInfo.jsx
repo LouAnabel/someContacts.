@@ -1,45 +1,104 @@
 import { useState } from 'react';
 import dayjs from 'dayjs';
 import DatePicker from '../../ui/DatePicker';
+import WebTitleSelection from '../../ui/WebTitleSelection';
+
+
+const Button = ({ children, onClick, className = "", ...props }) => {
+  return (
+    <button
+      onClick={onClick}
+      className={`text-black dark:text-white hover:text-red-500 dark:hover:text-red-500 transition-colors duration-200 ${className}`}
+      {...props}
+    >
+      {children}
+    </button>
+  );
+};
 
 const Step2AdditionalInfo = ({
   formData,
-  handleInputChange,
   setFormData,
-  links,
-  handleLinkChange,
-  addLink,
-  removeLink,
-  showLinks,
-  setShowLinks,
   showBirthdate,
   setShowBirthdate,
   expandedNotes,
   setExpandedNotes,
+  handleInputChange,
+  links,
+  handleLinkChange,
+  addLink,
+  removeLink,
+  getWebsiteDropdownState,
+  updateWebsiteDropdownState,
+  updateWebsiteTitle,
   errors,
   hasSubmitted,
   isLoading
 }) => {
 
-  const Button = ({ children, onClick, className = "", ...props }) => {
-    return (
-      <button
-        onClick={onClick}
-        className={`text-black dark:text-white hover:text-red-500 dark:hover:text-red-500 transition-colors duration-200 ${className}`}
-        {...props}
-      >
-        {children}
-      </button>
-    );
+
+
+  // Helper function to get the appropriate placeholder based on title
+  const getPlaceholder = (title) => {
+    const titleLower = title?.toLowerCase() || 'website';
+    switch (titleLower) {
+      case 'instagram':
+        return '@username';
+      case 'facebook':
+        return 'f.e. facebook.com/yourprofile';
+      case 'linkedin':
+        return 'f.e. linkedin.com/in/yourprofile';
+      case 'twitter':
+        return '@username';
+      case 'filmmakers':
+        return 'f.e. www.profile/filmmakers.com';
+      default:
+        return 'f.e. www.yourwebsite.com';
+    }
+  };
+
+  // Helper function to format input value based on title
+  const formatInputValue = (value, title) => {
+    const titleLower = title?.toLowerCase() || '';
+
+    // For Instagram and Twitter, ensure @ prefix
+    if (titleLower === 'instagram' || titleLower === 'twitter') {
+      if (!value) return '';
+      // If value doesn't start with @, add it
+      if (!value.startsWith('@')) {
+        return '@' + value;
+      }
+    }
+
+    return value;
+  };
+
+  // Handle input change with formatting
+  const handleInput = (index, field, value, title) => {
+    if (field === 'url') {
+      const titleLower = title?.toLowerCase() || '';
+
+      // For Instagram and Twitter, format with @
+      if (titleLower === 'instagram' || titleLower === 'twitter') {
+        // Remove any existing @ before processing
+        let cleanValue = value.replace(/^@+/, '');
+        // Add single @ prefix if there's content
+        if (cleanValue) {
+          value = '@' + cleanValue;
+        }
+      }
+    }
+
+    handleLinkChange(index, field, value);
   };
 
   // Handler for date picker
   const handleDateChange = (newValue) => {
-      setFormData(prev => ({
-          ...prev,
-          birthdate: newValue ? dayjs(newValue).format('DD.MM.YYYY') : ''
-      }));
-      console.log('Selected birthdate:', newValue);
+    setFormData(prev => ({
+      ...prev,
+      birthdate: newValue ? dayjs(newValue).format('DD.MM.YYYY') : ''
+    }));
+    console.log('Selected birthdate:', newValue);
   };
 
   return (
@@ -63,40 +122,40 @@ const Step2AdditionalInfo = ({
       ) : (
         <div className="relative">
           <div className="flex items-center justify-between">
-              <span>
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-1 h-6 bg-red-400 rounded-full"></div>
-                  <h2 className="text-lg font-light text-red-500 tracking-wide">
-                    birthdate.
-                  </h2>
-                </div>
-              </span>
+            <span>
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-1 h-6 bg-red-400 rounded-full"></div>
+                <h2 className="text-lg font-light text-red-500 tracking-wide">
+                  birthdate.
+                </h2>
+              </div>
+            </span>
 
-              <button
-                type="button"
-                onClick={() => {
-                  setShowBirthdate(false);
-                  setFormData(prev => ({ ...prev, birthdate: '' }));
-                }}
-                className="relative mr-3 text-red-500 tracking-wide hover:underline text-sm font-extralight -mt-2"
-                disabled={isLoading}
-              >
-                remove
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setShowBirthdate(false);
+                setFormData(prev => ({ ...prev, birthdate: '' }));
+              }}
+              className="relative mr-3 text-red-500 tracking-wide hover:underline text-sm font-extralight -mt-2"
+              disabled={isLoading}
+            >
+              remove
+            </button>
+          </div>
 
           {/* Date Picker */}
           <div className="relative">
-                
-                <DatePicker
-                    value={formData.birthdate}
-                    onChange={handleDateChange}
-                    label="select date"
-                    disabled={isLoading}
-                />
-            
-            </div>
-  
+
+            <DatePicker
+              value={formData.birthdate}
+              onChange={handleDateChange}
+              label="select date"
+              disabled={isLoading}
+            />
+
+          </div>
+
 
           {hasSubmitted && errors.birthdate && (
             <p className="absolute top-full right-1 text-sm text-red-600 z-20 font-extralight">
@@ -139,133 +198,129 @@ const Step2AdditionalInfo = ({
         </div>
       </div>
 
-      
-      {/* Optional Links */}
-      <div className="relative">
-        {/* Links Toggle and Fields */}
-        {!showLinks ? (
-          <button
-            type="button"
-            onClick={() => setShowLinks(true)}
-            className="flex items-center space-x-2 text-red-500 hover:font-light font-extralight"
-            disabled={isLoading}
-          >
-            <span className="text-lg font-semibold">+</span>
-            <span className="text-normal text-black ">add <span className="text-red-500 font-light"> weblinks</span></span>
-          </button>
-        ) : (
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span>
-                <div className="flex items-center gap-2 mb-4">
-                  <div className="w-1 h-6 bg-red-400 rounded-full"></div>
-                  <h2 className="text-lg font-light text-red-500 tracking-wide">
-                    websites & links.
-                  </h2>
-                </div>
-              </span>
-{/* 
-              <button
-                type="button"
-                onClick={() => {
-                  setShowLinks(false);
-                  // Don't reset links here, let parent handle it
-                }}
-                className="relative mr-3 text-red-500 tracking-wide hover:underline text-sm font-extralight -mt-2"
-                disabled={isLoading}
-              >
-                remove
-              </button> */}
+
+      {/* LINKS SECTION */}
+      <div className="space-y-1">
+
+        {/* Section Header */}
+        <div className="flex items-center justify-between">
+          <span>
+            <div className="flex items-center gap-2">
+              <div className="w-1 h-6 bg-red-400 rounded-full"></div>
+              <h2 className="text-lg font-light text-red-500 tracking-wide">
+                websites & links.
+              </h2>
             </div>
+          </span>
+        </div>
 
-            {links.map((link, index) => (
-              <div key={index} className="">
-                <div className="flex items-center justify-between space-x-2 -mt-2">
-                  {/* website input field */}
-                  <div className="relative mb-4">
-                    <label htmlFor={`link-title-${index}`} className="absolute left-2 -top-3 bg-white px-1 font-extralight text-gray-800 z-10">
-                      title/name
-                    </label>
+        {/* Weblinks */}
+        <div className="space-y-1">
+          {links.map((link, index) => {
+            const dropdownState = getWebsiteDropdownState(index);
 
-                    <input
-                      type="text"
-                      name="title"
-                      id={`link-title-${index}`}
-                      value={link.title}
-                      onChange={(e) => handleLinkChange(index, 'title', e.target.value)}
-                      placeholder="filmmakers"
-                      disabled={isLoading}
-                      className={`flex p-2.5 w-full min-w-[110px] rounded-xl border ${
-                        hasSubmitted && errors[`link_${index}`] ? 'border-red-500' : 'border-gray-400'
-                      } bg-white hover:border-red-300 text-black font-extralight placeholder-gray-300 h-[48px] focus:outline-none focus:border-red-500`}
-                      style={{
-                        fontSize: '16px',
-                        fontWeight: 100
-                      }}
-                    />
-                    {hasSubmitted && errors[`link_${index}`] && (
-                      <p className="absolute top-full mt-1 right-1 text-xs text-red-600 font-extralight">
-                        {errors[`link_${index}`]}
-                      </p>
-                    )}
-                  </div>
+            return (
+              <div key={index} className="relative">
 
-                  {/* URL input field */}
-                  <div className="relative mb-4 ml-1">
-                    <label htmlFor={`link-url-${index}`} className="absolute left-2 -top-3 bg-white px-1 font-extralight text-gray-800 z-10">
-                      weblink
-                    </label>
+                {/* Dropdown wrapper */}
+                <div className="ml-2 -mb-4 relative z-50">
+                  {/* Website Title Dropdown - serves as label */}
+                  <WebTitleSelection
+                    title={link.title}
+                    setTitle={(newTitle) => {
+                      updateWebsiteTitle(index, newTitle);
+                      handleLinkChange(index, 'title', newTitle);
 
-                    <input
-                      type="url"
-                      name="url"
-                      id={`link-url-${index}`}
-                      value={link.url}
-                      onChange={(e) => handleLinkChange(index, 'url', e.target.value)}
-                      placeholder="www.profile/filmmakers.com"
-                      disabled={isLoading}
-                      className={`flex p-2.5 w-full min-w-[260px] h-[48px] rounded-xl border border-gray-400 bg-white hover:border-red-300 text-black font-extralight placeholder-gray-300  focus:outline-none focus:border-red-500`}
-                      style={{
-                        fontSize: '16px',
-                        fontWeight: 100
-                      }}
-                    />
-                  </div>
+                      // Clear the URL when title changes to Instagram/Twitter
+                      const newTitleLower = newTitle.toLowerCase();
+                      if ((newTitleLower === 'instagram' || newTitleLower === 'twitter') &&
+                        link.url && !link.url.startsWith('@')) {
+                        handleLinkChange(index, 'url', '');
+                      }
+                    }}
+                    showDropdown={dropdownState.showDropdown}
+                    setShowDropdown={(value) => updateWebsiteDropdownState(index, { showDropdown: value })}
+                    showAddTitle={dropdownState.showAddTitle}
+                    setShowAddTitle={(value) => updateWebsiteDropdownState(index, { showAddTitle: value })}
+                    newTitleName={dropdownState.newTitleName}
+                    setNewTitleName={(value) => updateWebsiteDropdownState(index, { newTitleName: value })}
+                    disabled={isLoading}
+                  />
+                </div>
 
+                {/* URL input field with proper padding for remove button */}
+                <div className="relative">
+                  <input
+                    type="text"
+                    name="url"
+                    value={link.url || ''}
+                    onChange={(e) => handleInput(index, 'url', e.target.value, link.title)}
+                    placeholder={getPlaceholder(link.title)}
+                    disabled={isLoading}
+                    className={`w-full p-2.5 pr-5 h-[48px] rounded-xl border ${hasSubmitted && errors[`link_${index}`]
+                      ? 'border-red-500'
+                      : 'border-gray-400'
+                      } bg-white hover:border-red-300 text-black font-extralight placeholder-gray-400 focus:outline-none focus:border-red-500`}
+                    style={{
+                      fontSize: '16px',
+                      fontWeight: 100,
+                      paddingRight: '2.5rem'
+                    }}
+                  />
+
+                  {/* Remove button - positioned absolutely in top-right */}
                   {links.length > 1 && (
                     <button
                       type="button"
                       onClick={() => removeLink(index)}
                       disabled={isLoading}
-                      className="p-1 rounded-lg hover:bg-red-50 group -mt-3"
+                      className="absolute top-1/2 -translate-y-1/2 right-2 p-1 rounded-lg hover:bg-red-50 group"
+                      style={{ zIndex: 10 }}
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-3 h-3 text-gray-400 group-hover:text-red-500">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth="1.5"
+                        stroke="currentColor"
+                        className="w-3 h-3 text-gray-400 group-hover:text-red-500"
+                      >
                         <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
                       </svg>
                     </button>
                   )}
+
+                  {hasSubmitted && errors[`link_${index}`] && (
+                    <p className="absolute top-full mt-1 right-1 text-xs text-red-600 font-extralight z-20">
+                      {errors[`link_${index}`]}
+                    </p>
+                  )}
                 </div>
+
               </div>
-            ))}
+            );
+          })}
+        </div>
 
-            {/* add website */}
-            <div className="flex gap-2 items-right justify-end mr-3">
-              <Button
-                type="button"
-                onClick={addLink}
-                className="text-sm font-light tracking-wide text-red-500 hover:font-normal -mt-5"
-              >
-                <span className="text-sm text-black font-extralight mt-0.5"><span className="text-red-500 font-normal">+</span> add </span>
-                website
-              </Button>
-            </div>
-          </div>
-        )}
+        {/* add website */}
+        <div className="flex gap-2 items-center justify-end mr-3 mt-4">
+          <Button
+            type="button"
+            onClick={addLink}
+            className="text-sm font-light tracking-wide text-red-500 hover:font-normal"
+          >
+            <span className="text-sm text-black font-extralight">
+              <span className="text-red-500 font-normal">+</span> add
+            </span>
+            {' '}website
+          </Button>
+        </div>
       </div>
-
-
-
     </div>
+
+
+
+
   );
 };
 

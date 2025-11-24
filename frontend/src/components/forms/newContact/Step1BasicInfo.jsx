@@ -1,5 +1,5 @@
 import { useRef, useEffect } from 'react';
-import InlineTitleSelection from '../../ui/InlineTitleSelection.jsx';
+import InlineTitleSelection from '../../ui/ContactTitleSelection.jsx';
 import CategorySelection from '../../ui/CategorySelection.jsx';
 
 const Button = ({ children, onClick, className = "", ...props }) => {
@@ -18,8 +18,6 @@ const Step1BasicInfo = ({
     formData,
     setFormData,
     handleInputChange,
-    showBirthdate,
-    setShowBirthdate,
     emails,
     phones,
     addresses,
@@ -180,7 +178,7 @@ const Step1BasicInfo = ({
 
                 {/* How to contact? Section */}
                 {/* Emails Section */}
-                <div className="space-y-2">
+                <div className="space-y-1">
                     <div className="flex items-center gap-2">
                         <div className="w-1 h-6 bg-red-400 rounded-full"></div>
                         <p className="relative text-lg font-light text-red-500 tracking-wide">contact details.</p>
@@ -191,121 +189,136 @@ const Step1BasicInfo = ({
                             const dropdownState = getEmailDropdownState(index);
 
                             return (
-                                <div key={index} className="flex gap-2 items-start -mt-1">
-                                    <div className="relative flex-1">
-                                        <div className="flex items-center gap-2 ml-2 -mb-3">
-                                            {/* Inline Title Dropdown */}
-                                            <InlineTitleSelection
-                                                title={email.title}
-                                                setTitle={(newTitle) => updateEmailTitle(index, newTitle)}
-                                                showDropdown={dropdownState.showDropdown}
-                                                setShowDropdown={(value) => updateEmailDropdownState(index, { showDropdown: value })}
-                                                showAddTitle={dropdownState.showAddTitle}
-                                                setShowAddTitle={(value) => updateEmailDropdownState(index, { showAddTitle: value })}
-                                                newTitleName={dropdownState.newTitleName}
-                                                setNewTitleName={(value) => updateEmailDropdownState(index, { newTitleName: value })}
-                                                disabled={isLoading}
-                                            />
+                                <div key={index} className="relative">
+                                    {/* Dropdown and label wrapper */}
+                                    <div className="flex items-center gap-2 ml-2 -mb-4 relative z-50">
+                                        {/* Inline Title Dropdown */}
+                                        <InlineTitleSelection
+                                            title={email.title}
+                                            setTitle={(newTitle) => updateEmailTitle(index, newTitle)}
+                                            showDropdown={dropdownState.showDropdown}
+                                            setShowDropdown={(value) => updateEmailDropdownState(index, { showDropdown: value })}
+                                            showAddTitle={dropdownState.showAddTitle}
+                                            setShowAddTitle={(value) => updateEmailDropdownState(index, { showAddTitle: value })}
+                                            newTitleName={dropdownState.newTitleName}
+                                            setNewTitleName={(value) => updateEmailDropdownState(index, { newTitleName: value })}
+                                            disabled={isLoading}
+                                        />
 
-                                            {/* Email label */}
-                                            <label className="z-20 -ml-2 pr-1 text-black font-extralight bg-white pl-0.5" style={{ fontSize: '16px', fontWeight: 200 }}>
-                                                email
-                                            </label>
-                                        </div>
+                                        {/* Email label */}
+                                        <label className=" -ml-2 text-black font-extralight bg-white px-1" style={{ fontSize: '16px', fontWeight: 200 }}>
+                                            email
+                                        </label>
+                                    </div>
 
+                                    {/* Input field wrapper */}
+                                    <div className="relative">
                                         <input
                                             type="email"
                                             value={email.email}
                                             onChange={(e) => handleEmailChange(index, 'email', e.target.value)}
                                             placeholder="email@example.com"
-                                            className={`w-full rounded-xl border  bg-white hover:border-red-300 text-black font-extralight placeholder-gray-300 h-[48px] px-3 focus:outline-none focus:border-red-500 ${hasSubmitted && errors.email ? 'border-red-500 shadow-md' : 'border-gray-400'
+                                            disabled={isLoading}
+                                            className={`w-full mt-1 pr-10 rounded-xl border bg-white hover:border-red-300 text-black font-extralight placeholder-gray-300 h-[48px] px-3 focus:outline-none focus:border-red-500 ${hasSubmitted && errors.email ? 'border-red-500 shadow-md' : 'border-gray-400'
                                                 }`}
                                             style={{
                                                 fontSize: '16px',
-                                                fontWeight: 180
+                                                fontWeight: 180,
+                                                paddingRight: '2.5rem'
                                             }}
                                         />
-                                    </div>
 
-                                    {emails.length > 1 && (
-                                        <button
-                                            type="button"
-                                            onClick={() => removeEmail(index)}
-                                            className="p-1 rounded-lg hover:bg-red-50 group mt-7 -ml-1"
-                                        >
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-3 h-3 text-gray-400 group-hover:text-red-500 transition-colors duration-200">
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
-                                            </svg>
-                                        </button>
-                                    )}
+                                        {/* Remove button - positioned absolutely in top-right */}
+                                        {emails.length > 1 && (
+                                            <button
+                                                type="button"
+                                                onClick={() => removeEmail(index)}
+                                                disabled={isLoading}
+                                                className="absolute top-1/2 -translate-y-1/2 right-2 p-1 rounded-lg hover:bg-red-50 group"
+                                                style={{ zIndex: 10 }}
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-3 h-3 text-gray-400 group-hover:text-red-500 transition-colors duration-200">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                                </svg>
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
                             );
                         })}
                     </div>
 
-
                     {/* Phones Section */}
-                    <div className="space-y-3">
+                    <div className="space-y-1">
                         {phones.map((phone, index) => {
                             const dropdownState = getPhoneDropdownState(index);
 
                             return (
-                                <div key={index} className="flex gap-2 items-start">
-                                    <div className="relative flex-1">
-                                        <div className="flex items-center gap-2 -mb-3 -mt-1 ml-2">
-                                            {/* Inline Title Dropdown */}
-                                            <InlineTitleSelection
-                                                title={phone.title}
-                                                setTitle={(newTitle) => updatePhoneTitle(index, newTitle)}
-                                                showDropdown={dropdownState.showDropdown}
-                                                setShowDropdown={(value) => updatePhoneDropdownState(index, { showDropdown: value })}
-                                                showAddTitle={dropdownState.showAddTitle}
-                                                setShowAddTitle={(value) => updatePhoneDropdownState(index, { showAddTitle: value })}
-                                                newTitleName={dropdownState.newTitleName}
-                                                setNewTitleName={(value) => updatePhoneDropdownState(index, { newTitleName: value })}
-                                                disabled={isLoading}
-                                            />
+                                <div key={index} className="relative">
+                                    {/* Dropdown and label wrapper */}
+                                    <div className="flex items-center gap-2 ml-2 -mb-4 relative z-50">
+                                        {/* Inline Title Dropdown */}
+                                        <InlineTitleSelection
+                                            title={phone.title}
+                                            setTitle={(newTitle) => updatePhoneTitle(index, newTitle)}
+                                            showDropdown={dropdownState.showDropdown}
+                                            setShowDropdown={(value) => updatePhoneDropdownState(index, { showDropdown: value })}
+                                            showAddTitle={dropdownState.showAddTitle}
+                                            setShowAddTitle={(value) => updatePhoneDropdownState(index, { showAddTitle: value })}
+                                            newTitleName={dropdownState.newTitleName}
+                                            setNewTitleName={(value) => updatePhoneDropdownState(index, { newTitleName: value })}
+                                            disabled={isLoading}
+                                        />
 
-                                            {/* Phone label */}
-                                            <label className="z-20 text-black  font-extralight -ml-2 bg-white pr-1 pl-0.5" style={{ fontSize: '16px', fontWeight: 200 }}>
-                                                phone
-                                            </label>
-                                        </div>
+                                        {/* Phone label */}
+                                        <label className="-ml-2 text-black font-extralight bg-white px-1" style={{ fontSize: '16px', fontWeight: 200 }}>
+                                            phone
+                                        </label>
+                                    </div>
 
+                                    {/* Input field wrapper */}
+                                    <div className="relative">
                                         <input
                                             type="tel"
                                             value={phone.phone}
                                             onChange={(e) => handlePhoneChange(index, 'phone', e.target.value)}
                                             placeholder="+49 123 4567890"
-                                            className={`w-full rounded-xl border bg-white -mb-1 hover:border-red-300 text-black font-extralight placeholder-gray-300 h-[48px] px-3 focus:outline-none focus:border-red-500 ${hasSubmitted && errors.phone ? 'border-red-500 shadow-md' : 'border-gray-400'
+                                            disabled={isLoading}
+                                            className={`w-full pr-10 rounded-xl border bg-white hover:border-red-300 text-black font-extralight placeholder-gray-300 h-[48px] px-3 mt-1 focus:outline-none focus:border-red-500 ${hasSubmitted && errors.phone ? 'border-red-500 shadow-md' : 'border-gray-400'
                                                 }`}
                                             style={{
                                                 fontSize: '16px',
-                                                fontWeight: 180
+                                                fontWeight: 180,
+                                                paddingRight: '2.5rem'
                                             }}
                                         />
-                                    </div>
 
-                                    {phones.length > 1 && (
-                                        <button
-                                            type="button"
-                                            onClick={() => removePhone(index)}
-                                            className="p-1 rounded-lg hover:bg-red-50 group mt-6 -ml-1"
-                                        >
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-3 h-3 text-gray-400 group-hover:text-red-500 transition-colors duration-200">
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
-                                            </svg>
-                                        </button>
-                                    )}
+                                        {/* Remove button - positioned absolutely in top-right */}
+                                        {phones.length > 1 && (
+                                            <button
+                                                type="button"
+                                                onClick={() => removePhone(index)}
+                                                disabled={isLoading}
+                                                className="absolute top-1/2 -translate-y-1/2 right-2 p-1 rounded-lg hover:bg-red-50 group"
+                                                style={{ zIndex: 10 }}
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-3 h-3 text-gray-400 group-hover:text-red-500 transition-colors duration-200">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                                </svg>
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
                             );
                         })}
                     </div>
 
-                    {/* Add Phone Button */}
+                    {/* Add Email/Phone Buttons */}
                     <div className="relative">
-                        <div className=" flex items-center justify-end gap-1 mr-2">
-                            <span className="text-sm text-black font-extralight mt-0.5"><span className="text-red-500 font-normal">+</span> add</span>
+                        <div className="flex items-center justify-end gap-1 mr-2">
+                            <span className="text-sm text-black font-extralight mt-0.5">
+                                <span className="text-red-500 font-normal">+</span> add
+                            </span>
                             <span>
                                 <Button
                                     type="button"

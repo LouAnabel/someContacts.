@@ -73,6 +73,8 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
   const [phoneDropdownStates, setPhoneDropdownStates] = useState({});
   const [addressDropdownStates, setAddressDropdownStates] = useState({});
 
+  const [websiteDropdownStates, setWebsiteDropdownStates] = useState({});
+
   // ========================================
   // LOAD & HANDLE CATEGORIES
   // ========================================
@@ -278,24 +280,66 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
   };
 
   // Handle Links
+  useEffect(() => {
+    links.forEach((_, index) => {
+      if (!websiteDropdownStates[index]) {
+        setWebsiteDropdownStates(prev => ({
+          ...prev,
+          [index]: {
+            showDropdown: false,
+            showAddTitle: false,
+            newTitleName: ''
+          }
+        }));
+      }
+    });
+  }, [links.length]);
+
+  // Handle Links
   const handleLinkChange = (index, field, value) => {
     const newLinks = [...links];
 
-    // Auto-format URL
+    // Don't auto-format URLs for Instagram/Twitter (they use @)
     if (field === 'url' && value.trim()) {
-      if (!value.startsWith('http://') && !value.startsWith('https://')) {
-        if (value.includes('.')) {
-          value = 'https://' + value;
+      const titleLower = newLinks[index]?.title?.toLowerCase() || '';
+
+      // Only auto-format if NOT Instagram or Twitter
+      if (titleLower !== 'instagram' && titleLower !== 'twitter') {
+        if (!value.startsWith('http://') && !value.startsWith('https://') && !value.startsWith('@')) {
+          if (value.includes('.')) {
+            value = 'https://' + value;
+          }
         }
       }
     }
 
     newLinks[index] = { ...newLinks[index], [field]: value };
     setLinks(newLinks);
+
+    // Clear error for this link
+    if (errors[`link_${index}`]) {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[`link_${index}`];
+        return newErrors;
+      });
+    }
   };
 
   const addLink = () => {
+    const newIndex = links.length;
+
     setLinks([...links, { title: '', url: '' }]);
+
+    // Initialize dropdown state for new link
+    setWebsiteDropdownStates(prev => ({
+      ...prev,
+      [newIndex]: {
+        showDropdown: false,
+        showAddTitle: false,
+        newTitleName: ''
+      }
+    }));
   };
 
   const removeLink = (index) => {
@@ -377,6 +421,31 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
     setAddresses(updatedAddresses);
   };
 
+  // Helper functions for WEBSITES
+  const getWebsiteDropdownState = (index) => websiteDropdownStates[index] || {
+    showDropdown: false,
+    showAddTitle: false,
+    newTitleName: ''
+  };
+
+  const updateWebsiteDropdownState = (index, updates) => {
+    setWebsiteDropdownStates(prev => ({
+      ...prev,
+      [index]: {
+        ...(prev[index] || { showDropdown: false, showAddTitle: false, newTitleName: '' }),
+        ...updates
+      }
+    }));
+  };
+
+  const updateWebsiteTitle = (index, newTitle) => {
+    const updatedLinks = [...links];
+    updatedLinks[index].title = newTitle;
+    setLinks(updatedLinks);
+  };
+
+
+
   // ============================================
   // VALIDATION
   // ============================================
@@ -412,16 +481,16 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
     }
 
     // Validate links
-    if (showLinks && links) {
-      links.forEach((link, index) => {
-        const hasUrl = link.url && link.url.trim();
-        const hasTitle = link.title && link.title.trim();
+    // if (showLinks && links) {
+    //   links.forEach((link, index) => {
+    //     const hasUrl = link.url && link.url.trim();
+    //     const hasTitle = link.title && link.title.trim();
 
-        if (hasUrl && !hasTitle) {
-          newErrors[`link_${index}`] = 'title for URL required.';
-        }
-      });
-    }
+    //     if (hasUrl && !hasTitle) {
+    //       newErrors[`link_${index}`] = 'title for URL required.';
+    //     }
+    //   });
+    // }
 
     console.log('Validation errors:', newErrors);
     setErrors(newErrors);
@@ -590,6 +659,7 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
           />
         );
 
+
       case 2:
         return (
           <Step2AdditionalInfo
@@ -597,13 +667,16 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
             handleInputChange={handleInputChange}
             setFormData={setFormData}
             links={links}
-            showBirthdate={showBirthdate}
-            setShowBirthdate={setShowBirthdate}
+            getWebsiteDropdownState={getWebsiteDropdownState}
+            updateWebsiteDropdownState={updateWebsiteDropdownState}
+            updateWebsiteTitle={updateWebsiteTitle}
             handleLinkChange={handleLinkChange}
             addLink={addLink}
             removeLink={removeLink}
             showLinks={showLinks}
             setShowLinks={setShowLinks}
+            showBirthdate={showBirthdate}
+            setShowBirthdate={setShowBirthdate}
             expandedNotes={expandedNotes}
             setExpandedNotes={setExpandedNotes}
             errors={errors}
@@ -611,7 +684,7 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
             isLoading={isLoading}
           />
         );
-        
+
       // NOT USED ANYMORE
       // case 3:
       //   return (
@@ -628,7 +701,7 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
       //     />
       //   );
 
-        
+
 
       default:
         return null;
@@ -678,7 +751,7 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
         <div className="w-full px-6 max-w-[480px] -mt-24 pt-1">
           <div className="text-black dark:text-white font-extralight block relative"
             style={{ fontSize: '16px' }}>
-             want to {' '}
+            want to {' '}
             <button
               onClick={() => navigate('/myspace/contacts')}
               className="font-extralight text-red-500 hover:underline bg-transparent border-none cursor-pointer"
