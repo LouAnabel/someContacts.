@@ -48,7 +48,7 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
     city: '',
     country: ''
   }]);
-  const [links, setLinks] = useState([{ title: '', url: '' }]);
+  const [links, setLinks] = useState([{ title: 'website', url: '' }]);
 
   // UI states
   const [errors, setErrors] = useState({});
@@ -295,25 +295,31 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
     });
   }, [links.length]);
 
-  // Handle Links
   const handleLinkChange = (index, field, value) => {
     const newLinks = [...links];
 
-    // Don't auto-format URLs for Instagram/Twitter (they use @)
+    // Only auto-format regular URLs, NOT @ usernames
     if (field === 'url' && value.trim()) {
       const titleLower = newLinks[index]?.title?.toLowerCase() || '';
 
-      // Only auto-format if NOT Instagram or Twitter
-      if (titleLower !== 'instagram' && titleLower !== 'twitter') {
-        if (!value.startsWith('http://') && !value.startsWith('https://') && !value.startsWith('@')) {
-          if (value.includes('.')) {
-            value = 'https://' + value;
-          }
-        }
+      // For Instagram/Twitter, DON'T auto-format - keep @ format as is
+      if (titleLower === 'instagram' || titleLower === 'twitter') {
+        // Just store the value as-is (@ will be handled during submission)
+        newLinks[index] = { ...newLinks[index], [field]: value };
       }
+      // For other URLs, auto-format with https://
+      else if (!value.startsWith('http://') && !value.startsWith('https://') && !value.startsWith('@')) {
+        if (value.includes('.')) {
+          value = 'https://' + value;
+        }
+        newLinks[index] = { ...newLinks[index], [field]: value };
+      } else {
+        newLinks[index] = { ...newLinks[index], [field]: value };
+      }
+    } else {
+      newLinks[index] = { ...newLinks[index], [field]: value };
     }
 
-    newLinks[index] = { ...newLinks[index], [field]: value };
     setLinks(newLinks);
 
     // Clear error for this link
@@ -329,9 +335,9 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
   const addLink = () => {
     const newIndex = links.length;
 
-    setLinks([...links, { title: '', url: '' }]);
+    // Give new links a default title
+    setLinks([...links, { title: 'website', url: '' }]);
 
-    // Initialize dropdown state for new link
     setWebsiteDropdownStates(prev => ({
       ...prev,
       [newIndex]: {

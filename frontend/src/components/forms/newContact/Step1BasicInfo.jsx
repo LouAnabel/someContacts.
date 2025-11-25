@@ -177,13 +177,15 @@ const Step1BasicInfo = ({
                 </div>
 
                 {/* How to contact? Section */}
-                {/* Emails Section */}
+
                 <div className="space-y-1">
+
                     <div className="flex items-center gap-2">
                         <div className="w-1 h-6 bg-red-400 rounded-full"></div>
                         <p className="relative text-lg font-light text-red-500 tracking-wide">contact details.</p>
                     </div>
 
+                    {/* Emails Section */}
                     <div className="space-y-1">
                         {emails.map((email, index) => {
                             const dropdownState = getEmailDropdownState(index);
@@ -191,7 +193,7 @@ const Step1BasicInfo = ({
                             return (
                                 <div key={index} className="relative">
                                     {/* Dropdown and label wrapper */}
-                                    <div className="flex items-center gap-2 ml-2 -mb-4 relative z-50">
+                                    <div className="flex items-center gap-2 ml-2 -mb-4 relative">
                                         {/* Inline Title Dropdown */}
                                         <InlineTitleSelection
                                             title={email.title}
@@ -206,7 +208,7 @@ const Step1BasicInfo = ({
                                         />
 
                                         {/* Email label */}
-                                        <label className=" -ml-2 text-black font-extralight bg-white px-1" style={{ fontSize: '16px', fontWeight: 200 }}>
+                                        <label className=" -ml-2 text-black font-extralight bg-white px-1 z-20" style={{ fontSize: '16px', fontWeight: 200 }}>
                                             email
                                         </label>
                                     </div>
@@ -219,11 +221,14 @@ const Step1BasicInfo = ({
                                             onChange={(e) => handleEmailChange(index, 'email', e.target.value)}
                                             placeholder="email@example.com"
                                             disabled={isLoading}
-                                            className={`w-full mt-1 pr-10 rounded-xl border bg-white hover:border-red-300 text-black font-extralight placeholder-gray-300 h-[48px] px-3 focus:outline-none focus:border-red-500 ${hasSubmitted && errors.email ? 'border-red-500 shadow-md' : 'border-gray-400'
-                                                }`}
+                                            className={`w-full p-2.5 pr-5 h-[48px] rounded-xl border mt-0.5
+                                                ${hasSubmitted && errors.email 
+                                                ? 'border-red-500'
+                                                : 'border-gray-400'
+                                                } bg-white hover:border-red-300 text-black font-extralight placeholder-gray-400 focus:outline-none focus:border-red-500`}
                                             style={{
                                                 fontSize: '16px',
-                                                fontWeight: 180,
+                                                fontWeight: 100,
                                                 paddingRight: '2.5rem'
                                             }}
                                         />
@@ -256,7 +261,7 @@ const Step1BasicInfo = ({
                             return (
                                 <div key={index} className="relative">
                                     {/* Dropdown and label wrapper */}
-                                    <div className="flex items-center gap-2 ml-2 -mb-4 relative z-50">
+                                    <div className="flex items-center gap-2 ml-2 -mb-4 relative">
                                         {/* Inline Title Dropdown */}
                                         <InlineTitleSelection
                                             title={phone.title}
@@ -271,7 +276,7 @@ const Step1BasicInfo = ({
                                         />
 
                                         {/* Phone label */}
-                                        <label className="-ml-2 text-black font-extralight bg-white px-1" style={{ fontSize: '16px', fontWeight: 200 }}>
+                                        <label className="-ml-2 z-20 text-black font-extralight bg-white px-1" style={{ fontSize: '16px', fontWeight: 200 }}>
                                             phone
                                         </label>
                                     </div>
@@ -284,7 +289,7 @@ const Step1BasicInfo = ({
                                             onChange={(e) => handlePhoneChange(index, 'phone', e.target.value)}
                                             placeholder="+49 123 4567890"
                                             disabled={isLoading}
-                                            className={`w-full pr-10 rounded-xl border bg-white hover:border-red-300 text-black font-extralight placeholder-gray-300 h-[48px] px-3 mt-1 focus:outline-none focus:border-red-500 ${hasSubmitted && errors.phone ? 'border-red-500 shadow-md' : 'border-gray-400'
+                                            className={`w-full pr-10 rounded-xl border bg-white hover:border-red-300 text-black font-extralight placeholder-gray-300 h-[48px] px-3 mt-0.5 focus:outline-none focus:border-red-500 ${hasSubmitted && errors.phone ? 'border-red-500 shadow-md' : 'border-gray-400'
                                                 }`}
                                             style={{
                                                 fontSize: '16px',

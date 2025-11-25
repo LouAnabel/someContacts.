@@ -115,7 +115,7 @@ const CategorySelection = ({
             {showCategoryDropdown && (
                 <div 
                     ref={dropdownRef}
-                    className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-xl shadow-lg z-30 max-h-60 overflow-y-auto"
+                    className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-xl shadow-lg z-[100] max-h-60 overflow-y-auto"
                 > 
                     
                     {/* Show category options only if categories exist */}

@@ -11,12 +11,12 @@ const WebTitleSelection = ({
     setNewTitleName,
     disabled = false
 }) => {
-    const predefinedTitles = ['website', 'instagram', 'facebook', 'linkedIn', 'filmmakers', 'other'];
+    const predefinedTitles = ['website', 'instagram', 'facebook', 'linkedIn', 'filmmakers', 'schauspielervideos'];
     const currentTitle = title || 'website';
 
     // Ref for dropdown menu
     const dropdownRef = useRef(null);
-    const addTitleFormRef = useRef(null); // Ref for the custom label form
+    const addTitleFormRef = useRef(null); 
 
     // Scroll to custom label form when it opens
     useEffect(() => {
@@ -55,7 +55,7 @@ const WebTitleSelection = ({
                 <>
                     <div
                         ref={dropdownRef}
-                        className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-[100] max-h-60 overflow-y-auto min-w-[150px] max-w-[200px]"
+                        className="absolute top-full left-0 bg-white border border-gray-200 rounded-xl shadow-lg z-[100] max-h-60 overflow-y-auto min-w-[150px] max-w-[200px]"
                         onClick={(e) => e.stopPropagation()}
                     >
                         {predefinedTitles.map((titleOption) => {
@@ -72,7 +72,7 @@ const WebTitleSelection = ({
                                         setShowAddTitle(false);
                                         setNewTitleName('');
                                     }}
-                                    className={`w-full text-left px-3 py-2 transition-colors duration-150 font-extralight ${
+                                    className={`w-full text-left px-3 py-2 font-extralight ${
                                         isSelected
                                             ? 'bg-red-50 text-red-500'
                                             : 'hover:bg-red-50 text-black hover:text-red-500'
@@ -99,7 +99,7 @@ const WebTitleSelection = ({
                                     setShowAddTitle(true);
                                     setNewTitleName('');
                                 }}
-                                className="w-full text-left px-3 py-2 hover:bg-red-50 transition-colors duration-150 text-red-500 font-extralight flex items-center space-x-2"
+                                className="w-full text-left px-3 py-2 hover:bg-red-50 text-red-500 font-extralight flex items-center space-x-2"
                                 style={{ fontSize: '14px', fontWeight: 300 }}
                             >
                                 <span className="text-lg font-light">+</span>

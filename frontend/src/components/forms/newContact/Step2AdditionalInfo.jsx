@@ -43,35 +43,20 @@ const Step2AdditionalInfo = ({
     const titleLower = title?.toLowerCase() || 'website';
     switch (titleLower) {
       case 'instagram':
-        return '@username';
+        return 'enter username with @';
       case 'facebook':
         return 'f.e. facebook.com/yourprofile';
       case 'linkedin':
         return 'f.e. linkedin.com/in/yourprofile';
-      case 'twitter':
-        return '@username';
       case 'filmmakers':
         return 'f.e. www.profile/filmmakers.com';
+      case 'schauspielervideos':
+        return 'f.e. www.profile/schauspielervideos.de';
       default:
         return 'f.e. www.yourwebsite.com';
     }
   };
 
-  // Helper function to format input value based on title
-  const formatInputValue = (value, title) => {
-    const titleLower = title?.toLowerCase() || '';
-
-    // For Instagram and Twitter, ensure @ prefix
-    if (titleLower === 'instagram' || titleLower === 'twitter') {
-      if (!value) return '';
-      // If value doesn't start with @, add it
-      if (!value.startsWith('@')) {
-        return '@' + value;
-      }
-    }
-
-    return value;
-  };
 
   // Handle input change with formatting
   const handleInput = (index, field, value, title) => {
@@ -79,7 +64,7 @@ const Step2AdditionalInfo = ({
       const titleLower = title?.toLowerCase() || '';
 
       // For Instagram and Twitter, format with @
-      if (titleLower === 'instagram' || titleLower === 'twitter') {
+      if (titleLower === 'instagram') {
         // Remove any existing @ before processing
         let cleanValue = value.replace(/^@+/, '');
         // Add single @ prefix if there's content
@@ -214,6 +199,10 @@ const Step2AdditionalInfo = ({
           </span>
         </div>
 
+        <div className="text-sm text-gray-400 italic font-extralight">
+          select website title and enter the corresponding url.
+        </div>
+
         {/* Weblinks */}
         <div className="space-y-1">
           {links.map((link, index) => {
@@ -229,11 +218,11 @@ const Step2AdditionalInfo = ({
                     title={link.title}
                     setTitle={(newTitle) => {
                       updateWebsiteTitle(index, newTitle);
-                      handleLinkChange(index, 'title', newTitle);
+                      // handleLinkChange(index, 'title', newTitle);
 
                       // Clear the URL when title changes to Instagram/Twitter
                       const newTitleLower = newTitle.toLowerCase();
-                      if ((newTitleLower === 'instagram' || newTitleLower === 'twitter') &&
+                      if ((newTitleLower === 'instagram') &&
                         link.url && !link.url.startsWith('@')) {
                         handleLinkChange(index, 'url', '');
                       }
