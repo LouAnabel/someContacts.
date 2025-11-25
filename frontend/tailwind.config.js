@@ -1,11 +1,20 @@
 /** @type {import('tailwindcss').Config} */
 
+
+
 export default {
+
+  corePlugins: {
+   preflight: false,
+  },
+
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
-    "./node_modules/flowbite/**/*.js"
+    "./node_modules/flowbite/**/*.js",
+    "./node_modules/flowbite-datepicker"
   ],
+  important: '#root',
   darkMode: 'class', // 3.x uses 'class', not 'selector'
   theme: {
     extend: {
@@ -17,5 +26,6 @@ export default {
   },
   plugins: [
     require('flowbite/plugin')
-  ],
+  ]
+
 }

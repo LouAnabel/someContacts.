@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import ContactMenuBar from "./ContactCardMenu";
-import ContactCardPhotoSmall from '../ui/ContactCardPhoto';
+import ContactCardPhotoSmall from './ContactCardPhoto';
 import { useNavigate, Link } from 'react-router';
 import { useAuthContext } from '../../context/AuthContextProvider';
 import { updateContact } from '../../apiCalls/contactsApi';

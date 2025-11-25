@@ -2,6 +2,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@source "../node_modules/flowbite-datepicker";
+
+@plugin "tailwindcss-animate";
+@plugin "tailwindcss-react-aria-components";
 
 @layer base {
   html {
@@ -15,4 +19,19 @@
 
 #root {
   width: 100vw;
+}
+
+.css-4k4mmf-MuiButtonBase-root-MuiPickersDay-root.Mui-selected {
+  background-color: #ef4444 !important; /* Tailwind's red-500 */
+  color: white;
+}
+
+.css-1mvmid-MuiYearCalendar-button.Mui-selected {
+  background-color: #ef4444 !important; /* Tailwind's red-500 */
+  color: white;
+}
+
+.css-nmzp9i-MuiModal-root-MuiDialog-root .MuiDialog-paper
+{
+  border-radius: 25px !important;
 }

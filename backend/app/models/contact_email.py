@@ -4,25 +4,33 @@ class ContactEmail(db.Model):
     __tablename__ = 'contact_emails'
 
     id = db.Column(db.Integer, primary_key=True)
-    contact_id = db.Column(db.Integer, db.ForeignKey('contacts.id', ondelete='CASCADE'), nullable=False)
-    email = db.Column(db.String(500), nullable=False)
+
+    owner_type = db.Column(db.String(50), nullable=False)
+    contact_id = db.Column(db.Integer, db.ForeignKey('contacts.id', ondelete='CASCADE'), nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete='CASCADE'), nullable=True)
+
+    email = db.Column(db.String(120), nullable=False)
     title = db.Column(db.String(100), nullable=False)
 
     # Constraints
     __table_args__ = (
-        # Index for efficient queries
         db.Index('idx_contact_emails', 'contact_id'),
-        # Ensure URL is not empty
-        db.CheckConstraint('length(email) > 0', name='check_email_not_empty'),
-        # db.CheckConstraint("url LIKE 'http%'", name='check_email_format'),
+        db.Index('idx_user_emails', 'user_id'),
+        db.CheckConstraint(
+            '(owner_type = \'contact\' AND contact_id IS NOT NULL AND user_id IS NULL) OR '
+            '(owner_type = \'user\' AND user_id IS NOT NULL AND contact_id IS NULL)',
+            name='check_email_owner'
+        ),
     )
 
     def to_dict(self):
         return {
             'id': self.id,
             'contact_id': self.contact_id,
+            'user_id': self.user_id,
+            'owner_type': self.owner_type,
             'email': self.email,
-            'title': self.title,
+            'title': self.title
         }
 
     def __repr__(self):

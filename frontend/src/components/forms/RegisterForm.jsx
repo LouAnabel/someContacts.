@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import CircleButton from '../ui/Buttons';
 import { useNavigate } from 'react-router-dom';
+import {sendRegisterData} from '../../apiCalls/authApi';
+
 
 const RegisterForm = () => {
     const navigate = useNavigate();
@@ -13,7 +15,7 @@ const RegisterForm = () => {
     });
     const [errors, setErrors] = useState({});
     const [hasSubmitted, setHasSubmitted] = useState(false);
-    const [acceptTerms, setAcceptTerms] = useState(false);
+    // const [acceptTerms, setAcceptTerms] = useState(false);
     const [apiLoading, setApiLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
@@ -29,7 +31,7 @@ const RegisterForm = () => {
         });
         setErrors({});
         setHasSubmitted(false);
-        setAcceptTerms(false);
+        // setAcceptTerms(false);
         setApiLoading(false);
     }, []);
   
@@ -39,64 +41,61 @@ const RegisterForm = () => {
         try {
             setApiLoading(true);
             
-            
-            const response = await fetch('http://127.0.0.1:5000/auth/register', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    first_name: registerData.firstName,
-                    last_name: registerData.lastName,
-                    email: registerData.email,
-                    password: registerData.password
-                })
+            const data = await sendRegisterData({
+                first_name: registerData.firstName,
+                last_name: registerData.lastName,
+                email: registerData.email,
+                password: registerData.password
             });
 
-            const data = await response.json();
+            console.log('Registration successful:', data);
+
+            // Backend returns user data, not token on registration
+            if (data.user) {
+                localStorage.setItem('userData', JSON.stringify(data.user));    
+            }
+
+            setErrors({});
+            setFormData({
+                firstName: '',
+                lastName: '',
+                email: '',
+                password: '',
+                confirmPassword: ''
+            });
+
+            // setAcceptTerms(false);
+            setHasSubmitted(false);
             
-            console.log('API Response Status:', response.status);
-            console.log('API Response Data:', data);
+            // later Email send for verifivation can be added here
+            alert('Registration successful! Ready to login!');
+            navigate('/login');
 
-            if (response.ok) {
-                console.log('Registration successful:', data);
+        } catch (error) {
+            console.error('Registration error:', error);
             
-                if (data.token) {
-                    localStorage.setItem('authToken', data.token);
-                }
-
-                if (data.user) {
-                    localStorage.setItem('userData', JSON.stringify(data.user));    
-                }
-
-                setErrors({});
-                setFormData({
-                    firstName: '',
-                    lastName: '',
-                    email: '',
-                    password: '',
-                    confirmPassword: ''
-                });
-
-                setAcceptTerms(false);
-                setHasSubmitted(false);
-                
-                alert('Registration successful! Ready to login!');
-                navigate('/login');
-
-            } else {
-                console.error('Registration failed:', data);
+            // Handle different types of errors
+            if (error.status === 409) {
+                // Email already registered
                 setErrors({
-                    submit: data.message || 'Registration failed. Please try again.'
+                    submit: 'Email already registered. Please login instead.'
+                });
+            } else if (error.status === 400) {
+                // Validation error
+                setErrors({
+                    submit: error.data?.message || 'Invalid input. Please check your details.'
+                });
+            } else if (error.status >= 500) {
+                // Server errors
+                setErrors({
+                    submit: 'Server error. Please try again later.'
+                });
+            } else {
+                // Network or other errors
+                setErrors({
+                    submit: 'Unable to connect to server. Please try again later.'
                 });
             }
-        
-            
-        } catch (error) {
-            console.error('Network/API error:', error);
-            setErrors({
-                submit: 'Unable to connect to server. Please try again later.'
-            });
         } finally {
             setApiLoading(false);
         }
@@ -124,14 +123,15 @@ const RegisterForm = () => {
     }
 
 
-    const handleTermsChange = (e) => {
-        setAcceptTerms(e.target.checked);
+    // const handleTermsChange = (e) => {
+    //     setAcceptTerms(e.target.checked);
         
-        // Clear terms error immediately when checkbox is checked
-        if (e.target.checked && errors.terms) {
-            setErrors(prev => ({ ...prev, terms: '' }));
-        }
-    };
+    //     // Clear terms error immediately when checkbox is checked
+    //     if (e.target.checked && errors.terms) {
+    //         setErrors(prev => ({ ...prev, terms: '' }));
+    //     }
+    // };
+    
 
     const validateForm = () => {
         const newErrors = {};
@@ -182,6 +182,7 @@ const RegisterForm = () => {
     };
 
     const handleSubmit = async (e) => {
+        console.log("formdata on submit:", formData);
         e.preventDefault();
         setHasSubmitted(true);
         
@@ -201,7 +202,7 @@ const RegisterForm = () => {
              style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
 
             {/* Main Register Card */}
-            <div className="bg-white rounded-3xl p-5 relative z-10 overflow-visible w-[88vw] min-w-[260px] max-w-[480px] "
+            <div className="bg-white rounded-3xl p-4 relative z-10 overflow-visible w-[90vw] min-w-[260px] max-w-[480px] "
                  style={{ 
                      boxShadow: '0 4px 32px rgba(109, 71, 71, 0.29)'
                  }}>
@@ -212,6 +213,12 @@ const RegisterForm = () => {
                 {/* Form Element - This is the key addition! */}
                 <form onSubmit={handleSubmit}>
                     <div className="space-y-3 mb-14">
+                        
+                        <div className="flex items-center gap-2 left-2">
+                            <div className="w-1 h-6 bg-red-400 rounded-full mb-2"></div>
+                            <p className="relative text-lg font-light text-red-500 tracking-wide -mt-1">what's your name?</p>
+                        </div>
+
                         <div className="space-y-5">
                             {/* First Name Field */}
                             <div className="relative">
@@ -233,9 +240,9 @@ const RegisterForm = () => {
                                 />
                                 <label 
                                     htmlFor="firstName" 
-                                    className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-extralight"
+                                    className="absolute -top-3 left-2 bg-white px-1 text-base text-black font-extralight"
                                 >
-                                    first name
+                                    first name<span className="text-red-500">*</span>
                                 </label>
                                 {hasSubmitted && errors.firstName && (
                                     <p className="absolute font-extralight top-full right-1 text-sm text-red-600 z-20">{errors.firstName}</p>
@@ -263,9 +270,9 @@ const RegisterForm = () => {
                                 />
                                 <label 
                                     htmlFor="lastName" 
-                                    className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-extralight"
+                                    className="absolute -top-3 left-2 bg-white px-1 text-base text-black font-extralight"
                                 >
-                                    last name
+                                    last name<span className="text-red-500">*</span>
                                 </label>
                                 {hasSubmitted && errors.lastName && (
                                     <p className="absolute top-full font-light right-1 text-sm text-red-600 z-20">{errors.lastName}</p>
@@ -274,8 +281,11 @@ const RegisterForm = () => {
                         </div>
 
                         
-                            
-                        <p className="relative text-red-500 left-2 tracking-wide font-extralight pt-6 ">how to login?</p>
+                        <div className="flex items-center gap-2 pt-6 left-2">
+                            <div className="w-1 h-6 bg-red-400 rounded-full mb-2"></div>
+                            <p className="relative text-lg font-light text-red-500 tracking-wide -mt-1">how to login?</p>
+                        </div>
+
                         {/* Email Field */}
                         <div className="space-y-5">
                             <div className="relative">
@@ -297,9 +307,9 @@ const RegisterForm = () => {
                                 />
                                 <label 
                                     htmlFor="email" 
-                                    className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-extralight"
+                                    className="absolute -top-3 left-2 bg-white px-1 text-base text-black font-extralight"
                                 >
-                                    email
+                                    email<span className="text-red-500">*</span>
                                 </label>
                                 {hasSubmitted && errors.email && (
                                     <p className="absolute top-full font-extralight right-1 text-sm text-red-600 z-20">{errors.email}</p>
@@ -310,9 +320,9 @@ const RegisterForm = () => {
                             <div className="relative">
                                 <label 
                                     htmlFor="password" 
-                                    className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-extralight"
+                                    className="absolute -top-3 left-2 bg-white px-1 text-base text-black font-extralight"
                                 >
-                                    password
+                                    password<span className="text-red-500">*</span>
                                 </label>
                                 <input
                                     type={showPassword ? "text" : "password"}
@@ -365,9 +375,9 @@ const RegisterForm = () => {
                             <div className="relative">
                                 <label 
                                     htmlFor="confirmPassword" 
-                                    className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-extralight"
+                                    className="absolute -top-3 left-2 bg-white px-1 text-base text-black font-extralight"
                                 >
-                                    confirm password
+                                    confirm password<span className="text-red-500">*</span>
                                 </label>
                                 <input
                                     type="password"

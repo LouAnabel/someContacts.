@@ -1,20 +1,11 @@
-
-import { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuthContext } from '../../context/AuthContextProvider';
-import { getContactById, getCategories, updateContact, deleteContactById } from '../../apiCalls/contactsApi';
-import FormDataToApiData from '../helperFunctions/FormToApiData';
-import ApiDataToFormData from '../helperFunctions/ApiToFormData';
-import { validateDate } from '../helperFunctions/dateConversion';
 import CircleButton from '../ui/Buttons';
-import CategorySelection from '../ui/CategorySelection';
-
+import filmmakersLogo from '../../assets/filmmakersLogo.png';
 
 const Button = ({ children, onClick, className = "", ...props }) => {
   return (
     <button
       onClick={onClick}
-      className={` text-black dark:text-white hover:text-red-500 dark:hover:text-red-500 transition-colors duration-200 ${className}`}
+      className={`text-black dark:text-white hover:text-red-500 dark:hover:text-red-500 transition-colors duration-200 ${className}`}
       {...props}
     >
       {children}
@@ -22,1798 +13,536 @@ const Button = ({ children, onClick, className = "", ...props }) => {
   );
 };
 
-const ShowContactForm = ({id}) => {
- 
-  const navigate = useNavigate();
-  const { accessToken } = useAuthContext();
-  
-  // Loading state and Error State
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [isSaving, setIsSaving] = useState(false);
 
-  const [contactData, setContactData] = useState({});
-  const [formData, setFormData] = useState({});
-  
+export default function ShowContactForm({
+  contactData,
+  navigate,
+  handleFavoriteToggle,
+  handleIsContactedToggle,
+  handleIsToContactToggle,
+  onEdit,
+  onNavigate,
+  isLoading
 
-  // Edit Mode states
-  const [isEditing, setIsEditing] = useState(false);
-  const [hasSubmitted, setHasSubmitted] = useState(false);
-  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [errors, setErrors] = useState({}); 
+}) {
 
-  // Form states for edit mode for Categories
-  const [categories, setCategories] = useState([]);
-  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
-  const [showAddCategory, setShowAddCategory] = useState(false);
-  const [expandedNotes, setExpandedNotes] = useState(false);
-  const [newCategoryName, setNewCategoryName] = useState('');
-  const [isAddingCategory, setIsAddingCategory] = useState(false);
-
-  // Form states for edit mode
-  const [showBirthdate, setShowBirthdate] = useState(false);
-  const [showAddress, setShowAddress] = useState(false);
-  const [showContactDetails, setShowContactDetails] = useState(false);
-  const [showLinks, setShowLinks] = useState(false);
-  const [links, setLinks] = useState([{ title: '', url: '' }]);
-
-
-  // GUARDS to prevent duplicate API calls
-  const contactFetched = useRef(false);
-  const categoriesFetched = useRef(false);
-
-
-  // Contact data fetching with guard
-  useEffect(() => {
-    const fetchContactData = async () => {
-
-      // GUARD: Prevent duplicate calls
-      if (!accessToken || !id || contactFetched.current) return;
-      
-      console.log('ShowContact: Starting contact fetch for ID:', id);
-      contactFetched.current = true; // Mark as fetching
-      
-      try {
-        setIsLoading(true);
-        setError(null);
-
-        // fetch and set contactData
-        const apiContactData = await getContactById(accessToken, id);
-        console.log('Contact data received from API:', apiContactData);
-        setContactData(apiContactData); // -> contactData
-        
-        // transform API contactData to form format and set formData
-        const newFormData = ApiDataToFormData(apiContactData);
-        console.log('Form data transformed:', newFormData);
-        setFormData(newFormData); // -> formData
-
-
-        // Initialize optional sections with the NEW form data
-        setShowBirthdate(!!newFormData.birthdate);
-        setShowAddress(
-          !!(newFormData.streetAndNr || newFormData.city || 
-            newFormData.country || newFormData.postalcode)
-        );
-        setShowContactDetails(
-          !!(newFormData.lastContactDate || newFormData.nextContactDate)
-        );
-        
-        const hasLinks = newFormData.links && newFormData.links.length > 0;
-        setShowLinks(hasLinks);
-        setLinks(hasLinks ? newFormData.links : [{ title: '', url: '' }]);
-
-
-      } catch (error) {
-        console.error('Contact fetch failed:', error);
-        setError(error.message || 'Failed to load contact data');
-        setContactData({});
-        setFormData({});
-        contactFetched.current = false; // Reset on error
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchContactData();
-  }, [accessToken, id]); // Only depend on accessToken and id
-
-
-
-
-  // Categories loading with guard
-  useEffect(() => {
-    const loadCategories = async () => {
-      // GUARD: Prevent duplicate calls
-      if (!accessToken || categoriesFetched.current) return;
-      categoriesFetched.current = true;
-
-      try {
-        const categoriesData = await getCategories(accessToken);
-        console.log("categoriesData:", categoriesData)
-        setCategories(categoriesData);
-
-      } catch (error) {   
-        console.error('Categories fetch failed:', error);
-        setCategories([]);
-        categoriesFetched.current = false;
-      }
-    };
-
-    loadCategories();
-  }, [accessToken]); 
-
-
-  // Reset guards when component unmounts or ID changes
-  useEffect(() => {
-    return () => {
-      contactFetched.current = false;
-      categoriesFetched.current = false;
-    };
-  }, [id]);
-
-
-  const handleInputChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: type === 'checkbox' ? checked : value
-        }));
-        
-        // Clear errors if user has already submitted once
-        if (hasSubmitted && errors[name]) {
-            setErrors(prev => ({ ...prev, [name]: '' }));
-        }
-
-        if (errors.submit) {
-            setErrors(prev => ({ ...prev, submit: '' }));
-        }
-    };
-  
-    const handleLinkChange = (index, field, value) => {
-      const newLinks = [...links];
-      
-          // If it's a URL field, auto-format it
-          if (field === 'url' && value.trim()) {
-              // Check if URL already has protocol
-              if (!value.startsWith('http://') && !value.startsWith('https://')) {
-                  // Add https:// if it looks like a URL (contains a dot)
-                  if (value.includes('.')) {
-                      value = 'https://' + value;
-                  }
-              }
-          }
-          
-          newLinks[index] = {
-              ...newLinks[index],
-              [field]: value
-          };
-          setLinks(newLinks);
-      };
-
-      const addLink = () => {
-          setLinks([...links, { title: '', url: '' }]);
-      };
-
-      const removeLink = (index) => {
-          if (links.length > 1) {
-              const newLinks = links.filter((_, i) => i !== index);
-              setLinks(newLinks);
-          }
-      };
-  
-  const handleCategoryClick = (categoryId) => {
-    navigate(`/myspace/categories?expand=${categoryId}`, { replace: true });
-  };
-      
-  //  HELPER FUNCTION: Get next available category ID
-  const getNextCategoryId = (categories) => {
-    if (!categories || categories.length === 0) return 1;
-  
-    // Find the highest existing ID and add 1
-    const maxId = Math.max(...categories.map(cat => parseInt(cat.id) || 0));
-    return maxId + 1;
-  };
-
-  // CREATING CATEGORY FOR DISPLAY (ADDING WHEN CONTACT GETS CREATED)
-  const addCategory = async () => {
-    if (newCategoryName.trim() && !isAddingCategory) {
-      setIsAddingCategory(true);
-      
-      try {
-        const categoryName = newCategoryName.charAt(0).toUpperCase() + newCategoryName.slice(1).trim();
-        // Get the next available ID
-        const nextId = getNextCategoryId(categories);
-        
-        // Create category with predictable ID
-        const newCategory = {
-          id: nextId,
-          name: categoryName,
-          creator_id: null, // Will be set by backend
-          contact_count: 0,
-          isPersisted: false
-        };
-        
-        // Add to local categories list
-        setCategories(prevCategories => [...prevCategories, newCategory]);
-        
-        // Add to form data
-        setFormData(prevFormData => ({
-          ...prevFormData, 
-          categories: [...prevFormData.categories, { name: newCategory.name, id: newCategory.id }]
-        }));
-
-        // Clear category errors
-        if (hasSubmitted && errors.categories) {
-          setErrors(prev => ({ ...prev, categories: '' }));
-        }
-        
-        setNewCategoryName('');
-        setShowAddCategory(false);
-        setShowCategoryDropdown(false);
-        
-        console.log('Category added successfully to local categories:', newCategory);
-        
-      } catch (error) {
-        console.error('Failed to add category:', error);
-        alert(`Failed to add category: ${error.message}`);
-      } finally {
-        setIsAddingCategory(false);
-      }
-    }
-  };
-
-
-  const addCategoryToForm = (category) => {
-      // Check if category is already selected
-      const isAlreadySelected = formData.categories.some(cat => cat.id === category.id);
-      if (isAlreadySelected) {
-          return; // Don't add if already selected
-      }
-
-      // Check if we already have 3 categories
-      if (formData.categories.length >= 3) {
-          alert('Maximum 3 categories allowed');
-          return;
-      }
-
-      // Add the category
-      setFormData(prev => ({
-          ...prev,
-          categories: [...prev.categories, { name: category.name, id: category.id }]
-      }));
-
-      // Clear error immediately
-      if (hasSubmitted && errors.categories) {
-          setErrors(prev => ({ ...prev, categories: '' }));
-      }
-  };
-
-  const removeCategoryFromForm = (categoryId) => {
-      setFormData(prev => ({
-          ...prev,
-          categories: prev.categories.filter(cat => cat.id !== categoryId)
-      }));
-  };
-
-  const handleDeleteContact = async () => {
-    setIsDeleting(true);
-    try {
-      if(!accessToken) {
-        throw new Error("AccessToken is not valid")
-      }
-
-      const deleteMessage = await deleteContactById(accessToken, formData.id);
-      navigate('/myspace/contacts', { replace: true });
-    } catch (error) {
-      console.error('Error deleting contact:', error);
-      setErrors(prev => ({ ...prev, submit: `Failed to delete contact: ${error.message}` }));
-    } finally {
-      setIsDeleting(false);
-      setShowDeleteConfirmation(false);
-    }
-  };
-
-  const handleFavoriteToggle = async () => {
-      const newFavoriteState = !formData.isFavorite;
-
-      try {
-          setFormData(prev => ({...prev, isFavorite: newFavoriteState}));
-          
-          if (!accessToken) {
-              throw new Error("Access token is not available.");
-          }
-
-          // Send ONLY the favorite status - minimal payload!
-          const minimalUpdateData = {
-              is_favorite: newFavoriteState
-          };
-
-          console.log("Minimal data sent to API:", minimalUpdateData);
-          const apiResponse = await updateContact(accessToken, formData.id, minimalUpdateData);
-          
-          if (!apiResponse) {
-              throw new Error('Failed to update favorite status');
-          }
-
-          // Update contact data to match
-          setContactData(prev => ({ ...prev, is_favorite: newFavoriteState }));
-          
-      } catch (error) {
-          console.error('Error updating favorite status:', error);
-          // Revert the UI change if API call failed
-          setFormData(prev => ({ ...prev, isFavorite: !newFavoriteState }));
-          setError(`Failed to update favorite status: ${error.message}`);
-      }
-  };
-
-    const handleIsContactedToggle = async () => {
-      const newIsContactedState = !formData.isContacted;
-
-      try {
-        setFormData(prev => ({...prev, isContacted: newIsContactedState}));
-        
-        if (!accessToken) {
-          throw new Error("Access token is not available.");
-        }
-
-        const minimalUpdateData = {
-          is_contacted: newIsContactedState
-        };
-
-        console.log("Minimal data sent to API:", minimalUpdateData);
-        const apiResponse = await updateContact(accessToken, formData.id, minimalUpdateData);
-        
-        if (!apiResponse) {
-          throw new Error('Failed to update contacted status');
-        }
-
-        setContactData(prev => ({ ...prev, is_contacted: newIsContactedState }));
-        
-      } catch (error) {
-        console.error('Error updating contacted status:', error);
-        setFormData(prev => ({ ...prev, isContacted: !newIsContactedState }));
-        setError(`Failed to update contacted status: ${error.message}`);
-      }
-    };
-
-
-    const handleIsToContactToggle = async () => {
-      const newIsToContactState = !formData.isToContact;
-
-      try {
-        setFormData(prev => ({...prev, isToContact: newIsToContactState}));
-        
-        if (!accessToken) {
-          throw new Error("Access token is not available.");
-        }
-
-        const minimalUpdateData = {
-          is_to_contact: newIsToContactState
-        };
-
-        console.log("Minimal data sent to API:", minimalUpdateData);
-        const apiResponse = await updateContact(accessToken, formData.id, minimalUpdateData);
-        
-        if (!apiResponse) {
-          throw new Error('Failed to update to contact status');
-        }
-
-        setContactData(prev => ({ ...prev, is_to_contact: newIsToContactState }));
-        
-      } catch (error) {
-        console.error('Error updating to contact status:', error);
-        setFormData(prev => ({ ...prev, isToContact: !newIsToContactState }));
-        setError(`Failed to update to contact status: ${error.message}`);
-      }
-    };
-
-
-  const validateForm = () => {
-    const newErrors = {};       
-    
-    // First name validation
-    if (!formData.firstName.trim()) {
-        newErrors.firstName = 'First name is required';
-    } else if (formData.firstName.trim().length < 2) {
-        newErrors.firstName = 'First name must be at least 2 characters';
-    }
-    
-    if (formData.lastName && formData.lastName.trim() && formData.lastName.trim().length < 2) {
-        newErrors.lastName = 'Last name must be at least 2 characters';
-    }
-
-    // category validation
-    if (!formData.categories || !Array.isArray(formData.categories) || formData.categories.length === 0) {
-        newErrors.categories = 'At least one category is required';
-    }
-    
-    // Email validation
-    if (!formData.email) {
-        newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-        newErrors.email = 'Email is invalid';
-    }
-    
-    // Phone validation (optional but if provided, should be valid)
-    if (formData.phone && formData.phone.trim() && !/^\+?[\d\s\-\(\)]{10,}$/.test(formData.phone.trim())) {
-        newErrors.phone = 'Please enter a valid phone number';
-    }
-
-    // Validate birthdate (must be in the past)
-    if (formData.birthdate && formData.birthdate.trim()) {
-        const birthdateError = validateDate(formData.birthdate, 'Birthdate', true);
-        if (birthdateError) {
-            newErrors.birthdate = birthdateError;
-        }
-    }
-
-    // Validate links - URL must have a title
-    if (showLinks && links) {
-        links.forEach((link, index) => {
-            const hasUrl = link.url && link.url.trim();
-            const hasTitle = link.title && link.title.trim();
-            
-            if (hasUrl && !hasTitle) {
-                newErrors[`link_${index}`] = 'title for url required.';
-            }
-        });
-    }
-    
-    console.log('Validation errors:', newErrors);
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleEdit = () => {
-    if (!formData) return;
-    setIsEditing(true);
-    setHasSubmitted(false);
-    setErrors({});
-  };
 
   const handleGoBack = () => {
-  navigate(-1);
+    onNavigate(-1);
   };
 
-
-const handleSave = async (e) => {
-    console.log("📋 === STARTING SAVE PROCESS ===");
-    console.log("📋 Initial formData:", formData);
-    
-    e.preventDefault();
-    setHasSubmitted(true);
-    
-    if (!validateForm()) {
-      console.log("Validation failed");
-      return;
-    }
-    
-    setIsSaving(true);
-
-    try {
-      if (!accessToken) {
-        throw new Error("Access token is not available.");
-      }
-
-      // STEP 1: Find categories that need to be persisted
-      const newCategories = formData.categories.filter(formCat => {
-        const categoryInState = categories.find(cat => cat.id === formCat.id);
-        return categoryInState && categoryInState.isPersisted === false;
-      });
-      console.log("🆕 New categories to persist:", newCategories);
-      
-      const idMappings = new Map(); // oldId -> newId
-
-      // STEP 2: Persist new categories
-      for (const newCat of newCategories) {
-        try {
-          console.log("💾 Persisting category:", newCat.name, "with ID:", newCat.id);
-       
-          const response = await fetch('http://127.0.0.1:5000/categories', {
-            method: 'POST',
-            headers: { 
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${accessToken}`
-            },
-            body: JSON.stringify({ 
-              name: newCat.name,
-              id: newCat.id 
-            })
-          });
-          
-          if (!response.ok) {
-            const errorText = await response.text();
-            console.error('Category API Error:', response.status, errorText);
-            throw new Error(`Failed to persist category: ${response.status}`);
-          }
-          
-          const apiResponse = await response.json();
-          console.log("Category persisted successfully:", apiResponse);
-          
-          // If backend returns a different ID, update our local data
-          const actualId = apiResponse.id || apiResponse.category?.id || newCat.id;
-          if (actualId !== newCat.id) {
-            console.log(`ID mismatch: expected ${newCat.id}, got ${actualId}`);
-            idMappings.set(newCat.id, actualId);
-          }
-          
-        } catch (error) {
-          console.error('❌ Failed to persist category:', newCat.name, error);
-          throw new Error(`Failed to save category "${newCat.name}": ${error.message}`);
-        }
-      }
-
-      // STEP 3: Save the contact
-      console.log("📤 === PREPARING CONTACT SAVE ===");
-
-      // Create updated form data with correct IDs
-      const updatedFormData = {
-        ...formData,
-        categories: formData.categories.map(cat => ({
-          ...cat,
-          id: idMappings.get(cat.id) || cat.id // Use mapped ID if available, otherwise original
-        }))
-      };
-      console.log("Updated formData with correct IDs:", updatedFormData);
-
-
-      const submittedContactData = FormDataToApiData(updatedFormData, categories, links);
-      console.log("📤 === DATA BEING SENT TO API ===");
-      console.log("📤 Complete submitted data:", submittedContactData);
-
-      const apiContactData = await updateContact(accessToken, formData.id, submittedContactData);
-      if (!apiContactData) {
-        throw new Error('Failed to update contact - no response from server');
-      }
-      
-      console.log("📥 === API RESPONSE RECEIVED ===");
-      console.log("📥 Categories in API response:", apiContactData.categories);
-  
-      // STEP 4: Update state with API response
-      console.log("🔄 === UPDATING STATE ===");
-      // Update categories state with new categories that have correct IDs
-      setCategories(prev => {
-        const updated = [...prev];
-        idMappings.forEach((newId, oldId) => {
-          const index = updated.findIndex(cat => cat.id === oldId);
-          if (index !== -1) {
-            updated[index] = { ...updated[index], id: newId, isPersisted: true };
-          }
-        });
-        return updated;
-      });
-      
-      setContactData(apiContactData);
-      
-      const finalFormData = ApiDataToFormData(apiContactData);
-      setFormData(finalFormData);
-      
-      setExpandedNotes(false);
-      setIsEditing(false);
-      setHasSubmitted(false);
-      setErrors({});
-      
-      console.log("✅ === SAVE COMPLETED SUCCESSFULLY ===");
-      
-    } catch (error) {
-      console.error('❌ Error updating contact:', error);
-      setError(`Failed to update contact: ${error.message}`);
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-
-  const handleCancel = () => {
-    if (!formData) return;
-
-    const originalFormData = ApiDataToFormData(contactData);
-    setFormData(originalFormData);
-
-    // Remove any new categories that weren't in the original categories list
-    const originalCategoryIds = contactData.categories ? contactData.categories.map(cat => cat.id) : [];
-    setCategories(prevCategories => 
-      prevCategories.filter(cat => originalCategoryIds.includes(cat.id))
-    );
-
-    setIsEditing(false);
-    setHasSubmitted(false);
-    setExpandedNotes(false);
-    setErrors({});
-    
-    // Reset UI states based on original data
-    setShowBirthdate(!!originalFormData.birthdate);
-    setShowAddress(
-      !!(originalFormData.streetAndNr || originalFormData.city || 
-        originalFormData.country || originalFormData.postalcode)
-    );
-    setShowContactDetails(
-      !!(originalFormData.lastContactDate || originalFormData.nextContactDate)
-    );
-    
-    const hasLinks = originalFormData.links && originalFormData.links.length > 0;
-    setShowLinks(hasLinks);
-    setLinks(hasLinks ? originalFormData.links : [{ title: '', url: '' }]);
-  };
-
-
-  // Show loading state
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading contact...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Show error state
-  if (error) {
-    console.log("Error: Error Page Showing")
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <p className="text-red-600 tracking-wider mb-4">{error}</p>
-          <button 
-            onClick={() => navigate('/myspace/contacts')}
-            className="bg-red-500 text-white tracking-wider px-4 py-2 rounded-full hover:bg-black"
-          >
-            Back to contacts.
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // Not found state
-  if (!contactData || !formData) {
-    console.log("No Data found: No Contact Found Page Showing")
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <p className="text-black tracking-wider text-lg font-light mb-4">Sorry! Your contact cannot be found.</p>
-          <button 
-            onClick={handleGoBack}
-            className="bg-red-500 text-white tracking-wide px-4 py-2 rounded-full hover:bg-black"
-          >
-            go back.
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // Editing Mode
-  if (isEditing) {
-    return (
-     <div className=" flex flex-col items-center min-h-screen bg-white dark:bg-black" 
-        style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
-          <form onSubmit={handleSave}>
-            
-
-            {/* Main Edit Contact Card */}
-            <div className="bg-white rounded-3xl p-5 mt-10 relative z-10 overflow-visible w-[88vw] min-w-[260px] max-w-[480px] mx-auto"
-                style={{ 
-                    boxShadow: '0 4px 32px rgba(109, 71, 71, 0.29)'
-                }}>
-                <h1 className="text-3xl font-bold text-center mt-6 mb-10 text-black">
-                    edit <span className="text-red-500">{formData.firstName}.</span>
-                </h1>
-
-                
-                {/* Favorite Checkbox */}
-                <div className="flex items-center w-full relative left-2 mt-3 mb-9 rounded-lg">
-                    <button
-                        type="button"
-                        onClick={handleFavoriteToggle}
-                        // onClick={() => setFormData(prev => ({ ...prev, isFavorite: !prev.isFavorite }))}
-                        className="flex items-center space-x-2 hover:scale-110 transform"
-                        disabled={isLoading}
-                    >
-                        <svg 
-                            className={`w-7 h-7 ${
-                                formData.isFavorite ? 'text-red-500 hover:text-yellow-300' : 'text-black hover:text-yellow-300'
-                            }`} 
-                            aria-hidden="true" 
-                            xmlns="http://www.w3.org/2000/svg" 
-                            fill="currentColor" 
-                            viewBox="0 0 22 20"
-                        >
-                            <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
-                        </svg>
-                        <span className="text-sm font-light text-black cursor-pointer">
-                            {formData.isFavorite ? 'favorite contact' : 'not a favorite'}
-                        </span>
-                    </button>
-                </div>
-                
-
-                {/* Main Contact Informations */}
-                <div className="space-y-8 mb-5">
-
-                    {/* Name & Category */}
-                    <div className="space-y-5">
-                        {/* First Name Field */}
-                        <div className="relative">
-                            
-                            <input 
-                                type="text" 
-                                name="firstName" 
-                                id="firstName" 
-                                value={formData.firstName}
-                                onChange={handleInputChange}
-                                placeholder="meryl"
-                                disabled={isLoading}
-                                className={`w-full rounded-xl border bg-white  hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
-                                    hasSubmitted && errors.firstName ? 'border-red-400 ' : 'border-gray-400 dark:border-gray-400'
-                                }`}
-                                style={{
-                                    fontSize: '17px',
-                                    fontWeight: 200
-                                }}
-                            />
-                            <label 
-                                htmlFor="firstName" 
-                                className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-extralight"
-                            >
-                                first name
-                            </label>
-                            {hasSubmitted && errors.firstName && (
-                                <p className="absolute top-full right-1 font-light text-sm text-red-600 z-20">{errors.firstName}</p>
-                            )}
-                        </div>
-
-                        {/* Last Name Field */}
-                        <div className="relative">
-                            <input 
-                                type="text" 
-                                name="lastName" 
-                                id="lastName" 
-                                value={formData.lastName}
-                                onChange={handleInputChange}
-                                placeholder="streep"
-                                disabled={isLoading}
-                                className={`w-full rounded-xl border bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-light placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
-                                    hasSubmitted && errors.lastName ? 'border-red-500 shadow-md' : 'border-gray-400 dark:border-gray-400'
-                                }`}
-                                style={{
-                                    fontSize: '17px',
-                                    fontWeight: 200
-                                }}
-                            />
-                            <label 
-                                htmlFor="lastName" 
-                                className="absolute -top-3 left-4 bg-white px-1 text-base text-black font-extralight"
-                            >
-                                last name
-                            </label>
-                            {hasSubmitted && errors.lastName && (
-                                <p className="absolute top-full right-1 font-light text-sm text-red-600 z-20">{errors.lastName}</p>
-                            )}
-                        </div>
-
-                        {/* Category Field */}
-                        <div className="relative">
-                            <CategorySelection 
-                                formData={formData}
-                                categories={categories}
-                                showCategoryDropdown={showCategoryDropdown}
-                                setShowCategoryDropdown={setShowCategoryDropdown}
-                                showAddCategory={showAddCategory}
-                                setShowAddCategory={setShowAddCategory}
-                                newCategoryName={newCategoryName}
-                                setNewCategoryName={setNewCategoryName}
-                                isAddingCategory={isAddingCategory}
-                                addCategory={addCategory}
-                                addCategoryToForm={addCategoryToForm}
-                                removeCategoryFromForm={removeCategoryFromForm}
-                                hasSubmitted={hasSubmitted}
-                                errors={errors}
-                                disabled={false}
-                            />
-                        </div>
-
-                        {/* Checkboxes */}
-                        <div className="ml-2"> 
-
-                            {/* isContacted Checkbox */}
-                            <div className="flex items-center w-full relative rounded-lg">
-                                <button
-                                    type="button"
-                                    onClick={handleIsContactedToggle}
-                                    className="flex items-center space-x-3 text-red-500"
-                                    disabled={isLoading}
-                                >
-                                    {formData.isContacted ? (
-                                        <>
-                                          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-5">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
-                                          </svg>
-
-                                            <span className="text-sm font-extralight text-black cursor-pointer">
-                                                contacted
-                                            </span>
-                                        </>
-                                    ) : (
-                                        <>
-                                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="black" className="size-5">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
-                                          </svg>
-                                            <span className="text-sm font-extralight text-black cursor-pointer">
-                                                mark as contacted
-                                            </span>
-                                        </>
-                                    )}
-                                </button>
-                            </div>
-
-                            {/* isToContact Checkbox */}
-                            <div className="flex items-center w-full relative">
-                                <button
-                                    type="button"
-                                    onClick={handleIsToContactToggle}
-                                    className="flex items-center space-x-3 mt-2 text-red-500 hover:text-red-500"
-                                    disabled={isLoading}
-                                >
-                                    {formData.isToContact ? (
-                                        <>
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-5">
-                                              <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
-                                            </svg>
-
-                                            <span className="text-sm font-extralight text-black cursor-pointer">
-                                                remind me
-                                            </span>
-                                        </>
-                                    ) : (
-                                        <>
-                                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="black" className="size-5">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
-                                          </svg>
-                                            <span className="text-sm font-extralight text-black cursor-pointer">
-                                                reminder
-                                            </span>
-                                        </>
-                                    )}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    
-
-                    {/* How to contact */}
-                    <div className="space-y-2">
-                        <p className="relative tracking-wide -mb-2 text-red-500 left-2 font-extralight">how to contact?</p>
-                            {/* email Field */}
-                            <div className="relative mb-4">
-                                <label htmlFor="email" className="relative left-4 bg-white px-1 text-base text-black font-extralight">
-                                    email
-                                </label>
-                                <input 
-                                    type="email" 
-                                    name="email" 
-                                    id="email" 
-                                    value={formData.email}
-                                    onChange={handleInputChange}
-                                    placeholder="your@email.com"
-                                    disabled={isLoading}
-                                    className={`w-full rounded-xl border -mt-3 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
-                                        hasSubmitted && errors.email ? 'border-red-500 shadow-md' : 'border-gray-400 dark:border-gray-400'
-                                    }`}
-                                    style={{
-                                        fontSize: '17px',
-                                        fontWeight: 200
-                                    }}
-                                />
-                                {hasSubmitted && errors.email && (
-                                    <p className="absolute top-full right-1 text-sm font-extralight text-red-600 z-20">{errors.email}</p>
-                                )}
-                            </div>
-                            
-                    
-                        <div>
-                            {/* phone Field */}
-                            <div className="relative mb-5">
-                                <label htmlFor="phone" className="relative left-4 bg-white px-1 text-base text-black font-extralight">
-                                    phone
-                                </label>
-                                <input 
-                                    type="tel" 
-                                    name="phone" 
-                                    id="phone" 
-                                    value={formData.phone}
-                                    onChange={handleInputChange}
-                                    placeholder="+49 1781234567"
-                                    disabled={isLoading}
-                                    className={`w-full rounded-xl border -mt-3 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500 ${
-                                        hasSubmitted && errors.phone ? 'border-red-500 shadow-md' : 'border-gray-400 dark:border-gray-400'
-                                    }`}
-                                    style={{
-                                        fontSize: '17px',
-                                        fontWeight: 200
-                                    }}
-                                />
-                                {hasSubmitted && errors.phone && (
-                                    <p className="absolute top-full right-1 font-extralight text-sm text-red-600 z-20">{errors.phone}</p>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Optional Address Toggle */}
-                        <div className="relative">
-                            {!showAddress ? (
-                                <button
-                                    type="button"
-                                    onClick={() => setShowAddress(true)}
-                                    className="flex items-center ml-1.5 -mt-1 space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-extralight"
-                                    disabled={isLoading}
-                                >
-                                    <span className="text-lg font-semibold">+</span>
-                                    <span className="text-base text-black hover:text-red-500">add address</span>
-                                </button>
-                            ) : (
-                                <div className="mt-4">
-                                    <div className="flex items-center justify-between">
-                                        <span className="relative left-2 mt-2 mb-3 tracking-wide text-sans font-extralight text-red-500 font-md">
-                                            address information
-                                        </span>
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                setShowAddress(false);
-                                                setFormData(prev => ({ 
-                                                    ...prev, 
-                                                    streetAndNr:'', 
-                                                    postalcode: '', 
-                                                    city: '', 
-                                                    country: '' 
-                                                }));
-                                            }}
-                                            className="relative -mb-2 right-1 text-red-500 hover:text-red-700 transition-colors duration-200 text-sm font-extralight"
-                                            disabled={isLoading}
-                                        >
-                                            remove
-                                        </button>
-                                    </div>
-                                    
-                                    {/* Address Field */}
-                                    <div className="relative">
-                                        <label htmlFor="streetAndNr" className="absolute -top-3 left-4 bg-white px-1 text-sans text-base text-black font-extralight">
-                                            street & nr°
-                                        </label>
-                                        <input 
-                                            type="text" 
-                                            name="streetAndNr" 
-                                            id="streetAndNr" 
-                                            value={formData.streetAndNr}
-                                            onChange={handleInputChange}
-                                            placeholder="greifwalder Str. 8"
-                                            disabled={isLoading}
-                                            className={`w-full rounded-xl border -mb-1 border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
-                                            style={{
-                                                fontSize: '17px',
-                                                fontWeight: 200
-                                            }}
-                                        />
-                                        {hasSubmitted && errors.streetAndNr && (
-                                            <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.streetAndNr}</p>
-                                        )}
-                                    </div>
-
-                                    {/* Postal Code and City in a row */}
-                                    <div className="flex space-x-4">
-                                        <div className="relative flex-1">
-                                            <label htmlFor="postalcode" className="relative top-3 bg-white px-1 left-4 text-sans text-base text-black font-extralight">
-                                                postal code
-                                            </label>
-                                            <input 
-                                                type="text" 
-                                                name="postalcode" 
-                                                id="postalcode" 
-                                                value={formData.postalcode}
-                                                onChange={handleInputChange}
-                                                placeholder="10407"
-                                                disabled={isLoading}
-                                                className={`w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
-                                                style={{
-                                                    fontSize: '17px',
-                                                    fontWeight: 200
-                                                }}
-                                            />
-                                            {hasSubmitted && errors.postalcode && (
-                                                <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.postalcode}</p>
-                                            )}
-                                        </div>
-
-                                        <div className="relative flex-1">
-                                            <label htmlFor="city" className="relative top-3 bg-white px-1 left-4 text-sans text-base text-black font-extralight">
-                                                city
-                                            </label>
-                                            <input 
-                                                type="text" 
-                                                name="city" 
-                                                id="city" 
-                                                value={formData.city}
-                                                onChange={handleInputChange}
-                                                placeholder="berlin"
-                                                disabled={isLoading}
-                                                className={`w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-200 max-w-full min-w-[150px] h-[48px] focus:outline-none focus:border-red-500`}
-                                                style={{
-                                                    fontSize: '18px',
-                                                    fontWeight: 200
-                                                }}
-                                            />
-                                            {hasSubmitted && errors.city && (
-                                                <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.city}</p>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    {/* Country Field */}
-                                    <div className="relative">
-                                        <label htmlFor="country" className="relative top-3 bg-white px-1 left-4 text-sans text-base text-black font-extralight">
-                                            country
-                                        </label>
-                                        <input 
-                                            type="text" 
-                                            name="country" 
-                                            id="country" 
-                                            value={formData.country}
-                                            onChange={handleInputChange}
-                                            placeholder="germany"
-                                            disabled={isLoading}
-                                            className={`w-full rounded-xl mb-5 border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
-                                            style={{
-                                                fontSize: '18px',
-                                                fontWeight: 200
-                                            }}
-                                        />
-                                        {hasSubmitted && errors.country && (
-                                            <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.country}</p>
-                                        )}
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
-
-                 
-                    <div className="space-y-3"> 
-                        <div className="relative">
-                              <p className="font-text text-base font-extralight tracking-wide text-red-500 ml-1 mt-6 ">date and place of</p>
-                            {/* Next Contact Field */}
-                            <div className="relative -mt-1">
-                                <label htmlFor="nextContactDate" className="relative top-3 left-4 bg-white px-1 text-sans text-base text-black font-extralight">
-                                    next planned contact
-                                </label>
-                                <input 
-                                    type="text" 
-                                    name="nextContactDate" 
-                                    id="nextContactDate" 
-                                    value={formData.nextContactDate}
-                                    onChange={handleInputChange}
-                                    placeholder="coffe shop, berlin ..."
-                                    disabled={isLoading}
-                                    className={`w-full mb-5 rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
-                                    style={{
-                                        fontSize: '17px',
-                                        fontWeight: 200
-                                    }}
-                                />
-                                {hasSubmitted && errors.nextContactDate && (
-                                    <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.nextContactDate}</p>
-                                )}
-                            </div>    
-
-                            {/* Contact History Fields */}
-                                <div className="relative -mt-2">
-                                <label htmlFor="lastContactDate" className="relative left-4  bg-white px-1 text-sans text-base text-black font-extralight">
-                                    last contact
-                                </label>
-                                <input 
-                                    type="text" 
-                                    name="lastContactDate" 
-                                    id="lastContactDate" 
-                                    value={formData.lastContactDate}
-                                    onChange={handleInputChange}
-                                    placeholder="am 19.05.2025 in Berlin"
-                                    disabled={isLoading}
-                                    className={`w-full rounded-xl border -mt-3 border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
-                                    style={{
-                                        fontSize: '17px',
-                                        fontWeight: 200
-                                    }}
-                                />
-                                {hasSubmitted && errors.lastContactDate && (
-                                    <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.lastContactDate}</p>
-                                )}
-                            </div>
-
-                            
-                        </div>
-                    </div>
-                
-                    {/* Notes */}
-                    <div className="relative">   
-                        {/* Notes Field */}
-                        <p className="relative tracking-wide text-red-500 -mt-2 left-2  font-extralight">additional information</p>
-
-                        <div className="flex items-center justify-between mt-1">
-                            <label htmlFor="notes" className="relative bg-white px-1 left-4 text-sans text-base text-black font-extralight">
-                                important notes
-                            </label>
-                        </div>
-                        <textarea 
-                            name="notes" 
-                            id="notes" 
-                            value={formData.notes}
-                            onChange={handleInputChange}
-                            placeholder="every thought matters.."
-                            disabled={isLoading}
-                            rows={expandedNotes ? 6 : 3}
-                            className={`w-full rounded-xl -mt-3 pt-4 border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
-                            style={{
-                                fontSize: '17px',
-                                fontWeight: 200,
-                                height: expandedNotes ? 'auto' : 'auto'
-                            }}
-                        />
-                        {hasSubmitted && errors.notes && (
-                            <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.notes}</p>
-                        )}
-                    </div>
-
-                    {/* Optional Links */}
-                    <div className="relative space-y-3">
-                        {/* Links Toggle and Fields */}
-                        {!showLinks ? (
-                            <button
-                                type="button"
-                                onClick={() => setShowLinks(true)}
-                                className="flex items-center ml-1.5 -mt-5 space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-extralight"
-                                disabled={isLoading}
-                            >
-                                <span className="text-lg font-semibold">+</span>
-                                <span className="text-base text-black hover:text-red-500">add weblinks</span>
-                            </button>
-                        ) : (
-                            <div className="space-y-2">
-                                <div className="flex items-center -mt-3 -mb-2 justify-between">
-                                    <span className="relative left-2 text-sans font-extralight text-red-500 font-md">
-                                        websites & links
-                                    </span>
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                        setShowLinks(false);
-                                        setLinks([{ title: '', url: '' }]);
-                                    }}
-                                        className="text-red-500 -mb-1 mr-2 font-extralight hover:text-red-700 text-sm"
-                                        disabled={isLoading}
-                                    >
-                                        remove
-                                    </button>
-                                </div>
-                                
-                                {links.map((link, index) => (
-                                    <div key={index} className="relative flex items-center space-x-2">
-                                        <input 
-                                            type="text" 
-                                            value={link.title}
-                                            onChange={(e) => handleLinkChange(index, 'title', e.target.value)}
-                                            placeholder="website"
-                                            disabled={isLoading}
-                                            className="flex relative p-2.5 w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-200 min-w-[100px] max-w-[120px] h-[48px] focus:outline-none focus:border-red-500"
-                                            style={{
-                                                fontSize: '17px',
-                                                fontWeight: 200
-                                            }}
-                                        />
-                                        <input 
-                                            type="url" 
-                                            value={link.url}
-                                            onChange={(e) => handleLinkChange(index, 'url', e.target.value)}
-                                            placeholder="https://example.com"
-                                            disabled={isLoading}
-                                            className="flex p-2.5 w-full rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500"
-                                            style={{
-                                                fontSize: '17px',
-                                                fontWeight: 200
-                                            }}
-                                        />
-                                        {links.length > 1 && (
-                                            <button
-                                                type="button"
-                                                onClick={() => removeLink(index)}
-                                                className="text-red-500 hover:text-red-700 transition-colors duration-200 p-1"
-                                                disabled={isLoading}
-                                            >
-                                                ×
-                                            </button>
-                                        )}
-                                    </div>
-                                ))}
-                                
-                                <button
-                                    type="button"
-                                    onClick={addLink}
-                                    className="flex ml-1.5 items-center space-x-2 text-red-500 hover:text-red-600 transition-colors duration-200 font-extralight text-normal"
-                                    disabled={isLoading}
-                                >
-                                    <span className="mt-1 font-semibold text-lg">+</span>
-                                    <span className="mt-1 text-black hover:text-red-500">add another link</span>
-                                </button>
-                            </div>
-                        )}
-                    </div> 
-                    <div className="relative">
-                            {!showBirthdate ? (
-                                <button
-                                    type="button"
-                                    onClick={() => setShowBirthdate(true)}
-                                    className="ml-1.5 flex items-center space-x-2 -mt-8 text-red-500 hover:text-red-600 transition-colors duration-200 font-extralight"
-                                    disabled={isLoading}
-                                >
-                                    <span className="text-lg font-semibold">+</span>
-                                    <span className="text-base text-black hover:text-red-500">birthdate</span>
-                                </button>
-                            ) : (
-                                <div>
-                                    <div className="flex items-center justify-between">
-                                        <p className="relative -mb-1 left-4 bg-white p-1 text-sans font-extralight text-black font-md">
-                                            birthdate
-                                        </p>
-                                        <span className="relative -mt-4 right-1 font-extralight">
-                                            <button
-                                                type="button"
-                                                onClick={() => {
-                                                    setShowBirthdate(false);
-                                                    setFormData(prev => ({ ...prev, birthdate: '' }));
-                                                }}
-                                                className="text-red-500 hover:text-red-700 text-sm"
-                                                disabled={isLoading}
-                                            >
-                                                remove
-                                            </button>
-                                        </span>
-                                    </div>
-                                    <input 
-                                        type="text" 
-                                        name="birthdate" 
-                                        id="birthdate" 
-                                        value={formData.birthdate}
-                                        onChange={handleInputChange}
-                                        placeholder="18.04.1995"
-                                        disabled={isLoading}
-                                        className={`w-full -mt-3 rounded-xl border border-gray-400 dark:border-gray-400 bg-white hover:border-red-300 dark:hover:border-red-300 text-black font-extralight placeholder-gray-200 max-w-full min-w-[200px] h-[48px] focus:outline-none focus:border-red-500`}
-                                        style={{
-                                            fontSize: '17px',
-                                            fontWeight: 200
-                                        }}
-                                    />
-                                    {hasSubmitted && errors.birthdate && (
-                                        <p className="absolute top-full right-1 text-sm text-red-600 z-20">{errors.birthdate}</p>
-                                    )}
-                                </div>
-                            )}
-                        </div>
-                </div> 
-                {/* Save and Cancel Buttons */}
-                
-                
-                {/* Deleting Button with Confirmation */}
-                <CircleButton
-                    type="button"
-                    size="medium"
-                    onClick={() => setShowDeleteConfirmation(true)}
-                    className="absolute -bottom-[74px] right-[100px] text-xl font-light hover:bg-red-700"
-                    style={{ 
-                      marginTop: '2rem', 
-                      marginRight: 'auto', 
-                      display: 'block',
-                    }}
-                    disabled={isSaving || isDeleting}
-                  >
-                    delete.
-                  </CircleButton>
-                  
-                  <div className="flex space-x-4 items-center justify-center mt-8 ml-auto">
-                    <CircleButton
-                        size="xl"
-                        variant="dark"
-                        type="submit"
-                        onClick={handleSave}
-                        className=" absolute -bottom-[85px] -right-[10px] text-2xl font-semibold"
-                            style={{ 
-                                marginTop: '2rem', 
-                                marginLeft: 'auto', 
-                                display: 'block' 
-                            }}
-                        disabled={isSaving}
-                    >
-                        {isSaving ? 'saving...' : 'save.'}
-                    </CircleButton>
-                </div>
-
-                  {/* Delete Confirmation Modal */}
-                  {showDeleteConfirmation && (
-                    <div className="fixed font-extralight inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-                        style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
-                      <div className="bg-white rounded-3xl p-8 relative overflow-visible w-[85vw] min-w-[280px] max-w-[400px] mx-auto"
-                          style={{ 
-                            boxShadow: '0 8px 48px rgba(109, 71, 71, 0.35)'
-                          }}>
-                        
-                        {/* Warning Icon */}
-                        <div className="flex justify-center mb-6">
-                          <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center">
-                            <svg 
-                              className="w-8 h-8 text-red-500 font-extralight" 
-                              fill="none" 
-                              stroke="currentColor" 
-                              viewBox="0 0 24 24"
-                            >
-                              <path 
-                                strokeLinecap="round" 
-                                strokeLinejoin="round" 
-                                strokeWidth={2} 
-                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" 
-                              />
-                            </svg>
-                          </div>
-                        </div>
-
-                        {/* Title */}
-                        <h2 className="text-2xl font-bold text-center mb-4 text-black">
-                          delete <span className="text-red-500">{formData.firstName}?</span>
-                        </h2>
-                        
-                        {/* Message */}
-                        <p className="text-center text-black tracking-wider font-extralight mb-8 leading-relaxed">
-                          this action cannot be undone. all contact information, notes, and history will be permanently removed.
-                        </p>
-                        
-                        {/* Action Buttons */}
-                        <div className="flex space-x-4">
-                          {/* Cancel Button */}
-                          <button
-                            type="button"
-                            onClick={() => setShowDeleteConfirmation(false)}
-                            disabled={isDeleting}
-                            className="flex-1 py-3 px-6 rounded-xl font-extralight border-2 border-gray-300 text-black tracking-wide font-md hover:bg-gray-50 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
-                            style={{ fontSize: '16px' }}
-                          >
-                            cancel.
-                          </button>
-                          
-                          {/* Delete Button */}
-                          <button
-                            type="button"
-                            onClick={handleDeleteContact}
-                            disabled={isDeleting}
-                            className="flex-1 py-3 px-6 rounded-xl bg-red-500 text-white font-md tracking-wide hover:bg-red-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-                            style={{ fontSize: '16px' }}
-                          >
-                            {isDeleting ? (
-                              <>
-                                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 0 1 8-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 0 1 4 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                                deleting...
-                              </>
-                            ) : (
-                              'delete forever.'
-                            )}
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-            </div>
-
-            {/* Back Link */}
-            <div className="text-black dark:text-white font-extralight block mt-2 relative -ml-48 mb-36"
-                style={{ fontSize: '16px' }}>
-                want to cancel? {' '}
-                <button 
-                    onClick={handleCancel}
-                    className="font-light text-red-500 hover:underline bg-transparent border-none cursor-pointer"
-                    disabled={isSaving}
-                >
-                    go back.
-                </button>
-            </div>
-          </form>
-      </div>
-    );
-  }
-
-
-
-  // VIEW MODE
-  console.log("Contact Mode Showing")
   return (
-    <div className=" flex flex-col items-center min-h-screen bg-white dark:bg-black" 
-        style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
+    <div className=" min-h-screen w-full">
 
+      {/* Contact Display Card */}
+      <div className="bg-white rounded-3xl p-4 relative z-10 overflow-visible w-[90vw] min-w-[260px] max-w-[480px] h-fit mx-auto"
+        style={{
+          boxShadow: '0 4px 32px rgba(109, 71, 71, 0.29)'
+        }}>
 
-        {/* Contact Display Card */}
-        <div className="bg-white rounded-3xl p-4 relative z-10 overflow-visible w-[88vw] min-w-[260px] max-w-[480px] h-fit mx-auto mt-10 "
-            style={{ 
-                boxShadow: '0 4px 32px rgba(109, 71, 71, 0.29)'
-            }}>
-        
-        
-        <div className="text-center mb-4 space-y-8 pb-3">
+        {/* Favorite Button, Name, Categories */}
+        <div className="text-center mb-4 space-y-7 pb-3">
+
           {/* Favorite checkbox */}
-            <div className="flex justify-center">
-                <button
-                        type="button"
-                        onClick={handleFavoriteToggle} 
-                        className="flex items-center hover:scale-110 transcontact -mb-5"
-                        disabled={isLoading}
-                    >
-                    <svg 
-                        className={`w-7 h-7 ${
-                            contactData.is_favorite ? 'text-red-500 hover:text-yellow-300' : 'text-black hover:text-yellow-300'
-                        }`} 
-                        aria-hidden="true" 
-                        xmlns="http://www.w3.org/2000/svg" 
-                        fill="currentColor" 
-                        viewBox="0 0 22 20"
-                        >
-                        <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
-                    </svg>
-                </button>
-            </div>
-
-          {/* Names */}
-          <div className="flex items-center justify-center space-x-7">
-            <h1 className="text-3xl font-bold text-black -mb-4">
-              {contactData.first_name} {contactData.last_name}
-            </h1>
+          <div className="flex justify-center">
+            <button
+              type="button"
+              onClick={handleFavoriteToggle}
+              className="flex items-center hover:scale-110 transcontact -mb-4"
+              disabled={isLoading}
+            >
+              <svg
+                className={`w-7 h-7 ${contactData.is_favorite ? 'text-red-500 hover:text-yellow-300' : 'text-black hover:text-yellow-300'
+                  }`}
+                aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                viewBox="0 0 22 20"
+              >
+                <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z" />
+              </svg>
+            </button>
           </div>
 
-          
+          {/* Name */}
+          <h1 className="text-3xl font-bold text-center text-black">
+            {contactData.first_name} {contactData.last_name}
+          </h1>
+
+
           {/* Categories Display */}
           {contactData && contactData.categories && contactData.categories.length > 0 && (
-            <div className="w-full justify-center mx-auto flex-wrap space-x-2">
+            <div className="w-full justify-center mx-auto flex-wrap ">
+              <div className="-mt-4">
                 {contactData.categories.map((category, index) => (
-                    <span 
-                    key={category.id || index} 
+                  <span
+                    key={category.id || index}
                     onClick={() => navigate(`/myspace/categories?expand=${category.id}`)}
-                    className="inline-block px-3 py-2 min-w-[90px]  bg-red-100 tracking-wide hover:bg-red-50 hover:text-red-700 text-red-700 rounded-full text-base font-extralight">
-                        {category.name}
-                    </span>
+                    className="inline-block py-2 min-w-[80px] mx-1 bg-gray-100 tracking-wide hover:bg-red-50 hover:text-red-700 text-black rounded-full text-base font-extralight cursor-pointer">
+                    {category.name}
+                  </span>
                 ))}
+              </div>
             </div>
           )}
-        </div>
-        
-        
-
-        {/* Contact Information */}
-        <div className="space-y-7 mb-7 ">
 
           {/* Checkboxes */}
-          <div className="ml-2 border-b border-gray-200 pb-5"> 
-            
-              {/* isContacted Checkbox */}
-              <div className="flex items-center w-full relative rounded-lg">
-                  <button
-                      type="button"
-                      onClick={handleIsContactedToggle} 
-                      className="flex items-center space-x-3 text-red-500 hover:text-red-700"
-                      disabled={isLoading}
-                  >
-                      {contactData.is_contacted ? ( 
-                          <>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-5">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
-                            </svg>
+          <div className="ml-2 border-b border-gray-200 pb-5">
 
-                              <span className="text-sm font-extralight text-black cursor-pointer">
-                                  contacted
-                              </span>
-                          </>
-                      ) : (
-                          <>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="black" className="size-5">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
-                            </svg>
-                              <span className="text-sm font-extralight text-black cursor-pointer">
-                                  mark as contacted
-                              </span>
-                          </>
-                      )}
-                  </button>
-              </div>
-
-              {/* isToContact Checkbox */}
-              <div className="flex items-center w-full relative">
-                  <button
-                      type="button"
-                      onClick={handleIsToContactToggle} // FIXED: Use the correct handler
-                      className="flex items-center space-x-3 mt-2 text-red-500 hover:text-red-700"
-                      disabled={isLoading}
-                  >
-                      {contactData.is_to_contact ? ( // FIXED: Use contactData instead of formData
-                          <>
-                              <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-5">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
-                              </svg>
-
-                              <span className="text-sm font-extralight text-black cursor-pointer">
-                                  remind me
-                              </span>
-                          </>
-                      ) : (
-                          <>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="black" className="size-5">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
-                            </svg>
-                              <span className="text-sm font-extralight text-black cursor-pointer">
-                                  reminder
-                              </span>
-                          </>
-                      )}
-                  </button>
-              </div>
-          </div>
-          
-          <div>
-              <h2 className="relative text-black left-2 font-extralight">Contact Information</h2>
-          </div>
-    
-            {/* Contact Methods */}
-            {(contactData.email || contactData.phone) && (
-              <div className="space-y-4">
-                
-                {/* Email */}
-                {contactData.email && (
-                  <div className="-mt-4">
-                    <h2 className="text-red-500  font-extralight text-[14px] -mb-7 ml-3">private <span className="text-gray-700 font-extralight">email</span></h2>
-                      <div className=" bg-gray-50 rounded-xl pt-6 p-3 space-y-1">
-                        <div className="flex items-start ">
-                          
-                            <a 
-                              href={`mailto:${contactData.email}`}
-                              className="text-black text-[17px] font-extralight hover:text-red-500"
-                            >
-                              {/* list of emails & titles */}
-                              {contactData.email}
-                            </a>
-                         
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  
-                  {/* Phone */}
-                  {contactData.phone && (
-                    <div className="mt-2">
-                      <h2 className="text-red-500 font-extralight text-[14px] -mb-7 ml-3">office <span className="text-gray-700 font-extralight">number</span></h2>
-                      <div className=" bg-gray-50 rounded-xl pt-6 p-3 space-y-1">
-                        <div className="flex items-start">
-                          {/* <span className="text-gray-500 font-extralight text-sm ">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="currentColor" className="size-4">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z" />
-                            </svg>
-                          </span> */}
-                          
-                            <a 
-                              href={`tel:${contactData.phone}`}
-                              className="text-black text-[17px] font-extralight hover:text-red-500"
-                            >
-                              {contactData.phone}
-                            </a>
-                          
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                
-              </div>
-            )}
-
-
-            {/* Address */}
-            {(contactData.street_and_nr || contactData.city || contactData.country) && (
-              <div className="space-y-2">
-                  <h3 className="text-red-500 font-extralight text-[14px] -mb-9 ml-3 -mt-3">office <span className="text-gray-700 font-extralight">address</span></h3>
-
-                <a
-                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                    [
-                      contactData.street_and_nr,
-                      contactData.postal_code,
-                      contactData.city,
-                      contactData.country
-                    ]
-                      .filter(Boolean) // Remove empty values
-                      .join(', ')
-                  )}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block bg-gray-50 rounded-xl pt-7 p-3 cursor-pointer"
-                  title="Open in Google Maps"
-                >
-                  <span className="flex items-center justify-start">
-                    {/* Small indicator */}
-                    <svg 
-                      className="w-4 h-4 text-gray-300" 
-                      fill="currentColor" 
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+            {/* isContacted Checkbox */}
+            <div className="flex items-center w-full relative rounded-lg">
+              <button
+                type="button"
+                onClick={handleIsContactedToggle}
+                className="flex items-center space-x-3 text-red-500 hover:text-red-700"
+                disabled={isLoading}
+              >
+                {contactData.is_contacted ? (
+                  <>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
                     </svg>
-                </span>
-                  <div className="text-black text-[17px] hover:text-red-500 font-extralight -space-y-1 -mt-5 ml-6">
-                    {contactData.street_and_nr && <div>{contactData.street_and_nr},</div>}
-                    <div>
-                      {contactData.postal_code && `${contactData.postal_code} `}
-                      {contactData.city},
-                    </div>
-                    {contactData.country && <div>{contactData.country}</div>}
-                  </div>
-                </a>
-              </div>
-            )}
 
-            <div className="space-y-2 mt-4">
-              {/* Contact History */}
-              {(contactData.last_contact_date || contactData.next_contact_date) && (
-                <>
-                  <h2 className="relative text-black left-2 font-extralight">Contact History</h2>
-
-                  {/* next contact */}
-                  {contactData.next_contact_date && (
-                    <div className=" bg-gray-50 rounded-xl space-y-1">
-                    <h3 className="text-red-500 font-extralight text-[14px] pt-2 ml-3 -mb-6">next <span className="text-gray-700 font-extralight">planned contact:</span></h3>
-                    <div className="p-3 -mt-2 pt-4">
-                      <span className="text-red-500 text-[17px] font-extralight">
-                          13.09.2025
-                      </span>
-                      <span className="text-black text-[17px] font-extralight">
-                        { } {contactData.next_contact_date}
-                      </span>
-                    </div>
-                  </div>  
-                )}  
-
-                {/* last contact */}
-                {contactData.last_contact_date && (
-                  <div className=" bg-gray-50 rounded-xl space-y-1">
-                  <h3 className="text-red-500 text-[14px] font-extralight pt-2 ml-3 -mb-6">last <span className="text-gray-700 font-extralight">contact:</span></h3>
-                    <div className="pt-4 p-3">
-                    <span className="text-red-500 text-[17px] font-extralight">
-                          13.09.2024
-                      </span>
-                      <span className="text-black text-[17px] font-extralight">
-                        { } {contactData.next_contact_date}
-                      </span>
-                    </div>
-                  </div>
+                    <span className="text-sm font-extralight text-black cursor-pointer">
+                      contacted
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="black" className="size-5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
+                    </svg>
+                    <span className="text-sm font-extralight text-black cursor-pointer">
+                      mark as contacted
+                    </span>
+                  </>
                 )}
-              </>
-              )}
+              </button>
             </div>
 
-            <div className="">
-              {/* Additional Information */}
-              {(contactData.notes || 
-              contactData.birth_date || 
-                (contactData.links && contactData.links.some(link => link.url?.trim() && link.title?.trim()))
-                ) && (
-                <div className="space-y-2">
-                  <h2 className="relative text-black left-2 font-extralight mb-4">Additional Information</h2>
+            {/* isToContact Checkbox */}
+            <div className="flex items-center w-full relative">
+              <button
+                type="button"
+                onClick={handleIsToContactToggle}
+                className="flex items-center space-x-3 mt-2 text-red-500 hover:text-red-700"
+                disabled={isLoading}
+              >
+                {contactData.is_to_contact ? (
+                  <>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
+                    </svg>
 
-                  {/* Notes */}
-                  {contactData.notes && (
-                  <div className="relative">
-                    <h3 className="text-gray-700 font-extralight text-[14px] ml-3 -mb-6">notes</h3>
-                    <div className="bg-gray-50 rounded-xl p-3 pt-6 -mt-2 min-h-[100px]">
-                      <div className="text-black text-[17px] font-extralight whitespace-pre-wrap ">
-                        "{contactData.notes}"
+                    <span className="text-sm font-extralight text-black cursor-pointer">
+                      remind me
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="black" className="size-5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
+                    </svg>
+                    <span className="text-sm font-extralight text-black cursor-pointer">
+                      reminder
+                    </span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+
+
+        {/* Contact Information Section */}
+        {/* basic information */}
+        <div className="space-y-4">
+
+          <div className="flex items-center gap-2 ml-0.5">
+            <div className="w-1 h-6 bg-red-400 rounded-full mb-1"></div>
+            <p className="relative text-lg font-light text-red-400 tracking-wide -mt-1">call or mail.</p>
+          </div>
+
+          <div className="space-y-4">
+
+            {/* Emails */}
+            {contactData.emails && contactData.emails.length > 0 && (
+              <div className="mt-3">
+                {contactData.emails.map((emailItem, index) => (
+                  <>
+                    <h2 className="text-red-400 font-light tracking-wide text-[14px] -mb-7 ml-3">
+                      {emailItem.title}
+                      <span className="text-gray-700 tracking-wide font-extralight"> email</span>
+                    </h2>
+                    <div key={index} className="bg-gray-50 rounded-xl p-2 space-y-1 mb-4">
+                      <div className="flex items-start ">
+                        <a
+                          href={`mailto:${emailItem.email}`}
+                          className="text-black text-[17px] font-extralight mt-5 ml-1 hover:text-red-500 transition-colors"
+                        >
+                          {emailItem.email}
+                        </a>
                       </div>
                     </div>
-                  </div>
-                  )}
-              
-                  {/* birthdate */}
-                  {contactData.birth_date && (
-                      <div className="relative space-y-2">
-                        <h3 className="text-gray-700 font-extralight text-[14px] ml-3 -mb-8">date of birth</h3>
-                        <div className="bg-gray-50 rounded-xl p-3 pt-5">
-                          <div className="text-black text-[17px] tracking-wide font-extralight">
-                            {contactData.birth_date}
+                  </>
+                ))}
 
-                            {/* Link: add to calendar on the phone */}
-                            
+              </div>
+            )}
+
+            {/* Phones */}
+            {contactData.phones && contactData.phones.length > 0 && (
+              <div className="mt-3">
+                {contactData.phones.map((phoneItem, index) => (
+                  <>
+                    <h2 className="text-red-400 font-light tracking-wide  text-[14px] -mb-7 ml-3">
+                      {phoneItem.title}
+                      <span className="text-gray-700 tracking-wide font-extralight"> phone</span>
+                    </h2>
+                    <div key={index} className="bg-gray-50 rounded-xl p-2 space-y-1 mb-4">
+                      <div className="flex items-start ">
+                        <a
+                          href={`mailto:${phoneItem.phone}`}
+                          className="text-black text-[17px] font-extralight mt-5 hover:text-red-500 transition-colors"
+                        >
+                          {phoneItem.phone}
+                        </a>
+                      </div>
+                    </div>
+                  </>
+                ))}
+
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-4 pt-3">
+            {/* Addresses */}
+            {contactData.addresses && contactData.addresses.length > 0 && (
+              <>
+                <div className="flex items-center gap-2 ml-0.5 mb-3">
+                  <div className="w-1 h-6 bg-red-400 rounded-full mb-1"></div>
+                  <p className="relative text-lg font-light text-red-400 tracking-wide -mt-1">where at.</p>
+                </div>
+
+                <div className="border-b">
+                  {contactData.addresses.map((address, index) => (
+                    <>
+                      <h2 className="text-red-400 font-light tracking-wide text-[14px] -mb-7 ml-3">
+                        {address.title}
+                        <span className="text-gray-700 tracking-wide font-extralight"> address</span>
+                      </h2>
+
+                      <div key={index}>
+                        <div className="bg-gray-50 rounded-xl pt-4 p-2 mb-4">
+                          <div className="flex items-start mt-1 ">
+                            <a
+                              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                                [address.street_and_nr, address.postal_code, address.city, address.country]
+                                  .filter(Boolean)
+                                  .join(', ')
+                              )}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="block transparent rounded-xl pl-0 p-3 cursor-pointer"
+                              title="Open in Google Maps"
+                            >
+                              <span className="flex items-center justify-start">
+                                <svg className="w-4 h-4 text-gray-300" fill="currentColor" viewBox="0 0 24 24">
+                                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+                                </svg>
+                              </span>
+                              <div className="text-black text-[17px] hover:text-red-500 font-extralight -space-y-1 -mt-5 ml-6">
+                                {address.street_and_nr && <div>{address.street_and_nr},</div>}
+                                {address.additional_info && <div>{address.additional_info}</div>}
+                                <div>
+                                  {address.postal_code && `${address.postal_code} `}
+                                  {address.city},
+                                </div>
+                                {address.country && <div>{address.country}</div>}
+                              </div>
+                            </a>
                           </div>
                         </div>
                       </div>
-                    )}
-
-                  {/* Links */}
-                  {contactData.links && contactData.links.some(link => link.url?.trim() && link.title?.trim()) && (
-                    <div className="space-y-2">
-                      <h3 className="text-gray-700 font-extralight ml-2 mt-4 -mb-2">links</h3>
-                      <div className="flex-row space-y-2 max-w-[200px]">
-                        {contactData.links
-                          .filter(link => link.url?.trim() && link.title?.trim()) // Only show links with both URL and title
-                          .map((link, index) => (
-                            <div key={index} className="flex bg-gray-50 rounded-xl p-3 pt-2 hover:text-red-500 h-[45px]">
-                              <a 
-                                href={link.url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-red-500 text-[17px] font-extralight hover:text-red-700 break-all"
-                              >
-                                {link.title}
-                              </a>
-                            </div>
-                          ))}
-                      </div>
-                    </div>
-                  )}
+                    </>
+                  ))}
                 </div>
-              )}
-            </div>
+              </>
+            )}
+          </div>
         </div>
-      
-      
-      
+
+        {/* Additional Information Section */}
+        <div className="space-y-4 mt-4">
+
+          <div className="flex items-center gap-2 ml-0.5">
+            <div className="w-1 h-6 bg-red-400 rounded-full mb-1"></div>
+            <p className="relative text-lg font-light text-red-400 tracking-wide -mt-1">additional information.</p>
+          </div>
+
+          {/* Birthday */}
+          {/* {contactData.birthdate && ( */}
+          <>
+            <div className="bg-gray-50 rounded-xl p-2 space-y-1">
+              <h2 className="text-red-400 font-light tracking-wide text-[14px] -mb-1 ml-1">
+                birthdate
+              </h2>
+
+              <div className="flex items-start text-normal font-extralight ml-1">
+                f.e. 18.04.1995 {contactData.birthdate}
+              </div>
+            </div>
+          </>
+
+
+          {/* Notes */}
+          {contactData.notes && (
+            <>
+              <div className="bg-gray-50 rounded-xl p-2 space-y-1">
+                <h2 className="text-red-400 font-light tracking-wide text-[14px] -mb-1 ml-1">
+                  notes
+                </h2>
+
+                <div className="flex items-start text-normal font-extralight ml-1">
+                  {contactData.notes}
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Links */}
+          {contactData.links && contactData.links.length > 0 && (
+            <div className="mt-3">
+              <>
+                <h2 className="text-red-400 font-light tracking-wide text-[16px] -mb-7 ml-3">
+                  links
+                </h2>
+
+                <div className="rounded-xl p-3 pt-7">
+                  <div className="flex flex-wrap gap-2">
+                    {contactData.links.map((link, index) => {
+                      const titleLower = link.title?.toLowerCase() || '';
+
+                      // Instagram
+                      if (titleLower === 'instagram') {
+                        return (
+                          <a
+                            key={index}
+                            href={link.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-13 h-13 flex items-center justify-center group rounded-lg bg-white shadow-md shadow-gray-200 transition-all duration-300 hover:shadow-lg"
+                            title="Instagram"
+                          >
+                            <svg className="transition-all duration-300 group-hover:scale-110" width="28" height="28" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M27.4456 35.7808C27.4456 31.1786 31.1776 27.4468 35.7826 27.4468C40.3875 27.4468 44.1216 31.1786 44.1216 35.7808C44.1216 40.383 40.3875 44.1148 35.7826 44.1148C31.1776 44.1148 27.4456 40.383 27.4456 35.7808ZM22.9377 35.7808C22.9377 42.8708 28.6883 48.618 35.7826 48.618C42.8768 48.618 48.6275 42.8708 48.6275 35.7808C48.6275 28.6908 42.8768 22.9436 35.7826 22.9436C28.6883 22.9436 22.9377 28.6908 22.9377 35.7808ZM46.1342 22.4346C46.1339 23.0279 46.3098 23.608 46.6394 24.1015C46.9691 24.595 47.4377 24.9797 47.9861 25.2069C48.5346 25.4342 49.1381 25.4939 49.7204 25.3784C50.3028 25.2628 50.8378 24.9773 51.2577 24.5579C51.6777 24.1385 51.9638 23.6041 52.0799 23.0222C52.1959 22.4403 52.1367 21.8371 51.9097 21.2888C51.6828 20.7406 51.2982 20.2719 50.8047 19.942C50.3112 19.6122 49.7309 19.436 49.1372 19.4358H49.136C48.3402 19.4361 47.5771 19.7522 47.0142 20.3144C46.4514 20.8767 46.1349 21.6392 46.1342 22.4346ZM25.6765 56.1302C23.2377 56.0192 21.9121 55.6132 21.0311 55.2702C19.8632 54.8158 19.0299 54.2746 18.1538 53.4002C17.2777 52.5258 16.7354 51.6938 16.2827 50.5266C15.9393 49.6466 15.533 48.3214 15.4222 45.884C15.3009 43.2488 15.2767 42.4572 15.2767 35.781C15.2767 29.1048 15.3029 28.3154 15.4222 25.678C15.5332 23.2406 15.9425 21.918 16.2827 21.0354C16.7374 19.8682 17.2789 19.0354 18.1538 18.1598C19.0287 17.2842 19.8612 16.7422 21.0311 16.2898C21.9117 15.9466 23.2377 15.5406 25.6765 15.4298C28.3133 15.3086 29.1054 15.2844 35.7826 15.2844C42.4598 15.2844 43.2527 15.3106 45.8916 15.4298C48.3305 15.5408 49.6539 15.9498 50.537 16.2898C51.7049 16.7422 52.5382 17.2854 53.4144 18.1598C54.2905 19.0342 54.8308 19.8682 55.2855 21.0354C55.6289 21.9154 56.0351 23.2406 56.146 25.678C56.2673 28.3154 56.2915 29.1048 56.2915 35.781C56.2915 42.4572 56.2673 43.2466 56.146 45.884C56.0349 48.3214 55.6267 49.6462 55.2855 50.5266C54.8308 51.6938 54.2893 52.5266 53.4144 53.4002C52.5394 54.2738 51.7049 54.8158 50.537 55.2702C49.6565 55.6134 48.3305 56.0194 45.8916 56.1302C43.2549 56.2514 42.4628 56.2756 35.7826 56.2756C29.1024 56.2756 28.3125 56.2514 25.6765 56.1302ZM25.4694 10.9322C22.8064 11.0534 20.9867 11.4754 19.3976 12.0934C17.7518 12.7316 16.3585 13.5878 14.9663 14.977C13.5741 16.3662 12.7195 17.7608 12.081 19.4056C11.4626 20.9948 11.0403 22.8124 10.9191 25.4738C10.7958 28.1394 10.7676 28.9916 10.7676 35.7808C10.7676 42.57 10.7958 43.4222 10.9191 46.0878C11.0403 48.7494 11.4626 50.5668 12.081 52.156C12.7195 53.7998 13.5743 55.196 14.9663 56.5846C16.3583 57.9732 17.7518 58.8282 19.3976 59.4682C20.9897 60.0862 22.8064 60.5082 25.4694 60.6294C28.138 60.7506 28.9893 60.7808 35.7826 60.7808C42.5759 60.7808 43.4286 60.7526 46.0958 60.6294C48.759 60.5082 50.5774 60.0862 52.1676 59.4682C53.8124 58.8282 55.2066 57.9738 56.5989 56.5846C57.9911 55.1954 58.8438 53.7998 59.4842 52.156C60.1026 50.5668 60.5268 48.7492 60.6461 46.0878C60.7674 43.4202 60.7956 42.57 60.7956 35.7808C60.7956 28.9916 60.7674 28.1394 60.6461 25.4738C60.5248 22.8122 60.1026 20.9938 59.4842 19.4056C58.8438 17.7618 57.9889 16.3684 56.5989 14.977C55.2088 13.5856 53.8124 12.7316 52.1696 12.0934C50.5775 11.4754 48.7588 11.0514 46.0978 10.9322C43.4306 10.811 42.5779 10.7808 35.7846 10.7808C28.9913 10.7808 28.138 10.809 25.4694 10.9322Z" fill="url(#paint0_radial_ig)" />
+                              <path d="M27.4456 35.7808C27.4456 31.1786 31.1776 27.4468 35.7826 27.4468C40.3875 27.4468 44.1216 31.1786 44.1216 35.7808C44.1216 40.383 40.3875 44.1148 35.7826 44.1148C31.1776 44.1148 27.4456 40.383 27.4456 35.7808ZM22.9377 35.7808C22.9377 42.8708 28.6883 48.618 35.7826 48.618C42.8768 48.618 48.6275 42.8708 48.6275 35.7808C48.6275 28.6908 42.8768 22.9436 35.7826 22.9436C28.6883 22.9436 22.9377 28.6908 22.9377 35.7808ZM46.1342 22.4346C46.1339 23.0279 46.3098 23.608 46.6394 24.1015C46.9691 24.595 47.4377 24.9797 47.9861 25.2069C48.5346 25.4342 49.1381 25.4939 49.7204 25.3784C50.3028 25.2628 50.8378 24.9773 51.2577 24.5579C51.6777 24.1385 51.9638 23.6041 52.0799 23.0222C52.1959 22.4403 52.1367 21.8371 51.9097 21.2888C51.6828 20.7406 51.2982 20.2719 50.8047 19.942C50.3112 19.6122 49.7309 19.436 49.1372 19.4358H49.136C48.3402 19.4361 47.5771 19.7522 47.0142 20.3144C46.4514 20.8767 46.1349 21.6392 46.1342 22.4346ZM25.6765 56.1302C23.2377 56.0192 21.9121 55.6132 21.0311 55.2702C19.8632 54.8158 19.0299 54.2746 18.1538 53.4002C17.2777 52.5258 16.7354 51.6938 16.2827 50.5266C15.9393 49.6466 15.533 48.3214 15.4222 45.884C15.3009 43.2488 15.2767 42.4572 15.2767 35.781C15.2767 29.1048 15.3029 28.3154 15.4222 25.678C15.5332 23.2406 15.9425 21.918 16.2827 21.0354C16.7374 19.8682 17.2789 19.0354 18.1538 18.1598C19.0287 17.2842 19.8612 16.7422 21.0311 16.2898C21.9117 15.9466 23.2377 15.5406 25.6765 15.4298C28.3133 15.3086 29.1054 15.2844 35.7826 15.2844C42.4598 15.2844 43.2527 15.3106 45.8916 15.4298C48.3305 15.5408 49.6539 15.9498 50.537 16.2898C51.7049 16.7422 52.5382 17.2854 53.4144 18.1598C54.2905 19.0342 54.8308 19.8682 55.2855 21.0354C55.6289 21.9154 56.0351 23.2406 56.146 25.678C56.2673 28.3154 56.2915 29.1048 56.2915 35.781C56.2915 42.4572 56.2673 43.2466 56.146 45.884C56.0349 48.3214 55.6267 49.6462 55.2855 50.5266C54.8308 51.6938 54.2893 52.5266 53.4144 53.4002C52.5394 54.2738 51.7049 54.8158 50.537 55.2702C49.6565 55.6134 48.3305 56.0194 45.8916 56.1302C43.2549 56.2514 42.4628 56.2756 35.7826 56.2756C29.1024 56.2756 28.3125 56.2514 25.6765 56.1302ZM25.4694 10.9322C22.8064 11.0534 20.9867 11.4754 19.3976 12.0934C17.7518 12.7316 16.3585 13.5878 14.9663 14.977C13.5741 16.3662 12.7195 17.7608 12.081 19.4056C11.4626 20.9948 11.0403 22.8124 10.9191 25.4738C10.7958 28.1394 10.7676 28.9916 10.7676 35.7808C10.7676 42.57 10.7958 43.4222 10.9191 46.0878C11.0403 48.7494 11.4626 50.5668 12.081 52.156C12.7195 53.7998 13.5743 55.196 14.9663 56.5846C16.3583 57.9732 17.7518 58.8282 19.3976 59.4682C20.9897 60.0862 22.8064 60.5082 25.4694 60.6294C28.138 60.7506 28.9893 60.7808 35.7826 60.7808C42.5759 60.7808 43.4286 60.7526 46.0958 60.6294C48.759 60.5082 50.5774 60.0862 52.1676 59.4682C53.8124 58.8282 55.2066 57.9738 56.5989 56.5846C57.9911 55.1954 58.8438 53.7998 59.4842 52.156C60.1026 50.5668 60.5268 48.7492 60.6461 46.0878C60.7674 43.4202 60.7956 42.57 60.7956 35.7808C60.7956 28.9916 60.7674 28.1394 60.6461 25.4738C60.5248 22.8122 60.1026 20.9938 59.4842 19.4056C58.8438 17.7618 57.9889 16.3684 56.5989 14.977C55.2088 13.5856 53.8124 12.7316 52.1696 12.0934C50.5775 11.4754 48.7588 11.0514 46.0978 10.9322C43.4306 10.811 42.5779 10.7808 35.7846 10.7808C28.9913 10.7808 28.138 10.809 25.4694 10.9322Z" fill="url(#paint1_radial_ig)" />
+                              <defs>
+                                <radialGradient id="paint0_radial_ig" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(17.4144 61.017) scale(65.31 65.2708)">
+                                  <stop offset="0.09" stopColor="#FA8F21" />
+                                  <stop offset="0.78" stopColor="#D82D7E" />
+                                </radialGradient>
+                                <radialGradient id="paint1_radial_ig" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(41.1086 63.257) scale(51.4733 51.4424)">
+                                  <stop offset="0.64" stopColor="#8C3AAA" stopOpacity="0" />
+                                  <stop offset="1" stopColor="#8C3AAA" />
+                                </radialGradient>
+                              </defs>
+                            </svg>
+                          </a>
+                        );
+                      }
+
+                      // Facebook
+                      if (titleLower === 'facebook') {
+                        return (
+                          <a
+                            key={index}
+                            href={link.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-13 h-13 flex items-center justify-center rounded-lg bg-white shadow-md shadow-gray-200 group transition-all duration-300 hover:shadow-lg"
+                            title="Facebook"
+                          >
+                            <svg className="transition-all duration-300 group-hover:scale-110" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 72 72" fill="none">
+                              <path d="M46.4927 38.6403L47.7973 30.3588H39.7611V24.9759C39.7611 22.7114 40.883 20.4987 44.4706 20.4987H48.1756V13.4465C46.018 13.1028 43.8378 12.9168 41.6527 12.8901C35.0385 12.8901 30.7204 16.8626 30.7204 24.0442V30.3588H23.3887V38.6403H30.7204V58.671H39.7611V38.6403H46.4927Z" fill="#337FFF" />
+                            </svg>
+                          </a>
+                        );
+                      }
+
+                      // LinkedIn
+                      if (titleLower === 'linkedin') {
+                        return (
+                          <a
+                            key={index}
+                            href={link.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-13 h-13 flex items-center justify-center rounded-lg bg-white shadow-md shadow-gray-200 group transition-all duration-300 hover:shadow-lg"
+                            title="LinkedIn"
+                          >
+                            <svg className="rounded-md transition-all duration-100 group-hover:scale-110" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 72 72" fill="none">
+                              <path fillRule="evenodd" clipRule="evenodd" d="M14.6975 11C12.6561 11 11 12.6057 11 14.5838V57.4474C11 59.4257 12.6563 61.03 14.6975 61.03H57.3325C59.3747 61.03 61.03 59.4255 61.03 57.4468V14.5838C61.03 12.6057 59.3747 11 57.3325 11H14.6975ZM26.2032 30.345V52.8686H18.7167V30.345H26.2032ZM26.6967 23.3793C26.6967 25.5407 25.0717 27.2703 22.4615 27.2703L22.4609 27.2701H22.4124C19.8998 27.2701 18.2754 25.5405 18.2754 23.3791C18.2754 21.1686 19.9489 19.4873 22.5111 19.4873C25.0717 19.4873 26.6478 21.1686 26.6967 23.3793ZM37.833 52.8686H30.3471L30.3469 52.8694C30.3469 52.8694 30.4452 32.4588 30.3475 30.3458H37.8336V33.5339C38.8288 31.9995 40.6098 29.8169 44.5808 29.8169C49.5062 29.8169 53.1991 33.0363 53.1991 39.9543V52.8686H45.7133V40.8204C45.7133 37.7922 44.6293 35.7269 41.921 35.7269C39.8524 35.7269 38.6206 37.1198 38.0796 38.4653C37.8819 38.9455 37.833 39.6195 37.833 40.2918V52.8686Z" fill="#006699" />
+                            </svg>
+                          </a>
+                        );
+                      }
+
+
+                      // Filmmakers
+                      if (titleLower === 'filmmakers') {
+                        return (
+                          <a
+                            key={index}
+                            href={link.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-13 h-13 flex items-center justify-center rounded-full bg-white shadow-md shadow-gray-200 group hover:shadow-lg transition-all duration-300"
+                            title="Filmmakers"
+                          >
+                            <img
+                              alt="Filmmakers Icon"
+                              className="w-8 h-8 transition-all duration-100 group-hover:scale-110"
+                              src={filmmakersLogo}
+                            />
+                          </a>
+                        );
+                      }
+
+                      // Schauspielervideos
+                      if (titleLower === 'schauspielervideos') {
+                        return (
+                          <a
+                            key={index}
+                            href={link.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-13 h-13 flex items-center justify-center rounded-full bg-white shadow-md shadow-gray-200 group hover:shadow-lg"
+                            title="schauspielervideos"
+                          >
+                            <img
+                              alt="Schauspielervideos Icon"
+                              className="w-8 h-8 group-hover:scale-110"
+                              src="https://assets.filmmakers.eu/assets/web_presence_icons/schauspielervideos-30b9a754.svg"
+                            />
+                          </a>
+                        );
+                      }
+
+                      // Website (globe icon)
+                      if (titleLower === 'website') {
+                        return (
+                          <a
+                            key={index}
+                            href={link.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-13 h-13 flex items-center justify-center rounded-lg bg-white shadow-md shadow-gray-200 group transition-all duration-100 hover:shadow-lg"
+                            title="Website"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6 text-gray-700 transition-all duration-300 group-hover:scale-110">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418" />
+                            </svg>
+                          </a>
+                        );
+                      }
+
+                      // Other or unknown titles - text button
+                      return (
+                        <a
+                          key={index}
+                          href={link.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-3 py-2 flex items-center justify-center rounded-lg bg-white shadow-md shadow-gray-200 hover:shadow-lg hover:bg-red-50 "
+                          title={link.title}
+                        >
+                          <span className="text-normal font-light text-gray-700 hover:text-red-500 hover:scale-110">
+                            {link.title}
+                          </span>
+                        </a>
+                      );
+                    })}
+                  </div>
+                </div>
+              </>
+            </div>
+          )}
+
+
+          {/* Contact History */}
+          {
+            (contactData.last_contact_date || contactData.next_contact_date) && (
+              <div className="bg-gray-50 rounded-xl">
+                {/* Last contact */}
+                {contactData.last_contact_date && (
+                  <>
+                    <h3 className="text-red-700 text-[15px] ml-3 pt-3">
+                      <span className="font-extralight">last date of contact:</span>
+                    </h3>
+                    <div className="p-3 pt-2">
+                      <div className="text-black text-[16px] font-extralight">{contactData.last_contact_date}</div>
+                    </div>
+                  </>
+                )}
+
+                {/* Next contact */}
+                {contactData.next_contact_date && (
+                  <>
+                    <h3 className="text-red-700 font-extralight text-[15px] ml-3">
+                      <span className="font-extralight">next planned contact:</span>
+                    </h3>
+                    <div className="p-3 pb-3">
+                      <div className="text-black text-[17px] font-extralight">{contactData.next_contact_date}</div>
+                      {contactData.next_contact_place && (
+                        <div className="text-gray-500 text-[14px] font-extralight mt-1">
+                          at: {contactData.next_contact_place}
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
+              </div>
+            )
+          }
+        </div>
+
         {/* Edit Button */}
-        <CircleButton
-            size="xl"
-            variant="dark"
-          onClick={handleEdit}
+        < CircleButton
+          size="xl"
+          variant="dark"
+          onClick={onEdit}
           className="absolute -bottom-[85px] -right-[10px] font-semibold"
-          style={{ 
-            marginTop: '2rem', 
-            marginLeft: 'auto', 
-            display: 'block' 
+          style={{
+            marginTop: '2rem',
+            marginLeft: 'auto',
+            display: 'block'
           }}
-          disabled={isLoading}
         >
           edit.
-        </CircleButton>
-
-      </div>
+        </CircleButton >
+      </div >
 
       {/* Back Links */}
-      <div className="w-full px-8 pt-2 space-y-0.25 max-w-[480px] pb-28">
-        <div className="text-black dark:text-white font-extralight block relative"
-            style={{ fontSize: '16px' }}>
-          want to go {' '}
-          <button 
-            onClick={() => navigate('/myspace/contacts')}
+      < div className="w-full px-8 mt-2 space-y-0.25 max-w-[480px]" >
+        <div className="text-black dark:text-white font-extralight block relative" style={{ fontSize: '16px' }}>
+          want to go{' '}
+          <button
+            onClick={() => onNavigate('/myspace/contacts')}
             className="font-light text-red-500 hover:underline bg-transparent border-none cursor-pointer"
           >
-          to contacts?
+            to contacts?
           </button>
         </div>
-        <div className="text-black dark:text-white font-extralight block -mt-2 relative"
-            style={{ fontSize: '16px' }}>
-          or go {' '}
-          <button 
-            onClick={handleGoBack}
-            className="font-light text-red-500 hover:underline bg-transparent border-none cursor-pointer"
-          >
-          back
+        <div className="text-black dark:text-white font-extralight block -mt-2 relative" style={{ fontSize: '16px' }}>
+          or go{' '}
+          <button onClick={handleGoBack} className="font-light text-red-500 hover:underline bg-transparent border-none cursor-pointer">
+            back
           </button>
         </div>
-      </div>
-    
-  </div>
-  );
-};
+      </div >
 
-export default ShowContactForm;
+    </div >
+  );
+}

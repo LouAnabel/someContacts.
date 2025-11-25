@@ -13,28 +13,52 @@ class Contact(db.Model):
     # Basic Contact Information
     first_name = db.Column(db.String(100), nullable=False)
     last_name = db.Column(db.String(100), nullable=True)  # Optional
-    email = db.Column(db.String(255), nullable=True)  # Optional and removed unique constraint
-    phone = db.Column(db.String(20), nullable=True)
     is_favorite = db.Column(db.Boolean, default=False, nullable=True)
 
     # Additional fields that your to_dict() method expects
-    birth_date = db.Column(db.Date,nullable=True)
+    birth_date = db.Column(db.Date, nullable=True)
     is_to_contact = db.Column(db.Boolean, default=False, nullable=True)
     is_contacted = db.Column(db.Boolean, default=False, nullable=True)
-    last_contact_date = db.Column(db.String(200), nullable=True)
-    next_contact_date = db.Column(db.String(200), nullable=True)
-
-    street_and_nr = db.Column(db.String(200), nullable=True)
-    postal_code = db.Column(db.String(100), nullable=True)
-    city = db.Column(db.String(100), nullable=True)
-    country = db.Column(db.String(100), nullable=True)
+    last_contact_date = db.Column(db.Date, nullable=True)
+    last_contact_place = db.Column(db.String(200), nullable=True)
+    next_contact_date = db.Column(db.Date, nullable=True)
+    next_contact_place = db.Column(db.String(200), nullable=True)
     notes = db.Column(db.String(2000))
 
-    links = db.relationship('ContactLinks', backref='contact', lazy='dynamic', cascade='all, delete-orphan')
+
+    # Relationships - filtering by owner_type
+    emails = db.relationship(
+        'ContactEmail',
+        primaryjoin='and_(foreign(ContactEmail.contact_id)==Contact.id, ContactEmail.owner_type=="contact")',
+        lazy='dynamic',
+        cascade='all, delete-orphan',
+        viewonly=False
+    )
+    phones = db.relationship(
+        'ContactPhone',
+        primaryjoin='and_(foreign(ContactPhone.contact_id)==Contact.id, ContactPhone.owner_type=="contact")',
+        lazy='dynamic',
+        cascade='all, delete-orphan',
+        viewonly=False
+    )
+    addresses = db.relationship(
+        'ContactAddress',
+        primaryjoin='and_(foreign(ContactAddress.contact_id)==Contact.id, ContactAddress.owner_type=="contact")',
+        lazy='dynamic',
+        cascade='all, delete-orphan',
+        viewonly=False
+    )
+    links = db.relationship(
+        'ContactLink',
+        primaryjoin='and_(foreign(ContactLink.contact_id)==Contact.id, ContactLink.owner_type=="contact")',
+        lazy='dynamic',
+        cascade='all, delete-orphan',
+        viewonly=False
+    )
+
     # Many-to-many Relationships
     contact_categories = db.relationship('ContactCategory', back_populates='contact', cascade='all, delete-orphan')
     categories = db.relationship('Category', secondary='contact_categories', back_populates='contacts', viewonly=True)
-
 
     # Timestamps
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
@@ -44,41 +68,43 @@ class Contact(db.Model):
 
     # Constraints for data integrity
     __table_args__ = (
-        # Index for creator_id and email queries (allows duplicates)
-        db.Index('idx_creator_email', 'creator_id', 'email', unique=False,
-                 postgresql_where=db.text('email IS NOT NULL')),
         db.Index('idx_creator_favorite', 'creator_id', 'is_favorite'),
         # Check constraints
         db.CheckConstraint('length(first_name) > 0', name='check_first_name_not_empty'),
         db.CheckConstraint('birth_date <= CURRENT_DATE', name='check_birth_date_not_future'),
+        db.CheckConstraint('next_contact_date IS NULL OR next_contact_date > CURRENT_DATE',
+                           name='check_next_contact_date_future'),
+        db.CheckConstraint('last_contact_date IS NULL OR last_contact_date <= CURRENT_DATE',
+                           name='check_last_contact_date_past'),
     )
 
-    def to_dict(self, include_categories=True, include_links=True):
-        data: dict[str | Any, None | dict[str, Any] | list[Any] | Any] = {
+    def to_dict(self, include_phones=True, include_emails=True, include_addresses=True, include_links=True, include_categories=True):
+        data = {
             'id': self.id,
             'creator_id': self.creator_id,
             'first_name': self.first_name,
             'last_name': self.last_name,
-            'email': self.email,
-            'phone': self.phone,
             'is_favorite': self.is_favorite,
             'birth_date': self.birth_date.strftime('%d.%m.%Y') if self.birth_date else None,
-            'is_contacted':self.is_contacted,
-            'is_to_contact' : self.is_to_contact,
-            'last_contact_date': self.last_contact_date,
-            'next_contact_date': self.next_contact_date,
-            'street_and_nr': self.street_and_nr,
-            'postal_code': self.postal_code,
-            'city': self.city,
-            'country': self.country,
+            'is_contacted': self.is_contacted,
+            'is_to_contact': self.is_to_contact,
+            'last_contact_date': self.last_contact_date.strftime('%d.%m.%Y') if self.last_contact_date else None,
+            'last_contact_place': self.last_contact_place,
+            'next_contact_date': self.next_contact_date.strftime('%d.%m.%Y') if self.next_contact_date else None,
+            'next_contact_place': self.next_contact_place,
             'notes': self.notes,
             'created_at': self.created_at.strftime('%d.%m.%Y %H:%M:%S') if self.created_at else None,
             'updated_at': self.updated_at.strftime('%d.%m.%Y %H:%M:%S') if self.updated_at else None,
         }
 
+        if include_phones:
+            data['phones'] = [phone.to_dict() for phone in self.phones.all()]
+        if include_emails:
+            data['emails'] = [email.to_dict() for email in self.emails.all()]
+        if include_addresses:
+            data['addresses'] = [address.to_dict() for address in self.addresses.all()]
         if include_links:
             data['links'] = [link.to_dict() for link in self.links.all()]
-
         if include_categories:
             data['categories'] = [category.to_dict() for category in self.categories]
 

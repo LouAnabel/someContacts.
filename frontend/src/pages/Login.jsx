@@ -6,8 +6,9 @@ const Login = () => {
             <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto lg:py-0">
                 <LoginForm />
             </div>
+            
             {/* Bottom Tagline */}
-            <div className="text-center text-black dark:text-white text-l absolute bottom-[34px] left-1/2 transform -translate-x-1/2 w-full min-[480px]:text-base"
+            <div className="text-center text-black dark:text-white text-l absolute bottom-[42px] left-1/2 transform -translate-x-1/2 w-full min-[480px]:text-base"
                 style={{
                     fontWeight: 300,
                     lineHeight: 1.4,

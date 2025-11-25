@@ -14,7 +14,7 @@ function LandingPage() {
         <h1 className="text-2xl font-heading font-light text-gray-900 dark:text-white mb-10">
             welcome to <span className="text-red-500 tracking-wide">someContacts.</span>
         </h1>
-        <container className="text-xl font-text font-light text-black dark:text-white mb-6">
+        <div className="text-xl font-text font-light text-black dark:text-white mb-6">
             <p className="mb-3"> keep all your contacts in one smart space. </p> 
             <p>collect personal notes, pictures, and every important detail while everything stays effortlessly organized.</p> 
             <p>Just the way you need it. Whether it’s your best friend, your favorite client, or that one person's name you always forget – </p>
@@ -25,7 +25,7 @@ function LandingPage() {
                 </Link>
                 {" "}now.
             </p>
-        </container>
+        </div>
         <CircleButton 
             size="xl"
             variant="dark"
