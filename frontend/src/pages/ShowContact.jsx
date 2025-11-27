@@ -302,7 +302,7 @@ export default function ShowContact() {
 
   return (
     <div
-      className="flex flex-col items-center justify-center mx-auto lg:py-0 mt-10 bg-white dark:bg-black"
+      className="flex flex-col items-center justify-center mx-auto lg:py-20 mt-10 bg-white dark:bg-black"
       style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}
     >
       {/* Back Button */}

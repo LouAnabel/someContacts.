@@ -32,7 +32,7 @@ export default function ShowContactForm({
   };
 
   return (
-    <div className=" min-h-screen w-full">
+    <div className=" min-h-[1200px] w-full">
 
       {/* Contact Display Card */}
       <div className="bg-white rounded-3xl p-4 pb-8 relative z-10 overflow-visible w-[90vw] min-w-[260px] max-w-[480px] h-fit mx-auto"
@@ -313,7 +313,7 @@ export default function ShowContactForm({
 
           {/* Links */}
           {contactData.links && contactData.links.length > 0 && (
-            <div className="mt-3 bg-gray-50 rounded-xl pt-2">
+            <div className="mt-3 bg-gray-50 rounded-xl pt-2 pb-4">
               <>
                 <h2 className="text-red-400 font-light tracking-wide text-[14px] -mb-6 ml-3">
                   links
@@ -525,7 +525,7 @@ export default function ShowContactForm({
       </div >
 
       {/* Back Links */}
-      < div className="w-full px-8 mt-2 space-y-0.25 max-w-[480px]" >
+      < div className="w-full mx-auto pl-5 mt-2 space-y-0.25 max-w-[480px]" >
         <div className="text-black dark:text-white font-extralight block relative" style={{ fontSize: '16px' }}>
           want to go{' '}
           <button
