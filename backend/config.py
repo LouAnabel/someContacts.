@@ -11,8 +11,8 @@ class Config:
 
     # JWT configuration
     JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'my_super_secret_jwt_key')
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(seconds=30) #FOR TEST PHASE! also possible 1h
-    JWT_REFRESH_TOKEN_EXPIRES = timedelta(minutes=2) #FOR TEST PHASE! otherwise 24h
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=1)  # Longer for development convenience
+    JWT_REFRESH_TOKEN_EXPIRES = timedelta(hours=24)
 
     instance_dir = os.path.join(basedir, 'instance')
     if not os.path.exists(instance_dir):
@@ -41,16 +41,16 @@ class TestingConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
     
     # Very short tokens for testing
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(seconds=30)
-    JWT_REFRESH_TOKEN_EXPIRES = timedelta(minutes=2)
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=1)
+    JWT_REFRESH_TOKEN_EXPIRES = timedelta(hours=24)
 
 
 class DevelopmentConfig(Config):
     DEBUG = True
 
     # Development-specific settings
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(seconds=30)  # Longer for development convenience
-    JWT_REFRESH_TOKEN_EXPIRES = timedelta(minutes=2)
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=5)  # Longer for development convenience
+    JWT_REFRESH_TOKEN_EXPIRES = timedelta(hours=2)
 
     instance_dir = os.path.join(basedir, 'instance')
     if not os.path.exists(instance_dir):
@@ -63,7 +63,7 @@ class DevelopmentConfig(Config):
 
 class ProductionConfig(Config):
     DEBUG = False
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=15)  # Shorter for security reasons
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=2)  # Shorter for security reasons
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=1)
 
     # For local production: use instance/ folder

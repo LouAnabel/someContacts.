@@ -85,7 +85,7 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
       try {
         if (accessToken) {
           const categoriesData = await getCategories(authFetch);
-          console.log('Categories loaded:', categoriesData);
+
           setCategories(categoriesData);
         }
       } catch (error) {
@@ -128,7 +128,7 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
         setShowAddCategory(false);
         setShowCategoryDropdown(false);
 
-        console.log('Category added to form:', newCategory);
+
       } catch (error) {
         console.error('Failed to add category:', error);
         alert(`Failed to add category: ${error.message}`);
@@ -199,7 +199,7 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
 
   // Handle basic input changes
   const handleInputChange = (e) => {
-    console.log('e.target:', e.target.value);
+
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -498,7 +498,7 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
     //   });
     // }
 
-    console.log('Validation errors:', newErrors);
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -512,7 +512,7 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
     setHasSubmitted(true);
 
     if (!validateForm()) {
-      console.log('Validation failed');
+
       return;
     }
 
@@ -522,8 +522,6 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
       if (!accessToken) {
         throw new Error('Access token is not available');
       }
-
-      console.log('sending categories', formData.categories.map(cat => cat.id))
 
       // Prepare contact data with multi-fields
       const contactData = {
@@ -583,12 +581,12 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
           };
         });
 
-      console.log('Creating contact with data:', contactData);
+
 
       // Create contact
       const newContact = await createContact(authFetch, contactData);
 
-      console.log('Contact created successfully:', newContact);
+
 
       // Call success callback
       if (onCreateSuccess) {

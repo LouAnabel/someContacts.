@@ -21,7 +21,7 @@ const Button = ({ children, onClick, className = "", ...props }) => {
   );
 };
 
-export default function EditContact({ contactData, onCancel, onSaveSuccess, onDelete, authFetch }) {
+export default function EditContactForm({ contactData, onCancel, onSaveSuccess, onDelete, authFetch }) {
   const navigate = useNavigate();
 
   // Form data - convert from API format to form format
@@ -96,7 +96,7 @@ export default function EditContact({ contactData, onCancel, onSaveSuccess, onDe
       try {
         if (authFetch) {
           const categoriesData = await getCategories(authFetch);
-          console.log('Categories loaded:', categoriesData);
+
           setCategories(categoriesData);
         }
       } catch (error) {
@@ -362,7 +362,7 @@ export default function EditContact({ contactData, onCancel, onSaveSuccess, onDe
         setShowAddCategory(false);
         setShowCategoryDropdown(false);
 
-        console.log('Category added to form:', newCategory);
+
       } catch (error) {
         console.error('Failed to add category:', error);
         alert(`Failed to add category: ${error.message}`);
@@ -475,7 +475,7 @@ export default function EditContact({ contactData, onCancel, onSaveSuccess, onDe
       }
     });
 
-    console.log('Validation errors:', newErrors);
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -489,7 +489,7 @@ export default function EditContact({ contactData, onCancel, onSaveSuccess, onDe
     setHasSubmitted(true);
 
     if (!validateForm()) {
-      console.log('Validation failed');
+
       return;
     }
 
@@ -557,12 +557,12 @@ export default function EditContact({ contactData, onCancel, onSaveSuccess, onDe
           };
         });
 
-      console.log('Updating contact with data:', contactUpdateData);
+
 
       // Update contact
       const updatedContact = await updateContact(authFetch, contactData.id, contactUpdateData);
 
-      console.log('Contact updated successfully:', updatedContact);
+
 
       // Call success callback
       if (onSaveSuccess) {
@@ -591,7 +591,7 @@ export default function EditContact({ contactData, onCancel, onSaveSuccess, onDe
       }
 
       await deleteContactById(authFetch, contactData.id);
-      console.log('Contact deleted successfully');
+
 
       if (onDelete) {
         onDelete();

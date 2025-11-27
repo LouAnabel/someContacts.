@@ -22,7 +22,7 @@ const ContactPlanner = ({
             lastContactDate: newValue ? dayjs(newValue).format('DD.MM.YYYY') : '',
 
         }));
-        console.log('Selected last contact date:', newValue);
+
     };
 
     // Handler for date picker
@@ -32,7 +32,7 @@ const ContactPlanner = ({
             nextContactDate: newValue ? dayjs(newValue).format('DD.MM.YYYY') : '',
 
         }));
-        console.log('Selected next contact date:', newValue);
+
     };
 
 

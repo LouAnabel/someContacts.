@@ -13,7 +13,7 @@ const ContactCloud = ({ contacts }) => {
 
   useEffect(() => {
     // Debug logging
-    console.log('ContactCloud - favorite contacts:', contacts);
+
     
     const gridPlaceholders = [
         { left: 9, top: 1, fontSizeClass: 'text-3xl', fontWeightClass: 'font-light', rotation: 0, },

@@ -27,8 +27,8 @@ const ContactCard = ({contact = {}, onContactUpdate, onDeleteRequest, handleCate
                 throw new Error("Access token is not available.");
             }
 
-            console.log('Updating favorite status to:', newFavoriteState);
-            console.log('Contact ID:', contact.id);
+
+
 
             // Update local state immediately for better UX
             setLocalContact(prev => ({ ...prev, is_favorite: newFavoriteState }));
@@ -38,11 +38,11 @@ const ContactCard = ({contact = {}, onContactUpdate, onDeleteRequest, handleCate
                 is_favorite: newFavoriteState
             };
             
-            console.log('Sending to API:', updatedContactData);
+
 
             const apiResponse = await updateContact(accessToken, contact.id, updatedContactData);
             
-            console.log('API Response:', apiResponse);
+
             
             if (!apiResponse) {
                 throw new Error('Failed to update favorite status - no response from server');

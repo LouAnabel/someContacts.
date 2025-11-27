@@ -57,7 +57,7 @@ export default function ShowCategories() {
         setError(null);
 
         const categoriesData = await getCategories(authFetch); // ← Changed: pass authFetch
-        console.log('Categories data:', categoriesData);
+
         
         if (!categoriesData || !Array.isArray(categoriesData)) {
           console.error('Invalid categories data:', categoriesData);
@@ -86,7 +86,7 @@ export default function ShowCategories() {
 
       try {
         const contactsData = await getContacts(authFetch); // ← Changed: pass authFetch
-        console.log('Contacts data:', contactsData);
+
         
         if (!contactsData || !Array.isArray(contactsData)) {
           console.error('Invalid contacts data:', contactsData);
@@ -142,7 +142,7 @@ export default function ShowCategories() {
     if (!expandCategoryId || categories.length === 0) {
       return;
     }
-    console.log('Processing URL expansion for category:', expandCategoryId);
+
     console.log('Available categories:', categories.map(c => ({ id: c.id, name: c.name })));
     
     const targetCategory = categories.find(cat => {
@@ -152,7 +152,7 @@ export default function ShowCategories() {
     });
 
     if (targetCategory) {
-      console.log('Found target category:', targetCategory);
+
         
       // Expand the category
       setExpandedCategories(prev => {
@@ -171,7 +171,7 @@ export default function ShowCategories() {
               block: 'center' 
             });
           } else {
-            console.log('Category element not found in ref');
+
           }
         }, 50);
       });
@@ -181,7 +181,7 @@ export default function ShowCategories() {
       const cleanUrl = `/myspace/categories${newSearchParams.toString() ? '?' + newSearchParams.toString() : ''}`;
       navigate(cleanUrl, { replace: true });
     } else {
-      console.log('Category not found for ID:', expandCategoryId);
+
     }
   }, [categories, searchParams, navigate]);
 
@@ -213,7 +213,7 @@ export default function ShowCategories() {
     setIsSaving(true);
     try {
       const updatedCategory = await updateCategory(authFetch, categoryId, { name: editingName.trim() }); // ← Changed: pass authFetch
-      console.log('Category updated successfully:', updatedCategory);
+
 
       // Update local state
       setCategories(prev => 
@@ -252,7 +252,7 @@ export default function ShowCategories() {
     setIsDeleting(true);
     try {
       await deleteCategory(authFetch, categoryToDelete.id); // ← Changed: pass authFetch
-      console.log('Category deleted successfully');
+
 
       // Update local state
       setCategories(prev => prev.filter(cat => cat.id !== categoryToDelete.id));

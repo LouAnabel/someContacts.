@@ -25,7 +25,7 @@ const SearchFormAllContacts = ({ onSearch, resetTrigger }) => {
     const loadCategories = async () => {
       try {
         const categoriesData = await getCategories(authFetch);
-        console.log("categoriesData:", categoriesData)
+       
         setCategories(categoriesData || []);
       } catch (error) {   
         console.error('Failed to load categories:', error);
@@ -78,7 +78,7 @@ const SearchFormAllContacts = ({ onSearch, resetTrigger }) => {
   };
 
   const handleCategorySelect = (category) => {
-    console.log('Selected category:', category);
+
     
     const isSelected = formData.categories.some(cat => cat.id === category.id);
     let updatedCategories;

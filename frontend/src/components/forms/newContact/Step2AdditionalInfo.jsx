@@ -83,7 +83,7 @@ const Step2AdditionalInfo = ({
       ...prev,
       birthdate: newValue ? dayjs(newValue).format('DD.MM.YYYY') : ''
     }));
-    console.log('Selected birthdate:', newValue);
+
   };
 
   return (

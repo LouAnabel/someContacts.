@@ -59,12 +59,11 @@ export default function AllContacts() {
       contactsFetched.current = true; //fetching
         
       try {
-        console.log("Trying to fetch data from API")
         setIsLoading(true);
         setErrors(null);
 
         const contactsData = await getContacts(authFetch);
-        console.log('Contacts data:', contactsData); 
+
         
         // Add validation:
         if (!contactsData || !Array.isArray(contactsData)) {
@@ -98,10 +97,10 @@ export default function AllContacts() {
   }, [authFetch]);
 
   const handleSearch = (searchTerm, selectedCategories, contactedFilter, toContactFilter) => {
-    console.log('Search term:', searchTerm);
-    console.log('Selected categories:', selectedCategories);
-    console.log('Contacted filter:', contactedFilter);
-    console.log('To contact filter:', toContactFilter);
+
+
+
+
     
     setCurrentSearchTerm(searchTerm);
     setCurrentCategories(selectedCategories || []);
@@ -205,7 +204,7 @@ export default function AllContacts() {
     setIsDeleting(true);
 
     try {
-      await deleteContactById(accessToken, contactToDelete.id);
+      await deleteContactById(authFetch, contactToDelete.id);
       
       // Update all contact arrays
       const updatedContacts = contacts.filter(contact => contact.id !== contactToDelete.id);

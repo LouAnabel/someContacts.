@@ -50,7 +50,7 @@ const CategorySelection = ({
                                 <button
                                     type="button"
                                     onClick={() => {
-                                        console.log('Removing category:', category);
+
                                         removeCategoryFromForm(category.id);
                                     }}
                                     className="ml-2 text-red-400 hover:text-red-600"
@@ -137,11 +137,11 @@ const CategorySelection = ({
                                             
                                             if (isSelected) {
                                                 // Remove category if it's selected
-                                                console.log('Removing category:', category);
+
                                                 removeCategoryFromForm(category.id);
                                             } else if (canSelect) {
                                                 // Add category if it's not selected and can be selected
-                                                console.log('Adding category:', category);
+
                                                 addCategoryToForm(category);
                                             }
                                         }}
@@ -187,7 +187,7 @@ const CategorySelection = ({
                             <button
                                 type="button"
                                 onClick={() => {
-                                    console.log('Opening add category form');
+
                                     setShowAddCategory(true);
                                 }}
                                 className="w-full text-left px-3 py-2 hover:bg-red-50 transition-colors duration-150 text-red-500 font-extralight flex items-center space-x-2"
@@ -202,7 +202,7 @@ const CategorySelection = ({
                                     type="text"
                                     value={newCategoryName}
                                     onChange={(e) => {
-                                        console.log('New category name changed:', e.target.value);
+
                                         setNewCategoryName(e.target.value);
                                     }}
                                     placeholder="enter category name"

@@ -38,7 +38,7 @@ const Navbar = () => {
   }
 
   const handleSearch = (searchTerm) => {
-    console.log('Searching for:', searchTerm);
+
     if (searchTerm.trim()) {
       navigate('/myspace/contacts', { state: { searchTerm } });
     }

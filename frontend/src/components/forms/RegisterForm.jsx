@@ -48,7 +48,7 @@ const RegisterForm = () => {
                 password: registerData.password
             });
 
-            console.log('Registration successful:', data);
+
 
             // Backend returns user data, not token on registration
             if (data.user) {
@@ -182,7 +182,7 @@ const RegisterForm = () => {
     };
 
     const handleSubmit = async (e) => {
-        console.log("formdata on submit:", formData);
+
         e.preventDefault();
         setHasSubmitted(true);
         

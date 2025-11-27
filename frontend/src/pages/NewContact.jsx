@@ -22,11 +22,11 @@ export default function NewContact() {
   const handlePhotoUpload = (file, previewUrl) => {
     setContactPhoto(previewUrl);
     // TODO: Upload to server when backend is ready
-    console.log('Photo uploaded:', file);
+
   };
 
   const handleCreateSuccess = (newContact) => {
-    console.log('Contact created successfully:', newContact);
+
     // Navigate to the new contact's page
     navigate(`/myspace/contacts/${newContact.id}`);
   };

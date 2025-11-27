@@ -20,13 +20,23 @@ const Button = ({ children, onClick, className = "", ...props }) => {
 
 export default function UserProfile() {
   const navigate = useNavigate();
-  const { accessToken, authFetch } = useAuthContext(); 
+  const { accessToken, authFetch } = useAuthContext();
 
   // State
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+
   const [userData, setUserData] = useState({});
+  const [formData, setFormData] = useState({});
+  const [links, setLinks] = useState([{ title: '', url: '' }]);
+
+  // Photo State
+  const [contactPhoto, setContactPhoto] = useState(null);
+
+  // Edit Mode states
   const [isEditing, setIsEditing] = useState(false);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [errors, setErrors] = useState({});
 
   // GUARD to prevent duplicate API calls
   const userFetched = useRef(false);
@@ -36,7 +46,7 @@ export default function UserProfile() {
     const fetchUserData = async () => {
       if (!authFetch || userFetched.current) return; // ← Changed: check authFetch
 
-      console.log('UserProfilePage: Starting user fetch');
+
       userFetched.current = true;
 
       try {
@@ -44,7 +54,7 @@ export default function UserProfile() {
         setError(null);
 
         const apiUserData = await authMe(accessToken); // ← Changed: pass authFetch
-        console.log('User data received from API:', apiUserData);
+
         setUserData(apiUserData);
 
       } catch (error) {
@@ -66,12 +76,27 @@ export default function UserProfile() {
     };
   }, []);
 
+  // ========================================
+  // HANDLE FORM FUNKTIONS
+  // ========================================
+
+  const handlePhotoUpload = (file, previewUrl) => {
+    setContactPhoto(previewUrl);
+    // TODO: Upload to server when backend is ready
+
+  };
+
   const handleEdit = () => {
     setIsEditing(true);
   };
 
   const handleCancel = () => {
     setIsEditing(false);
+  };
+
+  const handleDelete = () => {
+    // Navigate back to contacts list
+    navigate('/myspace/contacts', { replace: true });
   };
 
   const handleSaveSuccess = (updatedUserData) => {
@@ -126,28 +151,32 @@ export default function UserProfile() {
       <div className="flex justify-center mb-6">
         <PhotoField
           photo={userData.profile_photo}
-          disabled={true}
+          onUpload={handlePhotoUpload}
+          disabled={!isEditing}
           size="large"
           name={`${userData.first_name} ${userData.last_name}`}
         />
-        </div>
-
-
-        {!isEditing ? (
-          <ShowUserProfile
-            userData={userData}
-            onEdit={handleEdit}
-            authFetch={authFetch} // ← Changed: pass authFetch instead of accessToken
-            onNavigate={navigate}
-          />
-        ) : (
-          <EditUserProfile
-            userData={userData}
-            onCancel={handleCancel}
-            onSaveSuccess={handleSaveSuccess}
-            authFetch={authFetch} // ← Changed: pass authFetch instead of accessToken
-          />
-        )}
       </div>
-      );
+
+
+      {!isEditing ? (
+        <ShowUserProfile
+          userData={userData}
+          onEdit={handleEdit}
+          authFetch={authFetch}
+          onDelete={handleDelete}
+          onNavigate={navigate}
+          isLoading={isLoading}
+          setIsLoading={setIsLoading}
+        />
+      ) : (
+        <EditUserProfile
+          userData={userData}
+          onCancel={handleCancel}
+          onSaveSuccess={handleSaveSuccess}
+          authFetch={authFetch} // ← Changed: pass authFetch instead of accessToken
+        />
+      )}
+    </div>
+  );
 }

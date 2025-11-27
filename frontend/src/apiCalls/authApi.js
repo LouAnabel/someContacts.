@@ -53,7 +53,7 @@ export function validatePassword(password) {
 
 //Register User API Call
 export async function sendRegisterData(registerData) {
-    console.log("In AUTH FILE: Register Data to send:", registerData);
+
     try {
         const response = await fetch(`${BACKEND_URL}/auth/register`, {
             method: 'POST',
@@ -69,10 +69,10 @@ export async function sendRegisterData(registerData) {
         });
 
         const data = await handleResponse(response);
-        console.log("In AUTH FILE: Put User Data:", data);
+
         return data || {};
     } catch (error) {
-        console.log('In AUTH FILE: Error fetching user Data:', error);
+
         throw error;
     }
 }
@@ -93,10 +93,10 @@ export async function sendLoginData(loginData) {
         });
         
         const data = await handleResponse(response);
-        console.log("In AUTH FILE: Login User Data:", data);
+
         return data || {};
     } catch (error) {
-        console.log('In AUTH FILE: Error fetching user Data:', error);
+
         throw error;
     }
 }
@@ -115,7 +115,7 @@ export async function authMe(token) {
         });
 
         const data = await handleResponse(response);
-        console.log("In AUTH FILE: Fetching and sending userData");
+
         return data.user || {};
     } catch (error) {
         console.error('In AUTH FILE: Error fetching user data:', error);
@@ -136,7 +136,7 @@ export async function updateUserData(token, userData) {
         });
         
         const data = await handleResponse(response);
-        console.log("In AUTH FILE: User data updated successfully");
+
         return data;
     } catch (error) {
         console.error('In AUTH FILE: Error updating user data:', error);
@@ -156,7 +156,7 @@ export async function refreshToken(refreshToken) {
         });
         
         const data = await handleResponse(response);
-        console.log("In AUTH FILE: Token refreshed successfully");
+
         return data;
     } catch (error) {
         console.error('In AUTH FILE: Error refreshing token:', error);
@@ -177,7 +177,7 @@ export async function logoutUser(token) {
         });
         
         const data = await handleResponse(response);
-        console.log("In AUTH FILE: User logged out successfully");
+
         return data;
     } catch (error) {
         console.error('In AUTH FILE: Error logging out user:', error);
@@ -198,7 +198,7 @@ export async function logoutAllDevices(token) {
         });
         
         const data = await handleResponse(response);
-        console.log("In AUTH FILE: User logged out from all devices");
+
         return data;
     } catch (error) {
         console.error('In AUTH FILE: Error logging out from all devices:', error);

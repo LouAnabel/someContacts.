@@ -16,37 +16,7 @@ export default function ShowUserProfile({ userData, onEdit, onNavigate, authFetc
     );
   };
 
-  // Form data - convert from API format to form format
-  const [formData, setFormData] = useState({
-    firstName: userData.first_name || '',
-    lastName: userData.last_name || '',
-    birthdate: userData.birth_date || '',
-  });
 
-  // Multi-field arrays
-  const [emails, setEmails] = useState(
-    userData.emails && userData.emails.length > 0 ? userData.emails : [{ title: 'private', email: '' }]
-  );
-  const [phones, setPhones] = useState(
-    userData.phones && userData.phones.length > 0 ? userData.phones : [{ title: 'mobile', phone: '' }]
-  );
-  const [addresses, setAddresses] = useState(
-    userData.addresses && userData.addresses.length > 0
-      ? userData.addresses.map(a => ({
-          title: a.title,
-          streetAndNr: a.street_and_nr,
-          additionalInfo: a.additional_info,
-          postalcode: a.postal_code,
-          city: a.city,
-          country: a.country
-        }))
-      : [{ title: 'private', streetAndNr: '', additionalInfo: '', postalcode: '', city: '', country: '' }]
-  );
-  const [links, setLinks] = useState(
-    userData.links && userData.links.length > 0 ? userData.links : [{ title: '', url: '' }]
-  );
-
-  console.log("formData:", formData)
 
   return (
     <div className=" min-h-screen w-full">
@@ -62,7 +32,7 @@ export default function ShowUserProfile({ userData, onEdit, onNavigate, authFetc
           {/* Header */}
           <div className="text-center mt-6 mb-8">
             <h1 className="text-3xl font-bold text-black tracking-wide">
-              {userData.first_name.toLowerCase()} {userData.last_name.toLowerCase()}.
+              {userData.first_name} {userData.last_name}.
             </h1>
           </div>
 
@@ -128,10 +98,10 @@ export default function ShowUserProfile({ userData, onEdit, onNavigate, authFetc
             </div>
 
             {/* Additional Emails */}
-            {formData.emails && formData.emails.length > 0 && (
+            {userData.emails && userData.emails.length > 0 && (
               <div className="space-y-2 mt-4">
                 <h3 className="text-sm text-gray-500 font-extralight ml-2 mb-2">additional emails</h3>
-                {formData.emails.map((emailItem, index) => (
+                {userData.emails.map((emailItem, index) => (
                   <div key={index} className="relative">
                     <label className="absolute -top-2.5 left-2 bg-white px-1 text-xs text-gray-500 font-extralight z-10">
                       {emailItem.title}
@@ -159,10 +129,10 @@ export default function ShowUserProfile({ userData, onEdit, onNavigate, authFetc
             </div>
 
             {/* Phones */}
-            {formData.phones && formData.phones.length > 0 && (
+            {userData.phones && userData.phones.length > 0 && (
               <div className="space-y-2 mt-4">
                 <h3 className="text-sm text-gray-500 font-extralight ml-2 mb-2">phone numbers</h3>
-                {formData.phones.map((phoneItem, index) => (
+                {userData.phones.map((phoneItem, index) => (
                   <div key={index} className="relative">
                     <label className="absolute -top-2.5 left-2 bg-white px-1 text-xs text-gray-500 font-extralight z-10">
                       {phoneItem.title || ''}
@@ -182,7 +152,7 @@ export default function ShowUserProfile({ userData, onEdit, onNavigate, authFetc
           </div>
 
           {/* ADDRESS SECTION */}
-          {formData.addresses && formData.addresses.length > 0 && (
+          {userData.addresses && userData.addresses.length > 0 && (
             <div className="space-y-1">
               <div className="flex items-center gap-2">
                 <div className="w-1 h-6 bg-red-400 rounded-full"></div>
@@ -190,7 +160,7 @@ export default function ShowUserProfile({ userData, onEdit, onNavigate, authFetc
               </div>
 
               <div className="space-y-3 mt-3">
-                {formData.addresses.map((address, index) => (
+                {userData.addresses.map((address, index) => (
                   <div key={index} className="relative">
                     <label className="absolute -top-2.5 left-2 bg-white px-1 text-xs text-gray-500 font-extralight z-10">
                       {address.title}
@@ -228,7 +198,7 @@ export default function ShowUserProfile({ userData, onEdit, onNavigate, authFetc
           )}
 
           {/* LINKS SECTION */}
-          {formData.links && formData.links.length > 0 && (
+          {userData.links && userData.links.length > 0 && (
             <div className="space-y-1">
               <div className="flex items-center gap-2">
                 <div className="w-1 h-6 bg-red-400 rounded-full"></div>
@@ -236,7 +206,7 @@ export default function ShowUserProfile({ userData, onEdit, onNavigate, authFetc
               </div>
 
               <div className="space-y-2 mt-3">
-                {formData.links.map((link, index) => (
+                {userData.links.map((link, index) => (
                   <div key={index} className="relative">
                     <label className="absolute -top-2.5 left-2 bg-white px-1 text-xs text-gray-500 font-extralight z-10">
                       {link.title}
@@ -287,7 +257,7 @@ export default function ShowUserProfile({ userData, onEdit, onNavigate, authFetc
             </button>
           </div>
         </div>
-        
+
       </div>
       
       

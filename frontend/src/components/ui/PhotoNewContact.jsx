@@ -38,7 +38,7 @@ const PhotoField = ({
                 if (file) {
                     // Create preview URL
                     const previewUrl = URL.createObjectURL(file);
-                    console.log('File selected:', file);
+
                     
                     // If onUpload callback exists, call it with file and preview
                     if (onUpload) {
@@ -57,7 +57,7 @@ const PhotoField = ({
             onTakePhoto();
         } else {
             // Default behavior - access camera
-            console.log('Take photo clicked');
+
             // Create file input with camera capture
             const input = document.createElement('input');
             input.type = 'file';
@@ -67,7 +67,7 @@ const PhotoField = ({
                 const file = e.target.files[0];
                 if (file) {
                     const previewUrl = URL.createObjectURL(file);
-                    console.log('Photo captured:', file);
+
                     
                     // If onUpload callback exists, call it with file and preview
                     if (onUpload) {

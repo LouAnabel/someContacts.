@@ -16,7 +16,7 @@ const API_BASE_URL = getBackendUrl();
  * CREATE CONTACT with multi-field support
  */
 export const createContact = async (authFetch, contactData) => {
-    console.log('Creating contact with data:', contactData);
+
     
     const response = await authFetch(`${API_BASE_URL}/contacts`, {
         method: 'POST',
@@ -35,7 +35,7 @@ export const createContact = async (authFetch, contactData) => {
     }
 
     const data = await response.json();
-    console.log("Contact created successfully:", data.contact);
+
     return data.contact;
 };
 
@@ -43,7 +43,7 @@ export const createContact = async (authFetch, contactData) => {
  * UPDATE CONTACT with multi-field support
  */
 export const updateContact = async (authFetch, contactId, contactData) => {
-    console.log('Updating contact with data:', contactData);
+
     
     const response = await authFetch(`${API_BASE_URL}/contacts/${contactId}`, {
         method: 'PUT',
@@ -62,7 +62,7 @@ export const updateContact = async (authFetch, contactId, contactData) => {
     }
 
     const data = await response.json();
-    console.log("Contact updated successfully:", data.contact);
+
     return data.contact;
 };
 
@@ -86,7 +86,7 @@ export const getContactById = async (authFetch, contactId) => {
     }
     
     const data = await response.json();
-    console.log("Contact fetched:", data.contact);
+
     return data.contact;
 };
 
@@ -94,7 +94,7 @@ export const getContactById = async (authFetch, contactId) => {
  * GET all contacts
  */
 export const getContacts = async (authFetch) => {
-    console.log("Fetching all contacts");
+
     
     const response = await authFetch(`${API_BASE_URL}/contacts`, {
         method: 'GET',
@@ -112,7 +112,7 @@ export const getContacts = async (authFetch) => {
     }
     
     const data = await response.json();
-    console.log(`Fetched ${data.contacts?.length || 0} contacts`);
+
     return data.contacts;
 };
 
@@ -136,7 +136,7 @@ export const deleteContactById = async (authFetch, contactId) => {
     }
     
     const data = await response.json();
-    console.log("Contact deleted successfully");
+
     return data;
 };
 
@@ -144,7 +144,7 @@ export const deleteContactById = async (authFetch, contactId) => {
  * BULK DELETE multiple contacts
  */
 export const bulkDeleteContacts = async (authFetch, contactIds) => {
-    console.log(`Bulk deleting ${contactIds.length} contacts`);
+
     
     const response = await authFetch(`${API_BASE_URL}/contacts/bulk-delete`, {
         method: 'DELETE',
@@ -163,7 +163,7 @@ export const bulkDeleteContacts = async (authFetch, contactIds) => {
     }
     
     const data = await response.json();
-    console.log(`Deleted ${data.deleted_count} contacts`);
+
     return data;
 };
 
@@ -191,7 +191,7 @@ export const getFavorites = async (authFetch) => {
     }
     
     const data = await response.json();
-    console.log(`Fetched ${data.favorites?.length || 0} favorites`);
+
     return data.favorites;
 };
 
@@ -215,7 +215,7 @@ export const toggleFavorite = async (authFetch, contactId) => {
     }
     
     const data = await response.json();
-    console.log("Favorite toggled:", data.contact);
+
     return data.contact;
 };
 
@@ -243,7 +243,7 @@ export const getCategories = async (authFetch) => {
     }
     
     const data = await response.json();
-    console.log(`Fetched ${data.categories?.length || 0} categories`);
+
     return data.categories;
 };
 
@@ -268,7 +268,7 @@ export const createCategory = async (authFetch, categoryData) => {
     }
     
     const data = await response.json();
-    console.log("Category created:", data.category);
+
     return data.category;
 };
 
@@ -293,7 +293,7 @@ export const updateCategory = async (authFetch, categoryId, categoryData) => {
     }
     
     const data = await response.json();
-    console.log("Category updated:", data.category);
+
     return data.category;
 };
 
@@ -317,7 +317,7 @@ export const deleteCategory = async (authFetch, categoryId) => {
     }
     
     const data = await response.json();
-    console.log("Category deleted");
+
     return data;
 };
 
@@ -369,7 +369,7 @@ export const updateContactCategories = async (authFetch, contactId, categoryIds)
     }
     
     const data = await response.json();
-    console.log("Contact categories updated");
+
     return data;
 };
 
@@ -394,7 +394,7 @@ export const addCategoriesToContact = async (authFetch, contactId, categoryIds) 
     }
     
     const data = await response.json();
-    console.log("Categories added to contact");
+
     return data;
 };
 
@@ -418,7 +418,7 @@ export const removeCategoryFromContact = async (authFetch, contactId, categoryId
     }
     
     const data = await response.json();
-    console.log("Category removed from contact");
+
     return data;
 };
 

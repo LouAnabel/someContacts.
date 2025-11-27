@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useAuthContext } from '../../context/AuthContextProvider.jsx';
 import { updateUserData } from '../../apiCalls/authApi';
 import CircleButton from '../ui/Buttons';
 import PhotoField from '../ui/PhotoShowContact.jsx';
@@ -16,6 +17,9 @@ const Button = ({ children, onClick, className = "", ...props }) => {
 };
 
 export default function EditUserProfile({ userData, onCancel, onSaveSuccess, accessToken }) {
+
+  const { authFetch } = useAuthContext();
+
   // Form state
   const [formData, setFormData] = useState({
     firstName: userData.first_name || '',
@@ -249,7 +253,7 @@ export default function EditUserProfile({ userData, onCancel, onSaveSuccess, acc
     setHasSubmitted(true);
 
     if (!validateForm()) {
-      console.log('Validation failed');
+
       return;
     }
 
@@ -258,7 +262,7 @@ export default function EditUserProfile({ userData, onCancel, onSaveSuccess, acc
     setSuccess(null);
 
     try {
-      if (!accessToken) {
+      if (!authFetch) {
         throw new Error('Access token is not available.');
       }
 
@@ -287,15 +291,15 @@ export default function EditUserProfile({ userData, onCancel, onSaveSuccess, acc
         updateData.new_password = passwordData.newPassword;
       }
 
-      console.log('Updating user with data:', updateData);
 
-      const apiUserData = await updateUserData(accessToken, updateData);
+
+      const apiUserData = await updateUserData(authFetch, updateData);
 
       if (!apiUserData) {
         throw new Error('Failed to update profile - no response from server');
       }
 
-      console.log('Profile updated successfully:', apiUserData);
+
 
       setSuccess('Profile updated successfully!');
 

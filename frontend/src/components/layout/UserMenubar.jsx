@@ -26,7 +26,7 @@ const MenuBar = ({ isMenuOpen, setIsMenuOpen }) => {
 
   const handleLogout = (e) => {
     e.stopPropagation();
-    console.log('Logout clicked');
+
     setIsMenuOpen(false);
     logout();
     navigate('/login', { replace: true });
@@ -34,7 +34,7 @@ const MenuBar = ({ isMenuOpen, setIsMenuOpen }) => {
 
   const handleLinkClick = (to, e) => {
     e.stopPropagation();
-    console.log('🔵 Navigation clicked to:', to);
+
     setIsMenuOpen(false);
     navigate(to);
   };
@@ -65,7 +65,7 @@ const MenuBar = ({ isMenuOpen, setIsMenuOpen }) => {
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
-        console.log('Actually clicked outside menu, closing');
+
         setIsMenuOpen(false);
       }
     };
@@ -108,7 +108,7 @@ const MenuBar = ({ isMenuOpen, setIsMenuOpen }) => {
           }`}
           onClick={(e) => {
             e.stopPropagation();
-            console.log('Clicked inside dropdown');
+
           }}
         >
           <div className="py-2">

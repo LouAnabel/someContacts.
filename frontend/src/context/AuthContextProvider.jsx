@@ -19,10 +19,8 @@ function AuthContextProvider({ children }) {
 
         // Simple check: if no tokens, logout
         if (!localAccessToken && !localRefreshToken) {
-            console.log('No tokens found - user not logged in');
             logout();
         } else if (!localRefreshToken) {
-            console.log('No refresh token - logging out');
             logout();
         } else {
             // Tokens exist, set them
@@ -42,6 +40,8 @@ function AuthContextProvider({ children }) {
         setAccessToken(accessTokenValue)
         setUserData(user)
         setRefreshToken(refreshTokenValue)
+        
+        console.log("Login successful - userData:", user)
     }, [])
 
     const logout = useCallback(() => {
@@ -54,11 +54,13 @@ function AuthContextProvider({ children }) {
         setUserData(undefined)
     }, [])
 
-    const authFetch = useCallback(async (url, options = {}) => {
-        const token = localStorage.getItem('accessToken');
-        const refreshToken = localStorage.getItem('refreshToken');
 
-        const res = await fetch(url, {
+    const authFetch = useCallback(async (url, options = {}) => {
+        
+        let token = localStorage.getItem('accessToken');
+        const storedRefreshToken = localStorage.getItem('refreshToken');
+        
+        let res = await fetch(url, {
             ...options,
             headers: {
                 'Content-Type': 'application/json',
@@ -67,37 +69,43 @@ function AuthContextProvider({ children }) {
             },
         });
 
-        // // If 401, logout (backend says token is invalid/expired)
-        // if (response.status === 401) {
-        //     logout();
-        //     throw new Error('Session expired - please login again');
-        // }
-
         if (res.status !== 401) return res;
+        
+        console.log("Access Expired!")
 
         // 2) Try refresh
-        if (!refreshToken) {
+        if (!storedRefreshToken) {
             logout();
             throw new Error('No refresh token');
         }
 
+        console.log("refreshing AccessToken")
+        
+        // Get fresh userData from localStorage instead of stale state
+        const storedUserData = JSON.parse(localStorage.getItem('userData'));
+        console.log("passing userData for refresh:", storedUserData)
+
         const refreshRes = await fetch('http://127.0.0.1:5000/auth/refresh', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${refreshToken}` },
-            
+            headers: { 
+                'Content-Type': 'application/json', 
+                Authorization: `Bearer ${storedRefreshToken}` 
+            },
         });
 
         if (!refreshRes.ok) {
+            console.log("Refresh Expired!")
             logout();
             window.location.href = "http://localhost:5173/login"
             throw new Error('Refresh failed');
         }
 
         const data = await refreshRes.json();
-        const newAccessToken = data.access_token;
-        // const newRefreshToken = data.refresh_token;
 
-        login(data.access_token, userData, refreshToken)
+        const newAccessToken = data.access_token;
+
+        // Use stored userData instead of stale state
+        login(newAccessToken, storedUserData, storedRefreshToken)
 
         // 3) Retry original request with fresh token
         res = await fetch(url, {
@@ -105,7 +113,7 @@ function AuthContextProvider({ children }) {
             headers: {
                 'Content-Type': 'application/json',
                 ...(options.headers || {}),
-                ...(token ? { Authorization: `Bearer ${newAccessToken}` } : {}),
+                Authorization: `Bearer ${newAccessToken}`,
             },
         });
 
@@ -115,7 +123,7 @@ function AuthContextProvider({ children }) {
         }
 
         return res;
-    }, [logout]);
+    }, [login, logout]);
 
     const contextValue = useMemo(() => ({
         userData,
