@@ -21,7 +21,7 @@ const Button = ({ children, onClick, className = "", ...props }) => {
 
 export default function AllContacts() {
   const navigate = useNavigate();
-  const { accessToken } = useAuthContext();
+  const { accessToken, authFetch } = useAuthContext();
 
   // Contact states
   const [contacts, setContacts] = useState([]);
@@ -63,7 +63,7 @@ export default function AllContacts() {
         setIsLoading(true);
         setErrors(null);
 
-        const contactsData = await getContacts(accessToken);
+        const contactsData = await getContacts(authFetch);
         console.log('Contacts data:', contactsData); 
         
         // Add validation:
@@ -95,7 +95,7 @@ export default function AllContacts() {
     };
 
     fetchContacts();
-  }, [accessToken]);
+  }, [authFetch]);
 
   const handleSearch = (searchTerm, selectedCategories, contactedFilter, toContactFilter) => {
     console.log('Search term:', searchTerm);

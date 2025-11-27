@@ -7,11 +7,12 @@ import { useAuthContext } from '../../context/AuthContextProvider';
 const SearchFormAllContacts = ({ onSearch, resetTrigger }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [formData, setFormData] = useState({
-    categories: [], // Changed to array
+    categories: [],
     contactedFilter: null,
-    toContactFilter: null
+    toContactFilter: null,
+    favoriteFilter: null
   });
-  const {accessToken} = useAuthContext();
+  const { authFetch } = useAuthContext();
 
   const searchRef = useRef(null);
   const dropdownRef = useRef(null);
@@ -23,20 +24,16 @@ const SearchFormAllContacts = ({ onSearch, resetTrigger }) => {
   useEffect(() => {
     const loadCategories = async () => {
       try {
-        if (accessToken) {
-          const categoriesData = await getCategories(accessToken);
-          console.log("categoriesData:", categoriesData)
-          setCategories(categoriesData);
-        } else {
-          setCategories([]);
-        }
+        const categoriesData = await getCategories(authFetch);
+        console.log("categoriesData:", categoriesData)
+        setCategories(categoriesData || []);
       } catch (error) {   
         console.error('Failed to load categories:', error);
         setCategories([]);
       }
     };
     loadCategories();
-  }, [accessToken]);
+  }, [authFetch]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -59,44 +56,39 @@ const SearchFormAllContacts = ({ onSearch, resetTrigger }) => {
       setFormData({
         categories: [],
         contactedFilter: null,
-        toContactFilter: null
+        toContactFilter: null,
+        favoriteFilter: null
       });
       setShowCategoryDropdown(false);
     }
   }, [resetTrigger]);
 
-
   const handleSearch = (value) => {
     setSearchTerm(value);
     if (onSearch) {
-      onSearch(value, formData.categories, formData.contactedFilter, formData.toContactFilter);
+      onSearch(value, formData.categories, formData.contactedFilter, formData.toContactFilter, formData.favoriteFilter);
     }
   };
 
-  
   const handleSubmit = (e) => {
     e.preventDefault();
     if (onSearch && searchTerm.trim()) {
-      onSearch(searchTerm.trim(), formData.categories, formData.contactedFilter, formData.toContactFilter);
+      onSearch(searchTerm.trim(), formData.categories, formData.contactedFilter, formData.toContactFilter, formData.favoriteFilter);
     }
   };
 
   const handleCategorySelect = (category) => {
     console.log('Selected category:', category);
     
-    // Check if category is already selected
     const isSelected = formData.categories.some(cat => cat.id === category.id);
     let updatedCategories;
     
     if (isSelected) {
-      // Remove category if already selected
       updatedCategories = formData.categories.filter(cat => cat.id !== category.id);
     } else {
-      // Add category if not selected and less than 3 categories
       if (formData.categories.length < 3) {
         updatedCategories = [...formData.categories, { name: category.name, id: category.id }];
       } else {
-        // Don't add if already 3 categories selected
         return;
       }
     }
@@ -106,9 +98,8 @@ const SearchFormAllContacts = ({ onSearch, resetTrigger }) => {
       categories: updatedCategories
     }));
     
-    // Always trigger search when category is selected/deselected
     if (onSearch) {
-      onSearch(searchTerm.trim(), updatedCategories, formData.contactedFilter, formData.toContactFilter);
+      onSearch(searchTerm.trim(), updatedCategories, formData.contactedFilter, formData.toContactFilter, formData.favoriteFilter);
     }
   };
 
@@ -120,7 +111,7 @@ const SearchFormAllContacts = ({ onSearch, resetTrigger }) => {
     }));
     
     if (onSearch) {
-      onSearch(searchTerm.trim(), formData.categories, newValue, formData.toContactFilter);
+      onSearch(searchTerm.trim(), formData.categories, newValue, formData.toContactFilter, formData.favoriteFilter);
     }
   };
 
@@ -132,7 +123,19 @@ const SearchFormAllContacts = ({ onSearch, resetTrigger }) => {
     }));
     
     if (onSearch) {
-      onSearch(searchTerm.trim(), formData.categories, formData.contactedFilter, newValue);
+      onSearch(searchTerm.trim(), formData.categories, formData.contactedFilter, newValue, formData.favoriteFilter);
+    }
+  };
+
+  const handleFavoriteToggle = (value) => {
+    const newValue = formData.favoriteFilter === value ? null : value;
+    setFormData(prev => ({ 
+      ...prev, 
+      favoriteFilter: newValue
+    }));
+    
+    if (onSearch) {
+      onSearch(searchTerm.trim(), formData.categories, formData.contactedFilter, formData.toContactFilter, newValue);
     }
   };
 
@@ -146,11 +149,11 @@ const SearchFormAllContacts = ({ onSearch, resetTrigger }) => {
               boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)'
             }}>
             
-            {/* Category Dropdown Button - Never shows selected categories */}
+            {/* Category Dropdown Button */}
             <button 
               type="button"
               onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
-              className="inline-flex w-[138px] py-3 items-center rounded-xl px-4 text-[15px] font-extralight text-center text-gray-800 hover:bg-red-50 bg-gray-100 dark:text-black hover:text-red-800 hover:dark:bg-red-100 hover:dark:text-red-800" 
+              className="inline-flex w-[138px] py-3 items-center rounded-xl px-4 text-[15px] font-extralight text-center text-gray-800 hover:bg-red-50 bg-gray-100 dark:text-black hover:text-red-500 hover:dark:bg-red-100 hover:dark:text-red-500" 
             >
               <span className="font-extralight tracking-wider">
                 Categories
@@ -168,8 +171,6 @@ const SearchFormAllContacts = ({ onSearch, resetTrigger }) => {
             {/* Category Dropdown Menu */}
             {showCategoryDropdown && (
               <div className="absolute bg-white rounded-2xl shadow-lg w-[200px] top-full mt-1 left-0 z-20 max-h-60 overflow-y-auto">
-                
-                {/* Category options */}
                 {categories.length > 0 ? (
                   categories.map((category) => {
                     const isSelected = formData.categories.some(cat => cat.id === category.id);
@@ -186,7 +187,7 @@ const SearchFormAllContacts = ({ onSearch, resetTrigger }) => {
                             ? 'bg-red-50 text-red-500' 
                             : isDisabled
                             ? 'text-gray-300 cursor-not-allowed'
-                            : 'text-black hover:bg-red-50 hover:text-red-800'
+                            : 'text-black hover:bg-red-50 hover:text-red-500'
                         }`}
                       >
                         <span>{category.name}</span>
@@ -213,61 +214,85 @@ const SearchFormAllContacts = ({ onSearch, resetTrigger }) => {
                 id="search-dropdown" 
                 value={searchTerm}
                 onChange={(e) => handleSearch(e.target.value)}
-                className="rounded-e-xl pt-2.5 pb-2.5 px-4 -mt-2 -mb-2 w-full text-normal font-extralight border-1 border-white text-black placeholder-gray-200 placeholder-font-light placeholder-text-sm bg-white dark:bg-white dark:placeholder-gray-300  focus:outline-none focus:border-white"
+                className="rounded-e-xl pt-2.5 pb-2.5 px-4 -mt-2 -mb-2 w-full text-normal font-extralight border-1 border-white text-black placeholder-gray-200 placeholder-font-light placeholder-text-sm bg-white dark:bg-white dark:placeholder-gray-300 focus:outline-none focus:border-white"
                 placeholder="search..."
               />
             </div>
           </div>
 
-          {/* Toggle Buttons Row */}
-          <div className="flex gap-1 flex-col">
+          {/* Filter Buttons Row - Pretty Pills */}
+          <div className="flex gap-3 flex-wrap items-center">
+            
+            {/* Favorites Filter */}
+            <button
+              type="button"
+              onClick={() => handleFavoriteToggle(true)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full font-extralight tracking-wide text-[14px]  ${
+                formData.favoriteFilter === true
+                  ? 'bg-red-50 text-red-500 shadow-md'
+                  : 'bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-500'
+              }`}
+            >
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                fill={formData.favoriteFilter === true ? "currentColor" : "none"}
+                viewBox="0 0 24 24" 
+                strokeWidth="1.5" 
+                stroke="currentColor" 
+                className="size-4"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z" />
+              </svg>
+              <span>favorites</span>
+            </button>
 
-            {/* To Contact Toggle */}
-            <div className="flex items-center">
+            {/* Reminder Filter */}
+            <button
+              type="button"
+              onClick={() => handleToContactToggle(true)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full font-extralight tracking-wide text-[14px] ${
+                formData.toContactFilter === true
+                  ? 'bg-red-50 text-red-500 shadow-md'
+                  : 'bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-500'
+              }`}
+            >
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                fill={formData.toContactFilter === true ? "currentColor" : "none"}
+                viewBox="0 0 24 24" 
+                strokeWidth="1.5" 
+                stroke="currentColor" 
+                className="size-4"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
+              </svg>
+              <span>reminder</span>
+            </button>
 
-                <button
-                  type="button"
-                  onClick={() => handleToContactToggle(true)}
-                  className={`px-2 py-1 font-extralight tracking-wide transition-colors ${
-                    formData.toContactFilter === true
-                      ? ' text-red-500'
-                      : 'text-gray-200 '
-                  }`}
-                >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-5">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
-                </svg>
+            {/* Contacted Filter */}
+            <button
+              type="button"
+              onClick={() => handleContactedToggle(true)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full font-extralight tracking-wide text-[14px]  ${
+                formData.contactedFilter === true
+                  ? 'bg-red-50 text-red-500 shadow-md'
+                  : 'bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-500'
+              }`}
+            >
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                fill={formData.contactedFilter === true ? "currentColor" : "none"}
+                viewBox="0 0 24 24" 
+                strokeWidth="1.5" 
+                stroke="currentColor" 
+                className="size-4"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+              </svg>
+              <span>contacted</span>
+            </button>
 
-                </button>
-                <span className="text-[15px] font-extralight tracking-wide text-gray-600 dark:text-white">
-                  reminder
-                </span>
-            </div>
-
-            {/* Contacted Toggle */}
-            <div className="flex items-center">
-              
-              <div className="flex overflow-hidden">
-                <button
-                  type="button"
-                  onClick={() => handleContactedToggle(true)}
-                  className={`px-2 py-1 text-sm font-extralight tracking-wide transition-colors ${
-                    formData.contactedFilter === true
-                      ? ' text-red-500'
-                      : 'text-gray-200 '
-                  }`}
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-5">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" />
-                  </svg>
-                </button>
-               
-                <span className="text-[15px] pt-0.5 font-extralight tracking-wide text-gray-600 dark:text-white">
-                marked as contacted
-                </span>
-                
-              </div>
-            </div>
+            
           </div>
 
         </div>

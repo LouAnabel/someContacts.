@@ -20,12 +20,11 @@ const Button = ({ children, onClick, className = "", ...props }) => {
   );
 };
 
-
 export default function ShowContact() {
 
   const { id } = useParams();
   const navigate = useNavigate();
-  const { accessToken } = useAuthContext();
+  const { authFetch } = useAuthContext(); // ← Changed: removed accessToken, use only authFetch
 
   // Loading state and Error State
   const [isLoading, setIsLoading] = useState(true);
@@ -49,7 +48,7 @@ export default function ShowContact() {
   const [links, setLinks] = useState([{ title: '', url: '' }]);
 
   // Photo State
-   const [contactPhoto, setContactPhoto] = useState(null);
+  const [contactPhoto, setContactPhoto] = useState(null);
 
   // Edit Mode states
   const [isEditing, setIsEditing] = useState(false);
@@ -81,7 +80,6 @@ export default function ShowContact() {
   const contactFetched = useRef(false);
   const categoriesFetched = useRef(false);
 
-
   // ========================================
   // LOAD & HANDLE CONTACT DATA
   // ========================================
@@ -90,7 +88,7 @@ export default function ShowContact() {
   useEffect(() => {
     const fetchContactData = async () => {
       // GUARD: Prevent duplicate calls
-      if (!accessToken || !id || contactFetched.current) return;
+      if (!authFetch || !id || contactFetched.current) return; // ← Changed: check authFetch
 
       console.log('ShowContactPage: Starting contact fetch for ID:', id);
       contactFetched.current = true;
@@ -100,7 +98,7 @@ export default function ShowContact() {
         setError(null);
 
         // fetch and set contactData
-        const apiContactData = await getContactById(accessToken, id);
+        const apiContactData = await getContactById(authFetch, id); // ← Changed: pass authFetch
         console.log('Contact data received from API:', apiContactData);
         setContactData(apiContactData); // contactData from API
 
@@ -141,8 +139,7 @@ export default function ShowContact() {
     };
 
     fetchContactData();
-  }, [accessToken, id]);
-
+  }, [authFetch, id]); // ← Changed: authFetch dependency
 
   // Reset guard when component unmounts or ID changes
   useEffect(() => {
@@ -152,7 +149,6 @@ export default function ShowContact() {
     };
   }, [id]);
 
-
   // ========================================
   // LOAD & HANDLE CATEGORIES
   // ========================================
@@ -161,11 +157,11 @@ export default function ShowContact() {
   useEffect(() => {
     const loadCategories = async () => {
       // GUARD: Prevent duplicate calls
-      if (!accessToken || categoriesFetched.current) return;
+      if (!authFetch || categoriesFetched.current) return; // ← Changed: check authFetch
       categoriesFetched.current = true;
 
       try {
-        const categoriesData = await getCategories(accessToken);
+        const categoriesData = await getCategories(authFetch); // ← Changed: pass authFetch
         console.log('Categories loaded:', categoriesData);
         setCategories(categoriesData);
 
@@ -177,45 +173,44 @@ export default function ShowContact() {
     };
 
     loadCategories();
-  }, [accessToken]);
+  }, [authFetch]); // ← Changed: authFetch dependency
 
-  
   // ========================================
   // TOGGLE FUNCTIONS
   // ========================================
 
   // Handle FavoriteToggle
   const handleFavoriteToggle = async () => {
-      const newFavoriteState = !formData.isFavorite;
+    const newFavoriteState = !formData.isFavorite;
 
-      try {
-          setFormData(prev => ({...prev, isFavorite: newFavoriteState}));
-          
-          if (!accessToken) {
-              throw new Error("Access token is not available.");
-          }
-
-          // Send ONLY the favorite status - minimal payload!
-          const minimalUpdateData = {
-              is_favorite: newFavoriteState
-          };
-
-          console.log("Minimal data sent to API:", minimalUpdateData);
-          const apiResponse = await updateContact(accessToken, formData.id, minimalUpdateData);
-          
-          if (!apiResponse) {
-              throw new Error('Failed to update favorite status');
-          }
-
-          // Update contact data to match
-          setContactData(prev => ({ ...prev, is_favorite: newFavoriteState }));
-          
-      } catch (error) {
-          console.error('Error updating favorite status:', error);
-          // Revert the UI change if API call failed
-          setFormData(prev => ({ ...prev, isFavorite: !newFavoriteState }));
-          setError(`Failed to update favorite status: ${error.message}`);
+    try {
+      setFormData(prev => ({...prev, isFavorite: newFavoriteState}));
+      
+      if (!authFetch) { // ← Changed: check authFetch
+        throw new Error("Authentication not available.");
       }
+
+      // Send ONLY the favorite status - minimal payload!
+      const minimalUpdateData = {
+        is_favorite: newFavoriteState
+      };
+
+      console.log("Minimal data sent to API:", minimalUpdateData);
+      const apiResponse = await updateContact(authFetch, formData.id, minimalUpdateData); // ← Changed: pass authFetch
+      
+      if (!apiResponse) {
+        throw new Error('Failed to update favorite status');
+      }
+
+      // Update contact data to match
+      setContactData(prev => ({ ...prev, is_favorite: newFavoriteState }));
+      
+    } catch (error) {
+      console.error('Error updating favorite status:', error);
+      // Revert the UI change if API call failed
+      setFormData(prev => ({ ...prev, isFavorite: !newFavoriteState }));
+      setError(`Failed to update favorite status: ${error.message}`);
+    }
   };
 
   // Handle IsContactedToggle
@@ -225,8 +220,8 @@ export default function ShowContact() {
     try {
       setFormData(prev => ({...prev, isContacted: newIsContactedState}));
       
-      if (!accessToken) {
-        throw new Error("Access token is not available.");
+      if (!authFetch) { // ← Changed: check authFetch
+        throw new Error("Authentication not available.");
       }
 
       const minimalUpdateData = {
@@ -234,7 +229,7 @@ export default function ShowContact() {
       };
 
       console.log("Minimal data sent to API:", minimalUpdateData);
-      const apiResponse = await updateContact(accessToken, formData.id, minimalUpdateData);
+      const apiResponse = await updateContact(authFetch, formData.id, minimalUpdateData); // ← Changed: pass authFetch
       
       if (!apiResponse) {
         throw new Error('Failed to update contacted status');
@@ -256,8 +251,8 @@ export default function ShowContact() {
     try {
       setFormData(prev => ({...prev, isToContact: newIsToContactState}));
       
-      if (!accessToken) {
-        throw new Error("Access token is not available.");
+      if (!authFetch) { // ← Changed: check authFetch
+        throw new Error("Authentication not available.");
       }
 
       const minimalUpdateData = {
@@ -265,7 +260,7 @@ export default function ShowContact() {
       };
 
       console.log("Minimal data sent to API:", minimalUpdateData);
-      const apiResponse = await updateContact(accessToken, formData.id, minimalUpdateData);
+      const apiResponse = await updateContact(authFetch, formData.id, minimalUpdateData); // ← Changed: pass authFetch
       
       if (!apiResponse) {
         throw new Error('Failed to update to contact status');
@@ -290,55 +285,53 @@ export default function ShowContact() {
     console.log('Photo uploaded:', file);
   };
 
-
   const handleInputChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: type === 'checkbox' ? checked : value
-        }));
-        
-        // Clear errors if user has already submitted once
-        if (hasSubmitted && errors[name]) {
-            setErrors(prev => ({ ...prev, [name]: '' }));
-        }
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+    
+    // Clear errors if user has already submitted once
+    if (hasSubmitted && errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
 
-        if (errors.submit) {
-            setErrors(prev => ({ ...prev, submit: '' }));
-        }
-    };
-  
+    if (errors.submit) {
+      setErrors(prev => ({ ...prev, submit: '' }));
+    }
+  };
 
   const handleLinkChange = (index, field, value) => {
     const newLinks = [...links];
     
-        // If it's a URL field, auto-format it
-        if (field === 'url' && value.trim()) {
-            // Check if URL already has protocol
-            if (!value.startsWith('http://') && !value.startsWith('https://')) {
-                // Add https:// if it looks like a URL (contains a dot)
-                if (value.includes('.')) {
-                    value = 'https://' + value;
-                }
-            }
+    // If it's a URL field, auto-format it
+    if (field === 'url' && value.trim()) {
+      // Check if URL already has protocol
+      if (!value.startsWith('http://') && !value.startsWith('https://')) {
+        // Add https:// if it looks like a URL (contains a dot)
+        if (value.includes('.')) {
+          value = 'https://' + value;
         }
-        
-        newLinks[index] = {
-            ...newLinks[index],
-            [field]: value
-        };
-        setLinks(newLinks);
+      }
+    }
+    
+    newLinks[index] = {
+      ...newLinks[index],
+      [field]: value
     };
+    setLinks(newLinks);
+  };
 
   const addLink = () => {
-      setLinks([...links, { title: '', url: '' }]);
+    setLinks([...links, { title: '', url: '' }]);
   };
 
   const removeLink = (index) => {
-      if (links.length > 1) {
-          const newLinks = links.filter((_, i) => i !== index);
-          setLinks(newLinks);
-      }
+    if (links.length > 1) {
+      const newLinks = links.filter((_, i) => i !== index);
+      setLinks(newLinks);
+    }
   };
 
   const handleEdit = () => {
@@ -359,11 +352,9 @@ export default function ShowContact() {
     navigate('/myspace/contacts', { replace: true });
   };
 
-
   // ========================================
   // RENDERING
   // ========================================
-
 
   if (isLoading) {
     return (
@@ -432,7 +423,6 @@ export default function ShowContact() {
             onNavigate={navigate}
             isLoading={isLoading}
             setIsLoading={setIsLoading}
-
           />
         ) : (
           <EditContact
@@ -443,7 +433,7 @@ export default function ShowContact() {
             onCancel={handleCancelEdit}
             onSaveSuccess={handleSaveSuccess}
             onDelete={handleDelete}
-            accessToken={accessToken}
+            authFetch={authFetch} // ← Changed: pass authFetch instead of accessToken
           />
         )}
       </div>

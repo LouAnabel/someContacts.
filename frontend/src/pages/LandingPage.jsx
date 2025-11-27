@@ -1,9 +1,10 @@
 import CircleButton from "../components/ui/Buttons";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-import { useAuthContext } from "../context/AuthContextProvider";
+
 
 function LandingPage() {
+    
     const navigate = useNavigate();
     const handleClick = () => {
         navigate('/login');

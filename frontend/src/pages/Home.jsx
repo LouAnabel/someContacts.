@@ -7,12 +7,10 @@ import { getContacts } from "../apiCalls/contactsApi";
 import { authMe } from '../apiCalls/authApi';
 import ContactCloud from '../components/ui/ContactCloud';
 
-
-
 function Home() {
 
   const navigate = useNavigate()
-  const { accessToken, logout } = useAuthContext();
+  const { authFetch, accessToken, logout } = useAuthContext(); // ← Add authFetch
   const [contacts, setContacts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [userName, setUserName] = useState('');
@@ -44,7 +42,7 @@ function Home() {
           authMe(accessToken).catch(() => { 
             return {first_name: 'Friend'};
           }), 
-          getContacts(accessToken).catch(() => [])
+          getContacts(authFetch).catch(() => []) // ← Changed: pass authFetch instead of accessToken
         ]);
         
         console.log("Data successfully fetched!", userData, contactsData)
@@ -56,6 +54,7 @@ function Home() {
 
       } catch (error) {
         console.error('Error fetching initial data:', error);
+        // If error is session expired, user will already be logged out
         setUserName('Friend');
         setContacts([]);
       } finally {
@@ -64,12 +63,12 @@ function Home() {
     };
 
     fetchData();
-  }, [accessToken]);
+  }, [accessToken, authFetch]); // ← Add authFetch to dependencies
 
 
   const handleLogout = () => {
-  logout();
-  navigate('/login');
+    logout();
+    navigate('/login');
   };
 
   const handleCreateButton = () => {
@@ -78,8 +77,8 @@ function Home() {
 
   const contactsCount = contacts.length
   const favoriteContacts = Array.isArray(contacts) 
-  ? contacts.filter(contact => contact.is_favorite) 
-  : [];
+    ? contacts.filter(contact => contact.is_favorite) 
+    : [];
   
 
   return (

@@ -18,7 +18,7 @@ const Button = ({ children, onClick, className = "", ...props }) => {
 
 export default function ShowCategories() {
   const navigate = useNavigate();
-  const { accessToken } = useAuthContext();
+  const { authFetch } = useAuthContext(); // ← Changed: removed accessToken, kept only authFetch
   const [searchParams] = useSearchParams();
 
   // Data states
@@ -46,19 +46,17 @@ export default function ShowCategories() {
   const categoriesFetched = useRef(false);
   const contactsFetched = useRef(false);
 
-
-
   // Fetch categories
   useEffect(() => {
     const fetchCategories = async () => {
-      if (!accessToken || categoriesFetched.current) return;
+      if (!authFetch || categoriesFetched.current) return; // ← Changed: check authFetch instead
       categoriesFetched.current = true;
 
       try {
         setIsLoading(true);
         setError(null);
 
-        const categoriesData = await getCategories(accessToken);
+        const categoriesData = await getCategories(authFetch); // ← Changed: pass authFetch
         console.log('Categories data:', categoriesData);
         
         if (!categoriesData || !Array.isArray(categoriesData)) {
@@ -78,17 +76,16 @@ export default function ShowCategories() {
     };
 
     fetchCategories();
-  }, [accessToken]);
-
+  }, [authFetch]); // ← Changed: authFetch dependency
 
   // Fetch contacts
   useEffect(() => {
     const fetchContacts = async () => {
-      if (!accessToken || contactsFetched.current) return;
+      if (!authFetch || contactsFetched.current) return; // ← Changed: check authFetch instead
       contactsFetched.current = true;
 
       try {
-        const contactsData = await getContacts(accessToken);
+        const contactsData = await getContacts(authFetch); // ← Changed: pass authFetch
         console.log('Contacts data:', contactsData);
         
         if (!contactsData || !Array.isArray(contactsData)) {
@@ -109,9 +106,7 @@ export default function ShowCategories() {
     };
 
     fetchContacts();
-  }, [accessToken]);
-
-
+  }, [authFetch]); // ← Changed: authFetch dependency
 
   // Process category contacts when data changes
   useEffect(() => {
@@ -140,7 +135,6 @@ export default function ShowCategories() {
       contactsFetched.current = false;
     };
   }, []);
-
 
   // Handle category expansion from URL
   useEffect(() => {
@@ -191,7 +185,6 @@ export default function ShowCategories() {
     }
   }, [categories, searchParams, navigate]);
 
-
   const toggleCategoryExpansion = (categoryId) => {
     const newExpanded = new Set(expandedCategories);
     if (newExpanded.has(categoryId)) {
@@ -219,7 +212,7 @@ export default function ShowCategories() {
 
     setIsSaving(true);
     try {
-      const updatedCategory = await updateCategory(accessToken, categoryId, { name: editingName.trim() });
+      const updatedCategory = await updateCategory(authFetch, categoryId, { name: editingName.trim() }); // ← Changed: pass authFetch
       console.log('Category updated successfully:', updatedCategory);
 
       // Update local state
@@ -258,7 +251,7 @@ export default function ShowCategories() {
 
     setIsDeleting(true);
     try {
-      await deleteCategory(accessToken, categoryToDelete.id);
+      await deleteCategory(authFetch, categoryToDelete.id); // ← Changed: pass authFetch
       console.log('Category deleted successfully');
 
       // Update local state
@@ -302,7 +295,6 @@ export default function ShowCategories() {
     );
   }
 
-
   //IF NO CATEGORIES
   if (categories.length === 0) {
     return (
@@ -344,8 +336,7 @@ export default function ShowCategories() {
     );
   }
 
-
-  // ALL CATEGORIES
+  // ALL CATEGORIES (rest of JSX remains the same...)
   return (
     <div className="w-full 2xl:flex 2xl:flex-col 2xl:items-center"
          style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}>
@@ -394,7 +385,7 @@ export default function ShowCategories() {
             return (
               <div 
                 key={category.id}
-                ref={el => categoryRef.current[category.id] = el} // ref for scrolling
+                ref={el => categoryRef.current[category.id] = el}
                 className="bg-white rounded-3xl overflow-hidden"
                 style={{ 
                   boxShadow: '0 4px 32px rgba(109, 71, 71, 0.15)'
@@ -505,9 +496,6 @@ export default function ShowCategories() {
                 {isExpanded && contactsInCategory.length > 0 && (
                   <div className="border-t border-gray-100 bg-white">
                     <div className="p-6 space-y-3">
-                      {/* <h4 className="text-sm font-light text-red-500 mb-4 -mt-3">
-                        Contacts in this category:
-                      </h4> */}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         {contactsInCategory.map((contact) => (
                           <button
@@ -542,7 +530,7 @@ export default function ShowCategories() {
         </div>
       </div>
 
-      {/* Delete Confirmation Modal */}
+      {/* Delete Confirmation Modal - (rest remains same) */}
       {showDeleteConfirmation && categoryToDelete && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-3xl p-8 relative overflow-visible w-[85vw] min-w-[280px] max-w-[400px] mx-auto"
@@ -550,7 +538,6 @@ export default function ShowCategories() {
                  boxShadow: '0 8px 48px rgba(109, 71, 71, 0.35)'
                }}>
             
-            {/* Warning Icon */}
             <div className="flex justify-center mb-6">
               <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center">
                 <svg 
@@ -569,19 +556,15 @@ export default function ShowCategories() {
               </div>
             </div>
 
-            {/* Title */}
             <h2 className="text-2xl font-bold text-center mb-4 text-black">
               delete <span className="text-red-500">{categoryToDelete.name}?</span>
             </h2>
             
-            {/* Message */}
             <p className="text-center text-black tracking-wider font-extralight mb-8 leading-relaxed">
               this action cannot be undone. the category will be permanently removed.
             </p>
             
-            {/* Action Buttons */}
             <div className="flex space-x-4">
-              {/* Cancel Button */}
               <button
                 type="button"
                 onClick={() => {
@@ -595,7 +578,6 @@ export default function ShowCategories() {
                 cancel.
               </button>
               
-              {/* Delete Button */}
               <button
                 type="button"
                 onClick={handleDeleteCategory}

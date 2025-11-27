@@ -35,7 +35,7 @@ export default function ShowContactForm({
     <div className=" min-h-screen w-full">
 
       {/* Contact Display Card */}
-      <div className="bg-white rounded-3xl p-4 relative z-10 overflow-visible w-[90vw] min-w-[260px] max-w-[480px] h-fit mx-auto"
+      <div className="bg-white rounded-3xl p-4 pb-8 relative z-10 overflow-visible w-[90vw] min-w-[260px] max-w-[480px] h-fit mx-auto"
         style={{
           boxShadow: '0 4px 32px rgba(109, 71, 71, 0.29)'
         }}>
@@ -78,7 +78,7 @@ export default function ShowContactForm({
                   <span
                     key={category.id || index}
                     onClick={() => navigate(`/myspace/categories?expand=${category.id}`)}
-                    className="inline-block py-2 min-w-[80px] mx-1 bg-gray-100 tracking-wide hover:bg-red-50 hover:text-red-700 text-black rounded-full text-base font-extralight cursor-pointer">
+                    className="inline-block py-2 min-w-[80px] mx-1 px-3 bg-gray-100 tracking-wide hover:bg-red-50 hover:text-red-700 text-black rounded-full text-base font-extralight cursor-pointer">
                     {category.name}
                   </span>
                 ))}
@@ -156,11 +156,11 @@ export default function ShowContactForm({
 
         {/* Contact Information Section */}
         {/* basic information */}
-        <div className="space-y-4">
+        <div className="space-y-4 pb-3">
 
           <div className="flex items-center gap-2 ml-0.5">
             <div className="w-1 h-6 bg-red-400 rounded-full mb-1"></div>
-            <p className="relative text-lg font-light text-red-400 tracking-wide -mt-1">call or mail.</p>
+            <p className="relative text-lg font-light text-red-400 tracking-wide -mt-1">contact information.</p>
           </div>
 
           <div className="space-y-4">
@@ -220,10 +220,10 @@ export default function ShowContactForm({
             {/* Addresses */}
             {contactData.addresses && contactData.addresses.length > 0 && (
               <>
-                <div className="flex items-center gap-2 ml-0.5 mb-3">
+                {/* <div className="flex items-center gap-2 ml-0.5 mb-3">
                   <div className="w-1 h-6 bg-red-400 rounded-full mb-1"></div>
                   <p className="relative text-lg font-light text-red-400 tracking-wide -mt-1">where at.</p>
-                </div>
+                </div> */}
 
                 <div className="border-b">
                   {contactData.addresses.map((address, index) => (
@@ -276,7 +276,7 @@ export default function ShowContactForm({
         {/* Additional Information Section */}
         <div className="space-y-4 mt-4">
 
-          <div className="flex items-center gap-2 ml-0.5">
+          <div className="flex items-center gap-2 ml-0.5 -mb-1">
             <div className="w-1 h-6 bg-red-400 rounded-full mb-1"></div>
             <p className="relative text-lg font-light text-red-400 tracking-wide -mt-1">additional information.</p>
           </div>
@@ -313,9 +313,9 @@ export default function ShowContactForm({
 
           {/* Links */}
           {contactData.links && contactData.links.length > 0 && (
-            <div className="mt-3">
+            <div className="mt-3 bg-gray-50 rounded-xl pt-2">
               <>
-                <h2 className="text-red-400 font-light tracking-wide text-[16px] -mb-7 ml-3">
+                <h2 className="text-red-400 font-light tracking-wide text-[14px] -mb-6 ml-3">
                   links
                 </h2>
 
@@ -438,10 +438,10 @@ export default function ShowContactForm({
                             href={link.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="w-13 h-13 flex items-center justify-center rounded-lg bg-white shadow-md shadow-gray-200 group transition-all duration-100 hover:shadow-lg"
+                            className="w-13 h-13 flex items-center px-3 justify-center rounded-lg bg-white shadow-md shadow-gray-200 group hover:shadow-lg"
                             title="Website"
                           >
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6 text-gray-700 transition-all duration-300 group-hover:scale-110">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1" stroke="currentColor" className="w-6 h-6 text-gray-600 group-hover:scale-110 hover:text-red-500">
                               <path strokeLinecap="round" strokeLinejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418" />
                             </svg>
                           </a>
@@ -455,7 +455,7 @@ export default function ShowContactForm({
                           href={link.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="px-3 py-2 flex items-center justify-center rounded-lg bg-white shadow-md shadow-gray-200 hover:shadow-lg hover:bg-red-50 "
+                          className="px-3 py-2 flex items-center justify-center rounded-lg bg-white shadow-md shadow-gray-200 hover:shadow-lg"
                           title={link.title}
                         >
                           <span className="text-normal font-light text-gray-700 hover:text-red-500 hover:scale-110">

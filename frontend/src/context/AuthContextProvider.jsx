@@ -1,51 +1,63 @@
-import { createContext, useContext, useEffect, useState, useMemo, useRef } from 'react'
-import { getBackendUrl } from '../apiCalls/authApi.js'
+import { createContext, useContext, useEffect, useState, useMemo, useRef, useCallback } from 'react'
 
 const AuthContext = createContext()
-const BACKEND_URL = getBackendUrl();
 
 function AuthContextProvider({ children }) {
     const [userData, setUserData] = useState(undefined)
     const [accessToken, setAccessToken] = useState(undefined)
+    const [refreshToken, setRefreshToken] = useState(undefined)
     const [isLoading, setIsLoading] = useState(true)
-    const initialized = useRef(false); // Add this
+    const initialized = useRef(false);
 
     useEffect(() => {
-        // Prevent double execution in Strict Mode
         if (initialized.current) return;
         initialized.current = true;
 
-        let localUser = JSON.parse(localStorage.getItem('userData'))
-        let localToken = localStorage.getItem('accessToken')
+        const localUser = JSON.parse(localStorage.getItem('userData'))
+        const localAccessToken = localStorage.getItem('accessToken')
+        const localRefreshToken = localStorage.getItem('refreshToken')
 
-        if (localUser) {
-            setUserData(localUser)
-        }
-        if (localToken) {
-            setAccessToken(localToken)
+        // Simple check: if no tokens, logout
+        if (!localAccessToken && !localRefreshToken) {
+            console.log('No tokens found - user not logged in');
+            logout();
+        } else if (!localRefreshToken) {
+            console.log('No refresh token - logging out');
+            logout();
+        } else {
+            // Tokens exist, set them
+            if (localUser) setUserData(localUser);
+            if (localAccessToken) setAccessToken(localAccessToken);
+            if (localRefreshToken) setRefreshToken(localRefreshToken);
         }
 
         setIsLoading(false)
     }, [])
 
-
-    const login = (token, user) => {
-        localStorage.setItem('accessToken', token)
+    const login = useCallback((accessTokenValue, user, refreshTokenValue) => {
+        localStorage.setItem('accessToken', accessTokenValue)
         localStorage.setItem('userData', JSON.stringify(user))
-        setAccessToken(token)
+        localStorage.setItem('refreshToken', refreshTokenValue)
+        
+        setAccessToken(accessTokenValue)
         setUserData(user)
-    }
+        setRefreshToken(refreshTokenValue)
+    }, [])
 
-
-    const logout = () => {
+    const logout = useCallback(() => {
         localStorage.removeItem('accessToken')
+        localStorage.removeItem('refreshToken')
         localStorage.removeItem('userData')
+        
         setAccessToken(undefined)
+        setRefreshToken(undefined)
         setUserData(undefined)
-    }
+    }, [])
 
-    const authFetch = async (url, options = {}) => {
-        const makeOptions = (token) => ({
+    const authFetch = useCallback(async (url, options = {}) => {
+        const token = localStorage.getItem('accessToken');
+        
+        const response = await fetch(url, {
             ...options,
             headers: {
                 'Content-Type': 'application/json',
@@ -54,57 +66,24 @@ function AuthContextProvider({ children }) {
             },
         });
 
-        // 1) First try
-        let res = await fetch(url, makeOptions(accessToken));
-
-        if (res.status !== 401) return res;
-
-        // 2) Try refresh
-        if (!refreshToken) {
-            logout(); // navigate to login or perform logout
-            throw new Error('No refresh token');
-        }
-
-        const refreshRes = await fetch(`${BACKEND_URL}/auth/refresh`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ refreshToken }),
-        });
-
-        if (!refreshRes.ok) {
+        // If 401, logout (backend says token is invalid/expired)
+        if (response.status === 401) {
             logout();
-            throw new Error('Refresh failed');
+            throw new Error('Session expired - please login again');
         }
 
-        const data = await refreshRes.json();
-        const newAccess = data.accessToken;
-        const newRefresh = (data.refreshToken) ?? refreshToken;
+        return response;
+    }, [logout]);
 
-        setAccessToken(newAccess);
-        localStorage.setItem('accessToken', newAccess);
-        localStorage.setItem('refreshToken', newRefresh)
-
-        // 3) Retry original request with fresh token
-        res = await fetch(url, makeOptions(newAccess));
-
-        if (res.status === 401) {
-            logout();
-            throw new Error('Unauthorized after refresh');
-        }
-
-        return res;
-    };
-
-    // Use useMemo to prevent unnecessary re-renders
     const contextValue = useMemo(() => ({
         userData,
         accessToken,
+        refreshToken,
+        authFetch,
         isLoading,
         login,
         logout,
-        setUserData,
-        setAccessToken
-    }), [userData, accessToken, isLoading]); // Only recreate when these actually change
+    }), [userData, accessToken, refreshToken, authFetch, isLoading, login, logout]);
 
     return (
         <AuthContext.Provider value={contextValue}>
@@ -114,5 +93,4 @@ function AuthContextProvider({ children }) {
 }
 
 export default AuthContextProvider
-
 export const useAuthContext = () => useContext(AuthContext)

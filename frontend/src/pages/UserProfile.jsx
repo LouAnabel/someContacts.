@@ -1,14 +1,26 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../context/AuthContextProvider';
-import { authMe} from '../apiCalls/authApi';
-import ShowUserProfile from '../components/forms/userProfileShow.jsx';
-import EditUserProfile from '../components/forms/userProfileEdit.jsx';
+import { authMe } from '../apiCalls/authApi';
+import PhotoField from '../components/ui/PhotoShowContact';
+import EditUserProfile from '../components/forms/UserProfileEdit';
+import ShowUserProfile from '../components/forms/UserProfileShow';
 
+const Button = ({ children, onClick, className = "", ...props }) => {
+  return (
+    <button
+      onClick={onClick}
+      className={`text-black dark:text-white hover:text-red-500 dark:hover:text-red-500 transition-colors duration-200 ${className}`}
+      {...props}
+    >
+      {children}
+    </button>
+  );
+};
 
 export default function UserProfile() {
   const navigate = useNavigate();
-  const { accessToken} = useAuthContext();
+  const { accessToken, authFetch } = useAuthContext(); 
 
   // State
   const [isLoading, setIsLoading] = useState(true);
@@ -16,14 +28,13 @@ export default function UserProfile() {
   const [userData, setUserData] = useState({});
   const [isEditing, setIsEditing] = useState(false);
 
-
   // GUARD to prevent duplicate API calls
   const userFetched = useRef(false);
 
   // Fetch user data on mount
   useEffect(() => {
     const fetchUserData = async () => {
-      if (!accessToken || userFetched.current) return;
+      if (!authFetch || userFetched.current) return; // ← Changed: check authFetch
 
       console.log('UserProfilePage: Starting user fetch');
       userFetched.current = true;
@@ -32,7 +43,7 @@ export default function UserProfile() {
         setIsLoading(true);
         setError(null);
 
-        const apiUserData = await authMe(accessToken);
+        const apiUserData = await authMe(accessToken); // ← Changed: pass authFetch
         console.log('User data received from API:', apiUserData);
         setUserData(apiUserData);
 
@@ -46,8 +57,7 @@ export default function UserProfile() {
     };
 
     fetchUserData();
-  }, [accessToken]);
-
+  }, [authFetch]); // ← Changed: authFetch dependency
 
   // Reset guard when component unmounts
   useEffect(() => {
@@ -69,7 +79,6 @@ export default function UserProfile() {
     setIsEditing(false);
   };
 
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-white dark:bg-gray-900">
@@ -88,24 +97,57 @@ export default function UserProfile() {
 
   return (
     <div
-      className="justify-items items-center min-h-screen bg-white dark:bg-gray-900 p-5 absolute top-[120px]"
+      className="flex flex-col items-center justify-center mx-auto lg:py-0 mt-10 bg-white dark:bg-black"
       style={{ fontFamily: "'IBM Plex Sans Devanagari', sans-serif" }}
     >
-      {!isEditing ? (
-        <ShowUserProfile
-          userData={userData}
-          onEdit={handleEdit}
-          accessToken={accessToken}
-          onNavigate={navigate}
+      {/* Back Button */}
+      <div className="relative mt-4 mb-4">
+        <Button
+          onClick={() => navigate(-1)}
+          className="text-black dark:text-white hover:text-red-500"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            className="size-5"
+          >
+            <path
+              fillRule="evenodd"
+              d="M17 10a.75.75 0 0 1-.75.75H5.612l4.158 3.96a.75.75 0 1 1-1.04 1.08l-5.5-5.25a.75.75 0 0 1 0-1.08l5.5-5.25a.75.75 0 1 1 1.04 1.08L5.612 9.25H16.25A.75.75 0 0 1 17 10Z"
+              clipRule="evenodd"
+            />
+          </svg>
+        </Button>
+      </div>
+
+
+      {/* Profile Photo */}
+      <div className="flex justify-center mb-6">
+        <PhotoField
+          photo={userData.profile_photo}
+          disabled={true}
+          size="large"
+          name={`${userData.first_name} ${userData.last_name}`}
         />
-      ) : (
-        <EditUserProfile
-          userData={userData}
-          onCancel={handleCancel}
-          onSaveSuccess={handleSaveSuccess}
-          accessToken={accessToken}
-        />
-      )}
-    </div>
-  );
+        </div>
+
+
+        {!isEditing ? (
+          <ShowUserProfile
+            userData={userData}
+            onEdit={handleEdit}
+            authFetch={authFetch} // ← Changed: pass authFetch instead of accessToken
+            onNavigate={navigate}
+          />
+        ) : (
+          <EditUserProfile
+            userData={userData}
+            onCancel={handleCancel}
+            onSaveSuccess={handleSaveSuccess}
+            authFetch={authFetch} // ← Changed: pass authFetch instead of accessToken
+          />
+        )}
+      </div>
+      );
 }

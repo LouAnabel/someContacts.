@@ -15,7 +15,7 @@ import Step2AdditionalInfo from './Step2AdditionalInfo';
 
 export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
   const navigate = useNavigate();
-  const { accessToken } = useAuthContext();
+  const { authFetch, accessToken, userData, logout } = useAuthContext();
 
   // multi-step form or optional sections
   const [currentStep, setCurrentStep] = useState(1);
@@ -84,7 +84,7 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
     const loadCategories = async () => {
       try {
         if (accessToken) {
-          const categoriesData = await getCategories(accessToken);
+          const categoriesData = await getCategories(authFetch);
           console.log('Categories loaded:', categoriesData);
           setCategories(categoriesData);
         }
@@ -94,7 +94,7 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
       }
     };
     loadCategories();
-  }, [accessToken]);
+  }, [accessToken, authFetch]);
 
 
   const addCategory = async () => {
@@ -586,7 +586,7 @@ export default function NewContactForm({ contactPhoto, onCreateSuccess }) {
       console.log('Creating contact with data:', contactData);
 
       // Create contact
-      const newContact = await createContact(accessToken, contactData);
+      const newContact = await createContact(authFetch, contactData);
 
       console.log('Contact created successfully:', newContact);
 

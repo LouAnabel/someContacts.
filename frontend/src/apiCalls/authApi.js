@@ -1,7 +1,7 @@
 
 
 // Get the appropriate backend URL based on environment
-const getBackendUrl = () => {
+const getBackendUrl = () =>{
     // In development, use local backend URL
     if (import.meta.env.DEV || import.meta.env.VITE_LOCAL_BACKEND_URL) {
         return import.meta.env.VITE_LOCAL_BACKEND_URL || 'http://127.0.0.1:5000';
@@ -144,8 +144,6 @@ export async function updateUserData(token, userData) {
     }
 }
 
-
-
 // Refresh access token using refresh token
 export async function refreshToken(refreshToken) {
     try {
@@ -213,6 +211,7 @@ export async function logoutAllDevices(token) {
 export default {
     sendRegisterData,
     sendLoginData,
+    getBackendUrl,
     authMe,
     refreshToken,
     logoutUser,

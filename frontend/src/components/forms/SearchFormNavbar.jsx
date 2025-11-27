@@ -6,6 +6,8 @@ import { useAuthContext } from '../../context/AuthContextProvider';
 import { useNavigate } from 'react-router-dom';
 
 const SearchForm = ({ onSearch }) => {
+
+  const { authFetch, accessToken } = useAuthContext(); 
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   
@@ -14,7 +16,7 @@ const SearchForm = ({ onSearch }) => {
   const [contacts, setContacts] = useState([]);
   const [filteredContacts, setFilteredContacts] = useState([]);
   const [showQuickResults, setShowQuickResults] = useState(false);
-  const {accessToken} = useAuthContext();
+
 
   const searchRef = useRef(null);
   const dropdownRef = useRef(null);
@@ -25,7 +27,7 @@ const SearchForm = ({ onSearch }) => {
     const loadContacts = async () => {
       try {
         if (accessToken) {
-          const contactsData = await getContacts(accessToken);
+          const contactsData = await getContacts(authFetch);
           setContacts(contactsData || []);
         }
       } catch (error) {
@@ -34,7 +36,7 @@ const SearchForm = ({ onSearch }) => {
       }
     };
     loadContacts();
-  }, [accessToken]);
+  }, [accessToken, authFetch]);
 
   // Handle quick search filtering
   useEffect(() => {
