@@ -28,11 +28,10 @@ const LoginForm = ({ onSubmit, isLoading = false }) => {
 
             if (data && data.access_token) {
                 // Store tokens (in context, localStorage, or state management)
-                localStorage.setItem('access_token', data.access_token);
-                localStorage.setItem('refresh_token', data.refresh_token);
+                console.log("data after Login:", data)
 
                 // Update auth context
-                login(data.access_token, data.user);
+                login(data.access_token, data.user, data.refresh_token);
                 console.log("Login successfull!")
 
                 // clear any previous errors & clear form data

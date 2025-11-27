@@ -38,7 +38,7 @@ function AuthContextProvider({ children }) {
         localStorage.setItem('accessToken', accessTokenValue)
         localStorage.setItem('userData', JSON.stringify(user))
         localStorage.setItem('refreshToken', refreshTokenValue)
-        
+
         setAccessToken(accessTokenValue)
         setUserData(user)
         setRefreshToken(refreshTokenValue)
@@ -48,7 +48,7 @@ function AuthContextProvider({ children }) {
         localStorage.removeItem('accessToken')
         localStorage.removeItem('refreshToken')
         localStorage.removeItem('userData')
-        
+
         setAccessToken(undefined)
         setRefreshToken(undefined)
         setUserData(undefined)
@@ -56,8 +56,9 @@ function AuthContextProvider({ children }) {
 
     const authFetch = useCallback(async (url, options = {}) => {
         const token = localStorage.getItem('accessToken');
-        
-        const response = await fetch(url, {
+        const refreshToken = localStorage.getItem('refreshToken');
+
+        const res = await fetch(url, {
             ...options,
             headers: {
                 'Content-Type': 'application/json',
@@ -66,13 +67,54 @@ function AuthContextProvider({ children }) {
             },
         });
 
-        // If 401, logout (backend says token is invalid/expired)
-        if (response.status === 401) {
+        // // If 401, logout (backend says token is invalid/expired)
+        // if (response.status === 401) {
+        //     logout();
+        //     throw new Error('Session expired - please login again');
+        // }
+
+        if (res.status !== 401) return res;
+
+        // 2) Try refresh
+        if (!refreshToken) {
             logout();
-            throw new Error('Session expired - please login again');
+            throw new Error('No refresh token');
         }
 
-        return response;
+        const refreshRes = await fetch('http://127.0.0.1:5000/auth/refresh', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${refreshToken}` },
+            
+        });
+
+        if (!refreshRes.ok) {
+            logout();
+            window.location.href = "http://localhost:5173/login"
+            throw new Error('Refresh failed');
+        }
+
+        const data = await refreshRes.json();
+        const newAccessToken = data.access_token;
+        // const newRefreshToken = data.refresh_token;
+
+        login(data.access_token, userData, refreshToken)
+
+        // 3) Retry original request with fresh token
+        res = await fetch(url, {
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...(options.headers || {}),
+                ...(token ? { Authorization: `Bearer ${newAccessToken}` } : {}),
+            },
+        });
+
+        if (res.status === 401) {
+            logout();
+            throw new Error('Unauthorized after refresh');
+        }
+
+        return res;
     }, [logout]);
 
     const contextValue = useMemo(() => ({

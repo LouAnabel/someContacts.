@@ -12,7 +12,7 @@ class Config:
     # JWT configuration
     JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'my_super_secret_jwt_key')
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(seconds=30) #FOR TEST PHASE! also possible 1h
-    JWT_REFRESH_TOKEN_EXPIRES = timedelta(hours=1) #FOR TEST PHASE! otherwise 24h
+    JWT_REFRESH_TOKEN_EXPIRES = timedelta(minutes=2) #FOR TEST PHASE! otherwise 24h
 
     instance_dir = os.path.join(basedir, 'instance')
     if not os.path.exists(instance_dir):
@@ -41,16 +41,16 @@ class TestingConfig(Config):
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
     
     # Very short tokens for testing
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(seconds=10)
-    JWT_REFRESH_TOKEN_EXPIRES = timedelta(minutes=1)
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(seconds=30)
+    JWT_REFRESH_TOKEN_EXPIRES = timedelta(minutes=2)
 
 
 class DevelopmentConfig(Config):
     DEBUG = True
 
     # Development-specific settings
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(hours=24)  # Longer for development convenience
-    JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=7)
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(seconds=30)  # Longer for development convenience
+    JWT_REFRESH_TOKEN_EXPIRES = timedelta(minutes=2)
 
     instance_dir = os.path.join(basedir, 'instance')
     if not os.path.exists(instance_dir):

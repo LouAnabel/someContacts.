@@ -257,6 +257,7 @@ export default function ShowUserProfile({ userData, onEdit, onNavigate, authFetc
             </div>
           )}
         </div>
+        
 
         {/* Edit Button */}
         <CircleButton
@@ -272,20 +273,25 @@ export default function ShowUserProfile({ userData, onEdit, onNavigate, authFetc
         >
           edit.
         </CircleButton>
-      </div>
 
-      {/* Bottom Navigation */}
-      <div className="w-full px-8 mt-2 space-y-0.25 max-w-[480px] pb-28">
-        <div className="text-black dark:text-white font-extralight block relative" style={{ fontSize: '16px' }}>
-          want to go{' '}
-          <button
-            onClick={() => onNavigate('/myspace/contacts')}
-            className="font-light text-red-500 hover:underline bg-transparent border-none cursor-pointer"
-          >
-            to contacts?
-          </button>
+        {/* Back Links */}
+        <div className="w-full px-6 max-w-[480px] ml-36 pt-1">
+          <div className="text-black dark:text-white font-extralight block relative"
+            style={{ fontSize: '16px' }}>
+            want to {' '}
+            <button
+              onClick={() => navigate('/myspace/contacts')}
+              className="font-extralight text-red-500 hover:underline bg-transparent border-none cursor-pointer"
+            >
+              cancel?
+            </button>
+          </div>
         </div>
+        
       </div>
+      
+      
+      
     </div>
   );
 }
